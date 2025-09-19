@@ -1,0 +1,1085 @@
+/************ TABLE OF CONTENTS ***************
+1. Fonts
+2. Reset
+3. Global
+4. Main Header / Style Two
+5. Banner Section / Style Two
+6. Featured Section / Two
+7. Subject Section
+8. Choose Section / Two
+9. Courses Section
+10. Skill Section
+11. Testimonial Section
+12. News Section / Two
+13. Main Footer
+14. Join Section
+15. Page Title
+16. Counter Section
+17. Team Section
+18. Faq's Section
+19. Event Section
+20. Course Detail Section
+21. Blog Widgets Section
+22. Not Found
+23. Contact Form Section
+24. Info Section
+25. Map Section
+
+**********************************************/
+
+/* 
+
+	font-family: 'Manrope', sans-serif;
+	font-family: 'Titillium Web', sans-serif;
+	
+*/
+
+/*** 
+
+====================================================================
+	Root Code Variables
+====================================================================
+
+ ***/
+
+/* Theme Color */
+
+:root {
+  /* #29eefa in decimal RGB */
+  --main-color: rgb(2, 57, 150);
+  --main-color-rgb: 41, 238, 250;
+
+  /* #202122 in decimal RGB */
+  --color-two: rgb(32, 33, 34);
+  --color-two-rgb: 32, 33, 34;
+
+  /* #0f0e0e in decimal RGB */
+  --color-three: rgb(15, 14, 14);
+  --color-three-rgb: 15, 14, 14;
+
+  /* #f0c767 in decimal RGB */
+  --color-four: rgb(2, 57, 150);
+  --color-four-rgb: 240, 199, 103;
+
+  /* #fbfbfb in decimal RGB */
+  --color-five: rgb(251, 251, 251);
+  --color-five-rgb: 251, 251, 251;
+
+  /* #fbfaf8 in decimal RGB */
+  --color-six: rgb(251, 250, 248);
+  --color-six-rgb: 251, 250, 248;
+
+  /* #2aeefa in decimal RGB */
+  --color-seven: rgb(42, 238, 250);
+  --color-seven-rgb: 42, 238, 250;
+
+  /* #e7e3dd in decimal RGB */
+  --color-eight: rgb(231, 227, 221);
+  --color-eight-rgb: 231, 227, 221;
+
+  /* #a9a9a9 in decimal RGB */
+  --color-nine: rgb(169, 169, 169);
+  --color-nine-rgb: 169, 169, 169;
+
+  /* #8a8a8a in decimal RGB */
+  --color-ten: rgb(138, 138, 138);
+  --color-ten-rgb: 138, 138, 138;
+
+  /* #c0c0c0 in decimal RGB */
+  --color-eleven: rgb(192, 192, 192);
+  --color-eleven-rgb: 192, 192, 192;
+
+  /* #f3eef5 in decimal RGB */
+  --color-twelve: rgb(243, 238, 245);
+  --color-twelve-rgb: 243, 238, 245;
+
+  /* #e1fdff in decimal RGB */
+  --color-thirteen: rgb(225, 253, 255);
+  --color-thirteen-rgb: 225, 253, 255;
+
+  /* #f8f5f0 in decimal RGB */
+  --color-fourteen: rgb(248, 245, 240);
+  --color-fourteen-rgb: 248, 245, 240;
+
+  /* #dbf8fa in decimal RGB */
+  --color-fifteen: rgb(219, 248, 250);
+  --color-fifteen-rgb: 219, 248, 250;
+
+  /* #13121d in decimal RGB */
+  --color-sixteen: rgb(19, 18, 29);
+  --color-sixteen-rgb: 19, 18, 29;
+
+  /* #e5e5e5 in decimal RGB */
+  --color-seventeen: rgb(229, 229, 229);
+  --color-seventeen-rgb: 229, 229, 229;
+
+  /* #c5e2e4 in decimal RGB */
+  --color-eighteen: rgb(197, 226, 228);
+  --color-eighteen-rgb: 197, 226, 228;
+
+  /* #161520 in decimal RGB */
+  --color-nineteen: rgb(22, 21, 32);
+  --color-nineteen-rgb: 22, 21, 32;
+
+  /* #e8e8e8 in decimal RGB */
+  --color-twenty: rgb(232, 232, 232);
+  --color-twenty-rgb: 232, 232, 232;
+
+  /* #424248 in decimal RGB */
+  --color-twentyone: rgb(66, 66, 72);
+  --color-twentyone-rgb: 66, 66, 72;
+
+  /* #727276 in decimal RGB */
+  --color-twentytwo: rgb(114, 114, 118);
+  --color-twentytwo-rgb: 114, 114, 118;
+
+  /* #e1f0f1 in decimal RGB */
+  --color-twentythree: rgb(225, 240, 241);
+  --color-twentythree-rgb: 225, 240, 241;
+
+  /* #343434 in decimal RGB */
+  --color-twentyfour: rgb(52, 52, 52);
+  --color-twentyfour-rgb: 52, 52, 52;
+
+  /* #242121 in decimal RGB */
+  --color-twentyfive: rgb(36, 33, 33);
+  --color-twentyfive-rgb: 36, 33, 33;
+
+  /* #393c3c in decimal RGB */
+  --color-twentysix: rgb(57, 60, 60);
+  --color-twentysix-rgb: 57, 60, 60;
+
+  /* #d5e1e2 in decimal RGB */
+  --color-twentyseven: rgb(213, 225, 226);
+  --color-twentyseven-rgb: 213, 225, 226;
+
+  /* #fdfaf4 in decimal RGB */
+  --color-twentyeight: rgb(253, 250, 244);
+  --color-twentyeight-rgb: 253, 250, 244;
+
+  /* #b2c6c7 in decimal RGB */
+  --color-twentynine: rgb(178, 198, 199);
+  --color-twentynine-rgb: 178, 198, 199;
+
+  /* #f7f1e6 in decimal RGB */
+  --color-thirty: rgb(247, 241, 230);
+  --color-thirty-rgb: 247, 241, 230;
+
+  /* #f3feff in decimal RGB */
+  --color-thirtyone: rgb(243, 254, 255);
+  --color-thirtyone-rgb: 243, 254, 255;
+
+  /* #faf9f5 in decimal RGB */
+  --color-thirtytwo: rgb(250, 249, 245);
+  --color-thirtytwo-rgb: 250, 249, 245;
+
+  /* #eead03 in decimal RGB */
+  --color-thirtythree: rgb(238, 173, 3);
+  --color-thirtythree-rgb: 238, 173, 3;
+
+  /* #eeeeee in decimal RGB */
+  --color-thirtyfour: rgb(238, 238, 238);
+  --color-thirtyfour-rgb: 238, 238, 238;
+
+  /* #f6f6f6 in decimal RGB */
+  --color-thirtyfive: rgb(246, 246, 246);
+  --color-thirtyfive-rgb: 246, 246, 246;
+
+  /* #eff4f9 in decimal RGB */
+  --color-thirtysix: rgb(239, 244, 249);
+  --color-thirtysix-rgb: 239, 244, 249;
+
+  /* #2f91ff in decimal RGB */
+  --color-thirtyseven: rgb(47, 145, 255);
+  --color-thirtyseven-rgb: 47, 145, 255;
+
+  /* #e1e7ec in decimal RGB */
+  --color-thirtyeight: rgb(225, 231, 236);
+  --color-thirtyeight-rgb: 225, 231, 236;
+
+  /* #e8eef3 in decimal RGB */
+  --color-thirtynine: rgb(232, 238, 243);
+  --color-thirtynine-rgb: 232, 238, 243;
+
+  /* #c7c7c7 in decimal RGB */
+  --color-fourty: rgb(199, 199, 199);
+  --color-fourty-rgb: 199, 199, 199;
+
+  /* #f5f5f5 in decimal RGB */
+  --color-fourtyone: rgb(245, 245, 245);
+  --color-fourtyone-rgb: 245, 245, 245;
+
+  /* #1c2035 in decimal RGB */
+  --color-fourtytwo: rgb(28, 32, 53);
+  --color-fourtytwo-rgb: 28, 32, 53;
+
+  /* #7b7c82 in decimal RGB */
+  --color-fourtythree: rgb(123, 124, 130);
+  --color-fourtythree-rgb: 123, 124, 130;
+
+  /* #e4e2e2 in decimal RGB */
+  --color-fourtyfour: rgb(228, 226, 226);
+  --color-fourtyfour-rgb: 228, 226, 226;
+
+  /* #eaf2f2 in decimal RGB */
+  --color-fourtyfive: rgb(234, 242, 242);
+  --color-fourtyfive-rgb: 234, 242, 242;
+
+  /* #f1bf4c in decimal RGB */
+  --color-fourtysix: rgb(241, 191, 76);
+  --color-fourtysix-rgb: 241, 191, 76;
+
+  /* #f0f8fa in decimal RGB */
+  --color-fourtyseven: rgb(240, 248, 250);
+  --color-fourtyseven-rgb: 240, 248, 250;
+
+  /* #fdf9f2 in decimal RGB */
+  --color-fourtyeight: rgb(253, 249, 242);
+  --color-fourtyeight-rgb: 253, 249, 242;
+
+  /* #f9f9f9 in decimal RGB */
+  --color-fourtynine: rgb(249, 249, 249);
+  --color-fourtynine-rgb: 249, 249, 249;
+
+  /* #848384 in decimal RGB */
+  --color-fifty: rgb(132, 131, 132);
+  --color-fifty-rgb: 132, 131, 132;
+
+  /* #0e0e10 in decimal RGB */
+  --color-fiftyone: rgb(14, 14, 16);
+  --color-fiftyone-rgb: 14, 14, 16;
+
+  /* #13171d in decimal RGB */
+  --color-fiftytwo: rgb(19, 23, 29);
+  --color-fiftytwo-rgb: 19, 23, 29;
+
+  /* #f7f7f6 in decimal RGB */
+  --color-fiftythree: rgb(247, 247, 246);
+  --color-fiftythree-rgb: 247, 247, 246;
+
+  /* #e0e0e0 in decimal RGB */
+  --color-fiftyfour: rgb(224, 224, 224);
+  --color-fiftyfour-rgb: 224, 224, 224;
+
+  /* #ededed in decimal RGB */
+  --color-fiftyfive: rgb(237, 237, 237);
+  --color-fiftyfive-rgb: 237, 237, 237;
+
+  /* #ffffff in decimal RGB */
+  --white-color: rgb(255, 255, 255);
+  --white-color-rgb: 255, 255, 255;
+
+  /* #000000 in decimal RGB */
+  --black-color: rgb(0, 0, 0);
+  --black-color-rgb: 0, 0, 0;
+
+  /* Fonts */
+  --font-family-Manrope: "Manrope", sans-serif;
+  --font-family-Titillium-Web: "Titillium Web", sans-serif;
+
+  /* Fonts Size's */
+
+  --font-10: 10px;
+  --font-12: 12px;
+  --font-13: 13px;
+  --font-14: 14px;
+  --font-15: 15px;
+  --font-16: 16px;
+  --font-17: 17px;
+  --font-18: 18px;
+  --font-20: 20px;
+  --font-22: 22px;
+  --font-24: 24px;
+  --font-26: 26px;
+  --font-28: 28px;
+  --font-30: 30px;
+  --font-32: 32px;
+  --font-34: 34px;
+  --font-35: 35px;
+  --font-36: 36px;
+  --font-40: 40px;
+  --font-42: 42px;
+  --font-44: 44px;
+  --font-45: 45px;
+  --font-48: 48px;
+  --font-50: 50px;
+  --font-52: 52px;
+  --font-54: 54px;
+  --font-56: 56px;
+  --font-58: 58px;
+  --font-60: 60px;
+  --font-62: 62px;
+  --font-64: 64px;
+  --font-65: 65px;
+  --font-66: 66px;
+  --font-68: 68px;
+  --font-70: 70px;
+  --font-72: 72px;
+  --font-74: 74px;
+  --font-76: 76px;
+  --font-78: 78px;
+  --font-80: 80px;
+  --font-90: 90px;
+  --font-100: 100px;
+  --font-110: 110px;
+  --font-120: 120px;
+  --font-150: 150px;
+  --font-160: 160px;
+  --font-200: 200px;
+
+  --margin-zero: 0px;
+
+  /* Margin Left Variables */
+  --margin-left-5: 5px;
+  --margin-left-10: 10px;
+  --margin-left-15: 15px;
+  --margin-left-20: 20px;
+  --margin-left-25: 25px;
+  --margin-left-30: 30px;
+  --margin-left-35: 35px;
+  --margin-left-40: 40px;
+  --margin-left-45: 45px;
+  --margin-left-50: 50px;
+  --margin-left-55: 55px;
+  --margin-left-60: 60px;
+  --margin-left-65: 65px;
+  --margin-left-70: 70px;
+  --margin-left-75: 75px;
+  --margin-left-80: 80px;
+  --margin-left-85: 85px;
+  --margin-left-90: 90px;
+  --margin-left-95: 95px;
+  --margin-left-100: 100px;
+
+  /* Margin Top Variables */
+  --margin-top-5: 5px;
+  --margin-top-10: 10px;
+  --margin-top-15: 15px;
+  --margin-top-20: 20px;
+  --margin-top-25: 25px;
+  --margin-top-30: 30px;
+  --margin-top-35: 35px;
+  --margin-top-40: 40px;
+  --margin-top-45: 45px;
+  --margin-top-50: 50px;
+  --margin-top-55: 55px;
+  --margin-top-60: 60px;
+  --margin-top-65: 65px;
+  --margin-top-70: 70px;
+  --margin-top-75: 75px;
+  --margin-top-80: 80px;
+  --margin-top-85: 85px;
+  --margin-top-90: 90px;
+  --margin-top-95: 95px;
+  --margin-top-100: 100px;
+  --margin-top-110: 110px;
+
+  /* Margin Right Variables */
+  --margin-right-5: 5px;
+  --margin-right-10: 10px;
+  --margin-right-15: 15px;
+  --margin-right-20: 20px;
+  --margin-right-25: 25px;
+  --margin-right-30: 30px;
+  --margin-right-35: 35px;
+  --margin-right-40: 40px;
+  --margin-right-45: 45px;
+  --margin-right-50: 50px;
+  --margin-right-55: 55px;
+  --margin-right-60: 60px;
+  --margin-right-65: 65px;
+  --margin-right-70: 70px;
+  --margin-right-75: 75px;
+  --margin-right-80: 80px;
+  --margin-right-85: 85px;
+  --margin-right-90: 90px;
+  --margin-right-95: 95px;
+  --margin-right-100: 100px;
+  --margin-right-110: 110px;
+
+  /* Margin Bottom Variables */
+  --margin-bottom-5: 5px;
+  --margin-bottom-10: 10px;
+  --margin-bottom-15: 15px;
+  --margin-bottom-20: 20px;
+  --margin-bottom-25: 25px;
+  --margin-bottom-30: 30px;
+  --margin-bottom-35: 35px;
+  --margin-bottom-40: 40px;
+  --margin-bottom-45: 45px;
+  --margin-bottom-50: 50px;
+  --margin-bottom-55: 55px;
+  --margin-bottom-60: 60px;
+  --margin-bottom-65: 65px;
+  --margin-bottom-70: 70px;
+  --margin-bottom-75: 75px;
+  --margin-bottom-80: 80px;
+  --margin-bottom-85: 85px;
+  --margin-bottom-90: 90px;
+  --margin-bottom-95: 95px;
+  --margin-bottom-100: 100px;
+  --margin-bottom-150: 150px;
+  --margin-bottom-200: 200px;
+
+  --padding-zero: 0px;
+
+  /* Padding Left Variables */
+  --padding-left-5: 5px;
+  --padding-left-10: 10px;
+  --padding-left-15: 15px;
+  --padding-left-20: 20px;
+  --padding-left-25: 25px;
+  --padding-left-30: 30px;
+  --padding-left-35: 35px;
+  --padding-left-40: 40px;
+  --padding-left-45: 45px;
+  --padding-left-50: 50px;
+  --padding-left-55: 55px;
+  --padding-left-60: 60px;
+  --padding-left-65: 65px;
+  --padding-left-70: 70px;
+  --padding-left-75: 75px;
+  --padding-left-80: 80px;
+  --padding-left-85: 85px;
+  --padding-left-90: 90px;
+  --padding-left-95: 95px;
+  --padding-left-100: 100px;
+  --padding-left-100: 110px;
+  --padding-left-120: 120px;
+  --padding-left-130: 130px;
+  --padding-left-140: 140px;
+  --padding-left-150: 150px;
+  --padding-left-160: 160px;
+  --padding-left-170: 170px;
+  --padding-left-180: 180px;
+  --padding-left-190: 190px;
+  --padding-left-200: 200px;
+  --padding-left-240: 240px;
+  --padding-left-290: 290px;
+
+  /* Padding Top Variables */
+  --padding-top-5: 5px;
+  --padding-top-10: 10px;
+  --padding-top-15: 15px;
+  --padding-top-20: 20px;
+  --padding-top-25: 25px;
+  --padding-top-30: 30px;
+  --padding-top-35: 35px;
+  --padding-top-40: 40px;
+  --padding-top-45: 45px;
+  --padding-top-50: 50px;
+  --padding-top-55: 55px;
+  --padding-top-60: 60px;
+  --padding-top-65: 65px;
+  --padding-top-70: 70px;
+  --padding-top-75: 75px;
+  --padding-top-80: 80px;
+  --padding-top-85: 85px;
+  --padding-top-90: 90px;
+  --padding-top-95: 95px;
+  --padding-top-100: 100px;
+  --padding-top-110: 110px;
+  --padding-top-120: 120px;
+  --padding-top-130: 130px;
+  --padding-top-140: 140px;
+  --padding-top-150: 150px;
+  --padding-top-200: 200px;
+
+  /* Padding Right Variables */
+  --padding-right-5: 5px;
+  --padding-right-10: 10px;
+  --padding-right-15: 15px;
+  --padding-right-20: 20px;
+  --padding-right-25: 25px;
+  --padding-right-30: 30px;
+  --padding-right-35: 35px;
+  --padding-right-40: 40px;
+  --padding-right-45: 45px;
+  --padding-right-50: 50px;
+  --padding-right-55: 55px;
+  --padding-right-60: 60px;
+  --padding-right-65: 65px;
+  --padding-right-70: 70px;
+  --padding-right-75: 75px;
+  --padding-right-80: 80px;
+  --padding-right-85: 85px;
+  --padding-right-90: 90px;
+  --padding-right-95: 95px;
+  --padding-right-100: 100px;
+  --padding-right-110: 110px;
+  --padding-right-150: 150px;
+  --padding-right-160: 160px;
+  --padding-right-170: 170px;
+  --padding-right-180: 180px;
+  --padding-right-200: 200px;
+  --padding-right-220: 220px;
+  --padding-right-240: 240px;
+  --padding-right-250: 250px;
+  --padding-right-260: 260px;
+
+  /* Padding Bottom Variables */
+  --padding-bottom-5: 5px;
+  --padding-bottom-10: 10px;
+  --padding-bottom-15: 15px;
+  --padding-bottom-20: 20px;
+  --padding-bottom-25: 25px;
+  --padding-bottom-30: 30px;
+  --padding-bottom-35: 35px;
+  --padding-bottom-40: 40px;
+  --padding-bottom-45: 45px;
+  --padding-bottom-50: 50px;
+  --padding-bottom-55: 55px;
+  --padding-bottom-60: 60px;
+  --padding-bottom-65: 65px;
+  --padding-bottom-70: 70px;
+  --padding-bottom-75: 75px;
+  --padding-bottom-80: 80px;
+  --padding-bottom-85: 85px;
+  --padding-bottom-90: 90px;
+  --padding-bottom-95: 95px;
+  --padding-bottom-100: 100px;
+  --padding-bottom-120: 120px;
+  --padding-bottom-130: 130px;
+  --padding-bottom-150: 150px;
+  --padding-bottom-200: 200px;
+  --padding-bottom-250: 250px;
+}
+
+/*** 
+
+====================================================================
+	Reset
+====================================================================
+
+ ***/
+
+* {
+  margin: 0px;
+  padding: 0px;
+  border: none;
+  outline: none;
+}
+
+/*** 
+
+====================================================================
+	Global Settings
+====================================================================
+
+***/
+
+body {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.6em;
+  color: var(--dark-color);
+  -webkit-font-smoothing: antialiased;
+  -moz-font-smoothing: antialiased;
+  font-family: var(--font-family-Manrope);
+}
+
+.bordered-layout .page-wrapper {
+  padding: 0px 50px 0px;
+}
+
+a {
+  text-decoration: none;
+  cursor: pointer;
+  color: var(--main-color);
+}
+
+button,
+a:hover,
+a:focus,
+a:visited {
+  text-decoration: none;
+  outline: none !important;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  position: relative;
+  margin: 0px;
+  background: none;
+  font-weight: 700;
+  font-family: var(--font-family-Titillium-Web);
+}
+
+input,
+button,
+select,
+textarea {
+}
+
+textarea {
+  overflow: hidden;
+}
+
+a {
+  -webkit-transition: all 300ms ease;
+  -ms-transition: all 300ms ease;
+  -o-transition: all 300ms ease;
+  -moz-transition: all 300ms ease;
+  transition: all 300ms ease;
+}
+
+.text,
+p {
+  position: relative;
+  line-height: 1.8em;
+  font-size: var(--font-15);
+  color: var(--dark-color);
+}
+
+/* Typography */
+
+h1 {
+  line-height: 90px;
+  font-size: var(--font-90);
+}
+
+h2 {
+  line-height: 1.2em;
+  font-size: var(--font-42);
+}
+
+h3 {
+  line-height: 1.3em;
+  font-size: var(--font-36);
+}
+
+h4 {
+  line-height: 1.4em;
+  font-size: var(--font-24);
+}
+
+h5 {
+  line-height: 1.4em;
+  font-size: var(--font-22);
+}
+
+h6 {
+  line-height: 1.6em;
+  font-size: var(--font-18);
+}
+
+.auto-container {
+  position: static;
+  max-width: 1200px;
+  padding: 0px 50px;
+  margin: 0 auto;
+}
+
+.medium-container {
+  position: static;
+  max-width: 1000px;
+  padding: 0px 15px;
+  margin: 0 auto;
+}
+
+.page-wrapper {
+  position: relative;
+  margin: 0 auto;
+  width: 100%;
+  min-width: 300px;
+}
+
+ul,
+li {
+  list-style: none;
+  padding: 0px;
+  margin: 0px;
+}
+
+img {
+  display: inline-block;
+  max-width: 100%;
+}
+
+.theme-btn {
+  cursor: pointer;
+  display: inline-block;
+  transition: all 0.3s ease;
+  -moz-transition: all 0.3s ease;
+  -webkit-transition: all 0.3s ease;
+  -ms-transition: all 0.3s ease;
+  -o-transition: all 0.3s ease;
+}
+
+.centered {
+  text-align: center;
+}
+
+::-webkit-input-placeholder {
+  color: inherit;
+}
+::-moz-input-placeholder {
+  color: inherit;
+}
+::-ms-input-placeholder {
+  color: inherit;
+}
+
+.preloader {
+  position: fixed;
+  left: 0px;
+  top: 0px;
+  width: 100%;
+  height: 100%;
+  z-index: 999999;
+  background-color: #ffffff;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-image: url(../images/icons/preloader.svg);
+  background-size: 110px;
+}
+
+/***
+
+====================================================================
+	Scroll To Top style
+====================================================================
+
+***/
+
+.scroll-to-top {
+  position: fixed;
+  bottom: 15px;
+  right: 15px;
+  width: 40px;
+  height: 40px;
+  color: var(--main-color);
+  font-size: var(--font-16);
+  text-transform: uppercase;
+  line-height: 38px;
+  text-align: center;
+  z-index: 100;
+  cursor: pointer;
+  background: var(--white-color);
+  display: none;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.15);
+  -webkit-transition: all 300ms ease;
+  -ms-transition: all 300ms ease;
+  -o-transition: all 300ms ease;
+  -moz-transition: all 300ms ease;
+  transition: all 300ms ease;
+}
+
+.scroll-to-top:hover {
+  color: var(--white-color);
+  background: var(--main-color);
+}
+
+/* List Style One */
+
+.list-style-one {
+  position: relative;
+}
+
+.list-style-one li {
+  position: relative;
+  font-weight: 400;
+  line-height: 1.8em;
+  color: var(--white-color);
+  font-size: var(--font-14);
+  margin-bottom: var(--margin-bottom-10);
+  padding-left: var(--padding-left-30);
+}
+
+.list-style-one li a {
+  position: relative;
+  color: var(--white-color);
+  -webkit-transition: all 300ms ease;
+  -moz-transition: all 300ms ease;
+  -ms-transition: all 300ms ease;
+  -o-transition: all 300ms ease;
+  transition: all 300ms ease;
+}
+
+.list-style-one li a:hover {
+  color: var(--main-color);
+}
+
+.list-style-one li .icon {
+  position: absolute;
+  left: 0px;
+  top: 5px;
+  color: var(--main-color);
+  font-size: var(--font-18);
+  line-height: 1em;
+  font-weight: 300;
+  -webkit-transition: all 300ms ease;
+  -moz-transition: all 300ms ease;
+  -ms-transition: all 300ms ease;
+  -o-transition: all 300ms ease;
+  transition: all 300ms ease;
+}
+
+/* Btn Style One */
+
+.btn-style-one {
+  position: relative;
+  line-height: 30px;
+  font-weight: 400;
+  overflow: hidden;
+  background: none;
+  text-align: center;
+  border-radius: 2px;
+  display: inline-grid;
+  padding: 13px 30px;
+  font-size: var(--font-16);
+  text-transform: capitalize;
+  color: var(--white-color);
+  background-color: var(--color-two);
+}
+
+.btn-style-one:before {
+  position: absolute;
+  content: "";
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  opacity: 0;
+  -webkit-transition: all 0.4s;
+  -moz-transition: all 0.4s;
+  -o-transition: all 0.4s;
+  transition: all 0.4s;
+  -webkit-transform: scale(0.2, 1);
+  transform: scale(0.2, 1);
+  background-color: var(--color-four);
+}
+
+.btn-style-one:hover::before {
+  opacity: 1;
+  -webkit-transform: scale(1, 1);
+  transform: scale(1, 1);
+}
+
+.btn-style-one .txt {
+  position: relative;
+  z-index: 1;
+}
+
+.btn-style-one i {
+  position: relative;
+  top: 2px;
+  font-style: normal;
+  line-height: 1em;
+  margin-right: 8px;
+}
+
+.btn-style-one:hover {
+  color: var(--white-color);
+}
+
+/* Btn Style Two */
+
+.btn-style-two {
+  position: relative;
+  line-height: 30px;
+  font-weight: 600;
+  text-align: center;
+  border-radius: 2px;
+  padding: 14px 40px;
+  color: var(--color-two);
+  display: inline-grid;
+  font-size: var(--font-16);
+  text-transform: uppercase;
+  background-color: var(--color-seven);
+}
+
+.btn-style-two:before {
+  position: absolute;
+  content: "";
+  top: 5px;
+  left: 5px;
+  right: -5px;
+  bottom: -5px;
+  z-index: -2;
+  border-radius: 2px;
+  -webkit-transition: all 0.4s;
+  -moz-transition: all 0.4s;
+  -o-transition: all 0.4s;
+  transition: all 0.4s;
+  background-color: var(--color-two);
+}
+
+.btn-style-two:hover::before {
+  background-color: var(--color-seven);
+}
+
+.btn-style-two .txt {
+  position: relative;
+  z-index: 1;
+}
+
+.btn-style-two:hover {
+  color: var(--white-color);
+  background-color: var(--color-two);
+}
+
+/* Btn Style Three */
+
+.btn-style-three {
+  position: relative;
+  line-height: 24px;
+  font-weight: 600;
+  overflow: hidden;
+  background: none;
+  text-align: center;
+  border-radius: 3px;
+  display: inline-grid;
+      padding: 5px 50px;
+  font-size: var(--font-16);
+  text-transform: uppercase;
+  color: var(--color-three);
+  border: 1px solid var(--color-three);
+}
+
+.btn-style-three:before {
+  position: absolute;
+  content: "";
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  opacity: 0;
+  -webkit-transition: all 0.4s;
+  -moz-transition: all 0.4s;
+  -o-transition: all 0.4s;
+  transition: all 0.4s;
+  -webkit-transform: scale(0.2, 1);
+  transform: scale(0.2, 1);
+  background-color: var(--color-three);
+}
+
+.btn-style-three:hover::before {
+  opacity: 1;
+  -webkit-transform: scale(1, 1);
+  transform: scale(1, 1);
+}
+
+.btn-style-three .txt {
+  position: relative;
+  z-index: 1;
+}
+
+.btn-style-three:hover {
+  color: var(--white-color);
+}
+
+/* Btn Style Four */
+
+.btn-style-four {
+  position: relative;
+  line-height: 30px;
+  font-weight: 500;
+  overflow: hidden;
+  background: none;
+  text-align: center;
+  border-radius: 3px;
+  padding: 15px 51px;
+  display: inline-grid;
+  font-size: var(--font-16);
+  text-transform: capitalize;
+  color: var(--white-color);
+  background-color: var(--color-three);
+}
+
+.btn-style-four:before {
+  position: absolute;
+  content: "";
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  opacity: 0;
+  -webkit-transition: all 0.4s;
+  -moz-transition: all 0.4s;
+  -o-transition: all 0.4s;
+  transition: all 0.4s;
+  -webkit-transform: scale(0.2, 1);
+  transform: scale(0.2, 1);
+  background-color: var(--color-four);
+}
+
+.btn-style-four:hover::before {
+  opacity: 1;
+  -webkit-transform: scale(1, 1);
+  transform: scale(1, 1);
+}
+
+.btn-style-four .txt {
+  position: relative;
+  z-index: 1;
+}
+
+.btn-style-four:hover {
+  color: var(--white-color);
+}
+
+.theme_color {
+  color: var(--main-color);
+}
+
+img {
+  display: inline-block;
+  max-width: 100%;
+  height: auto;
+}
+
+/*** 
+
+====================================================================
+	Section Title
+====================================================================
+
+***/
+
+.sec-title {
+  position: relative;
+  margin-bottom: var(--margin-bottom-45);
+}
+
+.sec-title .title {
+  position: relative;
+  font-weight: 500;
+  color: rgb(99, 96, 96);
+  font-size: var(--font-20);
+  text-transform: capitalize;
+  margin-bottom: var(--margin-bottom-15);
+}
+
+.sec-title .text {
+  line-height: 34px;
+  font-size: var(--font-18);
+  color: var(--color-sixteen);
+  margin-top: var(--margin-top-15);
+}
+
+.sec-title h2 {
+  font-weight: 700;
+  color: var(--color-three);
+}
+
+.sec-title.light .text,
+.sec-title.light h2 {
+  color: var(--white-color);
+}
+
+.sec-title.centered {
+  text-align: center !important;
+}
+
+.sec-title.centered .separator {
+  margin: 0 auto;
+  margin-bottom: var(--margin-bottom-25);
+}

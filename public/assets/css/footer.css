@@ -1,0 +1,250 @@
+/*** 
+
+====================================================================
+	Main Footer
+====================================================================
+
+***/
+
+.main-footer {
+  position: relative;
+  background-color: #045279;
+}
+
+.main-footer .pattern-one {
+  position: absolute;
+  left: 5%;
+  width: 143px;
+  height: 84px;
+  bottom: 22%;
+}
+
+.main-footer .pattern-two {
+  position: absolute;
+  right: 7%;
+  width: 29px;
+  height: 59px;
+  top: 18%;
+}
+
+.main-footer .pattern-three {
+  position: absolute;
+  left: 7%;
+  width: 38px;
+  height: 43px;
+  top: 18%;
+  opacity: 0.5;
+}
+
+.main-footer .widgets-section {
+  position: relative;
+  padding: 100px 0px 70px;
+}
+
+.main-footer .footer-column {
+  position: relative;
+  margin-bottom: var(--margin-bottom-30);
+}
+
+.main-footer h4 {
+  font-weight: 600;
+  color: rgb(235, 235, 235);
+  margin-bottom: var(--margin-bottom-30);
+  font-family: var(--font-family-Titillium-Web);
+}
+
+.main-footer .logo {
+  position: relative;
+  margin-bottom: var(--margin-bottom-20);
+}
+
+.main-footer .logo-widget .text {
+  font-size: var(--font-18);
+  color: rgb(235, 235, 235);
+  margin-bottom: var(--margin-bottom-35);
+}
+
+.main-footer .social-box {
+  position: relative;
+}
+
+.main-footer .social-box li {
+  position: relative;
+  display: inline-block;
+  margin-right: var(--margin-right-10);
+}
+
+.main-footer .social-box li a {
+  position: relative;
+  width: 42px;
+  height: 42px;
+  font-weight: 500;
+  line-height: 42px;
+  border-radius: 3px;
+  text-align: center;
+  display: inline-block;
+  font-family: "flaticon";
+  font-size: var(--font-16);
+  color: var(--color-twentyfour);
+  background-color: var(--white-color);
+}
+
+.main-footer .social-box li a:hover {
+  background-color: var(--color-twentyfour);
+  color: var(--white-color);
+}
+
+/* List Links */
+
+.main-footer .list-link {
+  position: relative;
+}
+
+.main-footer .list-link li {
+  position: relative;
+  margin-bottom: var(--margin-bottom-15);
+}
+
+.main-footer .list-link li a {
+  position: relative;
+  font-size: var(--font-16);
+  color: rgb(235, 235, 235);
+}
+
+.main-footer .contact-widget ul li {
+  position: relative;
+  line-height: 30px;
+  font-size: var(--font-16);
+  color: rgb(235, 235, 235);
+  padding-left: var(--padding-left-45);
+  margin-bottom: var(--margin-bottom-20);
+}
+
+.main-footer .contact-widget ul li .icon {
+  position: absolute;
+  left: 0px;
+  top: 8px;
+  line-height: 1em;
+  font-size: var(--font-30);
+  color: rgb(235, 235, 235);
+}
+
+.main-footer .contact-widget ul li a {
+  position: relative;
+  color: rgb(235, 235, 235);
+}
+
+.main-footer .contact-widget ul li:last-child .icon {
+  top: 4px;
+  font-size: var(--font-24);
+}
+
+.main-footer .newsletter-widget .text {
+  font-weight: 500;
+  line-height: 32px;
+  font-size: var(--font-18);
+  color: var(--color-three);
+  margin-bottom: var(--margin-bottom-35);
+}
+
+/* Newsletter Box */
+
+.newsletter-box {
+  position: relative;
+}
+
+.newsletter-box .form-group {
+  position: relative;
+  margin: 0px;
+}
+
+.newsletter-box .form-group input[type="text"],
+.newsletter-box .form-group input[type="email"] {
+  position: relative;
+  line-height: 43px;
+  display: block;
+  height: 60px;
+  width: 100%;
+  border-radius: 5px;
+  box-shadow: inherit;
+  font-size: var(--font-14);
+  transition: all 500ms ease;
+  -moz-transition: all 500ms ease;
+  -webkit-transition: all 500ms ease;
+  -ms-transition: all 500ms ease;
+  -o-transition: all 500ms ease;
+  padding: 10px 15px 10px 25px;
+  color: var(--color-twentyfive);
+  background: none;
+  font-family: var(--font-family-Manrope);
+  border: 1px solid rgb(235, 235, 235);
+}
+
+.newsletter-box .form-group input::placeholder,
+.newsletter-box .form-group textarea::placeholder {
+  color: rgba(var(--color-twentyfive-rgb), 0.5);
+}
+
+.newsletter-box .form-group button {
+  position: absolute;
+  right: 4px;
+  top: 4px;
+  line-height: 24px;
+  font-weight: 500;
+  padding: 14px 28px;
+  border-radius: 5px;
+  font-family: "flaticon";
+  font-size: var(--font-15);
+  color: var(--white-color);
+  text-transform: capitalize;
+  background-color: var(--color-twentyfour);
+  font-family: var(--font-family-Manrope);
+}
+
+.newsletter-box .form-group button:hover {
+  background-color: var(--main-color);
+}
+
+.main-footer .phone-box {
+  position: relative;
+  margin-top: var(--margin-top-30);
+}
+
+.main-footer .phone-box .box-inner {
+  position: relative;
+  line-height: 30px;
+  font-size: var(--font-16);
+  color: var(--color-twentysix);
+  padding-left: var(--padding-left-70);
+}
+
+.main-footer .phone-box .icon {
+  position: absolute;
+  left: 0px;
+  top: 5px;
+  width: 56px;
+  height: 56px;
+  line-height: 56px;
+  text-align: center;
+  border-radius: 4px;
+  font-size: var(--font-30);
+  color: var(--black-color);
+  background-color: var(--main-color);
+}
+
+.main-footer .footer-bottom {
+  position: relative;
+  padding: 26px 0px;
+  background-color: var(--color-twentyseven);
+}
+
+.main-footer .footer-bottom .copyright {
+  position: relative;
+  font-size: var(--font-15);
+  color: var(--color-three);
+}
+
+.main-footer .footer-bottom .text {
+  text-align: right;
+  color: var(--color-three);
+}

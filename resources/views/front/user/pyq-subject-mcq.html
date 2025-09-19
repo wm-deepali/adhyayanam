@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <script src="./js/header.js"></script>
+</head>
+
+<body class="hidden-bar-wrapper">
+  <!-- Page Title -->
+  <section class="page-title">
+    <div class="auto-container">
+      <h2>Adhyayanam</h2>
+      <ul class="bread-crumb clearfix">
+        <li><a href="index.html">Home</a></li>
+        <li>PYQ Geography MCQ 2023</li>
+      </ul>
+    </div>
+  </section>
+  <!-- End Page Title -->
+  <section class="course-page-section-two">
+    <div class="auto-container">
+
+
+      <div class="smaterial-boxs">
+        <div class="content">
+          <h3 class="osd sm">MCQ</h3>
+          <p class="text-justify">The G20 or Group of 20 is an intergovernmental forum <strong>founded in 1999,</strong>
+            comprising <strong>19 sovereign countrie</strong>s and two organisations- the <strong>European Union (EU),
+              and the African Union (AU).</strong> G20 is a significant grouping as its members account for<strong> 80%
+              of world GDP, 75% of international trade</strong> and <strong>two-thirds of the global
+              population.</strong> These are the <strong>largest economies in the world</strong> and meet annually to
+            discuss <strong>economic, political and social initiatives.</strong></p>
+        </div>
+
+      </div>
+      <div class="mcq-details">
+        <h2 class="mcq-hading">Multiple choice questions (MCQ's)</h2>
+        <div class="mcq-cont">
+          <h4>1) HTML stands for -</h4>
+          <ol class="pointsa">
+            <li>HighText Machine Language</li>
+            <li>HyperText and links Markup Language</li>
+            <li>HyperText Markup Language</li>
+            <li>None of these</li>
+          </ol>
+          <div class="show-ans-btn">
+            <button class="showanswer" onclick="showhide('answer1');">
+              <img src="./images/eye-black.png" />
+              <div id="btntext1">Show/Hide Answer</div>
+            </button>
+          </div>
+          <div class="testanswer" id="answer1" style="display: none;">
+            <p>HyperText simply means "Text within Text." A text has a link within it, is a hypertext. A markup language
+              is a computer language that is used to apply layout and formatting conventions to a text document.</p>
+          </div>
+        </div>
+        <div class="mcq-cont">
+          <h4>1) HTML stands for -</h4>
+          <ol class="pointsa">
+            <li>HighText Machine Language</li>
+            <li>HyperText and links Markup Language</li>
+            <li>HyperText Markup Language</li>
+            <li>None of these</li>
+          </ol>
+          <div class="show-ans-btn">
+            <button class="showanswer" id="cclick" onclick="showhide('answer1');">
+              <img src="./images/eye-black.png" />
+              <div id="btntext1">Show/Hide Answer</div>
+            </button>
+          </div>
+          <div class="testanswer" id="answer1" style="display: none;">
+            <p>HyperText simply means "Text within Text." A text has a link within it, is a hypertext. A markup language
+              is a computer language that is used to apply layout and formatting conventions to a text document.</p>
+          </div>
+        </div>
+      </div>
+
+  </section>
+
+
+  <!-- Main Footer -->
+  <script src="./js/footer.js"></script>
+
+  <!--End PageWrapper-->
+  <script>
+    function showhide(id) {
+      var divelement = document.getElementById(id);
+      if (divelement.style.display == 'none')
+        divelement.style.display = 'block';
+      else
+        divelement.style.display = 'none';
+    }
+  </script>
+
+</body>
+
+
+</html>

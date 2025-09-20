@@ -27,4 +27,9 @@ class Chapter extends Model
     {
         return $this->belongsTo(Subject::class, 'subject_id');
     }
+
+    public function studyMaterials()
+    {
+        return $this->hasMany(StudyMaterial::class, 'chapter_id');
+    }
 }

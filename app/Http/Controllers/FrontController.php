@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\BatchProgramme;
 use App\Models\Blog;
+use App\Models\Chapter;
 use App\Models\Question;
 use App\Models\Test;
 use App\Models\CallBack;
@@ -36,6 +37,7 @@ use App\Models\SocialMedia;
 use App\Models\Team;
 use App\Models\TestPlanner;
 use App\Models\Topic;
+use App\Models\CourseTopic;
 use App\Models\UpcomingExam;
 use Illuminate\Http\Request;
 use Validator;
@@ -44,100 +46,112 @@ use App\Helpers\LogActivity;
 
 class FrontController extends Controller
 {
-    public function aboutIndex(){
+    public function aboutIndex()
+    {
         $data['about'] = Page::first();
         $data['faqs'] = Faq::all();
-        $data['seo'] = SEO::where('page',$data['about']->heading1.' '.$data['about']->heading2??'')->first();
-        return view('front.user.about-us',$data);
+        $data['seo'] = SEO::where('page', $data['about']->heading1 . ' ' . $data['about']->heading2 ?? '')->first();
+        return view('front.user.about-us', $data);
     }
 
-    public function termIndex(){
+    public function termIndex()
+    {
         $data['term'] = Page::skip(1)->first();
-        $data['seo'] = SEO::where('page',$data['term']->heading1.' '.$data['term']->heading2??'')->first();
-        return view('front.user.term-and-condition',$data);
+        $data['seo'] = SEO::where('page', $data['term']->heading1 . ' ' . $data['term']->heading2 ?? '')->first();
+        return view('front.user.term-and-condition', $data);
     }
 
-    public function ourTeamIndex(){
-        $data['teams'] = Team::orderBy('created_at','DESC')->get();
-        return view('front.user.our-team',$data);
+    public function ourTeamIndex()
+    {
+        $data['teams'] = Team::orderBy('created_at', 'DESC')->get();
+        return view('front.user.our-team', $data);
     }
 
-    public function privacyIndex(){
+    public function privacyIndex()
+    {
         $data['privacy'] = Page::skip(2)->first();
-        $data['seo'] = SEO::where('page',$data['privacy']->heading1.' '.$data['privacy']->heading2??'')->first();
-        return view('front.user.privacy-policy',$data);
+        $data['seo'] = SEO::where('page', $data['privacy']->heading1 . ' ' . $data['privacy']->heading2 ?? '')->first();
+        return view('front.user.privacy-policy', $data);
     }
 
-    public function refundCancellationIndex(){
+    public function refundCancellationIndex()
+    {
         $data['refund'] = Page::skip(3)->first();
-        $data['seo'] = SEO::where('page',$data['refund']->heading1.' '.$data['refund']->heading2??'')->first();
-        return view('front.user.refunds-and-cancellation-policy',$data);
+        $data['seo'] = SEO::where('page', $data['refund']->heading1 . ' ' . $data['refund']->heading2 ?? '')->first();
+        return view('front.user.refunds-and-cancellation-policy', $data);
     }
-    public function cookiesIndex(){
+    public function cookiesIndex()
+    {
         $data['cookies'] = Page::skip(4)->first();
-        $data['seo'] = SEO::where('page',$data['cookies']->heading1.' '.$data['cookies']->heading2??'')->first();
-        return view('front.user.cookies-policy',$data);
+        $data['seo'] = SEO::where('page', $data['cookies']->heading1 . ' ' . $data['cookies']->heading2 ?? '')->first();
+        return view('front.user.cookies-policy', $data);
     }
 
-    public function faqIndex(){
+    public function faqIndex()
+    {
         $data['faqs'] = Faq::all();
-        return view('front.user.faq',$data);
+        return view('front.user.faq', $data);
     }
 
-    public function visionIndex(){
+    public function visionIndex()
+    {
         $data['vision'] = Page::skip(5)->first();
-        $data['seo'] = SEO::where('page',$data['vision']->heading1.' '.$data['vision']->heading2??'')->first();
-        return view('front.user.vision-mission',$data);
+        $data['seo'] = SEO::where('page', $data['vision']->heading1 . ' ' . $data['vision']->heading2 ?? '')->first();
+        return view('front.user.vision-mission', $data);
     }
 
-    public function blogIndex(){
+    public function blogIndex()
+    {
         $data['blogs'] = Blog::with('user')->get();
-        return view('front.user.blog',$data);
+        return view('front.user.blog', $data);
     }
 
-    public function blogDetailsIndex($id){
+    public function blogDetailsIndex($id)
+    {
         $data['blog'] = Blog::with('user')->findOrFail($id);
         $blogType = $data['blog']->type;
 
         // Retrieve the latest blogs of the same type, excluding the current blog
         $relatedBlogs = Blog::where('type', $blogType)
-                            ->where('id', '!=', $id)
-                            ->latest()
-                            ->take(3)
-                            ->get();
+            ->where('id', '!=', $id)
+            ->latest()
+            ->take(3)
+            ->get();
 
         // Check if additional blogs are needed to make up the difference
         $relatedCount = $relatedBlogs->count();
 
         if ($relatedCount < 3) {
             $additionalBlogs = Blog::where('id', '!=', $id) // Exclude the current blog
-                                ->where('type', '!=', $blogType) // Exclude blogs of the same type already fetched
-                                ->latest()
-                                ->take(3 - $relatedCount)
-                                ->get();
+                ->where('type', '!=', $blogType) // Exclude blogs of the same type already fetched
+                ->latest()
+                ->take(3 - $relatedCount)
+                ->get();
 
             // Merge the additional blogs into the related blogs collection
             $relatedBlogs = $relatedBlogs->merge($additionalBlogs);
         }
         $data['prevBlog'] = Blog::where('id', '<', $id)
-                            ->where('type', $blogType)
-                            ->latest('id')
-                            ->first();
+            ->where('type', $blogType)
+            ->latest('id')
+            ->first();
 
         // Fetch the next blog
         $data['nextBlog'] = Blog::where('id', '>', $id)
-                                ->where('type', $blogType)
-                                ->oldest('id')
-                                ->first();
+            ->where('type', $blogType)
+            ->oldest('id')
+            ->first();
         $data['relatedBlogs'] = $relatedBlogs;
-        return view('front.user.blog-detail',$data);
+        return view('front.user.blog-detail', $data);
     }
 
-    public function careerIndex(){
+    public function careerIndex()
+    {
         return view('front.user.career');
     }
 
-    public function careerStore(Request $request){
+    public function careerStore(Request $request)
+    {
         $request->validate([
             'position' => 'required|string|max:255',
             'name' => 'required|string|max:255',
@@ -168,27 +182,32 @@ class FrontController extends Controller
         return redirect()->route('career')->with('success', 'Application submitted successfully!');
     }
 
-    public function courseIndex(){
-        $data['courses'] = Course::with('examinationCommission','category','subCategory')->get();
-        return view('front.user.courses',$data);
+    public function courseIndex()
+    {
+        $data['courses'] = Course::with('examinationCommission', 'category', 'subCategory')->get();
+        return view('front.user.courses', $data);
     }
 
-    public function courseDetails($id){
+    public function courseDetails($id)
+    {
         $data['course'] = Course::findOrFail($id);
-        return view('front.user.course-detail',$data);
-    }
-    
-    public function courseFilter($id){
-        $data['courses'] = Course::with('examinationCommission','category','subCategory')->where('sub_category_id',$id)->get();
-        return view('front.user.courses',$data);
+        return view('front.user.course-detail', $data);
     }
 
-    public function enquiryIndex(){
+    public function courseFilter($id)
+    {
+        $data['courses'] = Course::with('examinationCommission', 'category', 'subCategory')->where('sub_category_id', $id)->get();
+        return view('front.user.courses', $data);
+    }
+
+    public function enquiryIndex()
+    {
         $data['enquiries'] = DirectEnquiry::all();
-        return view('front.user.enquire-now',$data);
+        return view('front.user.enquire-now', $data);
     }
 
-    public function enquiryStore(Request $request){
+    public function enquiryStore(Request $request)
+    {
         $request->validate([
             'query_for' => 'required|string|max:255',
             'full_name' => 'required|string|max:255',
@@ -209,13 +228,15 @@ class FrontController extends Controller
         return redirect()->back()->with('success', 'Enquiry submitted successfully!');
     }
 
-    public function contactUsIndex(){
+    public function contactUsIndex()
+    {
         $data['header'] = HeaderSetting::first();
-        $data['socialMedia'] = SocialMedia::first(); 
-        return view('front.user.contact-us',$data);
+        $data['socialMedia'] = SocialMedia::first();
+        return view('front.user.contact-us', $data);
     }
 
-    public function contactUsStore(Request $request){
+    public function contactUsStore(Request $request)
+    {
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255',
@@ -228,11 +249,13 @@ class FrontController extends Controller
         return redirect()->back()->with('success', 'We`ll contact you soon!');
     }
 
-    public function callbackIndex(){
+    public function callbackIndex()
+    {
         return view('front.user.call-back');
     }
 
-    public function callbackStore(Request $request){
+    public function callbackStore(Request $request)
+    {
         $request->validate([
             'query_for' => 'required',
             'full_name' => 'required|string|max:255',
@@ -245,96 +268,196 @@ class FrontController extends Controller
         return redirect()->back()->with('success', 'Our representative will call you soon!');
     }
 
-    public function currentAffairsIndex(){
+    public function currentAffairsIndex()
+    {
         $data['topics'] = Topic::with('currentAffair')->get();
-        return view('front.user.current-affair',$data);
+        return view('front.user.current-affair', $data);
     }
 
-    public function currentAffairsDetail($id){
+    public function currentAffairsDetail($id)
+    {
         $data['current_affair'] = CurrentAffair::findOrFail($id);
         $relatedBlogs = Blog::where('id', '!=', $id)
-                            ->latest()
-                            ->take(3)
-                            ->get();
+            ->latest()
+            ->take(3)
+            ->get();
 
         // Check if additional blogs are needed to make up the difference
         $relatedCount = $relatedBlogs->count();
 
         if ($relatedCount < 3) {
             $additionalBlogs = Blog::latest()
-                                ->take(3 - $relatedCount)
-                                ->get();
+                ->take(3 - $relatedCount)
+                ->get();
             $relatedBlogs = $relatedBlogs->merge($additionalBlogs);
         }
-        $data['relatedAffairs'] = CurrentAffair::where('id','!=',$id)
-                                                ->take(2)
-                                                ->get();
+        $data['relatedAffairs'] = CurrentAffair::where('id', '!=', $id)
+            ->take(2)
+            ->get();
         $data['relatedBlogs'] = $relatedBlogs;
-        return view('front.user.current-affair-detail',$data);
+        return view('front.user.current-affair-detail', $data);
     }
 
-    public function dailyBoostIndex(){
+    public function dailyBoostIndex()
+    {
         $data['dailyBoosts'] = DailyBooster::all();
-        return view('front.user.daily-booster',$data);
+        return view('front.user.daily-booster', $data);
     }
 
-    public function testPlannerIndex(){
+    public function testPlannerIndex()
+    {
         $data['testPlans'] = TestPlanner::all();
-        return view('front.user.test-planner',$data);
+        return view('front.user.test-planner', $data);
     }
 
-    public function testPlannerDetails($id){
+    public function testPlannerDetails($id)
+    {
         $data['data'] = TestPlanner::findOrFail($id);
-        return view('front.user.test-planner-details',$data);
+        return view('front.user.test-planner-details', $data);
     }
 
-   public function studyMaterialIndex(){
-        $data['topics'] = MainTopic::with('studyMaterials')->get();
-        $data['categories'] = studyMaterialCategory::get();
-        return view('front.user.study-material',$data);
+    public function studyMaterialIndex(Request $request, $examid = null, $catid = null, $subcat = null)
+    {
+        $subject_id = $request->query('subject_id');
+        $chapter_id = $request->query('chapter_id');
+        $topic_id = $request->query('topic_id');
+        $search = $request->query('search');
+
+        // Filter Subjects
+        $subjectQuery = Subject::with(['chapters']);
+        if ($examid)
+            $subjectQuery->where('exam_com_id', $examid);
+        if ($catid)
+            $subjectQuery->where('category_id', $catid);
+        if ($subcat)
+            $subjectQuery->where('sub_category_id', $subcat);
+        $data['subjects'] = $subjectQuery->get();
+
+        // Filter Chapters
+        $chapterQuery = Chapter::with(['subject']);
+        if ($examid)
+            $chapterQuery->where('exam_com_id', $examid);
+        if ($catid)
+            $chapterQuery->where('category_id', $catid);
+        if ($subcat)
+            $chapterQuery->where('sub_category_id', $subcat);
+        $data['chapters'] = $chapterQuery->get();
+
+        // Filter Topics
+        $topicQuery = CourseTopic::with(['subject', 'chapter']);
+        if ($examid)
+            $topicQuery->where('exam_com_id', $examid);
+        if ($catid)
+            $topicQuery->where('category_id', $catid);
+        if ($subcat)
+            $topicQuery->where('sub_category_id', $subcat);
+        $data['topics'] = $topicQuery->get();
+
+        // Study Materials
+        $studyMaterialsQuery = StudyMaterial::with(['commission', 'category', 'subcategory', 'subject', 'chapter', 'topic']);
+        if ($examid)
+            $studyMaterialsQuery->where('commission_id', $examid);
+        if ($catid)
+            $studyMaterialsQuery->where('category_id', $catid);
+        if ($subcat)
+            $studyMaterialsQuery->where('sub_category_id', $subcat);
+        if ($subject_id)
+            $studyMaterialsQuery->where('subject_id', $subject_id);
+        if ($chapter_id)
+            $studyMaterialsQuery->where('chapter_id', $chapter_id);
+        if ($topic_id)
+            $studyMaterialsQuery->where('topic_id', $topic_id);
+
+        // Safe search
+        if ($search) {
+            $studyMaterialsQuery->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                    ->orWhere('short_description', 'like', "%{$search}%");
+            });
+        }
+
+        $data['studyMaterials'] = $studyMaterialsQuery->paginate(10)->withQueryString();
+
+        // Pass the route parameters so Blade can build URLs
+        $data['examid'] = $examid;
+        $data['catid'] = $catid;
+        $data['subcat'] = $subcat;
+
+        return view('front.user.study-material', $data);
     }
 
-    public function studyMaterialAllTopics($id){
+
+
+
+    public function studyMaterialAllTopics($id)
+    {
         $data['topic'] = MainTopic::with('studyMaterials')->findOrFail($id);
-        return view('front.user.study-material-all-list',$data);
-        
+        return view('front.user.study-material-all-list', $data);
+
     }
-    public function studyMaterialDetails($id){
-        $data['studyMaterial'] = StudyMaterial::findOrFail($id);
-        return view('front.user.study-material-details',$data);
+    public function studyMaterialDetails($id)
+    {
+        // Get the main study material
+        $studyMaterial = StudyMaterial::findOrFail($id);
+
+        // Related study materials: try to match topic first, then chapter, then subject
+        $related = StudyMaterial::where('id', '!=', $studyMaterial->id)
+            ->where(function ($query) use ($studyMaterial) {
+                if ($studyMaterial->topic_id) {
+                    $query->where('topic_id', $studyMaterial->topic_id);
+                } elseif ($studyMaterial->chapter_id) {
+                    $query->where('chapter_id', $studyMaterial->chapter_id);
+                } elseif ($studyMaterial->subject_id) {
+                    $query->where('subject_id', $studyMaterial->subject_id);
+                } else {
+                    $query->where('category_id', $studyMaterial->category_id);
+                }
+            })
+            ->take(5) // Limit to 5 related items
+            ->get();
+
+        return view('front.user.study-material-details', [
+            'studyMaterial' => $studyMaterial,
+            'relatedMaterials' => $related
+        ]);
     }
 
-    public function studyMaterialFilter(Request $request){
-        $data['topics'] = MainTopic::with('studyMaterials')->where('category_id',$request->category_id)->get();
+    public function studyMaterialFilter(Request $request)
+    {
+        $data['topics'] = MainTopic::with('studyMaterials')->where('category_id', $request->category_id)->get();
         $data['categories'] = studyMaterialCategory::get();
         $data['filter_selected'] = $request->category_id;
-        return view('front.user.study-material',$data);
+        return view('front.user.study-material', $data);
     }
 
-    public function studyMaterialSearch(Request $request){
+    public function studyMaterialSearch(Request $request)
+    {
         $search = $request->search_field;
-        $data['topics'] = MainTopic::with('studyMaterials')->where('name', 'like', "%".$search."%")->get();
+        $data['topics'] = MainTopic::with('studyMaterials')->where('name', 'like', "%" . $search . "%")->get();
         $data['categories'] = studyMaterialCategory::get();
         $data['search'] = $search;
-        return view('front.user.study-material',$data);
+        return view('front.user.study-material', $data);
     }
 
-
-    public function upcomingExamsIndex(){
-        $data['upcomingExams'] = UpcomingExam::with('exam_commission')->orderBy('created_at','DESC')->get();
-        return view('front.user.upcoming-exams',$data);
+    public function upcomingExamsIndex()
+    {
+        $data['upcomingExams'] = UpcomingExam::with('exam_commission')->orderBy('created_at', 'DESC')->get();
+        return view('front.user.upcoming-exams', $data);
     }
 
-    public function netiCornerIndex(){
-        $data['testimonials'] = FeedTestimonial::where('type',2)->orderBy('created_at','DESC')->get();
-        return view('front.user.neti-corner',$data);
+    public function netiCornerIndex()
+    {
+        $data['testimonials'] = FeedTestimonial::where('type', 2)->orderBy('created_at', 'DESC')->get();
+        return view('front.user.neti-corner', $data);
     }
 
-    public function feedBackIndex(){
+    public function feedBackIndex()
+    {
         return view('front.user.feedback-and-testinomial');
     }
 
-    public function feedBackStore(Request $request){
+    public function feedBackStore(Request $request)
+    {
         $validatedData = $request->validate([
             'type' => 'required|integer',
             'username' => 'required|string|max:255',
@@ -357,170 +480,178 @@ class FrontController extends Controller
         return redirect()->back()->with('success', 'Feedback & Testimonial submitted successfully!');
     }
 
-    public function batchesIndex(){
+    public function batchesIndex()
+    {
         $data['batches'] = BatchProgramme::all();
-        return view('front.user.batches-and-online-programme',$data);
+        return view('front.user.batches-and-online-programme', $data);
     }
 
-    public function pyqPapers($examid,$catid,$subcat){
+    public function pyqPapers($examid, $catid, $subcat)
+    {
         $data['subcat'] = SubCategory::findOrFail($subcat);
         $data['papers'] = PYQ::where('sub_cat_id', $subcat)->where('has_subject', 0)->get();
         $data['subjects'] = Subject::where('sub_category_id', $subcat)->get();
-        $data['pyq_content'] = PyqContent::where('commission_id',$examid)->where('category_id',$catid)->where('sub_category_id',$subcat)->first();
-        $data['questions'] = Question::where('commission_id',$examid)->where('category_id',$catid)->where('sub_category_id',$subcat)->get();
-        return view('front.pyq-papers',$data);
-    }
-    
-    public function testseries($examid,$catid,$subcat){
-        $data['subcat'] = SubCategory::findOrFail($subcat);
-        $data['categories'] = Category::where('exam_com_id',$examid)->get();
-        $data['testseries'] = TestSeries::where('exam_com_id',$examid)->where('category_id',$catid)->where('sub_category_id',$subcat)->paginate(10);
-        return view('front.test-series',$data);
-    }
-    public function testseriesFilter(Request $request){
-        $data['subcat'] = array();
-        $data['testseries'] = TestSeries::where('category_id',$request->category_id)->paginate(10);
-        $data['categories'] = Category::get();
-        $data['filter_selected'] = $request->category_id;
-        return view('front.test-series',$data);
-    }
-    public function testseriesSearch(Request $request){
-        $search = $request->search_field;
-        $data['subcat'] = array();
-        $data['testseries'] = TestSeries::where('title', 'like', "%".$search."%")->paginate(10);
-        $data['categories'] = Category::get();
-        $data['search'] = $search;
-        return view('front.test-series',$data);
-    }
-    public function testseriesDetail($slug){
-        $testseries = TestSeries::where('slug',$slug)->first();
-        $data['testseries'] = $testseries;
-        $data['relatedtestseries'] = TestSeries::where('exam_com_id',$testseries->exam_com_id)->where('id','!=',$testseries->id)->get();
-        return view('front.test-series-detail',$data);
+        $data['pyq_content'] = PyqContent::where('commission_id', $examid)->where('category_id', $catid)->where('sub_category_id', $subcat)->first();
+        $data['questions'] = Question::where('commission_id', $examid)->where('category_id', $catid)->where('sub_category_id', $subcat)->get();
+        return view('front.pyq-papers', $data);
     }
 
-    public function subjectPapers($id){
+    public function testseries($examid, $catid, $subcat)
+    {
+        $data['subcat'] = SubCategory::findOrFail($subcat);
+        $data['categories'] = Category::where('exam_com_id', $examid)->get();
+        $data['testseries'] = TestSeries::where('exam_com_id', $examid)->where('category_id', $catid)->where('sub_category_id', $subcat)->paginate(10);
+        return view('front.test-series', $data);
+    }
+    public function testseriesFilter(Request $request)
+    {
+        $data['subcat'] = array();
+        $data['testseries'] = TestSeries::where('category_id', $request->category_id)->paginate(10);
+        $data['categories'] = Category::get();
+        $data['filter_selected'] = $request->category_id;
+        return view('front.test-series', $data);
+    }
+    public function testseriesSearch(Request $request)
+    {
+        $search = $request->search_field;
+        $data['subcat'] = array();
+        $data['testseries'] = TestSeries::where('title', 'like', "%" . $search . "%")->paginate(10);
+        $data['categories'] = Category::get();
+        $data['search'] = $search;
+        return view('front.test-series', $data);
+    }
+    public function testseriesDetail($slug)
+    {
+        $testseries = TestSeries::where('slug', $slug)->first();
+        $data['testseries'] = $testseries;
+        $data['relatedtestseries'] = TestSeries::where('exam_com_id', $testseries->exam_com_id)->where('id', '!=', $testseries->id)->get();
+        return view('front.test-series-detail', $data);
+    }
+
+    public function subjectPapers($id)
+    {
         $data['subject'] = Subject::findOrFail($id);
         $data['papers'] = PyqSubject::with('pyq')->where('subject_id', $id)->get();
-         $data['pyq_content'] = PyqContent::where('subject_id',$id)->first();
-          $data['questions'] = Question::where('subject_id',$id)->get();
-        return view('front.pyq-subjects',$data);
+        $data['pyq_content'] = PyqContent::where('subject_id', $id)->first();
+        $data['questions'] = Question::where('subject_id', $id)->get();
+        return view('front.pyq-subjects', $data);
     }
-public function sendotopstudent(Request $request){
+    public function sendotopstudent(Request $request)
+    {
         $validator = Validator::make($request->all(), [
-            'mobile_number'=>'required|digits:10',
+            'mobile_number' => 'required|digits:10',
         ]);
-        if($validator->fails()){
+        if ($validator->fails()) {
             return response()->json([
-                'success'=>false,
+                'success' => false,
                 'code' => 422,
-                'errors'=>$validator->errors(),
+                'errors' => $validator->errors(),
             ]);
         }
         $mobile_number = $request->mobile_number;
-        
-         $otp = substr(str_shuffle("0123456789"), 0, 4);
-         $teacher = UserMobiileVerification::where('mobile_number',$request->mobile_number)->first();
-        UserMobiileVerification::updateOrInsert(['mobile_number'=>$mobile_number],['mobile_number'=>$mobile_number,'otp'=>$otp]);
-        $message="$otp is the One Time Password(OTP) to verify your MOB number at Web Mingo, This OTP is Usable only once and is valid for 10 min,PLS DO NOT SHARE THE OTP WITH ANYONE";
-                $dlt_id = '1307161465983326774';
-                $request_parameter = array(
-                    'authkey'   => '133780AZGqc6gKWfh63da1812P1',
-                    'mobiles'   => $mobile_number,
-                    'message'   => urlencode($message),
-                    'sender'    => 'WMINGO',
-                    'route'     => '4',
-                    'country'   => '91',
-                    'unicode'   => '1',
-                );
-                $url = "http://sms.webmingo.in/api/sendhttp.php?";
-                foreach($request_parameter as $key=>$val)
-                {
-                    $url.=$key.'='.$val.'&';
-                }
-                $url = $url.'DLT_TE_ID='.$dlt_id;
-                $url =rtrim($url , "&");
-                try {
-                    $ch = curl_init();
-                    curl_setopt($ch, CURLOPT_URL, $url);
-                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-                    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-                    //get response
-                    $output = curl_exec($ch);
-                    curl_close($ch);
-                    return response()->json([
-                    'success' => true,
-                    'message' => 'Otp Successfully Send on Your mobile number!',
-                ]);
-                    // return true;
-                } catch (\Exception $e) {
-                    dd($e->getMessage());
-                }
-    }
-    public function verifymobilenumberstudent(Request $request){
-        $validator = Validator::make($request->all(), [
-            'mobile_number'=>'required|digits:10',
-            'otp'=>'required',
-        ],[
-            'otp.exists'=>'Enter Correct Otp']);
-        if($validator->fails()){
+
+        $otp = substr(str_shuffle("0123456789"), 0, 4);
+        $teacher = UserMobiileVerification::where('mobile_number', $request->mobile_number)->first();
+        UserMobiileVerification::updateOrInsert(['mobile_number' => $mobile_number], ['mobile_number' => $mobile_number, 'otp' => $otp]);
+        $message = "$otp is the One Time Password(OTP) to verify your MOB number at Web Mingo, This OTP is Usable only once and is valid for 10 min,PLS DO NOT SHARE THE OTP WITH ANYONE";
+        $dlt_id = '1307161465983326774';
+        $request_parameter = array(
+            'authkey' => '133780AZGqc6gKWfh63da1812P1',
+            'mobiles' => $mobile_number,
+            'message' => urlencode($message),
+            'sender' => 'WMINGO',
+            'route' => '4',
+            'country' => '91',
+            'unicode' => '1',
+        );
+        $url = "http://sms.webmingo.in/api/sendhttp.php?";
+        foreach ($request_parameter as $key => $val) {
+            $url .= $key . '=' . $val . '&';
+        }
+        $url = $url . 'DLT_TE_ID=' . $dlt_id;
+        $url = rtrim($url, "&");
+        try {
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            //get response
+            $output = curl_exec($ch);
+            curl_close($ch);
             return response()->json([
-                'success'=>false,
+                'success' => true,
+                'message' => 'Otp Successfully Send on Your mobile number!',
+            ]);
+            // return true;
+        } catch (\Exception $e) {
+            dd($e->getMessage());
+        }
+    }
+    public function verifymobilenumberstudent(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'mobile_number' => 'required|digits:10',
+            'otp' => 'required',
+        ], [
+            'otp.exists' => 'Enter Correct Otp'
+        ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
                 'code' => 422,
-                'errors'=>$validator->errors(),
+                'errors' => $validator->errors(),
             ]);
         }
-        $student = UserMobiileVerification::where('mobile_number',$request->mobile_number)->where('otp',$request->otp)->first();
-        if($student){
-            $student->update(['verified'=>'yes']);
-           $student1 = User::updateOrCreate(['mobile'=>$request->mobile_number,'type'=>'student'],[
-                'mobile'=>$request->mobile_number,
-                ]);
-                    Auth::login($student1);
-                $profile = ($student1->email !='' && $student1->type == 'student') ? 1 : 0;
-                    \LogActivity::addToLog('Login',$student1);
+        $student = UserMobiileVerification::where('mobile_number', $request->mobile_number)->where('otp', $request->otp)->first();
+        if ($student) {
+            $student->update(['verified' => 'yes']);
+            $student1 = User::updateOrCreate(['mobile' => $request->mobile_number, 'type' => 'student'], [
+                'mobile' => $request->mobile_number,
+            ]);
+            Auth::login($student1);
+            $profile = ($student1->email != '' && $student1->type == 'student') ? 1 : 0;
+            \LogActivity::addToLog('Login', $student1);
             return response()->json([
-                    'profile' => $profile,
-                    'success' => true,
-                    'message' => 'Succesfully Verified Otp',
-                ]);
-        }else{
-             return response()->json([
-                    'profile' => 0,
-                    'success' => false,
-                    'message' => 'Incorrect Otp',
-                ]);
+                'profile' => $profile,
+                'success' => true,
+                'message' => 'Succesfully Verified Otp',
+            ]);
+        } else {
+            return response()->json([
+                'profile' => 0,
+                'success' => false,
+                'message' => 'Incorrect Otp',
+            ]);
         }
-        
-        
+
+
     }
 
 
-    public function livetest($id){
-        $questions=[];
-        $questionIds=[];
+    public function livetest($id)
+    {
+        $questions = [];
+        $questionIds = [];
         $decodeId = base64_decode($id);
-        $testData = Test::where('id',$decodeId)->first();
+        $testData = Test::where('id', $decodeId)->first();
         $jsonData = json_decode($testData->question_marks_details);
-        if(isset($jsonData) && !empty($jsonData))
-        {
-            foreach($jsonData as $quesData)
-            {
-                if($quesData->question_id !="")
-                {
-                    $questionIds[]=$quesData->question_id;
+        if (isset($jsonData) && !empty($jsonData)) {
+            foreach ($jsonData as $quesData) {
+                if ($quesData->question_id != "") {
+                    $questionIds[] = $quesData->question_id;
                 }
-                
+
             }
             //dd($questionIds);
-            $questions = Question::whereIn('id', $questionIds)->where('status','Done')->get();
+            $questions = Question::whereIn('id', $questionIds)->where('status', 'Done')->get();
         }
-        
+
         $data['test'] = $testData;
         $data['questions'] = $questions;
-        return view('front.live-test',$data);
+        return view('front.live-test', $data);
     }
-    public function result($id){
+    public function result($id)
+    {
         $decodeId = base64_decode($id);
         $studentest = StudentTest::findOrFail($decodeId);
         $testData = Test::findOrFail($studentest->test_id);
@@ -529,32 +660,28 @@ public function sendotopstudent(Request $request){
         $count_attempt = StudentTest::where('test_id', $studentest->test_id)->where('student_id', $studentest->student_id)->get();
         $attemptCount = $count_attempt->count();
         $data['count_attempt'] = $attemptCount;
-        return view('front.result',$data);
+        return view('front.result', $data);
     }
-    public function submittest(Request $request){
-        $newArr=array();
-        $tempArr=array();
+    public function submittest(Request $request)
+    {
+        $newArr = array();
+        $tempArr = array();
         $new_array = array_reverse($request->storeQuestion);
-        if(!empty($request->storeQuestion))
-        {
-            foreach($new_array as $key => $type) {
-                if(!in_array($type['id'],$tempArr))
-                {
-                    $tempArr[]=$type['id'];
-                    $newArr[]=array('id'=>$type['id'], 'answer'=>$type['answer'], 'option'=>$type['option']);
+        if (!empty($request->storeQuestion)) {
+            foreach ($new_array as $key => $type) {
+                if (!in_array($type['id'], $tempArr)) {
+                    $tempArr[] = $type['id'];
+                    $newArr[] = array('id' => $type['id'], 'answer' => $type['answer'], 'option' => $type['option']);
                 }
             }
             $correct = 0;
-            $wrong =0;
-            if(!empty($newArr))
-            {
-                foreach($newArr as $key => $val) {
-                    if($val['answer'] == $val['option'])
-                    {
-                        $correct = $correct+1;
-                    }
-                    else{
-                        $wrong = $wrong+1;
+            $wrong = 0;
+            if (!empty($newArr)) {
+                foreach ($newArr as $key => $val) {
+                    if ($val['answer'] == $val['option']) {
+                        $correct = $correct + 1;
+                    } else {
+                        $wrong = $wrong + 1;
                     }
                 }
             }
@@ -566,12 +693,12 @@ public function sendotopstudent(Request $request){
             $attempted = $request->attempted;
             $test = Test::findOrFail($test_id);
             $total_marks = $test->total_marks;
-            $has_negative_marks =$test->has_negative_marks;
+            $has_negative_marks = $test->has_negative_marks;
             $negative_marks = $has_negative_marks == 'yes' ? $test->negative_marks_per_question_mcq : 0;
             $positive_marks = $test->positive_marks_per_question_mcq;
 
-            $p_marks = $correct*$positive_marks;
-            $n_marks = $wrong*$negative_marks;
+            $p_marks = $correct * $positive_marks;
+            $n_marks = $wrong * $negative_marks;
 
             $marks = $p_marks - $n_marks;
 
@@ -584,32 +711,31 @@ public function sendotopstudent(Request $request){
                 'correct_answer' => $correct,
                 'wrong_answer' => $wrong,
                 'total_marks' => $total_marks,
-                'score'=>$marks,
+                'score' => $marks,
                 'negative_marks' => $n_marks,
                 'duration' => $duration,
-                'taken_time' => $duration-$left_time,
+                'taken_time' => $duration - $left_time,
                 'status' => $attempted > 0 ? 'completed' : 'visited',
             ]);
 
         }
-        if($studentTest->id !='')
-        {
+        if ($studentTest->id != '') {
             return response()->json([
                 'id' => base64_encode($studentTest->id),
                 'success' => true,
                 'message' => 'Something went wrong!',
             ]);
-        }
-        else{
+        } else {
             return response()->json([
                 'success' => false,
                 'message' => 'Something went wrong!',
             ]);
         }
-      
+
     }
-    
-    public function logout(){
+
+    public function logout()
+    {
         Auth::logout();
         return redirect('/');
     }

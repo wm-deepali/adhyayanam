@@ -122,22 +122,7 @@
             Study Material
         </a>
         <ul class="nav-group-items" style="height: 0px;">
-        <li class="nav-item">
-                <a class="nav-link {{ request()->is('category*') ? 'active' : ''}}" href="{{ route('category.index') }}" target="_top">
-                    <svg class="nav-icon">
-                        <use xlink:href="{{ asset('icons/coreui.svg#cil-av-timer') }}"></use>
-                    </svg>
-                    {{ __('Manage Category') }}
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link {{ request()->is('main-topic*') ? 'active' : ''}}" href="{{ route('main-topic.index') }}" target="_top">
-                    <svg class="nav-icon">
-                        <use xlink:href="{{ asset('icons/coreui.svg#cil-av-timer') }}"></use>
-                    </svg>
-                    {{ __('Main Topic') }}
-                </a>
-            </li>
+      
             <li class="nav-item">
                 <a class="nav-link {{ request()->is('study.material*') ? 'active' : ''}}" href="{{route('study.material.index')}}" target="_top">
                     <svg class="nav-icon">

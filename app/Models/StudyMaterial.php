@@ -11,13 +11,19 @@ class StudyMaterial extends Model
     protected $table = 'study_material';
 
     protected $fillable = [
+        'commission_id',
+        'sub_category_id',
+        'subject_id',
+        'chapter_id',
         'category_id',
         'topic_id',
+        'material_type',
+        'is_pdf_downloadable',
+
         'title',
         'short_description',
         'detail_content',
         'status',
-        'pdf',
         'meta_title',
         'meta_keyword',
         'meta_description',
@@ -29,15 +35,37 @@ class StudyMaterial extends Model
         'price',
     ];
 
-    
 
-    public function studycategory()
+    protected $casts = [
+        'is_pdf_downloadable' => 'boolean',
+    ];
+
+    public function chapter()
     {
-        return $this->belongsTo(StudyMaterialCategory::class, 'category_id');
+        return $this->belongsTo(Chapter::class, 'chapter_id');
+    }
+    public function subject()
+    {
+        return $this->belongsTo(Subject::class, 'subject_id');
+    }
+    public function category()
+    {
+        return $this->belongsTo(Category::class, 'category_id');
     }
 
-    public function maintopic()
+    public function topic()
     {
-        return $this->belongsTo(MainTopic::class, 'topic_id');
+        return $this->belongsTo(CourseTopic::class, 'topic_id');
     }
+
+    public function subcategory()
+    {
+        return $this->belongsTo(SubCategory::class, 'sub_category_id');
+    }
+
+    public function commission()
+    {
+        return $this->belongsTo(ExaminationCommission::class, 'commission_id');
+    }
+
 }

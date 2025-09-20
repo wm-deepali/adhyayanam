@@ -28,4 +28,9 @@ class CourseTopic extends Model
     {
         return $this->belongsTo(Chapter::class, 'chapter_id');
     }
+
+    public function studyMaterials()
+    {
+        return $this->hasMany(StudyMaterial::class, 'topic_id');
+    }
 }

@@ -264,6 +264,43 @@
                                         </div>
                                     </div>
                                 </li>
+                                 <li class="dropdown">
+                                    <a href="#">Study Material</a>
+                                    <div class="mega-menu-container">
+                                        <div class="mega-menu-left">
+                                            @foreach($examinationCommission as $index => $commission)
+                                            <div class="mega-menu-tab {{ $loop->first ? 'active' : '' }}" data-tab="tab-test-{{ $commission->id }}">
+                                                {{ $commission->name }}
+                                            </div>
+                                            @endforeach
+                                        </div>
+                                        <div class="mega-menu-right">
+                                            @foreach($examinationCommission as $commission)
+                                            <div class="mega-menu-panel {{ $loop->first ? 'active' : '' }}" id="tab-test-{{ $commission->id }}" style="width: 100%;
+    display: grid; grid-template-columns: 1fr 1fr 1fr;">
+                                                @foreach($commission->categories as $category)
+                                                <div> <!-- Each category is a grid item -->
+                                                    <h5>{{ $category->name }}</h5>
+                                                    <ul>
+                                                        @foreach($category->subCategories as $subCat)
+                                                      <li>
+  <a href="{{ route('study.material.front', [
+      'examid' => $commission->id,
+      'catid' => $category->id,
+      'subcat' => $subCat->id
+  ]) }}">
+    {{ $subCat->name }}
+  </a>
+</li>
+                                                        @endforeach
+                                                    </ul>
+                                                </div>
+                                                @endforeach
+                                            </div>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                </li>
                                 <li class="dropdown">
                                     <a href="#">Current Affairs</a>
                                     <div class="mega-menu-container">
@@ -319,7 +356,6 @@
                                             <div class="mega-menu-panel active" id="tab-student-corner">
                                                 <h5>Resources</h5>
                                                 <ul>
-                                                    <li><a href="{{route('study.material.front')}}">Study Material</a></li>
                                                     <li><a href="{{route('daily.boost.front')}}">Daily Booster</a></li>
                                                     <li><a href="{{route('test.planner.front')}}">Test Planner</a></li>
                                                 </ul>

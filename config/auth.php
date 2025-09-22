@@ -44,6 +44,10 @@ return [
             'driver' => 'session',
             'provider' => 'admins',
         ],
+        'teacher' => [  // Add teacher guard
+            'driver' => 'session',
+            'provider' => 'teachers',
+        ],
     ],
 
     /*
@@ -73,10 +77,10 @@ return [
             'model' => App\Models\Admin::class,
         ],
 
-        // 'users' => [
-        //     'driver' => 'database',
-        //     'table' => 'users',
-        // ],
+        'teachers' => [  // Add teachers provider
+            'driver' => 'eloquent',
+            'model' => App\Models\Teacher::class,
+        ],
     ],
 
     /*
@@ -101,6 +105,12 @@ return [
     'passwords' => [
         'users' => [
             'provider' => 'users',
+            'table' => 'password_reset_tokens',
+            'expire' => 60,
+            'throttle' => 60,
+        ],
+        'teachers' => [  // Define password resets for teachers
+            'provider' => 'teachers',
             'table' => 'password_reset_tokens',
             'expire' => 60,
             'throttle' => 60,

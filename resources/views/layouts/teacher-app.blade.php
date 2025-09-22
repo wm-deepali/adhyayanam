@@ -65,12 +65,12 @@
             <img style="width:130px; height:55px; background:#fff; padding:5px;"
                 src="{{ url('images/Neti-logo.png#full') }}" alt="Adhyayanam Logo">
         </div>
-        @include('layouts.navigation')
+        @include('layouts.teacher-navigation')
         <button class="sidebar-toggler" type="button" data-coreui-toggle="unfoldable"></button>
     </div>
     <div class="wrapper d-flex flex-column min-vh-100 bg-light">
         <!-- Header block -->
-        @include('layouts.includes.header')
+        @include('layouts.includes.teacher-header')
         <!-- / Header block -->
 
         <div class="body flex-grow-1 px-3">

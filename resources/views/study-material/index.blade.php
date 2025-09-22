@@ -41,9 +41,11 @@
                                     <th class="text-center">
                                         <input type="checkbox" class="group_check checkbox">
                                     </th>
-                                    <th scope="col" width="15%">Date & Time</th>
+                                    <th scope="col" width="12%">Date & Time</th>
                                     <th scope="col">Title</th>
-                                    <th scope="col">Type</th>
+                                    <th scope="col">Examination Detail</th>
+                                    <th scope="col">Payment Type</th>
+                                    <th scope="col">Package Type</th>
                                     <th scope="col">Status</th>
                                     <th scope="col">Actions</th>
                                 </tr>
@@ -62,9 +64,11 @@
                                     <th class="text-center">
                                         <input type="checkbox" class="group_check checkbox">
                                     </th>
-                                    <th scope="col" width="15%">Date & Time</th>
+                                    <th scope="col" width="12%">Date & Time</th>
                                     <th scope="col">Title</th>
-                                    <th scope="col">Type</th>
+                                    <th scope="col">Examination Detail</th>
+                                    <th scope="col">Payment Type</th>
+                                    <th scope="col">Package Type</th>
                                     <th scope="col">Status</th>
                                     <th scope="col">Actions</th>
                                 </tr>
@@ -125,10 +129,13 @@
                     { data: 'checkbox', name: 'checkbox', orderable: false, searchable: false },
                     { data: 'created_at', name: 'created_at' },
                     { data: 'title', name: 'title' },
-                    { data: 'material_type', name: 'material_type' },
+                    { data: 'examination_detail', name: 'examination_detail' },
+                    { data: 'payment_type', name: 'payment_type' },
+                    { data: 'package_type', name: 'package_type' },
                     { data: 'status', name: 'status', orderable: false, searchable: false },
                     { data: 'action', name: 'action', orderable: false, searchable: false },
                 ],
+
                 lengthMenu: [10, 50, 100],
             });
         });
@@ -220,8 +227,9 @@
                         { data: 'checkbox', name: 'checkbox', orderable: false, searchable: false },
                         { data: 'created_at', name: 'created_at' },
                         { data: 'title', name: 'title' },
-                        { data: 'category', name: 'category' },
-                        { data: 'topic', name: 'topic' },
+                        { data: 'examination_detail', name: 'examination_detail' },
+                        { data: 'payment_type', name: 'payment_type' },
+                        { data: 'package_type', name: 'package_type' },
                         { data: 'status', name: 'status', orderable: false, searchable: false },
                         { data: 'action', name: 'action', orderable: false, searchable: false },
                     ],

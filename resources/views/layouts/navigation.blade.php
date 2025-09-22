@@ -1,5 +1,5 @@
 <style>
-    .sidebar-nav::-webkit-scrollbar{
+    .sidebar-nav::-webkit-scrollbar {
         display: none;
     }
 </style>
@@ -69,10 +69,10 @@
                     {{__('Topic')}}
                 </a>
             </li>
-            
+
         </ul>
     </li>
-     <li class="nav-group" aria-expanded="false">
+    <li class="nav-group" aria-expanded="false">
         <a class="nav-link nav-group-toggle" href="#">
             <svg class="nav-icon">
                 <use xlink:href="{{ asset('icons/coreui.svg#cil-notes') }}"></use>
@@ -107,7 +107,8 @@
         </ul>
     </li>
     <li class="nav-item">
-        <a class="nav-link {{ request()->is('courses.course.*') ? 'active' : ''}}" href="{{ route('courses.course.index') }}">
+        <a class="nav-link {{ request()->is('courses.course.*') ? 'active' : ''}}"
+            href="{{ route('courses.course.index') }}">
             <svg class="nav-icon">
                 <use xlink:href="{{ asset('icons/coreui.svg#cil-bug') }}"></use>
             </svg>
@@ -122,20 +123,42 @@
             Study Material
         </a>
         <ul class="nav-group-items" style="height: 0px;">
-      
+
             <li class="nav-item">
-                <a class="nav-link {{ request()->is('study.material*') ? 'active' : ''}}" href="{{route('study.material.index')}}" target="_top">
+                <a class="nav-link {{ request()->is('study.material*') ? 'active' : ''}}"
+                    href="{{route('study.material.index')}}" target="_top">
                     <svg class="nav-icon">
                         <use xlink:href="{{ asset('icons/coreui.svg#cil-note-add') }}"></use>
                     </svg>
                     {{ __('Study Material') }}
                 </a>
             </li>
-            
+
         </ul>
     </li>
 
-     <li class="nav-group" aria-expanded="false">
+    <li class="nav-group" aria-expanded="false">
+        <a class="nav-link nav-group-toggle" href="#">
+            <svg class="nav-icon">
+                <use xlink:href="{{ asset('icons/coreui.svg#cil-people') }}"></use>
+            </svg>
+            {{ __('Teacher\'s Management') }}
+        </a>
+        <ul class="nav-group-items" style="height: 0px;">
+            <li class="nav-item">
+                <a class="nav-link {{ request()->is('teachers*') ? 'active' : '' }}"
+                    href="{{ route('manage-teachers.index') }}">
+                    <svg class="nav-icon">
+                        <use xlink:href="{{ asset('icons/coreui.svg#cil-user') }}"></use>
+                    </svg>
+                    {{ __('Manage Teachers') }}
+                </a>
+            </li>
+        </ul>
+    </li>
+
+
+    <li class="nav-group" aria-expanded="false">
         <a class="nav-link nav-group-toggle" href="#">
             <svg class="nav-icon">
                 <use xlink:href="{{ asset('icons/coreui.svg#cil-book') }}"></use>
@@ -159,7 +182,7 @@
                     {{__('Add New Video')}}
                 </a>
             </li>
-            
+
         </ul>
     </li>
     <li class="nav-group" aria-expanded="false">
@@ -178,7 +201,7 @@
                     Manage PYQ
                 </a>
             </li>
-            
+
             <li class="nav-item">
                 <a class="nav-link" href="{{route('pyq.content.index')}}" target="_top">
                     <svg class="nav-icon">
@@ -187,7 +210,7 @@
                     Manage PYQ Content
                 </a>
             </li>
-            
+
         </ul>
     </li>
     <li class="nav-group" aria-expanded="false">
@@ -217,7 +240,8 @@
         </ul>
     </li>
     <li class="nav-item">
-        <a class="nav-link {{ request()->is('batches-programme*') ? 'active' : ''}}" href="{{ route('batches-programme.index') }}">
+        <a class="nav-link {{ request()->is('batches-programme*') ? 'active' : ''}}"
+            href="{{ route('batches-programme.index') }}">
             <svg class="nav-icon">
                 <use xlink:href="{{ asset('icons/coreui.svg#cil-paperclip') }}"></use>
             </svg>
@@ -225,7 +249,8 @@
         </a>
     </li>
     <li class="nav-item">
-        <a class="nav-link {{ request()->is('test-planner*') ? 'active' : ''}}" href="{{ route('test.planner.index') }}">
+        <a class="nav-link {{ request()->is('test-planner*') ? 'active' : ''}}"
+            href="{{ route('test.planner.index') }}">
             <svg class="nav-icon">
                 <use xlink:href="{{ asset('icons/coreui.svg#cil-av-timer') }}"></use>
             </svg>
@@ -233,7 +258,8 @@
         </a>
     </li>
     <li class="nav-item">
-        <a class="nav-link {{ request()->is('daily-booster*') ? 'active' : ''}}" href="{{ route('daily.boost.index') }}">
+        <a class="nav-link {{ request()->is('daily-booster*') ? 'active' : ''}}"
+            href="{{ route('daily.boost.index') }}">
             <svg class="nav-icon">
                 <use xlink:href="{{ asset('icons/coreui.svg#cil-album') }}"></use>
             </svg>
@@ -241,11 +267,12 @@
         </a>
     </li>
 
-    
 
-   
+
+
     <li class="nav-item">
-        <a class="nav-link {{ request()->is('upcoming-exams*') ? 'active' : ''}}" href="{{ route('upcoming.exam.index') }}">
+        <a class="nav-link {{ request()->is('upcoming-exams*') ? 'active' : ''}}"
+            href="{{ route('upcoming.exam.index') }}">
             <svg class="nav-icon">
                 <use xlink:href="{{ asset('icons/coreui.svg#cil-av-timer') }}"></use>
             </svg>
@@ -403,7 +430,7 @@
                     Failed Payments
                 </a>
             </li>
-            
+
         </ul>
     </li>
     <li class="nav-group" aria-expanded="false">
@@ -509,12 +536,12 @@
                     All Video's
                 </a>
             </li>
-            
+
         </ul>
     </li>
 
 
-    
+
 
     <li class="nav-group" aria-expanded="false">
         <a class="nav-link nav-group-toggle" href="#">
@@ -526,34 +553,34 @@
         <ul class="nav-group-items" style="height: 0px;">
             <li class="nav-item">
                 <a class="nav-link" href="{{route('users.index')}}" target="_top">
-                     <svg class="nav-icon">
-                <use xlink:href="{{ asset('icons/coreui.svg#cil-user') }}"></use>
-            </svg>
-            {{ __('Users') }}
+                    <svg class="nav-icon">
+                        <use xlink:href="{{ asset('icons/coreui.svg#cil-user') }}"></use>
+                    </svg>
+                    {{ __('Users') }}
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="{{route('roles.index')}}" target="_top">
-                     <svg class="nav-icon">
-                <use xlink:href="{{ asset('icons/coreui.svg#cil-group') }}"></use>
-            </svg>
-            {{ __('Roles') }}
+                    <svg class="nav-icon">
+                        <use xlink:href="{{ asset('icons/coreui.svg#cil-group') }}"></use>
+                    </svg>
+                    {{ __('Roles') }}
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="{{route('seo.index')}}" target="_top">
-                     <svg class="nav-icon">
-                <use xlink:href="{{ asset('icons/coreui.svg#cil-search') }}"></use>
-            </svg>
-            {{ __('SEO') }}
+                    <svg class="nav-icon">
+                        <use xlink:href="{{ asset('icons/coreui.svg#cil-search') }}"></use>
+                    </svg>
+                    {{ __('SEO') }}
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="{{route('permissions.index')}}" target="_top">
-                     <svg class="nav-icon">
-                <use xlink:href="{{ asset('icons/coreui.svg#cil-room') }}"></use>
-            </svg>
-            {{ __('Permissions') }}
+                    <svg class="nav-icon">
+                        <use xlink:href="{{ asset('icons/coreui.svg#cil-room') }}"></use>
+                    </svg>
+                    {{ __('Permissions') }}
                 </a>
             </li>
             <li class="nav-item">

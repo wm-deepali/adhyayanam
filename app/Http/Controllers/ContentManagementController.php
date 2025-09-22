@@ -1410,13 +1410,33 @@ class ContentManagementController extends Controller
                     return '<input type="checkbox" class="column_checkbox career_checkbox" id="' . $row->id . '" name="career_checkbox[]" />';
                 })
                 ->addColumn('created_at', function ($row) {
-                    return $row->created_at->format('d-m-Y H:i');
+                    return $row->created_at ? $row->created_at->format('d-m-Y H:i') : 'N/A';
                 })
-                ->addColumn('material_type', function ($row) {
-                    if (!$row->material_type) {
-                        return 'N/A';
-                    }
 
+                // ✅ Title with Topic (BR tag)
+                ->addColumn('title', function ($row) {
+                    $topicName = $row->topic?->name ?? '';
+                    return $row->title . ($topicName ? '<br><span>' . e($topicName) . '</span>' : '');
+                })
+
+                // ✅ Examination Detail (Commission, Category, Sub Category with BR tag)
+                ->addColumn('examination_detail', function ($row) {
+                    $commission = $row->commission->name ?? 'N/A';
+                    $category = $row->category->name ?? 'N/A';
+                    $subCat = $row->subCategory->name ?? 'N/A';
+
+                    return $commission . '<br>' . $category . '<br>' . $subCat;
+                })
+
+                // ✅ Payment Type (Free / Paid)
+                ->addColumn('payment_type', function ($row) {
+                    return $row->IsPaid == 1
+                        ? '<span class="badge badge-warning">Paid</span>'
+                        : '<span class="badge badge-success">Free</span>';
+                })
+
+                // ✅ Package Type (material_type logic already there)
+                ->addColumn('package_type', function ($row) {
                     return match ($row->material_type) {
                         'topic_based' => 'Topic Based',
                         'chapter_based' => 'Chapter Based',
@@ -1426,13 +1446,13 @@ class ContentManagementController extends Controller
                     };
                 })
 
+                // ✅ Status
                 ->addColumn('status', function ($row) {
-                    if ($row->status == 'Active') {
-                        return '<span class="badge badge-success">Active</span>';
-                    } else {
-                        return '<span class="badge badge-secondary">Inactive</span>';
-                    }
+                    return $row->status == 'Active'
+                        ? '<span class="badge badge-success">Active</span>'
+                        : '<span class="badge badge-secondary">Inactive</span>';
                 })
+
                 ->addColumn('action', function ($row) {
                     $editUrl = route('study.material.edit', $row->id);
                     $showUrl = route('study.material.show', $row->id);
@@ -1455,7 +1475,16 @@ class ContentManagementController extends Controller
                     return $actionBtn;
                 })
 
-                ->rawColumns(['checkbox', 'created_at', 'material_type', 'status', 'action'])
+                ->rawColumns([
+                    'checkbox',
+                    'created_at',
+                    'title',
+                    'examination_detail',
+                    'payment_type',
+                    'status',
+                    'action'
+                ])
+
                 ->make(true);
 
         }
@@ -1489,37 +1518,39 @@ class ContentManagementController extends Controller
             'chapter_id' => 'nullable|integer',
             'topic' => 'nullable|integer',
             'is_pdf_downloadable' => 'required|boolean',
-
             'title' => 'required',
             'short_description' => 'required|string',
             'detail_content' => 'required',
             'status' => 'required',
-            'pdf' => 'required|file|mimes:pdf|max:2048', // Assuming maximum file size is 2048 KB (2 MB)
+            'pdf' => 'nullable|file|mimes:pdf|max:2048',
             'meta_title' => 'nullable|string',
             'meta_keyword' => 'nullable|string',
             'meta_description' => 'nullable|string',
-            'banner' => 'required',
-            'IsPaid' => 'required',
-            'price' => 'nullable',
+            'banner' => 'required|file|image|max:2048', // make sure it's a file
+            'IsPaid' => 'required|boolean',
+            'price' => 'nullable|numeric',
         ]);
 
-        // Upload PDF file
-        $pdfPath = $request->file('pdf')->store('pdfs', 'public');
+        // Upload PDF file (nullable)
+        $pdfPath = null;
+        if ($request->hasFile('pdf')) {
+            $pdfPath = $request->file('pdf')->store('pdfs', 'public');
+        }
+
+        // Upload Banner (required)
         $bannerPath = $request->file('banner')->store('banners', 'public');
 
-        $materialType = null;
         // Decide the type: subject/chapter/topic
+        $materialType = 'general';
         if (!empty($validatedData['topic'])) {
             $materialType = 'topic_based';
         } elseif (!empty($validatedData['chapter_id'])) {
             $materialType = 'chapter_based';
         } elseif (!empty($validatedData['subject_id'])) {
             $materialType = 'subject_based';
-        } else {
-            $materialType = 'general';
         }
 
-        // Create a new StudyMaterial instance
+        // Create StudyMaterial
         $studyMaterial = new StudyMaterial();
         $studyMaterial->commission_id = $validatedData['commission_id'];
         $studyMaterial->category_id = $validatedData['category_id'];
@@ -1528,26 +1559,27 @@ class ContentManagementController extends Controller
         $studyMaterial->subject_id = $validatedData['subject_id'];
         $studyMaterial->topic_id = $validatedData['topic'];
         $studyMaterial->is_pdf_downloadable = $validatedData['is_pdf_downloadable'];
-        $studyMaterial->material_type = $materialType; // 👈 save type
-
+        $studyMaterial->material_type = $materialType;
         $studyMaterial->title = $validatedData['title'];
         $studyMaterial->short_description = $validatedData['short_description'];
         $studyMaterial->detail_content = $validatedData['detail_content'];
         $studyMaterial->status = $validatedData['status'];
-        $studyMaterial->pdf = $pdfPath;
+        $studyMaterial->pdf = $pdfPath; // nullable
         $studyMaterial->banner = $bannerPath;
         $studyMaterial->IsPaid = $validatedData['IsPaid'];
         $studyMaterial->price = $validatedData['price'];
         $studyMaterial->mrp = $request->mrp;
         $studyMaterial->discount = $request->discount;
-        $studyMaterial->meta_title = $validatedData['meta_title'];
-        $studyMaterial->meta_keyword = $validatedData['meta_keyword'];
-        $studyMaterial->meta_description = $validatedData['meta_description'];
+        $studyMaterial->meta_title = $validatedData['meta_title'] ?? null;
+        $studyMaterial->meta_keyword = $validatedData['meta_keyword'] ?? null;
+        $studyMaterial->meta_description = $validatedData['meta_description'] ?? null;
         $studyMaterial->save();
 
-        // Redirect back with success message
-        return redirect()->route('study.material.index')->with('success', 'Study material has been created successfully.');
+        return redirect()
+            ->route('study.material.index')
+            ->with('success', 'Study material has been created successfully.');
     }
+
 
 
     public function downloadPdf($id)
@@ -1690,12 +1722,12 @@ class ContentManagementController extends Controller
             $material->banner = $request->file('banner')->store('banners', 'public');
         }
 
-        // if ($request->hasFile('pdf')) {
-        //     if ($material->pdf) {
-        //         Storage::disk('public')->delete($material->pdf);
-        //     }
-        //     $material->pdf = $request->file('pdf')->store('pdfs', 'public');
-        // }
+        if ($request->hasFile('pdf')) {
+            if ($material->pdf) {
+                Storage::disk('public')->delete($material->pdf);
+            }
+            $material->pdf = $request->file('pdf')->store('pdfs', 'public');
+        }
 
         // dd($material->toArray(), $request->hasFile('banner'));
         $material->save();
@@ -2390,7 +2422,7 @@ class ContentManagementController extends Controller
                         return $query->where('chapter_id', $chapter_id);
                     })
                     ->when($request->topic_id, function ($query, $topic_id) {
-                        return $query->where('topic_id', $topic_id);
+                        return $query->where('topic', $topic_id);
                     })
                     ->when($year, function ($query, $year) {
                         return $query->where('previous_year', $year);

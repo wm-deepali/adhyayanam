@@ -17,6 +17,8 @@ use App\Models\UpcomingExam;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Feature;
+use App\Http\Controllers\Auth\TeacherLoginController;
+use App\Http\Controllers\TeacherController;
 
 /*
 |--------------------------------------------------------------------------
@@ -107,11 +109,11 @@ Route::get('current-affair/details/{id}', [App\Http\Controllers\FrontController:
 Route::get('daily-boost', [App\Http\Controllers\FrontController::class, 'dailyBoostIndex'])->name('daily.boost.front');
 Route::get('user/test-planner', [App\Http\Controllers\FrontController::class, 'testPlannerIndex'])->name('test.planner.front');
 Route::get('user/test-planner/details/{id}', [App\Http\Controllers\FrontController::class, 'testPlannerDetails'])->name('test.planner.details');
+Route::get('user/study-material/details/{id}', [App\Http\Controllers\FrontController::class, 'studyMaterialDetails'])->name('study.material.details');
 Route::get('user/study-material/{examid?}/{catid?}/{subcat?}', [App\Http\Controllers\FrontController::class, 'studyMaterialIndex'])->name('study.material.front');
 Route::post('user/study-material/filter', [App\Http\Controllers\FrontController::class, 'studyMaterialFilter'])->name('study.material.filter');
 Route::post('user/study-material/search', [App\Http\Controllers\FrontController::class, 'studyMaterialSearch'])->name('study.material.search');
 Route::get('user/study-material/all-topics/{id}', [App\Http\Controllers\FrontController::class, 'studyMaterialAllTopics'])->name('study.material.topics');
-Route::get('user/study-material/details/{id}', [App\Http\Controllers\FrontController::class, 'studyMaterialDetails'])->name('study.material.details');
 Route::get('user/upcoming-exams', [App\Http\Controllers\FrontController::class, 'upcomingExamsIndex'])->name('upcoming.exam.front');
 Route::get('user/adhyayanam-corner', [App\Http\Controllers\FrontController::class, 'netiCornerIndex'])->name('neti.corner.index');
 Route::get('user/feed-back-testimonial', [App\Http\Controllers\FrontController::class, 'feedBackIndex'])->name('feed.back.index');
@@ -124,6 +126,32 @@ Auth::routes(['verify' => false]);
 
 
 Route::group(['namespace' => 'App\Http\Controllers'], function () {
+
+
+    Route::prefix('teacher')->name('teacher.')->group(function () {
+        Route::get('/login', [TeacherLoginController::class, 'showLoginForm'])->name('login');
+        Route::post('/login', [TeacherLoginController::class, 'login']);
+        Route::post('/logout', [TeacherLoginController::class, 'logout'])->name('logout');
+        Route::get('password/reset', [TeacherLoginController::class, 'showLinkRequestForm'])->name('password.request');
+        Route::post('password/email', [TeacherLoginController::class, 'sendResetLinkEmail'])->name('password.email');
+
+        Route::get('password/reset/{token}', [TeacherLoginController::class, 'showResetForm'])->name('password.reset');
+        Route::post('password/reset', [TeacherLoginController::class, 'reset'])->name('password.update');
+        // Other teacher-authenticated routes using 'auth:teacher' middleware
+
+
+        Route::middleware(['auth:teacher'])->group(function () {
+            Route::get('/dashboard', function () {
+                return view('teachers.home');
+            })->name('dashboard');
+
+            Route::get('/{teacher}/show', [TeacherController::class, 'show'])->name('show');
+            Route::patch('/change-password', [TeacherController::class, 'changePassword'])->name('change-password');
+
+        });
+
+    });
+
     Route::middleware('auth')->group(function () {
 
         Route::get('/user/dashboard', function () {
@@ -321,6 +349,21 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
         Route::post('question-bank/update/{id}', [App\Http\Controllers\ContentManagementController::class, 'questionBankUpdate'])->name('question.bank.update');
         Route::get('question-bank/view/{id}', [App\Http\Controllers\ContentManagementController::class, 'questionBankView'])->name('question.bank.view');
 
+        // Teacher Management Routes
+        Route::prefix('manage-teachers')->name('manage-teachers.')->group(function () {
+            Route::get('/', [App\Http\Controllers\Admin\TeacherController::class, 'index'])->name('index'); // Listing Page
+            Route::get('/create', [App\Http\Controllers\Admin\TeacherController::class, 'create'])->name('create'); // Registration Form
+            Route::post('/store', [App\Http\Controllers\Admin\TeacherController::class, 'store'])->name('store'); // Store Teacher
+            Route::get('/{teacher}', [App\Http\Controllers\Admin\TeacherController::class, 'show'])->name('show');
+            Route::post('/{teacher}/change-password', [App\Http\Controllers\Admin\TeacherController::class, 'changePassword'])
+                ->name('change-password');
+            Route::get('/{teacher}/edit', [App\Http\Controllers\Admin\TeacherController::class, 'edit'])->name('edit'); // Edit Teacher
+            Route::put('/{teacher}', [App\Http\Controllers\Admin\TeacherController::class, 'update'])->name('update'); // Update Teacher
+            Route::delete('/delete/{teacher}', [App\Http\Controllers\Admin\TeacherController::class, 'destroy'])->name('delete');
+            Route::post('/bulk-delete', [App\Http\Controllers\Admin\TeacherController::class, 'bulkDelete'])
+                ->name('bulk-delete');
+
+        });
 
         Route::get('test-paper', [App\Http\Controllers\TestController::class, 'TestBankIndex'])->name('test.bank.index');
         Route::get('test-paper/create', [App\Http\Controllers\TestController::class, 'testPaperCreate'])->name('test.paper.create');

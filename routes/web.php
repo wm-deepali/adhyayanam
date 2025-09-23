@@ -20,6 +20,7 @@ use App\Models\Feature;
 use App\Http\Controllers\Auth\TeacherLoginController;
 use App\Http\Controllers\Teacher\TeacherController;
 use App\Http\Controllers\Teacher\QuestionBankController;
+use App\Http\Controllers\Admin\TeacherWalletController;
 
 /*
 |--------------------------------------------------------------------------
@@ -173,6 +174,18 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
                 ->name('teacher.question.bank.fetch-subjects');
             Route::get('fetch-chapter-by-subject/{subject}', 'TestController@fetchchapterbySubject')->name('fetch-chapter-by-subject');
             Route::get('fetch-topic-by-chapter/{subject}', 'TestController@fetchtopicbychapter')->name('fetch-topic-by-chapter');
+
+
+            // show walllet transaction 
+            Route::get('wallet/transactions', [TeacherController::class, 'TransactionsIndex'])
+                ->name('wallet.transactions.index');
+            Route::post('/withdraw-request', [TeacherController::class, 'withdrawRequest'])
+                ->name('withdraw.request');
+
+            // Withdrawal Requests page for teachers
+            Route::get('/wallet/withdrawals', [TeacherController::class, 'withdrawalsIndex'])
+                ->name('wallet.withdrawals.index');
+
         });
 
     });
@@ -392,6 +405,14 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
 
         });
 
+        Route::get('teacher-wallet', [TeacherWalletController::class, 'index'])->name('teacher.wallet.index');
+        Route::get('teacher-transactions', [TeacherWalletController::class, 'transactions'])
+            ->name('teacher.transactions.index');
+        Route::get('withdrawal-requests', [TeacherWalletController::class, 'withdrawalRequests'])->name('withdrawal.requests.index');
+        Route::post('teacher-withdrawal/{withdrawal}/update', [TeacherWalletController::class, 'updateWithdrawalStatus'])
+            ->name('teacher.withdrawal.update');
+
+
         Route::get('test-paper', [App\Http\Controllers\TestController::class, 'TestBankIndex'])->name('test.bank.index');
         Route::get('test-paper/create', [App\Http\Controllers\TestController::class, 'testPaperCreate'])->name('test.paper.create');
         Route::delete('test-paper/delete/{id}', [App\Http\Controllers\TestController::class, 'destroy'])->name('test.paper.delete');
@@ -403,6 +424,8 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
         Route::get('fetch-subject-by-subcategory/{sub_category}', 'TestController@fetchSubjectBySubCategory')->name('fetch-subject-by-subcategory');
         Route::post('generate-test-questions-by-selections', 'TestController@generatetestquestionsbyselections')->name('generate-test-questions-by-selections');
         Route::post('generate-test-paper-by-selections', 'TestController@generatetestpaperbyselections')->name('generate-test-paper-by-selections');
+        Route::get('test-papers/{id}/download', [App\Http\Controllers\TestController::class, 'download'])->name('test-papers.download');
+
 
         Route::post('preview-test', 'TestController@previewTest')->name('preview-test');
         Route::get('fetch-subject/{commission}/{category?}/{sub_category?}', 'TestController@fetchSubject')->name('fetch-subject');

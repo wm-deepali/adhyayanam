@@ -7,7 +7,7 @@ use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Notifications\Notifiable;
 
-    use App\Notifications\TeacherResetPasswordNotification;
+use App\Notifications\TeacherResetPasswordNotification;
 
 class Teacher extends Authenticatable implements CanResetPasswordContract
 {
@@ -66,10 +66,7 @@ class Teacher extends Authenticatable implements CanResetPasswordContract
         'cv',
 
         // Teacher Stats
-        'total_questions',
         'wallet_balance',
-        'total_paid',
-        'pending',
 
         // Status
         'status',
@@ -97,6 +94,27 @@ class Teacher extends Authenticatable implements CanResetPasswordContract
         'password',
         'remember_token'
     ];
+
+    // Append dynamic attributes
+    protected $appends = ['total_questions_count', 'total_paid_amount', 'pending_amount'];
+
+    // Accessor for total questions
+    public function getTotalQuestionsCountAttribute()
+    {
+        return $this->questions()->count();
+    }
+
+    // Accessor for total paid (sum of all credit transactions)
+    public function getTotalPaidAmountAttribute()
+    {
+        return $this->transactions()->where('type', 'credit')->sum('amount');
+    }
+
+    // Accessor for pending amount (sum of all debit transactions)
+    public function getPendingAmountAttribute()
+    {
+        return $this->transactions()->where('type', 'debit')->sum('amount');
+    }
     /**
      * Optional: Accessors to get formatted values
      */
@@ -116,6 +134,22 @@ class Teacher extends Authenticatable implements CanResetPasswordContract
     public function sendPasswordResetNotification($token)
     {
         $this->notify(new TeacherResetPasswordNotification($token));
+    }
+
+    public function transactions()
+    {
+        return $this->hasMany(WalletTransaction::class);
+    }
+
+    public function withdrawalRequests()
+    {
+        return $this->hasMany(WithdrawalRequest::class);
+    }
+
+    public function questions()
+    {
+        return $this->hasMany(Question::class, 'added_by_id')
+            ->where('added_by_type', 'teacher');
     }
 
 }

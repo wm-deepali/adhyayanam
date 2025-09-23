@@ -32,7 +32,6 @@
                             <th>Questions</th>
                             <th>Wallet Balance</th>
                             <th>Total Paid</th>
-                            <th>Pending</th>
                             <th>Status</th>
                             <th>Action</th>
                         </tr>
@@ -95,7 +94,6 @@
                     { data: 'total_questions', name: 'total_questions', orderable: false, searchable: false },
                     { data: 'wallet_balance', name: 'wallet_balance', orderable: false, searchable: false },
                     { data: 'total_paid', name: 'total_paid', orderable: false, searchable: false },
-                    { data: 'pending', name: 'pending', orderable: false, searchable: false },
                     { data: 'status', name: 'status', orderable: false, searchable: false },
                     { data: 'action', name: 'action', orderable: false, searchable: false },
                 ],

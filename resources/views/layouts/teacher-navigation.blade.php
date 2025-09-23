@@ -31,5 +31,25 @@
             </li>
         </ul>
     </li>
+    <li class="nav-group" aria-expanded="false">
+        <a class="nav-link nav-group-toggle" href="#">
+            <svg class="nav-icon">
+                <use xlink:href="{{ asset('icons/coreui.svg#cil-cash') }}"></use>
+            </svg>
+            Wallet
+        </a>
+        <ul class="nav-group-items" style="height: 0px;">
+            <li class="nav-item">
+                <a class="nav-link" href="{{ route('teacher.wallet.transactions.index') }}">
+                    Transactions
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ route('teacher.wallet.withdrawals.index') }}">
+                    Withdrawal Requests
+                </a>
+            </li>
+        </ul>
+    </li>
 
 </ul>

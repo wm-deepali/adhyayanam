@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -17,9 +18,12 @@ return new class extends Migration
             $table->text('details')->nullable(); // question IDs or extra info
             $table->timestamps();
 
-            $table->index(['teacher_id', 'source']);
+            // Only index on created_at for now, to avoid length issue
             $table->index('created_at');
         });
+
+        // Add index with prefix length for 'source' after table created
+        DB::statement('CREATE INDEX wallet_transactions_teacher_id_source_index ON wallet_transactions (teacher_id, source(50))');
     }
 
     public function down(): void

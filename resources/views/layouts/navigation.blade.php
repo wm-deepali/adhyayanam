@@ -154,8 +154,36 @@
                     {{ __('Manage Teachers') }}
                 </a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link {{ request()->is('admin/teacher-wallet') ? 'active' : '' }}"
+                    href="{{ route('teacher.wallet.index') }}">
+                    <svg class="nav-icon">
+                        <use xlink:href="{{ asset('icons/coreui.svg#cil-cash') }}"></use>
+                    </svg>
+                    {{ __('Teacher Wallet') }}
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {{ request()->is('admin/teacher-transactions') ? 'active' : '' }}"
+                    href="{{ route('teacher.transactions.index') }}">
+                    <svg class="nav-icon">
+                        <use xlink:href="{{ asset('icons/coreui.svg#cil-list') }}"></use>
+                    </svg>
+                    {{ __('Transactions') }}
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {{ request()->is('admin/withdrawal-requests') ? 'active' : '' }}"
+                    href="{{ route('withdrawal.requests.index') }}">
+                    <svg class="nav-icon">
+                        <use xlink:href="{{ asset('icons/coreui.svg#cil-paper-plane') }}"></use>
+                    </svg>
+                    {{ __('Withdrawal Requests') }}
+                </a>
+            </li>
         </ul>
     </li>
+
 
 
     <li class="nav-group" aria-expanded="false">

@@ -41,17 +41,15 @@ class TeacherController extends Controller
                     return $teacher->email;
                 })
                 ->addColumn('total_questions', function ($teacher) {
-                    return $teacher->total_questions ?? 0;
+                    return $teacher->total_questions_count ?? 0;
                 })
                 ->addColumn('wallet_balance', function ($teacher) {
                     return number_format($teacher->wallet_balance, 2);
                 })
                 ->addColumn('total_paid', function ($teacher) {
-                    return number_format($teacher->total_paid, 2);
+                    return number_format($teacher->total_paid_amount, 2);
                 })
-                ->addColumn('pending', function ($teacher) {
-                    return number_format($teacher->pending_amount, 2);
-                })
+                
                 ->addColumn('status', function ($teacher) {
                     return $teacher->status ? 'Active' : 'Inactive';
                 })
@@ -63,9 +61,9 @@ class TeacherController extends Controller
   </button>
   <ul class="dropdown-menu" aria-labelledby="actionMenu' . $teacher->id . '">
     <li><a class="dropdown-item text-primary" href="' . route("manage-teachers.show", $teacher->id) . '"><i class="fas fa-user me-2"></i> View Profile</a></li>
-    <li><a class="dropdown-item text-success" href="#"><i class="fas fa-wallet me-2"></i> View Wallet</a></li>
+        <li><a class="dropdown-item text-success" href="' . route("teacher.wallet.index", ['teacher_id' => $teacher->id]) . '"><i class="fas fa-wallet me-2"></i> View Wallet</a></li>
     <li><a class="dropdown-item text-info" href="#"><i class="fas fa-question-circle me-2"></i> View All Questions</a></li>
-    <li><a class="dropdown-item text-warning" href="#"><i class="fas fa-money-check me-2"></i> View Payouts</a></li>
+    <li><a class="dropdown-item text-warning" href="' . route("withdrawal.requests.index", ['teacher_id' => $teacher->id]) . '"><i class="fas fa-money-check me-2"></i> View Payouts</a></li>
     <li><a class="dropdown-item text-secondary" href="' . route("manage-teachers.edit", $teacher->id) . '"><i class="fas fa-edit me-2"></i> Edit</a></li>
     <li><button class="dropdown-item text-dark btn-change-password" data-id="' . $teacher->id . '" data-name="' . e($teacher->full_name) . '"><i class="fas fa-key me-2"></i> Change Password</button></li>
     <li>

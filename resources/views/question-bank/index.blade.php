@@ -17,6 +17,7 @@ Question Bank
                     <a href='{{route('question.bank.create')}}' class="btn btn-primary">&#43; Add</a>
                     <a href='{{route('question.bank.bulk-upload')}}' class="btn btn-primary">&#43; Bulk Upload</a>
                     <a href='{{route('question.bank.rejected')}}' class="btn btn-primary">Rejected Questions</a>
+                    <a href='{{route('question.bank.pending')}}' class="btn btn-primary">Pending Questions</a>
                 </div>
             </div>
             <div class="mt-2">

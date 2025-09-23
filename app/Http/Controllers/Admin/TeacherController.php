@@ -59,7 +59,7 @@ class TeacherController extends Controller
                     return '
     <div class="dropdown">
   <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" id="actionMenu' . $teacher->id . '" data-bs-toggle="dropdown" aria-expanded="false">
-    <span><i class="fas fa-ellipsis-v"></i></span>
+    <span>Actions</span>
   </button>
   <ul class="dropdown-menu" aria-labelledby="actionMenu' . $teacher->id . '">
     <li><a class="dropdown-item text-primary" href="' . route("manage-teachers.show", $teacher->id) . '"><i class="fas fa-user me-2"></i> View Profile</a></li>
@@ -109,23 +109,26 @@ class TeacherController extends Controller
     {
         // dd($request->all());
         $request->validate([
-            // Personal Info
+            // 🔹 Personal Info
             'full_name' => 'required|string|max:255',
             'email' => 'required|email|unique:teachers,email',
             'mobile_number' => 'required|string|max:15',
             'confirm_account_number' => 'same:account_number',
-            'password' => 'required|string|min:6|confirmed',  // Validates password and password_confirmation
+            'password' => 'required|string|min:6|confirmed',
 
-            // Files
-            'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg',
-            'cv' => 'nullable|mimes:pdf,doc,docx',
-            'education_docs.*' => 'nullable|mimes:pdf,doc,docx',
-            'pan_file' => 'nullable|mimes:jpeg,png,jpg,pdf',
-            'aadhar_front' => 'nullable|mimes:jpeg,png,jpg,pdf',
-            'aadhar_back' => 'nullable|mimes:jpeg,png,jpg,pdf',
-            'cancelled_cheque' => 'nullable|mimes:jpeg,png,jpg,pdf',
-            'qr_code' => 'nullable|mimes:jpeg,png,jpg,pdf',
+            // 🔹 Images
+            'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'aadhar_front' => 'nullable|mimes:jpeg,png,jpg,pdf|max:2048',
+            'aadhar_back' => 'nullable|mimes:jpeg,png,jpg,pdf|max:2048',
+            'pan_file' => 'nullable|mimes:jpeg,png,jpg,pdf|max:2048',
+            'cancelled_cheque' => 'nullable|mimes:jpeg,png,jpg,pdf|max:2048',
+            'qr_code' => 'nullable|mimes:jpeg,png,jpg,pdf|max:2048',
+
+            // 🔹 Docs
+            'cv' => 'nullable|mimes:pdf,doc,docx|max:5120',
+            'education_docs.*' => 'nullable|mimes:pdf,doc,docx,jpeg,png,jpg|max:5120',
         ]);
+
 
         // try {
         $teacher = new Teacher();
@@ -214,7 +217,7 @@ class TeacherController extends Controller
             }
         }
 
-        return redirect()->route('admin.teachers.index')->with('success', 'Teacher created successfully!');
+        return redirect()->route('manage-teachers.index')->with('success', 'Teacher created successfully!');
 
         // } catch (\Exception $e) {
         //     return back()->withInput()->with('error', 'Error: ' . $e->getMessage());
@@ -271,20 +274,23 @@ class TeacherController extends Controller
     public function update(Request $request, Teacher $teacher)
     {
         $request->validate([
+            // 🔹 Personal Info
             'full_name' => 'required|string|max:255',
             'email' => 'required|email|unique:teachers,email,' . $teacher->id,
             'mobile_number' => 'required|string|max:15',
             'confirm_account_number' => 'same:account_number',
 
-            // Add your other file validation rules here...
-            'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg',
-            'cv' => 'nullable|mimes:pdf,doc,docx',
-            'education_docs.*' => 'nullable|mimes:pdf,doc,docx',
-            'pan_file' => 'nullable|mimes:jpeg,png,jpg,pdf',
-            'aadhar_front' => 'nullable|mimes:jpeg,png,jpg,pdf',
-            'aadhar_back' => 'nullable|mimes:jpeg,png,jpg,pdf',
-            'cancelled_cheque' => 'nullable|mimes:jpeg,png,jpg,pdf',
-            'qr_code' => 'nullable|mimes:jpeg,png,jpg,pdf',
+            // 🔹 Images
+            'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'aadhar_front' => 'nullable|mimes:jpeg,png,jpg,pdf|max:2048',
+            'aadhar_back' => 'nullable|mimes:jpeg,png,jpg,pdf|max:2048',
+            'pan_file' => 'nullable|mimes:jpeg,png,jpg,pdf|max:2048',
+            'cancelled_cheque' => 'nullable|mimes:jpeg,png,jpg,pdf|max:2048',
+            'qr_code' => 'nullable|mimes:jpeg,png,jpg,pdf|max:2048',
+
+            // 🔹 Docs
+            'cv' => 'nullable|mimes:pdf,doc,docx|max:5120',
+            'education_docs.*' => 'nullable|mimes:pdf,doc,docx,jpeg,png,jpg|max:5120',
         ]);
 
         // Update basic info
@@ -419,7 +425,7 @@ class TeacherController extends Controller
                 ->delete();
         }
 
-        return redirect()->route('admin.teachers.index')->with('success', 'Teacher updated successfully!');
+        return redirect()->route('manage-teachers.index')->with('success', 'Teacher updated successfully!');
     }
 
     public function changePassword(Request $request, Teacher $teacher)
@@ -443,9 +449,9 @@ class TeacherController extends Controller
     {
         try {
             $teacher->delete();
-            return redirect()->route('admin.teachers.index')->with('success', 'Teacher deleted successfully!');
+            return redirect()->route('manage-teachers.index')->with('success', 'Teacher deleted successfully!');
         } catch (\Exception $e) {
-            return redirect()->route('admin.teachers.index')->with('error', 'Error deleting teacher: ' . $e->getMessage());
+            return redirect()->route('manage-teachers.index')->with('error', 'Error deleting teacher: ' . $e->getMessage());
         }
     }
 

@@ -59,6 +59,7 @@ use Maatwebsite\Excel\Concerns\Importable;
 use Maatwebsite\Excel\HeadingRowImport;
 use Yajra\DataTables\Facades\DataTables;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Models\WalletTransaction;
 
 class ContentManagementController extends Controller
 {
@@ -1454,25 +1455,26 @@ class ContentManagementController extends Controller
                 })
 
                 ->addColumn('action', function ($row) {
-                    $editUrl = route('study.material.edit', $row->id);
-                    $showUrl = route('study.material.show', $row->id);
-                    $downloadUrl = route('study.material.download', $row->id);
+                    return '
+    <div class="dropdown">
+  <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" id="actionMenu' . $row->id . '" data-bs-toggle="dropdown" aria-expanded="false">
+    <span>Actions</span>
+  </button>
+  <ul class="dropdown-menu" aria-labelledby="actionMenu' . $row->id . '">
+    <li><a class="dropdown-item text-primary" href="' . route('study.material.show', $row->id) . '"><i class="fa fa-eye"></i> View Details</a></li>
+    <li><a class="dropdown-item text-secondary" href="' . route('study.material.edit', $row->id) . '"><i class="fas fa-edit me-2"></i> Edit</a></li>
+    <li><a class="dropdown-item text-info" href="' . route('study.material.download', $row->id) . '"><i class="fa fa-download"></i> Download PDF</a></li>
+    <li>
+      <form action="' . route('study.material.delete', $row->id) . '" method="POST" style="display:inline" onsubmit="return confirm(\'Are you sure?\')">
+        ' . csrf_field() . '
+        ' . method_field("DELETE") . '
+        <button type="submit" class="dropdown-item text-danger"><i class="fas fa-trash me-2" style="color: red!important;"></i> Delete</button>
+      </form>
+    </li>
+  </ul>
+</div>';
 
-                    $actionBtn = '
-        <a href="' . $editUrl . '" class="btn btn-sm btn-primary" title="Edit"><i class="fa fa-edit"></i></a>
-        <a href="' . $showUrl . '" class="btn btn-sm btn-info" title="Details"><i class="fa fa-eye"></i></a>
-        <a href="' . $downloadUrl . '" class="btn btn-sm btn-success" title="Download PDF"><i class="fa fa-download"></i></a>
-    ';
 
-                    $actionBtn .= '
-        <form action="' . route('study.material.delete', $row->id) . '" method="POST" style="display:inline">
-            ' . csrf_field() . '
-            ' . method_field("DELETE") . '
-            <button type="submit" class="btn btn-sm btn-danger" title="Delete"><i class="fa fa-trash"></i></button>
-        </form>
-    ';
-
-                    return $actionBtn;
                 })
 
                 ->rawColumns([
@@ -1579,8 +1581,6 @@ class ContentManagementController extends Controller
             ->route('study.material.index')
             ->with('success', 'Study material has been created successfully.');
     }
-
-
 
     public function downloadPdf($id)
     {
@@ -2451,6 +2451,70 @@ class ContentManagementController extends Controller
         return view('question-bank.rejected', $data);
     }
 
+    public function pendingQuestionBankIndex(Request $request)
+    {
+        $questions = Question::where('status', 'Pending')->paginate(10);
+        return view('question-bank.pending', [
+            'questionBanks' => $questions,
+        ]);
+    }
+
+
+
+    public function updateStatus(Request $request, $id)
+    {
+        $request->validate([
+            'status' => 'required|in:Done,Rejected',
+            'note' => 'nullable|string|max:255', // Required only for rejection
+        ]);
+
+        $question = Question::findOrFail($id);
+        $question->status = $request->status;
+        $question->note = $request->status === 'Rejected' ? $request->note : null;
+        $question->save();
+
+        // 🔹 If approved, add amount to teacher wallet
+        if ($request->status === 'Done' && $question->added_by_type === 'teacher') {
+            $teacher = $question->addedBy;
+
+            if ($teacher) {
+                // Determine amount based on question type
+                switch ($question->question_type) {
+                    case 'MCQ':
+                        $amount = $teacher->pay_per_mcq;
+                        break;
+                    case 'Subjective':
+                        $amount = $teacher->pay_per_subjective;
+                        break;
+                    case 'Story Based':
+                        $amount = $teacher->pay_per_story;
+                        break;
+                    default:
+                        $amount = 0;
+                }
+
+                // dd($amount);
+                if ($amount > 0) {
+                    // Add wallet transaction
+                    WalletTransaction::create([
+                        'teacher_id' => $teacher->id,
+                        'type' => 'credit',
+                        'amount' => $amount,
+                        'source' => $question->question_type,
+                        'details' => 'Approved Question ID: ' . $question->id,
+                    ]);
+
+                    // Update teacher wallet balance
+                    $teacher->increment('wallet_balance', $amount);
+                }
+            }
+        }
+
+        return redirect()->back()->with('success', 'Question status updated successfully.');
+    }
+
+
+
     public function questionBankCreate()
     {
         $data['commissions'] = ExaminationCommission::get();
@@ -2603,6 +2667,9 @@ class ContentManagementController extends Controller
                 $question->has_solution = (isset($request->hasFile('answerformatsolution')[$key])) ? 'yes' : 'no';
                 $question->solution = isset(($request->hasFile('answerformatsolution')[$key])) ? $request->answerformatsolution->store('answerformatsolution')[$key] : NULL;
                 // Save the question to the database
+                $question->added_by_id = auth()->id(); // teacher's ID
+                $questionData['added_by_type'] = 'user';
+
                 $question->save();
 
                 if (isset($request->question_type) && $request->question_type == 'Story Based') {
@@ -2943,6 +3010,9 @@ class ContentManagementController extends Controller
                             $questionData['answer'] = strtoupper(Str::of($answer)->trim());
                             $questionData['has_solution'] = $has_solution;
                             $questionData['solution'] = $solution;
+
+                            $questionData['added_by_id'] = auth()->id(); // Logged in teacher/user
+                            $questionData['added_by_type'] = 'user';
 
                             $que = Question::where('question', $question)->where('commission_id', $request->commission_id)->where('category_id', $request->category_id)
                                 ->where('sub_category_id', $request->sub_category_id)

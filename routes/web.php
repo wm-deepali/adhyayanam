@@ -18,7 +18,8 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Feature;
 use App\Http\Controllers\Auth\TeacherLoginController;
-use App\Http\Controllers\TeacherController;
+use App\Http\Controllers\Teacher\TeacherController;
+use App\Http\Controllers\Teacher\QuestionBankController;
 
 /*
 |--------------------------------------------------------------------------
@@ -141,13 +142,37 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
 
 
         Route::middleware(['auth:teacher'])->group(function () {
+
+            // teacher home route
             Route::get('/dashboard', function () {
                 return view('teachers.home');
             })->name('dashboard');
 
+            // teacher profile routes
             Route::get('/{teacher}/show', [TeacherController::class, 'show'])->name('show');
             Route::patch('/change-password', [TeacherController::class, 'changePassword'])->name('change-password');
 
+            // teacher question bank routes
+            Route::get('question-bank', [QuestionBankController::class, 'index'])->name('question.bank.index');
+            Route::get('rejected-question-bank', [QuestionBankController::class, 'rejectQuestionBankIndex'])->name('question.bank.rejected');
+            Route::get('question-bank/create', [QuestionBankController::class, 'create'])->name('question.bank.create');
+            Route::post('question-bank/store', [QuestionBankController::class, 'store'])->name('question.bank.store');
+            Route::post('question-bank/import-questions', [QuestionBankController::class, 'ImportQuestions'])->name('question.bank.import-questions');
+            Route::get('question-bank/bulk-upload', [QuestionBankController::class, 'questionBankBulkUpload'])->name('question.bank.bulk-upload');
+            Route::delete('question-bank/delete/{id}', [QuestionBankController::class, 'questionBankDelete'])->name('question.bank.delete');
+            Route::get('question-bank/edit/{id}', [QuestionBankController::class, 'questionBankEdit'])->name('question.bank.edit');
+            Route::post('question-bank/update/{id}', [QuestionBankController::class, 'questionBankUpdate'])->name('question.bank.update');
+            Route::get('question-bank/view/{id}', [QuestionBankController::class, 'questionBankView'])->name('question.bank.view');
+
+            // filter teacher mapped data
+            Route::get('/fetch-categories-by-commission/{commission}', [QuestionBankController::class, 'fetchCategoriesByCommission'])
+                ->name('teacher.question.bank.fetch-categories');
+            Route::get('/fetch-subcategories-by-category/{category}', [QuestionBankController::class, 'fetchSubcategoriesByCategory'])
+                ->name('teacher.question.bank.fetch-subcategories');
+            Route::get('/fetch-subjects-by-subcategory/{sub_category}', [QuestionBankController::class, 'fetchSubjectsBySubcategory'])
+                ->name('teacher.question.bank.fetch-subjects');
+            Route::get('fetch-chapter-by-subject/{subject}', 'TestController@fetchchapterbySubject')->name('fetch-chapter-by-subject');
+            Route::get('fetch-topic-by-chapter/{subject}', 'TestController@fetchtopicbychapter')->name('fetch-topic-by-chapter');
         });
 
     });
@@ -339,6 +364,7 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
 
         Route::get('question-bank', [App\Http\Controllers\ContentManagementController::class, 'questionBankIndex'])->name('question.bank.index');
         Route::get('rejected-question-bank', [App\Http\Controllers\ContentManagementController::class, 'rejectQuestionBankIndex'])->name('question.bank.rejected');
+        Route::get('question-bank/pending', [App\Http\Controllers\ContentManagementController::class, 'pendingQuestionBankIndex'])->name('question.bank.pending');
 
         Route::post('question-bank/store', [App\Http\Controllers\ContentManagementController::class, 'questionBankStore'])->name('question.bank.store');
         Route::post('question-bank/import-questions', [App\Http\Controllers\ContentManagementController::class, 'ImportQuestions'])->name('question.bank.import-questions');
@@ -348,6 +374,7 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
         Route::get('question-bank/edit/{id}', [App\Http\Controllers\ContentManagementController::class, 'questionBankEdit'])->name('question.bank.edit');
         Route::post('question-bank/update/{id}', [App\Http\Controllers\ContentManagementController::class, 'questionBankUpdate'])->name('question.bank.update');
         Route::get('question-bank/view/{id}', [App\Http\Controllers\ContentManagementController::class, 'questionBankView'])->name('question.bank.view');
+        Route::post('question-bank/update-status/{id}', [App\Http\Controllers\ContentManagementController::class, 'updateStatus'])->name('question.bank.update-status');
 
         // Teacher Management Routes
         Route::prefix('manage-teachers')->name('manage-teachers.')->group(function () {

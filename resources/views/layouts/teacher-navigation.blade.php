@@ -22,7 +22,7 @@
         </a>
         <ul class="nav-group-items" style="height: 0px;">
             <li class="nav-item">
-                <a class="nav-link" href="{{ route('question.bank.index') }}" target="_top">
+                <a class="nav-link" href="{{ route('teacher.question.bank.index') }}" target="_top">
                     <svg class="nav-icon">
                         <use xlink:href="{{ asset('icons/coreui.svg#cil-av-timer') }}"></use>
                     </svg>

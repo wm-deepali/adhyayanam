@@ -41,6 +41,8 @@ class Question extends Model
         'solution',
         'status',
         'note',
+        'added_by_id',
+        'added_by_type'
     ];
 
     // public function questionBank()
@@ -62,7 +64,7 @@ class Question extends Model
 
     public function topics()
     {
-        return $this->belongsTo(CourseTopic::class, 'topic','id');
+        return $this->belongsTo(CourseTopic::class, 'topic', 'id');
     }
 
     public function subcategory()
@@ -78,5 +80,11 @@ class Question extends Model
     public function questionDeatils()
     {
         return $this->hasMany(QuestionDetail::class, 'question_id');
+    }
+
+    // 🔹 Polymorphic added_by relationship
+    public function addedBy()
+    {
+        return $this->morphTo(__FUNCTION__, 'added_by_type', 'added_by_id');
     }
 }

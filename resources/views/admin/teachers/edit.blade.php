@@ -20,22 +20,34 @@
                     <h4 class="mt-3 mb-3">Personal Profile</h4>
                     <div class="row">
                         <div class="col-md-6">
-                            <div class="mb-3"><label>Full Name</label>
+                            <div class="mb-3">
+                                <label>Full Name <span class="text-danger">*</span></label>
                                 <input type="text" name="full_name" class="form-control" required
                                     value="{{ old('full_name', $teacher->full_name) }}">
+                                <small class="form-text text-muted">Enter full name</small>
                             </div>
-                            <div class="mb-3"><label>Email ID</label>
+
+                            <div class="mb-3">
+                                <label>Email ID <span class="text-danger">*</span></label>
                                 <input type="email" name="email" class="form-control" required
                                     value="{{ old('email', $teacher->email) }}">
+                                <small class="form-text text-muted">Enter a valid email (e.g. user@example.com)</small>
                             </div>
-                            <div class="mb-3"><label>Mobile Number</label>
-                                <input type="text" name="mobile_number" class="form-control" required
+
+                            <div class="mb-3">
+                                <label>Mobile Number <span class="text-danger">*</span></label>
+                                <input type="text" name="mobile_number" class="form-control" required pattern="[0-9]{10}"
                                     value="{{ old('mobile_number', $teacher->mobile_number) }}">
+                                <small class="form-text text-muted">Must be exactly 10 digits</small>
                             </div>
-                            <div class="mb-3"><label>WhatsApp Number</label>
+
+                            <div class="mb-3">
+                                <label>WhatsApp Number</label>
                                 <input type="text" name="whatsapp_number" class="form-control"
                                     value="{{ old('whatsapp_number', $teacher->whatsapp_number) }}">
+                                <small class="form-text text-muted">Optional, 10 digits</small>
                             </div>
+
                             <div class="mb-3">
                                 <label>Gender</label>
                                 <select class="form-control" name="gender">
@@ -47,10 +59,13 @@
                                         Other</option>
                                 </select>
                             </div>
-                            <div class="mb-3"><label>Date of Birth</label>
+                            <div class="mb-3">
+                                <label>Date of Birth</label>
                                 <input type="date" name="dob" class="form-control"
                                     value="{{ old('dob', $teacher->dob ? $teacher->dob->format('Y-m-d') : '') }}">
+                                <small class="form-text text-muted">Format: YYYY-MM-DD</small>
                             </div>
+
                             <div class="mb-3"><label>Highest Qualification</label>
                                 <input type="text" name="highest_qualification" class="form-control"
                                     value="{{ old('highest_qualification', $teacher->highest_qualification) }}">
@@ -85,13 +100,13 @@
                             <div class="mb-3">
                                 <label>Allowed Language</label>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="language[]" value="hindi"
-                                        id="lang_hindi" {{ (in_array('hindi', old('language', $teacher->allow_languages ?? [])) ? 'checked' : '') }}>
+                                    <input class="form-check-input" type="checkbox" name="language[]" value="1"
+                                        id="lang_hindi" {{ (in_array('1', old('language', $teacher->allow_languages ?? [])) ? 'checked' : '') }}>
                                     <label class="form-check-label" for="lang_hindi">Hindi</label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="language[]" value="english"
-                                        id="lang_english" {{ (in_array('english', old('language', $teacher->allow_languages ?? [])) ? 'checked' : '') }}>
+                                    <input class="form-check-input" type="checkbox" name="language[]" value="2"
+                                        id="lang_english" {{ (in_array('2', old('language', $teacher->allow_languages ?? [])) ? 'checked' : '') }}>
                                     <label class="form-check-label" for="lang_english">English</label>
                                 </div>
                             </div>
@@ -184,10 +199,10 @@
                         @endforeach
                     </div>
 
-                    {{-- Bank Detail --}}
-                    <h4 class="mt-4 mb-3">Bank Detail</h4>
                     <div class="row">
+                        {{-- Bank Detail --}}
                         <div class="col-md-6">
+                            <h4 class="mt-4 mb-3">Bank Detail</h4>
                             <div class="mb-3"><label>UPI ID</label><input type="text" name="upi_id" class="form-control"
                                     value="{{ old('upi_id', $teacher->upi_id) }}"></div>
                             <div class="mb-3"><label>Account Name</label><input type="text" name="account_name"
@@ -206,34 +221,154 @@
                                     class="form-control" value="{{ old('ifsc_code', $teacher->ifsc_code) }}"></div>
                             <div class="mb-3"><label>SWIFT Code</label><input type="text" name="swift_code"
                                     class="form-control" value="{{ old('swift_code', $teacher->swift_code) }}"></div>
-                            <div class="mb-3"><label>Upload Cancelled Cheque</label><input type="file"
-                                    name="cancelled_cheque" class="form-control"></div>
-                            <div class="mb-3"><label>Upload QR Code</label><input type="file" name="qr_code"
-                                    class="form-control"></div>
-                        </div>
-                    </div>
+                            {{-- Cancelled Cheque --}}
+                            <div class="mb-3">
+                                <label>Upload Cancelled Cheque</label>
+                                <input type="file" name="cancelled_cheque" class="form-control">
+                                <small class="form-text text-muted">Accepted: jpeg, jpg, png, pdf | Max size: 2MB</small>
 
-                    {{-- Documents --}}
-                    <h4 class="mt-4 mb-3">Documents</h4>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-3"><label>PAN Card Number</label><input type="text" name="pan_number"
-                                    class="form-control" value="{{ old('pan_number', $teacher->pan_number) }}"></div>
-                            <div class="mb-3"><label>Upload PAN Card Copy</label><input type="file" name="pan_file"
-                                    class="form-control"></div>
-                            <div class="mb-3"><label>Aadhar Card Number</label><input type="text" name="aadhar_number"
-                                    class="form-control" value="{{ old('aadhar_number', $teacher->aadhar_number) }}"></div>
-                            <div class="mb-3"><label>Upload Aadhar Card (Front)</label><input type="file"
-                                    name="aadhar_front" class="form-control"></div>
-                            <div class="mb-3"><label>Upload Aadhar Card (Back)</label><input type="file" name="aadhar_back"
-                                    class="form-control"></div>
-                            <div class="mb-3"><label>Upload Profile Picture</label><input type="file" name="profile_picture"
-                                    class="form-control"></div>
-                            <div class="mb-3"><label>Upload Education Documents</label><input type="file"
-                                    name="education_docs[]" class="form-control" multiple></div>
-                            <div class="mb-3"><label>Upload CV</label><input type="file" name="cv" class="form-control">
+                                @if($teacher->cancelled_cheque)
+                                    <div class="mt-2">
+                                        @if(Str::endsWith($teacher->cancelled_cheque, ['.jpg', '.jpeg', '.png']))
+                                            <img src="{{ asset('storage/' . $teacher->cancelled_cheque) }}" class="img-thumbnail"
+                                                style="max-width:150px;">
+                                        @else
+                                            <a href="{{ asset('storage/' . $teacher->cancelled_cheque) }}" target="_blank">View
+                                                File</a>
+                                        @endif
+                                    </div>
+                                @endif
+                            </div>
+                            {{-- QR Code --}}
+                            <div class="mb-3">
+                                <label>Upload QR Code</label>
+                                <input type="file" name="qr_code" class="form-control">
+                                <small class="form-text text-muted">Accepted: jpeg, jpg, png, pdf | Max size: 2MB</small>
+
+                                @if($teacher->qr_code)
+                                    <div class="mt-2">
+                                        @if(Str::endsWith($teacher->qr_code, ['.jpg', '.jpeg', '.png']))
+                                            <img src="{{ asset('storage/' . $teacher->qr_code) }}" class="img-thumbnail"
+                                                style="max-width:150px;">
+                                        @else
+                                            <a href="{{ asset('storage/' . $teacher->qr_code) }}" target="_blank">View File</a>
+                                        @endif
+                                    </div>
+                                @endif
                             </div>
                         </div>
+
+                        {{-- Documents --}}
+                        <div class="col-md-6">
+                            <h4 class="mt-4 mb-3">Documents</h4>
+                            <div class="mb-3"><label>PAN Card Number</label><input type="text" name="pan_number"
+                                    class="form-control" value="{{ old('pan_number', $teacher->pan_number) }}"></div>
+                            {{-- PAN File --}}
+                            <div class="mb-3">
+                                <label>Upload PAN Card Copy</label>
+                                <input type="file" name="pan_file" class="form-control">
+                                <small class="form-text text-muted">Accepted: jpeg, jpg, png, pdf | Max size: 2MB</small>
+
+                                @if($teacher->pan_file)
+                                    <div class="mt-2">
+                                        @if(Str::endsWith($teacher->pan_file, ['.jpg', '.jpeg', '.png']))
+                                            <img src="{{ asset('storage/' . $teacher->pan_file) }}" class="img-thumbnail"
+                                                style="max-width:150px;">
+                                        @else
+                                            <a href="{{ asset('storage/' . $teacher->pan_file) }}" target="_blank">View File</a>
+                                        @endif
+                                    </div>
+                                @endif
+                            </div>
+
+                            {{-- Aadhar Front --}}
+                            <div class="mb-3">
+                                <label>Upload Aadhar Card (Front)</label>
+                                <input type="file" name="aadhar_front" class="form-control">
+                                <small class="form-text text-muted">Accepted: jpeg, jpg, png, pdf | Max size: 2MB</small>
+
+                                @if($teacher->aadhar_front)
+                                    <div class="mt-2">
+                                        @if(Str::endsWith($teacher->aadhar_front, ['.jpg', '.jpeg', '.png']))
+                                            <img src="{{ asset('storage/' . $teacher->aadhar_front) }}" class="img-thumbnail"
+                                                style="max-width:150px;">
+                                        @else
+                                            <a href="{{ asset('storage/' . $teacher->aadhar_front) }}" target="_blank">View File</a>
+                                        @endif
+                                    </div>
+                                @endif
+                            </div>
+
+                            {{-- Aadhar Back --}}
+                            <div class="mb-3">
+                                <label>Upload Aadhar Card (Back)</label>
+                                <input type="file" name="aadhar_back" class="form-control">
+                                <small class="form-text text-muted">Accepted: jpeg, jpg, png, pdf | Max size: 2MB</small>
+
+                                @if($teacher->aadhar_back)
+                                    <div class="mt-2">
+                                        @if(Str::endsWith($teacher->aadhar_back, ['.jpg', '.jpeg', '.png']))
+                                            <img src="{{ asset('storage/' . $teacher->aadhar_back) }}" class="img-thumbnail"
+                                                style="max-width:150px;">
+                                        @else
+                                            <a href="{{ asset('storage/' . $teacher->aadhar_back) }}" target="_blank">View File</a>
+                                        @endif
+                                    </div>
+                                @endif
+                            </div>
+
+                            {{-- Profile Picture --}}
+                            <div class="mb-3">
+                                <label>Upload Profile Picture</label>
+                                <input type="file" name="profile_picture" class="form-control file-input"
+                                    data-preview="profile_preview">
+                                <small class="form-text text-muted">Accepted: jpeg, jpg, png | Max size: 2MB</small>
+
+                                <div id="profile_preview" class="mt-2">
+                                    @if($teacher->profile_picture)
+                                        <img src="{{ asset('storage/' . $teacher->profile_picture) }}" class="img-thumbnail"
+                                            style="max-width:150px;">
+                                    @endif
+                                </div>
+                            </div>
+
+                            {{-- Education Docs --}}
+                            <div class="mb-3">
+                                <label>Upload Education Documents</label>
+                                <input type="file" name="education_docs[]" class="form-control" multiple>
+                                <small class="form-text text-muted">Accepted: pdf, doc, docx, jpeg, jpg, png | Max size: 5MB
+                                    each</small>
+
+                                @if($teacher->education_docs)
+                                    <div class="mt-2">
+                                        @foreach(json_decode($teacher->education_docs, true) as $doc)
+                                            @if(Str::endsWith($doc, ['.jpg', '.jpeg', '.png']))
+                                                <img src="{{ asset('storage/' . $doc) }}" class="img-thumbnail me-2 mb-2"
+                                                    style="max-width:120px;">
+                                            @else
+                                                <a href="{{ asset('storage/' . $doc) }}" target="_blank" class="d-block">View File</a>
+                                            @endif
+                                        @endforeach
+                                    </div>
+                                @endif
+                            </div>
+
+                            {{-- CV --}}
+                            <div class="mb-3">
+                                <label>Upload CV</label>
+                                <input type="file" name="cv" class="form-control">
+                                <small class="form-text text-muted">Accepted: pdf, doc, docx | Max size: 5MB</small>
+
+                                @if($teacher->cv)
+                                    <div class="mt-2">
+                                        <a href="{{ asset('storage/' . $teacher->cv) }}" target="_blank">View CV</a>
+                                    </div>
+                                @endif
+                            </div>
+
+
+                        </div>
+
                     </div>
 
                     <button type="submit" class="btn btn-primary">Update Teacher</button>

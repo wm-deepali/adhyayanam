@@ -1332,6 +1332,22 @@ class ContentManagementController extends Controller
         return redirect()->back()->with('success', 'Topic added successfully.');
     }
 
+    public function topicUpdate(Request $request, $id)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string|max:1000', // optional field
+        ]);
+
+        $topic = Topic::findOrFail($id); // Get the topic or fail
+        $topic->update([
+            'name' => $request->name,
+            'description' => $request->description,
+        ]);
+
+        return redirect()->back()->with('success', 'Topic updated successfully.');
+    }
+
     public function topicDelete($id)
     {
         $topic = Topic::findOrFail($id);

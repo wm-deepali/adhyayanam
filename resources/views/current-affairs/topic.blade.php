@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title')
-Adhyayanam | Current Affairs Categories 
+Adhyayanam | Current Affairs Categories
 @endsection
 
 @section('content')
@@ -16,7 +16,8 @@ Adhyayanam | Current Affairs Categories
             </div>
 
             <div class="container mt-4">
-                <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#addTopicModal">
+                <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal"
+                    data-bs-target="#addTopicModal">
                     Add Categories
                 </button>
 
@@ -36,15 +37,76 @@ Adhyayanam | Current Affairs Categories
                             <th scope="row">{{ $loop->iteration }}</th>
                             <td>{{ $topic->name }}</td>
                             <td>{{ $topic->description ?? '' }}</td>
-                            <td>{{ $topic->created_at }}</td>
+                            <td>{{ $topic->created_at->format('d M Y, h:i A') }}</td>
                             <td>
-                                <form action="{{ route('current.affairs.topic.delete', $topic->id) }}" method="POST" style="display:inline;">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-                                </form>
+                                <div class="dropdown">
+                                    <button class="btn btn-secondary dropdown-toggle btn-sm" type="button"
+                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                        Actions
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li>
+                                            <a class="dropdown-item" href="#" data-bs-toggle="modal"
+                                                data-bs-target="#editTopicModal{{ $topic->id }}">
+                                                <i class="fas fa-edit"></i> Edit
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <form action="{{ route('current.affairs.topic.delete', $topic->id) }}"
+                                                method="POST" style="display:inline;">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="dropdown-item text-danger">
+                                                    <i class="fas fa-trash" style="color: #dc3545!important"></i> Delete
+                                                </button>
+                                            </form>
+                                        </li>
+                                    </ul>
+                                </div>
                             </td>
                         </tr>
+
+                        <!-- Edit Modal for this category -->
+                        <div class="modal fade" id="editTopicModal{{ $topic->id }}" tabindex="-1"
+                            aria-labelledby="editTopicModalLabel{{ $topic->id }}" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <form method="POST"
+                                        action="{{ route('current.affairs.topic.update', $topic->id) }}">
+                                        @csrf
+                                        @method('PUT')
+                                        <div class="modal-header">
+                                            <h5 class="modal-title"
+                                                id="editTopicModalLabel{{ $topic->id }}">Edit Category</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="mb-3">
+                                                <label for="name" class="form-label">Category Name</label>
+                                                <input type="text" class="form-control" name="name"
+                                                    value="{{ $topic->name }}" required>
+                                                @error('name')
+                                                    <span class="text-danger">{{ $message }}</span>
+                                                @enderror
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="description" class="form-label">Description</label>
+                                                <textarea class="form-control" name="description" required>{{ $topic->description }}</textarea>
+                                                @error('description')
+                                                    <span class="text-danger">{{ $message }}</span>
+                                                @enderror
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary"
+                                                data-bs-dismiss="modal">Close</button>
+                                            <button type="submit" class="btn btn-primary">Update Category</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
                         @endforeach
                     </tbody>
                 </table>

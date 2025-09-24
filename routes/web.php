@@ -357,6 +357,7 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
         Route::get('current-affairs/show/{id}', [App\Http\Controllers\ContentManagementController::class, 'currentAffairShow'])->name('current.affairs.show');
         Route::put('current-affairs/update/{id}', [App\Http\Controllers\ContentManagementController::class, 'currentAffairUpdate'])->name('current.affairs.update');
         Route::post('current-affairs/topic/store', [App\Http\Controllers\ContentManagementController::class, 'topicStore'])->name('current.affairs.topic.store');
+        Route::put('current-affairs/topic/update/{id}', [App\Http\Controllers\ContentManagementController::class, 'topicUpdate'])->name('current.affairs.topic.update');
         Route::delete('current-affairs/topic/delete/{id}', [App\Http\Controllers\ContentManagementController::class, 'topicDelete'])->name('current.affairs.topic.delete');
         Route::post('current-affairs/store', [App\Http\Controllers\ContentManagementController::class, 'currentAffairStore'])->name('current.affairs.store');
         Route::delete('current-affairs/delete/{id}', [App\Http\Controllers\ContentManagementController::class, 'currentAffairDelete'])->name('current.affairs.delete');

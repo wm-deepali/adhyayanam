@@ -280,9 +280,8 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
         Route::get('enquiries-and-call/direct-enquiries', [App\Http\Controllers\ContentManagementController::class, 'directEnquiriesIndex'])->name('enquiries.direct.call');
         Route::get('enquiries-and-call/contact-us', [App\Http\Controllers\ContentManagementController::class, 'contactUsIndex'])->name('enquiries.contact.us');
         Route::get('enquiries-and-call/call-back-request', [App\Http\Controllers\ContentManagementController::class, 'callRequestIndex'])->name('enquiries.call.request');
-        Route::get('current-affairs/topic', [App\Http\Controllers\ContentManagementController::class, 'topicIndex'])->name('current.affairs.topic');
-        Route::get('current-affairs', [App\Http\Controllers\ContentManagementController::class, 'currentAffairIndex'])->name('current.affairs.index');
-        Route::get('current-affairs/create', [App\Http\Controllers\ContentManagementController::class, 'currentAffairCreate'])->name('current.affairs.create');
+
+
         Route::get('feedback', [App\Http\Controllers\ContentManagementController::class, 'feedIndex'])->name('feed.index');
         Route::get('testimonials', [App\Http\Controllers\ContentManagementController::class, 'testimonialsIndex'])->name('testimonials.index');
         Route::get('testimonial/view/{id}', [App\Http\Controllers\ContentManagementController::class, 'testimonialView'])->name('testimonial.view');
@@ -351,6 +350,12 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
         Route::delete('test-planner/delete/{id}', [App\Http\Controllers\ContentManagementController::class, 'testPlannerDelete'])->name('test.planner.delete');
         Route::get('test-planner/bulk-delete', [App\Http\Controllers\ContentManagementController::class, 'testPlannerBulkDelete'])->name('test.planner.bulk-delete');
 
+        Route::get('current-affairs/topic', [App\Http\Controllers\ContentManagementController::class, 'topicIndex'])->name('current.affairs.topic');
+        Route::get('current-affairs', [App\Http\Controllers\ContentManagementController::class, 'currentAffairIndex'])->name('current.affairs.index');
+        Route::get('current-affairs/create', [App\Http\Controllers\ContentManagementController::class, 'currentAffairCreate'])->name('current.affairs.create');
+        Route::get('current-affairs/edit/{id}', [App\Http\Controllers\ContentManagementController::class, 'currentAffairEdit'])->name('current.affairs.edit');
+        Route::get('current-affairs/show/{id}', [App\Http\Controllers\ContentManagementController::class, 'currentAffairShow'])->name('current.affairs.show');
+        Route::put('current-affairs/update/{id}', [App\Http\Controllers\ContentManagementController::class, 'currentAffairUpdate'])->name('current.affairs.update');
         Route::post('current-affairs/topic/store', [App\Http\Controllers\ContentManagementController::class, 'topicStore'])->name('current.affairs.topic.store');
         Route::delete('current-affairs/topic/delete/{id}', [App\Http\Controllers\ContentManagementController::class, 'topicDelete'])->name('current.affairs.topic.delete');
         Route::post('current-affairs/store', [App\Http\Controllers\ContentManagementController::class, 'currentAffairStore'])->name('current.affairs.store');

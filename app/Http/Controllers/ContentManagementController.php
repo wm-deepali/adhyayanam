@@ -1361,6 +1361,7 @@ class ContentManagementController extends Controller
             'publishing_date' => 'required',
             'thumbnail_image' => 'required|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
             'banner_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
+            'pdf_file' => 'nullable|mimes:pdf|max:10240', // max 10MB
             'image_alt_tag' => 'nullable|string|max:255',
             'meta_title' => 'nullable|string|max:255',
             'meta_keyword' => 'nullable|string|max:255',
@@ -1383,6 +1384,11 @@ class ContentManagementController extends Controller
             $bannerPath = $request->file('banner_image')->store('banners', 'public');
         }
 
+        $pdfPath = null;
+        if ($request->hasFile('pdf_file')) {
+            $pdfPath = $request->file('pdf_file')->store('pdfs', 'public');
+        }
+
         // Create a new record in the database
         $currentAffair = CurrentAffair::create([
             'topic_id' => $request->topic_id,
@@ -1392,6 +1398,7 @@ class ContentManagementController extends Controller
             'publishing_date' => $request->publishing_date,
             'thumbnail_image' => $thumbnailPath,
             'banner_image' => $bannerPath,
+            'pdf_file' => $pdfPath,
             'image_alt_tag' => $request->image_alt_tag,
             'meta_title' => $request->meta_title,
             'meta_keyword' => $request->meta_keyword,
@@ -1399,6 +1406,74 @@ class ContentManagementController extends Controller
         ]);
 
         return redirect()->route('current.affairs.index')->with('success', 'Current Affair added successfully!');
+    }
+
+    public function currentAffairShow($id)
+    {
+        $currentAffair = CurrentAffair::findOrFail($id);
+        return view('current-affairs.show', compact('currentAffair'));
+    }
+
+    // Show edit form
+    public function currentAffairEdit($id)
+    {
+        $currentAffair = CurrentAffair::findOrFail($id);
+        $topics = Topic::all();
+        return view('current-affairs.edit', compact('currentAffair', 'topics'));
+    }
+
+    // Update current affair
+    public function currentAffairUpdate(Request $request, $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'topic_id' => 'required|integer',
+            'title' => 'required|string|max:255',
+            'short_description' => 'required|string',
+            'details' => 'required|string',
+            'publishing_date' => 'required',
+            'thumbnail_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
+            'banner_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
+            'pdf_file' => 'nullable|mimes:pdf|max:10240', // max 10MB
+            'image_alt_tag' => 'nullable|string|max:255',
+            'meta_title' => 'nullable|string|max:255',
+            'meta_keyword' => 'nullable|string|max:255',
+            'meta_description' => 'nullable|string|max:255',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
+        $currentAffair = CurrentAffair::findOrFail($id);
+
+        // Handle file uploads
+        if ($request->hasFile('thumbnail_image')) {
+            $currentAffair->thumbnail_image = $request->file('thumbnail_image')->store('thumbnails', 'public');
+        }
+
+        if ($request->hasFile('banner_image')) {
+            $currentAffair->banner_image = $request->file('banner_image')->store('banners', 'public');
+        }
+
+        if ($request->hasFile('pdf_file')) {
+            $currentAffair->pdf_file = $request->file('pdf_file')->store('pdfs', 'public');
+        }
+
+
+        // Update other fields
+        $currentAffair->topic_id = $request->topic_id;
+        $currentAffair->title = $request->title;
+        $currentAffair->short_description = $request->short_description;
+        $currentAffair->details = $request->details;
+        $currentAffair->publishing_date = $request->publishing_date;
+        $currentAffair->image_alt_tag = $request->image_alt_tag;
+        $currentAffair->meta_title = $request->meta_title;
+        $currentAffair->meta_keyword = $request->meta_keyword;
+        $currentAffair->meta_description = $request->meta_description;
+
+        $currentAffair->save();
+
+        return redirect()->route('current.affairs.index')->with('success', 'Current Affair updated successfully!');
     }
 
     public function studyMaterialIndex(Request $request)

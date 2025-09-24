@@ -19,6 +19,7 @@ class CurrentAffair extends Model
         'publishing_date',
         'thumbnail_image',
         'banner_image',
+        'pdf_file',
         'image_alt_tag',
         'meta_title',
         'meta_keyword',

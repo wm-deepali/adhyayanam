@@ -254,7 +254,7 @@
                     <svg class="nav-icon">
                         <use xlink:href="{{ asset('icons/coreui.svg#cil-bug') }}"></use>
                     </svg>
-                    Topics
+                    Categories
                 </a>
             </li>
             <li class="nav-item">

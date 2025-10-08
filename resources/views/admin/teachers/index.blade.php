@@ -154,13 +154,13 @@
             var teacherNameSpan = $('#teacherName');
 
             // When change password button clicked
-            $(document).on('click', '.change-password-btn', function () {
+            $(document).on('click', '.btn-change-password', function () {
                 var teacherId = $(this).data('id');
                 var teacherName = $(this).data('name');
                 teacherNameSpan.text(teacherName);
 
                 // Change form action dynamically
-                form.attr('action', '/teachers/' + teacherId + '/change-password');
+                form.attr('action', '/manage-teachers/' + teacherId + '/change-password');
 
                 // Reset form fields
                 form[0].reset();

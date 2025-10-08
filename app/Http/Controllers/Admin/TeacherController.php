@@ -427,8 +427,9 @@ class TeacherController extends Controller
     }
 
     public function changePassword(Request $request, Teacher $teacher)
+    // Validate password and confirmation
     {
-        // Validate password and confirmation
+
         $request->validate([
             'password' => 'required|string|min:6|confirmed',
         ]);
@@ -438,7 +439,11 @@ class TeacherController extends Controller
         $teacher->save();
 
         // Redirect back with success message
-        return redirect()->back()->with('success', 'Password updated successfully!');
+        return response()->json([
+            'success' => true,
+            'message' => 'Password updated successfully!'
+        ]);
+
     }
 
 

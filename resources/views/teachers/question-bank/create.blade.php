@@ -537,29 +537,30 @@
             }
         });
 
-        document.getElementById('add-more').addEventListener('click', function () {
-            var qType = document.getElementById('question-type');
+         let questionIndex = 1; // Start with question 1
 
+        document.getElementById('add-more').addEventListener('click', function () {
+            questionIndex++; // increment for each new question
+
+            var qType = document.getElementById('question-type');
+            var questionBlock;
             if (qType.value == 'MCQ') {
-                var questionBlock = document.getElementById('mcq_question_form');
-            }
-            else if (qType.value == 'Subjective') {
-                var questionBlock = document.getElementById('subjective_question_form');
-            }
-            else if (qType.value == 'Story Based') {
-                var questionBlock = document.getElementById('story_question_form');
+                questionBlock = document.getElementById('mcq_question_form');
+            } else if (qType.value == 'Subjective') {
+                questionBlock = document.getElementById('subjective_question_form');
+            } else if (qType.value == 'Story Based') {
+                questionBlock = document.getElementById('story_question_form');
             }
 
             let newQuestionBlock = questionBlock.cloneNode(true);
 
             // Update question count
-            let count = document.querySelectorAll('.question-block').length + 1;
-
-            newQuestionBlock.querySelector('.question-count').innerHTML = '<h4 class="mt-4">Question ' + count + '</h4>';
+            newQuestionBlock.querySelector('.question-count').innerHTML = '<h4 class="mt-4">Question ' + questionIndex + '</h4>';
 
             // Append the cloned question block
             document.getElementById('question-clone').appendChild(newQuestionBlock);
         });
+        
         function toggleInstruction(checkbox) {
             const instructionGroup = checkbox.closest('.question-block').querySelector('.instruction-group');
             instructionGroup.style.display = checkbox.checked ? 'block' : 'none';

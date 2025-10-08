@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title')
-    Study Material
+    Adhayaynam | Study Material
 @endsection
 
 @section('content')

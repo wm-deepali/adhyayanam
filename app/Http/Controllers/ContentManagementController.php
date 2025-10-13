@@ -2673,7 +2673,7 @@ class ContentManagementController extends Controller
 
     public function questionBankStore(Request $request)
     {
-        //dd($request->all());
+        // dd($request->all());
         $validatedData = $request->validate([
             'language' => 'required',
             'question_category' => 'required',
@@ -2759,7 +2759,7 @@ class ContentManagementController extends Controller
                 $question->solution = isset(($request->hasFile('answerformatsolution')[$key])) ? $request->answerformatsolution->store('answerformatsolution')[$key] : NULL;
                 // Save the question to the database
                 $question->added_by_id = auth()->id(); // teacher's ID
-                $questionData['added_by_type'] = 'user';
+                $question->added_by_type = 'user';
 
                 $question->save();
 

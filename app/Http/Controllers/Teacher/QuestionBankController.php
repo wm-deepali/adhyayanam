@@ -149,7 +149,7 @@ class QuestionBankController extends Controller
 
     public function store(Request $request)
     {
-        //dd($request->all());
+        // dd($request->all());
         $validatedData = $request->validate([
             'language' => 'required',
             'question_category' => 'required',
@@ -219,7 +219,7 @@ class QuestionBankController extends Controller
 
                 // Assign the teacher who added the question
                 $question->added_by_id = auth()->id(); // teacher's ID
-                $questionData['added_by_type'] = 'teacher';
+                $question->added_by_type = 'teacher';
                 // Set default status
                 $question->status = 'pending';
 

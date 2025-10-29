@@ -175,29 +175,61 @@
 
 
                     {{-- Question Type Permission --}}
-                    <h4 class="mt-4 mb-3">Question Type Permission</h4>
-                    <div class="row">
-                        @php
-                            $questionTypes = ['MCQ', 'Subjective', 'Story / Passage-Based'];
-                            $oldPermissions = old('question_type_permission', []);
-                            $oldPayments = old('pay_per_question', []);
-                        @endphp
-                        @foreach($questionTypes as $type)
-                            <div class="col-md-4 mb-3">
-                                <div class="form-check">
-                                    <input type="checkbox" class="form-check-input qtype-checkbox" id="qtype_{{ $loop->index }}"
-                                        value="{{ $type }}" name="question_type_permission[]" {{ in_array($type, $oldPermissions) ? 'checked' : '' }}>
-                                    <labeWl class="form-check-label" for="qtype_{{ $loop->index }}">{{ $type }}</labeWl>
-                                </div>
-                                <div class="mt-2 pay-per-question"
-                                    style="{{ in_array($type, $oldPermissions) ? 'display:block' : 'display:none' }}">
-                                    <label>Pay Per Question (₹)</label>
-                                    <input type="number" name="pay_per_question[{{ $type }}]" class="form-control" min="0"
-                                        placeholder="Enter amount" value="{{ $oldPayments[$type] ?? '' }}">
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
+                  {{-- Question Type Permission --}}
+<h4 class="mt-4 mb-3">Question Type Permission</h4>
+<div class="row">
+  @php
+    $questionTypes = [
+        'MCQ' => 'mcq',
+        'Subjective' => 'subjective',
+        'Story / Passage-Based' => 'story'
+    ];
+
+    // Determine which permissions were checked in old input or model
+    $selectedPermissions = old('question_type_permission', []);
+    if (empty($selectedPermissions)) {
+        if ($teacher->allow_mcq) $selectedPermissions[] = 'MCQ';
+        if ($teacher->allow_subjective) $selectedPermissions[] = 'Subjective';
+        if ($teacher->allow_story) $selectedPermissions[] = 'Story / Passage-Based';
+    }
+
+    // Correct field mapping
+    $payPerQuestion = old('pay_per_question', [
+        'MCQ' => $teacher->pay_per_mcq,
+        'Subjective' => $teacher->pay_per_subjective,
+        'Story / Passage-Based' => $teacher->pay_per_story
+    ]);
+@endphp
+
+
+    @foreach($questionTypes as $label => $key)
+        <div class="col-md-4 mb-3">
+            <div class="form-check">
+                <input
+                    type="checkbox"
+                    class="form-check-input qtype-checkbox"
+                    id="qtype_{{ $loop->index }}"
+                    value="{{ $label }}"
+                    name="question_type_permission[]"
+                    {{ in_array($label, $selectedPermissions) ? 'checked' : '' }}>
+                <label class="form-check-label" for="qtype_{{ $loop->index }}">{{ $label }}</label>
+            </div>
+
+            <div class="mt-2 pay-per-question"
+                style="{{ in_array($label, $selectedPermissions) ? 'display:block' : 'display:none' }}">
+                <label>Pay Per Question (₹)</label>
+                <input
+                    type="number"
+                    name="pay_per_question[{{ $label }}]"
+                    class="form-control"
+                    min="0"
+                    placeholder="Enter amount"
+                    value="{{ $payPerQuestion[$label] ?? '' }}">
+            </div>
+        </div>
+    @endforeach
+</div>
+
 
                     <div class="row">
                         {{-- Bank Detail --}}
@@ -381,6 +413,10 @@
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
+        $('.qtype-checkbox').change(function () {
+    $(this).closest('.col-md-4').find('.pay-per-question').toggle(this.checked);
+});
+
         document.getElementById('teacherForm').addEventListener('submit', function (e) {
             e.preventDefault();
 

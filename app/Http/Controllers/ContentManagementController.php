@@ -2470,8 +2470,9 @@ class ContentManagementController extends Controller
 
     public function questionBankIndex(Request $request)
     {
-
         try {
+            $teacherId = $request->teacher_id; // 🔹 Added teacher filter
+
             if ($request->ajax()) {
                 $language = $request->language;
                 $question_type = $request->question_type;
@@ -2517,14 +2518,27 @@ class ContentManagementController extends Controller
                     })
                     ->when($year, function ($query, $year) {
                         return $query->where('previous_year', $year);
-                    })->where('status', '=', 'Done')->latest()->paginate(10);
+                    })
+                    ->when($teacherId, function ($query, $teacherId) {
+                        return $query->where('added_by_id', $teacherId);
+                    }) // 🔹 Teacher filter added
+                    ->where('status', '=', 'Done')
+                    ->latest()
+                    ->paginate(10);
 
                 return view('question-bank.question-table')->with([
                     'questionBanks' => $questions
                 ]);
             } else {
                 $data['commissions'] = ExaminationCommission::get();
-                $data['questionBanks'] = Question::where('status', '=', 'Done')->latest()->paginate(10);
+
+                $data['questionBanks'] = Question::when($teacherId, function ($query, $teacherId) {
+                    return $query->where('added_by_id', $teacherId);
+                })
+                    ->where('status', '=', 'Done')
+                    ->latest()
+                    ->paginate(10);
+
                 return view('question-bank.index', $data);
             }
         } catch (\Exception $ex) {
@@ -2538,13 +2552,13 @@ class ContentManagementController extends Controller
 
     public function rejectQuestionBankIndex()
     {
-        $data['questionBanks'] = Question::where('status', '=', 'Rejected')->get();
+        $data['questionBanks'] = Question::where('status', '=', 'Rejected')->paginate(10);
         return view('question-bank.rejected', $data);
     }
 
     public function pendingQuestionBankIndex(Request $request)
     {
-        $questions = Question::where('status', 'Pending')->paginate(10);
+        $questions = Question::where('status', 'Pending')->paginate(1);
         return view('question-bank.pending', [
             'questionBanks' => $questions,
         ]);
@@ -3028,26 +3042,57 @@ class ContentManagementController extends Controller
                             } else {
                                 $option_d = $tables[$i]->find('tr', 4)->find('td', 1)->find('p')->innerHtml;
                             }
-                            if ($tables[$i]->find('tr', 5)->find('td', 1)->find('p')->innerHtml == '&nbsp;') {
-                                $option_e = NULL;
+
+                            $rejectQuestion = false;
+                            $rejectNote = '';
+
+                            // Option E (optional)
+                            $tr5 = $tables[$i]->find('tr', 5);
+                            $td5 = $tr5 ? $tr5->find('td', 1) : null;
+                            $p5 = $td5 ? $td5->find('p') : null;
+                            if ($p5 === null || $p5->innerHtml === '&nbsp;') {
+                                $option_e = null;
                                 $has_option_e = false;
                             } else {
-                                $option_e = $tables[$i]->find('tr', 5)->find('td', 1)->find('p')->innerHtml;
+                                $option_e = $p5->innerHtml;
                                 $has_option_e = true;
                             }
 
-                            if ($tables[$i]->find('tr', 6)->find('td', 1)->find('p')->innerHtml == '&nbsp;') {
-                                $answer = NULL;
+                            // Answer (mandatory)
+                            $tr6 = $tables[$i]->find('tr', 6);
+                            $td6 = $tr6 ? $tr6->find('td', 1) : null;
+                            $p6 = $td6 ? $td6->find('p') : null;
+                            if ($p6 === null) {
+                                $answer = null;
+                                $rejectQuestion = true;
+                                $rejectNote = 'Question Format Issue';
                             } else {
-                                $answer = $tables[$i]->find('tr', 6)->find('td', 1)->find('p')->find('span')->innerHtml;
+                                $span = $p6->find('span');
+                                $answer = $span ? $span->innerHtml : null;
+                                if (!$answer) {
+                                    $rejectQuestion = true;
+                                    $rejectNote = 'Question Format Issue';
+                                }
                             }
 
-                            if ($tables[$i]->find('tr', 7)->find('td', 1)->find('p')->innerHtml == '&nbsp;') {
-                                $instruction = NULL;
+                            // Instruction (optional)
+                            $tr7 = $tables[$i]->find('tr', 7);
+                            $td7 = $tr7 ? $tr7->find('td', 1) : null;
+                            $p7 = $td7 ? $td7->find('p') : null;
+                            if ($p7 === null || $p7->innerHtml === '&nbsp;') {
+                                $instruction = null;
                                 $has_instruction = false;
                             } else {
-                                $instruction = $tables[$i]->find('tr', 7)->find('td', 1)->innerHtml;
+                                $instruction = $td7->innerHtml;
                                 $has_instruction = true;
+                            }
+
+                            // Finally, set status once
+                            if ($rejectQuestion) {
+                                $questionData['status'] = 'Rejected';
+                                $questionData['note'] = $rejectNote;
+                            } else {
+                                $questionData['status'] = 'Done'; // or success after insert
                             }
 
                             // $que =   QuestionBank::where('question',$question)
@@ -3431,17 +3476,36 @@ class ContentManagementController extends Controller
 
     }
 
-    public function questionBankDelete($id)
+    public function questionBankDelete(Request $request, $id)
     {
-        //  $question = QuestionBank::findOrFail($id);
-        //  if($question)
-        //  {
-        $que = Question::where('id', $id)->first();
-        $que->delete();
-        //  }
-        // $question->delete();
-        return redirect()->back()->with('success', 'Question Bank deleted successfully.');
+        try {
+            $question = Question::findOrFail($id);
+            $question->delete();
+
+            // If AJAX request → return JSON
+            if ($request->ajax()) {
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Question deleted successfully.'
+                ]);
+            }
+
+            // Normal (non-AJAX) delete
+            return redirect()->back()->with('success', 'Question Bank deleted successfully.');
+
+        } catch (\Exception $e) {
+            if ($request->ajax()) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Something went wrong while deleting the question.',
+                    'error' => $e->getMessage()
+                ], 500);
+            }
+
+            return redirect()->back()->with('error', 'Something went wrong while deleting the question.');
+        }
     }
+
 
 
     public function batchesProgrammeIndex()

@@ -62,7 +62,7 @@ class TeacherController extends Controller
   <ul class="dropdown-menu" aria-labelledby="actionMenu' . $teacher->id . '">
     <li><a class="dropdown-item text-primary" href="' . route("manage-teachers.show", $teacher->id) . '"><i class="fas fa-user me-2"></i> View Profile</a></li>
         <li><a class="dropdown-item text-success" href="' . route("teacher.wallet.index", ['teacher_id' => $teacher->id]) . '"><i class="fas fa-wallet me-2"></i> View Wallet</a></li>
-    <li><a class="dropdown-item text-info" href="#"><i class="fas fa-question-circle me-2"></i> View All Questions</a></li>
+    <li><a class="dropdown-item text-info" href="' . route("question.bank.index", ['teacher_id' => $teacher->id]) . '"><i class="fas fa-question-circle me-2"></i> View All Questions</a></li>
     <li><a class="dropdown-item text-warning" href="' . route("withdrawal.requests.index", ['teacher_id' => $teacher->id]) . '"><i class="fas fa-money-check me-2"></i> View Payouts</a></li>
     <li><a class="dropdown-item text-secondary" href="' . route("manage-teachers.edit", $teacher->id) . '"><i class="fas fa-edit me-2"></i> Edit</a></li>
     <li><button class="dropdown-item text-dark btn-change-password" data-id="' . $teacher->id . '" data-name="' . e($teacher->full_name) . '"><i class="fas fa-key me-2"></i> Change Password</button></li>

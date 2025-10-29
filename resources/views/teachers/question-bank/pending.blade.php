@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.teacher-app')
 
 @section('title')
     Pending Questions
@@ -14,7 +14,7 @@
                         <h6 class="card-subtitle mb-2 text-muted">Manage all pending questions here.</h6>
                     </div>
                     <div class="justify-content-end">
-                        <a href='{{route('question.bank.index')}}' class="btn btn-primary">Back</a>
+                        <a href='{{route('teacher.question.bank.index')}}' class="btn btn-primary">Back</a>
                     </div>
                 </div>
                 <div class="mt-2">
@@ -53,64 +53,24 @@
                                             Actions
                                         </button>
                                         <ul class="dropdown-menu">
-                                            <li><a class="dropdown-item" href="{{ route('question.bank.view', $data->id) }}"><i
+                                            <li><a class="dropdown-item" href="{{ route('teacher.question.bank.view', $data->id) }}"><i
                                                         class="fas fa-eye"></i> View</a></li>
-                                            <li><a class="dropdown-item" href="{{ route('question.bank.edit', $data->id) }}"><i
+                                            <li><a class="dropdown-item" href="{{ route('teacher.question.bank.edit', $data->id) }}"><i
                                                         class="fas fa-edit"></i> Edit</a></li>
                                             <li>
                                                 <button type="button" class="dropdown-item text-danger deleteBtn"
                                                     data-id="{{ $data->id }}"
-                                                    data-url="{{ route('question.bank.delete', $data->id) }}">
+                                                    data-url="{{ route('teacher.question.bank.delete', $data->id) }}">
                                                     <i class="fas fa-trash"></i> Delete</button>
                                             </li>
-                                            <li>
-                                                <form action="{{ route('question.bank.update-status', $data->id) }}"
-                                                    method="POST" style="display:inline;">
-                                                    @csrf
-                                                    <input type="hidden" name="status" value="Done">
-                                                    <button type="submit" class="dropdown-item text-success"><i
-                                                            class="fas fa-check"></i> Approve</button>
-                                                </form>
-                                            </li>
-                                            <li>
-                                                <button class="dropdown-item text-warning" data-bs-toggle="modal"
-                                                    data-bs-target="#rejectModal{{ $data->id }}"><i class="fas fa-times"></i>
-                                                    Reject</button>
-                                            </li>
+                                           
                                         </ul>
 
                                     </div>
                                 </td>
                             </tr>
 
-                            <!-- Reject Modal -->
-                            <div class="modal fade" id="rejectModal{{ $data->id ?? '' }}" tabindex="-1"
-                                aria-labelledby="rejectModalLabel{{ $data->id }}" aria-hidden="true">
-                                <div class="modal-dialog">
-                                    <form action="{{ route('question.bank.update-status', $data->id) }}" method="POST">
-                                        @csrf
-                                        <input type="hidden" name="status" value="Rejected">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" id="rejectModalLabel{{ $data->id }}">Reject Question
-                                                </h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                            </div>
-                                            <div class="modal-body">
-                                                <div class="form-group">
-                                                    <label>Reason for Rejection</label>
-                                                    <textarea name="note" class="form-control" required></textarea>
-                                                </div>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary"
-                                                    data-bs-dismiss="modal">Cancel</button>
-                                                <button type="submit" class="btn btn-warning">Reject</button>
-                                            </div>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
+                          
                         @endforeach
                     </tbody>
                 </table>

@@ -156,6 +156,7 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
             // teacher question bank routes
             Route::get('question-bank', [QuestionBankController::class, 'index'])->name('question.bank.index');
             Route::get('rejected-question-bank', [QuestionBankController::class, 'rejectQuestionBankIndex'])->name('question.bank.rejected');
+            Route::get('question-bank/pending', [QuestionBankController::class, 'pendingQuestionBankIndex'])->name('question.bank.pending');
             Route::get('question-bank/create', [QuestionBankController::class, 'create'])->name('question.bank.create');
             Route::post('question-bank/store', [QuestionBankController::class, 'store'])->name('question.bank.store');
             Route::post('question-bank/import-questions', [QuestionBankController::class, 'ImportQuestions'])->name('question.bank.import-questions');

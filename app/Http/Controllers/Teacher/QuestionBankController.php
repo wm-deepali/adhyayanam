@@ -72,7 +72,7 @@ class QuestionBankController extends Controller
                     ->when($year, function ($query, $year) {
                         return $query->where('previous_year', $year);
                     })
-                    ->whereIn('status', ['Pending', 'Done']) // 🔹 Include both Pending and Done
+                    ->whereIn('status', ['Done']) // 🔹 Include both Pending and Done
                     ->where('added_by_id', $teacherId) // 🔹 Filter by logged-in teacher
                     ->latest()->paginate(10);
 
@@ -81,7 +81,7 @@ class QuestionBankController extends Controller
                 ]);
             } else {
                 $data['commissions'] = ExaminationCommission::get();
-                $data['questionBanks'] = Question::whereIn('status', ['Pending', 'Done'])
+                $data['questionBanks'] = Question::whereIn('status', ['Done'])
                     ->where('added_by_id', $teacherId) // 🔹 Filter by logged-in teacher
                     ->latest()
                     ->paginate(10);
@@ -102,10 +102,24 @@ class QuestionBankController extends Controller
 
         $data['questionBanks'] = Question::where('status', 'Rejected')
             ->where('added_by_id', $teacherId)
-            ->get();
+            ->paginate(10);
 
         return view('teachers.question-bank.rejected', $data);
     }
+
+    public function pendingQuestionBankIndex(Request $request)
+    {
+        $teacherId = auth()->id(); // Logged-in teacher/user ID
+
+        $questions = Question::where('status', 'Pending')
+            ->where('added_by_id', $teacherId)
+            ->paginate(10);
+
+        return view('teachers.question-bank.pending', [
+            'questionBanks' => $questions,
+        ]);
+    }
+
 
     public function questionBankView($id)
     {
@@ -565,28 +579,58 @@ class QuestionBankController extends Controller
                             } else {
                                 $option_d = $tables[$i]->find('tr', 4)->find('td', 1)->find('p')->innerHtml;
                             }
-                            if ($tables[$i]->find('tr', 5)->find('td', 1)->find('p')->innerHtml == '&nbsp;') {
-                                $option_e = NULL;
+
+                            $rejectQuestion = false;
+                            $rejectNote = '';
+
+                            // Option E (optional)
+                            $tr5 = $tables[$i]->find('tr', 5);
+                            $td5 = $tr5 ? $tr5->find('td', 1) : null;
+                            $p5 = $td5 ? $td5->find('p') : null;
+                            if ($p5 === null || $p5->innerHtml === '&nbsp;') {
+                                $option_e = null;
                                 $has_option_e = false;
                             } else {
-                                $option_e = $tables[$i]->find('tr', 5)->find('td', 1)->find('p')->innerHtml;
+                                $option_e = $p5->innerHtml;
                                 $has_option_e = true;
                             }
 
-                            if ($tables[$i]->find('tr', 6)->find('td', 1)->find('p')->innerHtml == '&nbsp;') {
-                                $answer = NULL;
+                            // Answer (mandatory)
+                            $tr6 = $tables[$i]->find('tr', 6);
+                            $td6 = $tr6 ? $tr6->find('td', 1) : null;
+                            $p6 = $td6 ? $td6->find('p') : null;
+                            if ($p6 === null) {
+                                $answer = null;
+                                $rejectQuestion = true;
+                                $rejectNote = 'Question Format Issue';
                             } else {
-                                $answer = $tables[$i]->find('tr', 6)->find('td', 1)->find('p')->find('span')->innerHtml;
+                                $span = $p6->find('span');
+                                $answer = $span ? $span->innerHtml : null;
+                                if (!$answer) {
+                                    $rejectQuestion = true;
+                                    $rejectNote = 'Question Format Issue';
+                                }
                             }
 
-                            if ($tables[$i]->find('tr', 7)->find('td', 1)->find('p')->innerHtml == '&nbsp;') {
-                                $instruction = NULL;
+                            // Instruction (optional)
+                            $tr7 = $tables[$i]->find('tr', 7);
+                            $td7 = $tr7 ? $tr7->find('td', 1) : null;
+                            $p7 = $td7 ? $td7->find('p') : null;
+                            if ($p7 === null || $p7->innerHtml === '&nbsp;') {
+                                $instruction = null;
                                 $has_instruction = false;
                             } else {
-                                $instruction = $tables[$i]->find('tr', 7)->find('td', 1)->innerHtml;
+                                $instruction = $td7->innerHtml;
                                 $has_instruction = true;
                             }
 
+                            // Finally, set status once
+                            if ($rejectQuestion) {
+                                $questionData['status'] = 'Rejected';
+                                $questionData['note'] = $rejectNote;
+                            } else {
+                                $questionData['status'] = 'Done'; // or success after insert
+                            }
                             // $que =   QuestionBank::where('question',$question)
                             // // ->where('question_category',$request->question_category)
                             // // ->where('commission_id',$request->commission_id)
@@ -967,6 +1011,47 @@ class QuestionBankController extends Controller
         }
 
 
+    }
+
+    public function replaceThWithTd($htmlFilePath)
+    {
+        // Load the HTML
+        $html = file_get_contents($htmlFilePath);
+
+        // Create DOMDocument and load HTML
+        $dom = new \DOMDocument();
+        libxml_use_internal_errors(true); // Suppress warnings
+        $dom->loadHTML($html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+        libxml_clear_errors();
+
+        // Get all <th> elements
+        $thElements = $dom->getElementsByTagName('th');
+
+        // We need to loop backwards because we'll be replacing nodes in-place
+        for ($i = $thElements->length - 1; $i >= 0; $i--) {
+            $th = $thElements->item($i);
+
+            // Create new <td> element
+            $td = $dom->createElement('td');
+
+            // Copy attributes
+            if ($th->hasAttributes()) {
+                foreach ($th->attributes as $attr) {
+                    $td->setAttribute($attr->nodeName, $attr->nodeValue);
+                }
+            }
+
+            // Copy child nodes (text, formatting, etc.)
+            foreach (iterator_to_array($th->childNodes) as $child) {
+                $td->appendChild($child->cloneNode(true));
+            }
+
+            // Replace <th> with <td>
+            $th->parentNode->replaceChild($td, $th);
+        }
+
+        // Save the updated HTML
+        file_put_contents($htmlFilePath, $dom->saveHTML());
     }
 
     public function questionBankDelete($id)

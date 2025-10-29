@@ -18,6 +18,7 @@
                         <a href='{{route('teacher.question.bank.bulk-upload')}}' class="btn btn-primary">&#43; Bulk
                             Upload</a>
                         <a href='{{route('teacher.question.bank.rejected')}}' class="btn btn-primary">Rejected Questions</a>
+                        <a href='{{route('teacher.question.bank.pending')}}' class="btn btn-primary">Pending Questions</a>
                     </div>
                 </div>
                 <div class="mt-2">

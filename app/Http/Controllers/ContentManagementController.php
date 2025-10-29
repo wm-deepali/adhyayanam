@@ -2558,7 +2558,7 @@ class ContentManagementController extends Controller
 
     public function pendingQuestionBankIndex(Request $request)
     {
-        $questions = Question::where('status', 'Pending')->paginate(1);
+        $questions = Question::where('status', 'Pending')->paginate(10);
         return view('question-bank.pending', [
             'questionBanks' => $questions,
         ]);

@@ -42,6 +42,7 @@ use App\Models\Team;
 use App\Models\TestPlanner;
 use App\Models\TestSeries;
 use App\Models\Topic;
+use App\Models\Teacher;
 use App\Models\UpcomingExam;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -2473,6 +2474,13 @@ class ContentManagementController extends Controller
         try {
             $teacherId = $request->teacher_id; // 🔹 Added teacher filter
 
+            // 🔹 Count stats for cards
+            $totalQuestions = Question::count();
+            $approvedQuestions = Question::where('status', 'Done')->count();
+            $pendingQuestions = Question::where('status', 'Pending')->count();
+            $rejectedQuestions = Question::where('status', 'Rejected')->count();
+
+
             if ($request->ajax()) {
                 $language = $request->language;
                 $question_type = $request->question_type;
@@ -2484,10 +2492,9 @@ class ContentManagementController extends Controller
                 $subject_id = $request->subject_id;
                 $chapter_id = $request->chapter_id;
                 $topic_id = $request->topic_id;
-
                 $year = $request->question_category == 1 ? $request->previous_year : "";
 
-
+                // dd($request->all(), $teacherId);
                 $questions = Question::query()
                     ->when($request->language, function ($query, $language) {
                         return $query->where('language', $language);
@@ -2507,7 +2514,7 @@ class ContentManagementController extends Controller
                     ->when($request->sub_category_id, function ($query, $sub_category_id) {
                         return $query->where('sub_category_id', $sub_category_id);
                     })
-                    ->when($request->subject_id && $request->subject_id != "", function ($query, $subject_id) {
+                    ->when($request->subject_id, function ($query, $subject_id) {
                         return $query->where('subject_id', $subject_id);
                     })
                     ->when($request->chapter_id, function ($query, $chapter_id) {
@@ -2519,7 +2526,7 @@ class ContentManagementController extends Controller
                     ->when($year, function ($query, $year) {
                         return $query->where('previous_year', $year);
                     })
-                    ->when($teacherId, function ($query, $teacherId) {
+                    ->when($request->teacher_id, function ($query, $teacherId) {
                         return $query->where('added_by_id', $teacherId);
                     }) // 🔹 Teacher filter added
                     ->where('status', '=', 'Done')
@@ -2532,12 +2539,20 @@ class ContentManagementController extends Controller
             } else {
                 $data['commissions'] = ExaminationCommission::get();
 
+                $data['teachers'] = Teacher::where('status', 1)->get();
+
                 $data['questionBanks'] = Question::when($teacherId, function ($query, $teacherId) {
                     return $query->where('added_by_id', $teacherId);
                 })
                     ->where('status', '=', 'Done')
                     ->latest()
                     ->paginate(10);
+
+                // 🔹 Pass count stats to Blade
+                $data['totalQuestions'] = $totalQuestions;
+                $data['approvedQuestions'] = $approvedQuestions;
+                $data['pendingQuestions'] = $pendingQuestions;
+                $data['rejectedQuestions'] = $rejectedQuestions;
 
                 return view('question-bank.index', $data);
             }
@@ -2558,7 +2573,7 @@ class ContentManagementController extends Controller
 
     public function pendingQuestionBankIndex(Request $request)
     {
-        $questions = Question::where('status', 'Pending')->paginate(10);
+        $questions = Question::whereIn('status', ['Pending', 'resubmitted'])->paginate(10);
         return view('question-bank.pending', [
             'questionBanks' => $questions,
         ]);
@@ -2570,20 +2585,27 @@ class ContentManagementController extends Controller
     {
         $request->validate([
             'status' => 'required|in:Done,Rejected',
-            'note' => 'nullable|string|max:255', // Required only for rejection
+            'note' => 'nullable|string|max:255',
         ]);
 
         $question = Question::findOrFail($id);
         $question->status = $request->status;
         $question->note = $request->status === 'Rejected' ? $request->note : null;
+
+        // 🧩 Store who rejected (if applicable)
+        if ($request->status === 'Rejected') {
+            $question->rejected_by = auth()->id(); // admin who rejected
+        } else {
+            $question->rejected_by = null; // reset if approved
+        }
+
         $question->save();
 
-        // 🔹 If approved, add amount to teacher wallet
+        // 🟢 If approved, credit wallet
         if ($request->status === 'Done' && $question->added_by_type === 'teacher') {
             $teacher = $question->addedBy;
 
             if ($teacher) {
-                // Determine amount based on question type
                 switch ($question->question_type) {
                     case 'MCQ':
                         $amount = $teacher->pay_per_mcq;
@@ -2598,9 +2620,7 @@ class ContentManagementController extends Controller
                         $amount = 0;
                 }
 
-                // dd($amount);
                 if ($amount > 0) {
-                    // Add wallet transaction
                     WalletTransaction::create([
                         'teacher_id' => $teacher->id,
                         'type' => 'credit',
@@ -2609,7 +2629,6 @@ class ContentManagementController extends Controller
                         'details' => 'Approved Question ID: ' . $question->id,
                     ]);
 
-                    // Update teacher wallet balance
                     $teacher->increment('wallet_balance', $amount);
                 }
             }
@@ -2617,6 +2636,7 @@ class ContentManagementController extends Controller
 
         return redirect()->back()->with('success', 'Question status updated successfully.');
     }
+
 
 
 

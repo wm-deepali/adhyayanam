@@ -139,6 +139,19 @@
                         @endif    
                     </div>
 
+                    {{-- Instructions Section --}}
+@if(!empty($paper->test_instruction))
+    <div class="card mt-4">
+        <div class="card-header bg-primary text-white">
+            <strong>Instructions</strong>
+        </div>
+        <div class="card-body">
+            {!! $paper->test_instruction !!}
+        </div>
+    </div>
+@endif
+
+
                 </div>
             </div>
         </div>

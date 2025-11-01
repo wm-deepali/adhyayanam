@@ -42,7 +42,8 @@ class Question extends Model
         'status',
         'note',
         'added_by_id',
-        'added_by_type'
+        'added_by_type',
+        'rejected_by'
     ];
 
     // public function questionBank()
@@ -53,6 +54,13 @@ class Question extends Model
     {
         return $this->belongsTo(Chapter::class, 'chapter_id');
     }
+
+    public function rejectedBy()
+    {
+        return $this->belongsTo(User::class, 'rejected_by');
+    }
+
+
     public function subject()
     {
         return $this->belongsTo(Subject::class, 'subject_id');

@@ -289,17 +289,17 @@
 
         $(document).on('click', '.filterbtn', function (event) {
             let page = 1;
-            let language = $('#language').val();
-            let question_type = $('#question_type').val();
-            let fee_type = $('#fee_type').val();
-            let question_category = $('#question_category').val();
-            let previous_year = $('#previous_year').val();
-            let exam_com_id = $('#exam_com_id').val();
-            let category_id = $('#category_id').val();
-            let sub_category_id = $('#sub_category_id').val();
-            let subject_id = $('#subject_id').val();
-            let chapter_id = $('#chapter_id').val();
-            let topic_id = $('#topic_id').val();
+            let language = $('#language').val() || '';
+            let question_type = $('#question_type').val() || '';
+            let fee_type = $('#fee_type').val() || '';
+            let question_category = $('#question_category').val() || '';
+            let previous_year = $('#previous_year').val() || '';
+            let exam_com_id = $('#exam_com_id').val() || '';
+            let category_id = $('#category_id').val() || '';
+            let sub_category_id = $('#sub_category_id').val() || '';
+            let subject_id = $('#subject_id').val() || '';
+            let chapter_id = $('#chapter_id').val() || '';
+            let topic_id = $('#topic_id').val() || '';
 
             getData(page, language, question_type, fee_type, question_category, previous_year, exam_com_id, category_id, sub_category_id, subject_id, chapter_id, topic_id);
         })
@@ -328,17 +328,17 @@
             $('#language').val('');
 
             let page = 1;
-            let language = $('#language').val();
-            let question_type = $('#question_type').val();
-            let fee_type = $('#fee_type').val();
-            let question_category = $('#question_category').val();
-            let previous_year = $('#previous_year').val();
-            let exam_com_id = $('#exam_com_id').val();
-            let category_id = $('#category_id').val();
-            let sub_category_id = $('#sub_category_id').val();
-            let subject_id = $('#subject_id').val();
-            let chapter_id = $('#chapter_id').val();
-            let topic_id = $('#topic_id').val();
+            let language = $('#language').val() || '';
+            let question_type = $('#question_type').val() || '';
+            let fee_type = $('#fee_type').val() || '';
+            let question_category = $('#question_category').val() || '';
+            let previous_year = $('#previous_year').val() || '';
+            let exam_com_id = $('#exam_com_id').val() || '';
+            let category_id = $('#category_id').val() || '';
+            let sub_category_id = $('#sub_category_id').val() || '';
+            let subject_id = $('#subject_id').val() || '';
+            let chapter_id = $('#chapter_id').val() || '';
+            let topic_id = $('#topic_id').val() || '';
             getData(page, language, question_type, fee_type, question_category, previous_year, exam_com_id, category_id, sub_category_id, subject_id, chapter_id, topic_id);
         })
         $(document).on('click', '.pagination a', function (event) {
@@ -346,17 +346,17 @@
             $('li').removeClass('active');
             $(this).parent('li').addClass('active');
             let page = $(this).attr('href').split('page=')[1];
-            let language = $('#language').val();
-            let question_type = $('#question_type').val();
-            let fee_type = $('#fee_type').val();
-            let question_category = $('#question_category').val();
-            let previous_year = $('#previous_year').val();
-            let exam_com_id = $('#exam_com_id').val();
-            let category_id = $('#category_id').val();
-            let sub_category_id = $('#sub_category_id').val();
-            let subject_id = $('#subject_id').val();
-            let chapter_id = $('#chapter_id').val();
-            let topic_id = $('#topic_id').val();
+            let language = $('#language').val() || '';
+            let question_type = $('#question_type').val() || '';
+            let fee_type = $('#fee_type').val() || '';
+            let question_category = $('#question_category').val() || '';
+            let previous_year = $('#previous_year').val() || '';
+            let exam_com_id = $('#exam_com_id').val() || '';
+            let category_id = $('#category_id').val() || '';
+            let sub_category_id = $('#sub_category_id').val() || '';
+            let subject_id = $('#subject_id').val() || '';
+            let chapter_id = $('#chapter_id').val() || '';
+            let topic_id = $('#topic_id').val() || '';
             getData(page, language, question_type, fee_type, question_category, previous_year, exam_com_id, category_id, sub_category_id, subject_id, chapter_id, topic_id);
         });
 

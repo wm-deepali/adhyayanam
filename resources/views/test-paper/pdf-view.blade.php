@@ -33,6 +33,18 @@
         .marks {
             font-weight: bold;
         }
+        .instructions {
+            border: 1px solid #000;
+            padding: 10px;
+            margin-top: 20px;
+            background: #f9f9f9;
+        }
+        .instructions h3 {
+            margin-bottom: 8px;
+            background: #007bff;
+            color: #fff;
+            padding: 5px 10px;
+        }
     </style>
 </head>
 <body>
@@ -66,44 +78,52 @@
         </table>
     </div>
 
-    <!-- Questions Section -->
-     <div class="question-bank mt-4">
-                        @php
-                            $testDetails = $paper->testDetails()->with('question')->get();
-                        @endphp
+    <!-- 🟢 Instructions Section -->
+    @if(!empty($paper->test_instruction))
+        <div class="instructions">
+            <h3>Instructions</h3>
+            {!! $paper->test_instruction !!}
+        </div>
+    @endif
 
-                        @if($testDetails->count())
-                            @foreach($testDetails as $key => $testDetail)
-                                    @if(isset($testDetail->sub_question_id) && $testDetail->sub_question_id != "")
-                                        @php
-                                            $subQuestion = Helper::getSubQuestionDetails(
-                                                $testDetail->sub_question_id,
-                                                $testDetail->test_question_type,
-                                                $testDetail->sub_negative_mark,
-                                                $testDetail->sub_positive_mark
-                                            );
-                                            $marks = $testDetail->sub_positive_mark;
-                                        @endphp
-                                        @include('test-series.sub-questions', [
-                                            'question' => $subQuestion,
-                                            'marks' => $marks,
-                                            'index' => $key
-                                        ])
-                                    @elseif(isset($testDetail->question))
-                                    @php
-                                        $question = $testDetail->question;
-                                        $marks = $testDetail->positive_mark ?? $paper->positive_marks_per_question;
-                                    @endphp
-                                            @include('test-series.questions', [
-                                                'question' => $question,
-                                                'marks' => $marks,
-                                                'index' => $key
-                                            ])
-                                @endif
-                            @endforeach
-                        @else
+    <!-- Questions Section -->
+    <div class="question-bank mt-4">
+        @php
+            $testDetails = $paper->testDetails()->with('question')->get();
+        @endphp
+
+        @if($testDetails->count())
+            @foreach($testDetails as $key => $testDetail)
+                @if(isset($testDetail->sub_question_id) && $testDetail->sub_question_id != "")
+                    @php
+                        $subQuestion = Helper::getSubQuestionDetails(
+                            $testDetail->sub_question_id,
+                            $testDetail->test_question_type,
+                            $testDetail->sub_negative_mark,
+                            $testDetail->sub_positive_mark
+                        );
+                        $marks = $testDetail->sub_positive_mark;
+                    @endphp
+                    @include('test-series.sub-questions', [
+                        'question' => $subQuestion,
+                        'marks' => $marks,
+                        'index' => $key
+                    ])
+                @elseif(isset($testDetail->question))
+                    @php
+                        $question = $testDetail->question;
+                        $marks = $testDetail->positive_mark ?? $paper->positive_marks_per_question;
+                    @endphp
+                    @include('test-series.questions', [
+                        'question' => $question,
+                        'marks' => $marks,
+                        'index' => $key
+                    ])
+                @endif
+            @endforeach
+        @else
             <p class="text-center">No questions found for this test paper.</p>
-        @endif    
+        @endif
     </div>
 
 </body>

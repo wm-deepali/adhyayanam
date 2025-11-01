@@ -111,7 +111,7 @@ class QuestionBankController extends Controller
     {
         $teacherId = auth()->id(); // Logged-in teacher/user ID
 
-        $questions = Question::where('status', 'Pending')
+        $questions = Question::whereIn('status', ['Pending', 'resubmitted'])
             ->where('added_by_id', $teacherId)
             ->paginate(10);
 
@@ -373,6 +373,7 @@ class QuestionBankController extends Controller
         $data['added_by_id'] = $question->added_by_id;
         $data['status'] = $question->status;
 
+
         return view('teachers.question-bank.edit', $data);
     }
 
@@ -440,7 +441,10 @@ class QuestionBankController extends Controller
                 $question->answer_format = $request->answer_format[$key] ?? NULL;
                 $question->has_solution = (isset($request->hasFile('answerformatsolution')[$key])) ? 'yes' : 'no';
                 $question->solution = isset(($request->hasFile('answerformatsolution')[$key])) ? $request->answerformatsolution->store('answerformatsolution')[$key] : NULL;
-
+                // 🧠 If teacher is updating a rejected question → mark as 'resubmitted'
+                if ($question->status === 'Rejected') {
+                    $question->status = 'resubmitted';
+                }
                 // Save the question to the database
                 $question->save();
 

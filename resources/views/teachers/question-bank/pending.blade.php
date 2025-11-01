@@ -43,7 +43,14 @@
                                 <td>{{$data->topics->name ?? "_"}}</td>
                                 <td>{{$data->subject->name ?? "-"}}</td>
                                 <td>{{$data->instruction}}</td>
-                                <td>{{$data->status}}</td>
+                                <td>
+                                    @if($data->status === 'Pending')
+                                        <span class="badge bg-warning text-light">Pending</span>
+                                    @elseif($data->status === 'resubmitted')
+                                        <span class="badge bg-info text-light">Resubmitted</span>
+                                    @endif
+                                </td>
+
                                 <td>{{ $data->addedBy->full_name ?? '-' }}<br>{{ $data->addedBy->email ?? '-' }}</td>
                                 <td>
 
@@ -53,9 +60,11 @@
                                             Actions
                                         </button>
                                         <ul class="dropdown-menu">
-                                            <li><a class="dropdown-item" href="{{ route('teacher.question.bank.view', $data->id) }}"><i
+                                            <li><a class="dropdown-item"
+                                                    href="{{ route('teacher.question.bank.view', $data->id) }}"><i
                                                         class="fas fa-eye"></i> View</a></li>
-                                            <li><a class="dropdown-item" href="{{ route('teacher.question.bank.edit', $data->id) }}"><i
+                                            <li><a class="dropdown-item"
+                                                    href="{{ route('teacher.question.bank.edit', $data->id) }}"><i
                                                         class="fas fa-edit"></i> Edit</a></li>
                                             <li>
                                                 <button type="button" class="dropdown-item text-danger deleteBtn"
@@ -63,14 +72,14 @@
                                                     data-url="{{ route('teacher.question.bank.delete', $data->id) }}">
                                                     <i class="fas fa-trash"></i> Delete</button>
                                             </li>
-                                           
+
                                         </ul>
 
                                     </div>
                                 </td>
                             </tr>
 
-                          
+
                         @endforeach
                     </tbody>
                 </table>

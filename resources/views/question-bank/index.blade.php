@@ -23,6 +23,43 @@
                 <div class="mt-2">
                     @include('layouts.includes.messages')
                 </div>
+                <!-- Question Counts -->
+                <div class="row mb-3">
+                    <div class="col-md-3">
+                        <div class="card text-center shadow-sm border-0 bg-primary text-white">
+                            <div class="card-body">
+                                <h5>Total Questions</h5>
+                                <h3>{{ $totalQuestions ?? 0 }}</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card text-center shadow-sm border-0 bg-success text-white">
+                            <div class="card-body">
+                                <h5>Approved</h5>
+                                <h3>{{ $approvedQuestions ?? 0 }}</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card text-center shadow-sm border-0 bg-warning text-dark">
+                            <div class="card-body">
+                                <h5>Pending</h5>
+                                <h3>{{ $pendingQuestions ?? 0 }}</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card text-center shadow-sm border-0 bg-danger text-white">
+                            <div class="card-body">
+                                <h5>Rejected</h5>
+                                <h3>{{ $rejectedQuestions ?? 0 }}</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
                 <div class="row">
                     <h4 class="form-section">Filter by</h4>
                     <div class="col-md-3">
@@ -129,6 +166,18 @@
                             </select>
                         </div>
                     </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Filter by Teacher</label>
+                            <select class="form-control" id="teacher_id">
+                                <option value="">--Select Teacher--</option>
+                                @foreach($teachers as $teacher)
+                                    <option value="{{ $teacher->id }}">{{ $teacher->name ?? $teacher->full_name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+
                     <div class="col-md-6" style="margin-top: 25px;">
                         <div class="form-group">
                             <button type="button" class="btn btn-primary filterbtn">Filter Now</button>
@@ -288,19 +337,20 @@
 
         $(document).on('click', '.filterbtn', function (event) {
             let page = 1;
-            let language = $('#language').val();
-            let question_type = $('#question_type').val();
-            let fee_type = $('#fee_type').val();
-            let question_category = $('#question_category').val();
-            let previous_year = $('#previous_year').val();
-            let exam_com_id = $('#exam_com_id').val();
-            let category_id = $('#category_id').val();
-            let sub_category_id = $('#sub_category_id').val();
-            let subject_id = $('#subject_id').val();
-            let chapter_id = $('#chapter_id').val();
-            let topic_id = $('#topic_id').val();
+            let language = $('#language').val() || '';
+            let question_type = $('#question_type').val() || '';
+            let fee_type = $('#fee_type').val() || '';
+            let question_category = $('#question_category').val() || '';
+            let previous_year = $('#previous_year').val() || '';
+            let exam_com_id = $('#exam_com_id').val() || '';
+            let category_id = $('#category_id').val() || '';
+            let sub_category_id = $('#sub_category_id').val() || '';
+            let subject_id = $('#subject_id').val() || '';
+            let chapter_id = $('#chapter_id').val() || '';
+            let topic_id = $('#topic_id').val() || '';
+            let teacher_id = $('#teacher_id').val() || '';
 
-            getData(page, language, question_type, fee_type, question_category, previous_year, exam_com_id, category_id, sub_category_id, subject_id, chapter_id, topic_id);
+            getData(page, language, question_type, fee_type, question_category, previous_year, exam_com_id, category_id, sub_category_id, subject_id, chapter_id, topic_id, teacher_id);
         })
         $(document).on('click', '.resetbtn', function (event) {
             $('#exam_com_id').val('');
@@ -327,41 +377,43 @@
             $('#language').val('');
 
             let page = 1;
-            let language = $('#language').val();
-            let question_type = $('#question_type').val();
-            let fee_type = $('#fee_type').val();
-            let question_category = $('#question_category').val();
-            let previous_year = $('#previous_year').val();
-            let exam_com_id = $('#exam_com_id').val();
-            let category_id = $('#category_id').val();
-            let sub_category_id = $('#sub_category_id').val();
-            let subject_id = $('#subject_id').val();
-            let chapter_id = $('#chapter_id').val();
-            let topic_id = $('#topic_id').val();
-            getData(page, language, question_type, fee_type, question_category, previous_year, exam_com_id, category_id, sub_category_id, subject_id, chapter_id, topic_id);
+            let language = $('#language').val() || '';
+            let question_type = $('#question_type').val() || '';
+            let fee_type = $('#fee_type').val() || '';
+            let question_category = $('#question_category').val() || '';
+            let previous_year = $('#previous_year').val() || '';
+            let exam_com_id = $('#exam_com_id').val() || '';
+            let category_id = $('#category_id').val() || '';
+            let sub_category_id = $('#sub_category_id').val() || '';
+            let subject_id = $('#subject_id').val() || '';
+            let chapter_id = $('#chapter_id').val() || '';
+            let topic_id = $('#topic_id').val() || '';
+            let teacher_id = $('#teacher_id').val() || '';
+            getData(page, language, question_type, fee_type, question_category, previous_year, exam_com_id, category_id, sub_category_id, subject_id, chapter_id, topic_id, teacher_id);
         })
         $(document).on('click', '.pagination a', function (event) {
             event.preventDefault();
             $('li').removeClass('active');
             $(this).parent('li').addClass('active');
             let page = $(this).attr('href').split('page=')[1];
-            let language = $('#language').val();
-            let question_type = $('#question_type').val();
-            let fee_type = $('#fee_type').val();
-            let question_category = $('#question_category').val();
-            let previous_year = $('#previous_year').val();
-            let exam_com_id = $('#exam_com_id').val();
-            let category_id = $('#category_id').val();
-            let sub_category_id = $('#sub_category_id').val();
-            let subject_id = $('#subject_id').val();
-            let chapter_id = $('#chapter_id').val();
-            let topic_id = $('#topic_id').val();
-            getData(page, language, question_type, fee_type, question_category, previous_year, exam_com_id, category_id, sub_category_id, subject_id, chapter_id, topic_id);
+            let language = $('#language').val() || '';
+            let question_type = $('#question_type').val() || '';
+            let fee_type = $('#fee_type').val() || '';
+            let question_category = $('#question_category').val() || '';
+            let previous_year = $('#previous_year').val() || '';
+            let exam_com_id = $('#exam_com_id').val() || '';
+            let category_id = $('#category_id').val() || '';
+            let sub_category_id = $('#sub_category_id').val() || '';
+            let subject_id = $('#subject_id').val() || '';
+            let chapter_id = $('#chapter_id').val() || '';
+            let topic_id = $('#topic_id').val() || '';
+            let teacher_id = $('#teacher_id').val() || '';
+            getData(page, language, question_type, fee_type, question_category, previous_year, exam_com_id, category_id, sub_category_id, subject_id, chapter_id, topic_id, teacher_id);
         });
 
-        function getData(page, language, question_type, fee_type, question_category, previous_year, exam_com_id, category_id, sub_category_id, subject_id, chapter_id, topic_id) {
+        function getData(page, language, question_type, fee_type, question_category, previous_year, exam_com_id, category_id, sub_category_id, subject_id, chapter_id, topic_id, teacher_id) {
             $.ajax({
-                url: '{{ URL::to('question-bank') }}?page=' + page + '&language=' + language + '&question_type=' + question_type + '&fee_type=' + fee_type + '&question_category=' + question_category + '&previous_year=' + previous_year + '&exam_com_id=' + exam_com_id + '&category_id=' + category_id + '&sub_category_id=' + sub_category_id + '&subject_id=' + subject_id + '&chapter_id=' + chapter_id + '&topic_id=' + topic_id,
+                url: '{{ URL::to('question-bank') }}?page=' + page + '&language=' + language + '&question_type=' + question_type + '&fee_type=' + fee_type + '&question_category=' + question_category + '&previous_year=' + previous_year + '&exam_com_id=' + exam_com_id + '&category_id=' + category_id + '&sub_category_id=' + sub_category_id + '&subject_id=' + subject_id + '&chapter_id=' + chapter_id + '&topic_id=' + topic_id + '&teacher_id=' + teacher_id,
                 type: "get",
                 datatype: "html"
             }).done(function (data) {

@@ -43,7 +43,13 @@
                                 <td>{{$data->topics->name ?? "_"}}</td>
                                 <td>{{$data->subject->name ?? "-"}}</td>
                                 <td>{{$data->instruction}}</td>
-                                <td>{{$data->status}}</td>
+                                <td>
+                                    @if($data->status === 'Pending')
+                                        <span class="badge bg-warning text-light">Pending</span>
+                                    @elseif($data->status === 'resubmitted')
+                                        <span class="badge bg-info text-light">Resubmitted</span>
+                                    @endif
+                                </td>
                                 <td>{{ $data->addedBy->full_name ?? '-' }}<br>{{ $data->addedBy->email ?? '-' }}</td>
                                 <td>
 

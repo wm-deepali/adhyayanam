@@ -120,8 +120,9 @@
                                             name="has_instruction" onchange="toggleInstruction(this)">
                                         <label for="has_instruction">Has an Instruction</label>
                                     </div>
-                                    <div class="mb-3 instruction-group" style="display: none;">
-                                        <textarea class="form-control quill-editor ckeditor" name="instruction"></textarea>
+                                    <div class="form-group instruction-group" style="display: none;">
+                                        <textarea class="form-control quill-editor ckeditor" name="instruction"
+                                            id="instruction"></textarea>
                                         <label>Instruction</label>
                                     </div>
                                     <div class="mb-3 mt-2">
@@ -148,23 +149,28 @@
                                     </div>
                                     <div class="mb-3">
                                         <label>Option A</label>
-                                        <textarea class="form-control quill-editor2 ckeditor" name="option_a[]"></textarea>
+                                        <textarea class="form-control quill-editor2 ckeditor" name="option_a[]"
+                                            id="option_a_1"></textarea>
                                     </div>
                                     <div class="mb-3">
                                         <label>Option B</label>
-                                        <textarea class="form-control quill-editor3 ckeditor" name="option_b[]"></textarea>
+                                        <textarea class="form-control quill-editor3 ckeditor" name="option_b[]"
+                                            id="option_b_1"></textarea>
                                     </div>
                                     <div class="mb-3">
                                         <label>Option C</label>
-                                        <textarea class="form-control quill-editor4 ckeditor" name="option_c[]"></textarea>
+                                        <textarea class="form-control quill-editor4 ckeditor" name="option_c[]"
+                                            id="option_c_1"></textarea>
                                     </div>
                                     <div class="mb-3">
                                         <label>Option D</label>
-                                        <textarea class="form-control quill-editor5 ckeditor" name="option_d[]"></textarea>
+                                        <textarea class="form-control quill-editor5 ckeditor" name="option_d[]"
+                                            id="option_d_1"></textarea>
                                     </div>
                                     <div class="mb-3 option-e-group" style="display: none;">
                                         <label>Option E</label>
-                                        <textarea class="form-control quill-editor6 ckeditor" name="option_e[]"></textarea>
+                                        <textarea class="form-control quill-editor6 ckeditor" name="option_e[]"
+                                            id="option_e_1"></textarea>
                                     </div>
                                 </div>
                                 <div class="col-md-6" id="subjective_question_form" style="display:none;">
@@ -592,18 +598,25 @@
             return el.id;
         }
 
-        function initEditorsIn(container) {
+        document.addEventListener('DOMContentLoaded', function () {
+            initEditorsIn(document.getElementById('questions-container'));
+        });
 
+
+
+        function initEditorsIn(container) {
             var scope = container || document;
             if (typeof CKEDITOR === 'undefined') return;
-            scope.querySelectorAll('textarea.ckeditor, textarea.quesckeditor').forEach(function (el) {
-                var id = ensureCkId(el);
-                console.log('it comes here', !CKEDITOR.instances[id]);
-                if (CKEDITOR.instances[id]) {
-                    CKEDITOR.instances[id].destroy(true);
-                }
-                CKEDITOR.replace(el);
 
+            var textareas = scope.querySelectorAll('textarea.ckeditor, textarea.quesckeditor');
+            textareas.forEach(function (el, index) {
+                if (!el.id) {
+                    el.id = 'ckeditor_' + Math.random().toString(36).substring(2, 9);  // generate unique id
+                }
+                if (CKEDITOR.instances[el.id]) {
+                    CKEDITOR.instances[el.id].destroy(true);
+                }
+                CKEDITOR.replace(el.id);
             });
         }
 
@@ -741,64 +754,64 @@
         var id = 1;
         $(document).on('click', '.add_mcp', function (event) {
             $('.block_mcp:last').after(`
-                                                    <div class="block_mcp">
+                                                            <div class="block_mcp">
 
-                                        <div class="col-md-12">
-                                                                                        <label for="">Question </label>
-                                                                                        <div class="input-group">
-                                                                                            <textarea name="passage_mcq_questions[]" class="form-control multiple_choice_passage_question ckeditor rightContent" id="multiple_choice_passage_question_${id}" rows="2" cols="4"></textarea>
-                                                                                            <div class="text-danger validation-err" id="passage_mcq_questions-err"></div>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                    <div class="col-md-12">
-                                                                                        <label for="">Correct Answer</label>
-                                                                                        <div class="input-group">
-                                                                                            <select class="form-control multiple_choice_passage_answer" name="multiple_choice_passage_answer[]">
-                                                                                                <option value="A" selected>Option A</option>
-                                                                                                <option value="B">Option B</option>
-                                                                                                <option value="C">Option C</option>
-                                                                                                <option value="D">Option D</option>
-                                                                                            </select>
-                                                                                        </div>
-                                                                                    </div>
+                                                <div class="col-md-12">
+                                                                                                <label for="">Question </label>
+                                                                                                <div class="input-group">
+                                                                                                    <textarea name="passage_mcq_questions[]" class="form-control multiple_choice_passage_question ckeditor rightContent" id="multiple_choice_passage_question_${id}" rows="2" cols="4"></textarea>
+                                                                                                    <div class="text-danger validation-err" id="passage_mcq_questions-err"></div>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                            <div class="col-md-12">
+                                                                                                <label for="">Correct Answer</label>
+                                                                                                <div class="input-group">
+                                                                                                    <select class="form-control multiple_choice_passage_answer" name="multiple_choice_passage_answer[]">
+                                                                                                        <option value="A" selected>Option A</option>
+                                                                                                        <option value="B">Option B</option>
+                                                                                                        <option value="C">Option C</option>
+                                                                                                        <option value="D">Option D</option>
+                                                                                                    </select>
+                                                                                                </div>
+                                                                                            </div>
 
-                                                                                    <div class="col-md-12">
-                                                                                        <label for="">Option A </label>
-                                                                                        <div class="input-group">
-                                                                                            <textarea class="form-control multiple_choice_passage_option_a ckeditor rightContent" name="multiple_choice_passage_option_a[]" id="multiple_choice_passage_option_a_${id}"  rows="2" cols="4" placeholder="Option A"></textarea>
-                                                                                            <div class="text-danger validation-err" id="multiple_choice_passage_option_a-err"></div>
-                                                                                        </div>
-                                                                                    </div>
+                                                                                            <div class="col-md-12">
+                                                                                                <label for="">Option A </label>
+                                                                                                <div class="input-group">
+                                                                                                    <textarea class="form-control multiple_choice_passage_option_a ckeditor rightContent" name="multiple_choice_passage_option_a[]" id="multiple_choice_passage_option_a_${id}"  rows="2" cols="4" placeholder="Option A"></textarea>
+                                                                                                    <div class="text-danger validation-err" id="multiple_choice_passage_option_a-err"></div>
+                                                                                                </div>
+                                                                                            </div>
 
-                                                                                    <div class="col-md-12">
-                                                                                        <label for="">Option B </label>
-                                                                                        <div class="input-group">
-                                                                                            <textarea class="form-control multiple_choice_passage_option_b ckeditor rightContent" rows="2" name="multiple_choice_passage_option_b[]" id="multiple_choice_passage_option_b_${id}" cols="4" placeholder="Option B"></textarea>
-                                                                                            <div class="text-danger validation-err" id="multiple_choice_passage_option_b-err"></div>
-                                                                                        </div>
-                                                                                    </div>
+                                                                                            <div class="col-md-12">
+                                                                                                <label for="">Option B </label>
+                                                                                                <div class="input-group">
+                                                                                                    <textarea class="form-control multiple_choice_passage_option_b ckeditor rightContent" rows="2" name="multiple_choice_passage_option_b[]" id="multiple_choice_passage_option_b_${id}" cols="4" placeholder="Option B"></textarea>
+                                                                                                    <div class="text-danger validation-err" id="multiple_choice_passage_option_b-err"></div>
+                                                                                                </div>
+                                                                                            </div>
 
-                                                                                    <div class="col-md-12">
-                                                                                        <label for="">Option C </label>
-                                                                                        <div class="input-group">
-                                                                                            <textarea class="form-control multiple_choice_passage_option_c ckeditor rightContent" name="multiple_choice_passage_option_c[]" id="multiple_choice_passage_option_c_${id}" rows="2" cols="4" placeholder="Option C"></textarea>
-                                                                                            <div class="text-danger validation-err" id="multiple_choice_passage_option_c-err"></div>
-                                                                                        </div>
-                                                                                    </div>
+                                                                                            <div class="col-md-12">
+                                                                                                <label for="">Option C </label>
+                                                                                                <div class="input-group">
+                                                                                                    <textarea class="form-control multiple_choice_passage_option_c ckeditor rightContent" name="multiple_choice_passage_option_c[]" id="multiple_choice_passage_option_c_${id}" rows="2" cols="4" placeholder="Option C"></textarea>
+                                                                                                    <div class="text-danger validation-err" id="multiple_choice_passage_option_c-err"></div>
+                                                                                                </div>
+                                                                                            </div>
 
-                                                                                    <div class="col-md-12">
-                                                                                        <label for="">Option D </label>
-                                                                                        <div class="input-group">
-                                                                                            <textarea class="form-control multiple_choice_passage_option_d ckeditor rightContent" name="multiple_choice_passage_option_d[]" id="multiple_choice_passage_option_d_${id}" rows="2" cols="4" placeholder="Option D"></textarea>
-                                                                                            <div class="text-danger validation-err" id="multiple_choice_passage_option_d-err"></div>
-                                                                                        </div>
-                                                                                    </div>
-                                                        <div class="col-sm-12">
-                                                            <button type="button" class="btn btn-danger removebox remove_mcp"><i class="fa fa-minus"></i> Remove</button>
-                                                            <button type="button" class="btn btn-primary addbox add_mcp"><i class="fa fa-plus"></i> Add More</button>
-                                                        </div>
-                                                    </div>
-                                                `);
+                                                                                            <div class="col-md-12">
+                                                                                                <label for="">Option D </label>
+                                                                                                <div class="input-group">
+                                                                                                    <textarea class="form-control multiple_choice_passage_option_d ckeditor rightContent" name="multiple_choice_passage_option_d[]" id="multiple_choice_passage_option_d_${id}" rows="2" cols="4" placeholder="Option D"></textarea>
+                                                                                                    <div class="text-danger validation-err" id="multiple_choice_passage_option_d-err"></div>
+                                                                                                </div>
+                                                                                            </div>
+                                                                <div class="col-sm-12">
+                                                                    <button type="button" class="btn btn-danger removebox remove_mcp"><i class="fa fa-minus"></i> Remove</button>
+                                                                    <button type="button" class="btn btn-primary addbox add_mcp"><i class="fa fa-plus"></i> Add More</button>
+                                                                </div>
+                                                            </div>
+                                                        `);
             id = id + 1
             if (typeof initEditorsIn === 'function') { initEditorsIn(document.querySelector('.optionBox_mcp')); }
             // $('.editor').summernote();
@@ -810,20 +823,20 @@
 
         $(document).on('click', '.add_rp', function (event) {
             $('.block_rp:last').after(`
-                                                    <div class="blockbox block_rp">
-                                                        <div class="col-md-9">
-                                                                                        <label for="">Question </label>
-                                                                                        <div class="input-group">
-                                                                                            <textarea class="form-control reasoning_subjective_passage_question ckeditor rightContent" name="reasoning_passage_questions[]" id="reasoning_subjective_passage_question_${id}" rows="2" cols="4"></textarea>
-                                                                                            <div class="text-danger validation-err" id="reasoning_passage_questions-err"></div>
-                                                                                        </div>
-                                                                                    </div>
-                                                        <div class="col-sm-3">
-                                                            <button type="button" class="btn btn-danger removebox remove_rp"><i class="fa fa-minus"></i> Remove</button>
-                                                            <button type="button" class="btn btn-primary addbox add_rp"><i class="fa fa-plus"></i> Add More</button>
-                                                        </div>
-                                                    </div>
-                                                `);
+                                                            <div class="blockbox block_rp">
+                                                                <div class="col-md-9">
+                                                                                                <label for="">Question </label>
+                                                                                                <div class="input-group">
+                                                                                                    <textarea class="form-control reasoning_subjective_passage_question ckeditor rightContent" name="reasoning_passage_questions[]" id="reasoning_subjective_passage_question_${id}" rows="2" cols="4"></textarea>
+                                                                                                    <div class="text-danger validation-err" id="reasoning_passage_questions-err"></div>
+                                                                                                </div>
+                                                                                            </div>
+                                                                <div class="col-sm-3">
+                                                                    <button type="button" class="btn btn-danger removebox remove_rp"><i class="fa fa-minus"></i> Remove</button>
+                                                                    <button type="button" class="btn btn-primary addbox add_rp"><i class="fa fa-plus"></i> Add More</button>
+                                                                </div>
+                                                            </div>
+                                                        `);
             id = id + 1
             if (typeof initEditorsIn === 'function') { initEditorsIn(document.querySelector('.optionBox_rp')); }
             // $('.editor').summernote();

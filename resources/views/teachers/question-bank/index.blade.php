@@ -156,7 +156,7 @@
                 $('#topic_id').html("");
                 let competitive_commission = $(this).val();
                 $.ajax({
-                    url: `{{ URL::to('fetch-exam-category-by-commission/${competitive_commission}') }}`,
+                    url: `{{ URL::to('teacher/fetch-categories-by-commission/${competitive_commission}') }}`,
                     type: 'GET',
                     dataType: 'json',
                     success: function (result) {
@@ -175,7 +175,7 @@
                 let exam_category = $(this).val();
                 if (exam_category != '') {
                     $.ajax({
-                        url: `{{ URL::to('fetch-sub-category-by-exam-category/${exam_category}') }}`,
+                        url: `{{ URL::to('teacher/fetch-subcategories-by-category/${exam_category}') }}`,
                         type: 'GET',
                         dataType: 'json',
                         success: function (result) {
@@ -214,7 +214,7 @@
                 let sub_category_id = $('#sub_category_id').val();
                 $.ajax({
                     headers: { "Access-Control-Allow-Origin": "*" },
-                    url: `{{ URL::to('fetch-subject-by-subcategory/${sub_category_id}') }}`,
+                    url: `{{ URL::to('teacher/fetch-subjects-by-subcategory/${sub_category_id}') }}`,
                     type: 'GET',
                     dataType: 'json',
                     success: function (result) {
@@ -233,7 +233,7 @@
                 let subject = $(this).val();
                 if (subject != '') {
                     $.ajax({
-                        url: `{{ URL::to('fetch-chapter-by-subject/${subject}') }}`,
+                        url: `{{ URL::to('teacher/fetch-chapter-by-subject/${subject}') }}`,
                         type: 'GET',
                         dataType: 'json',
                         success: function (result) {
@@ -262,7 +262,7 @@
                 let chapter = $(this).val();
                 if (chapter != '') {
                     $.ajax({
-                        url: `{{ URL::to('fetch-topic-by-chapter/${chapter}') }}`,
+                        url: `{{ URL::to('teacher/fetch-topic-by-chapter/${chapter}') }}`,
                         type: 'GET',
                         dataType: 'json',
                         success: function (result) {

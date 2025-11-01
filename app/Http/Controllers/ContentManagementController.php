@@ -2565,19 +2565,67 @@ class ContentManagementController extends Controller
 
     }
 
-    public function rejectQuestionBankIndex()
+    public function rejectQuestionBankIndex(Request $request)
     {
-        $data['questionBanks'] = Question::where('status', '=', 'Rejected')->paginate(10);
-        return view('question-bank.rejected', $data);
+        $query = Question::where('status', 'Rejected');
+        if ($request->ajax()) {
+            // ✅ Filter by teacher or admin
+            if ($request->filled('teacher_id')) {
+                if ($request->teacher_id === 'admin') {
+                    // Admin-added questions (added_by_type = 'user')
+                    $query->where('added_by_type', '!=', 'teacher');
+                } else {
+                    // Teacher-added questions
+                    $query->where('added_by_type', 'teacher')
+                        ->where('added_by_id', $request->teacher_id);
+                }
+            }
+            $questions = $query->paginate(10);
+            return view('question-bank.rejected-question-table')->with([
+                'questionBanks' => $questions
+            ]);
+        }
+
+        $questions = $query->paginate(10);
+        $teachers = \App\Models\Teacher::where('status', 1)->get();
+        return view('question-bank.rejected')->with([
+            'questionBanks' => $questions,
+            'teachers' => $teachers,
+        ]);
     }
 
     public function pendingQuestionBankIndex(Request $request)
     {
-        $questions = Question::whereIn('status', ['Pending', 'resubmitted'])->paginate(10);
-        return view('question-bank.pending', [
+        // dd('here');
+        $query = Question::whereIn('status', ['Pending', 'resubmitted']);
+
+        if ($request->ajax()) {
+            // ✅ Filter by teacher or admin
+            if ($request->filled('teacher_id')) {
+                if ($request->teacher_id === 'admin') {
+                    // Admin-added questions (added_by_type = 'user')
+                    $query->where('added_by_type', 'user');
+                } else {
+                    // Teacher-added questions
+                    $query->where('added_by_type', 'teacher')
+                        ->where('added_by_id', $request->teacher_id);
+                }
+            }
+            $questions = $query->paginate(10);
+            return view('question-bank.pending-question-table')->with([
+                'questionBanks' => $questions
+            ]);
+        }
+
+        $questions = $query->paginate(10);
+        $teachers = \App\Models\Teacher::where('status', 1)->get();
+
+        return view('question-bank.pending')->with([
             'questionBanks' => $questions,
+            'teachers' => $teachers,
         ]);
     }
+
 
 
 

@@ -186,7 +186,6 @@ class TestController extends Controller
 
     public function previewTest(Request $request)
     {
-        //dd($request->all());
         $validator = Validator::make($request->all(), [
             'language' => 'required',
             'competitive_commission' => 'required',
@@ -260,6 +259,7 @@ class TestController extends Controller
 
                     'positive_per_question_marks' => $request->positive_per_question_marks,
                     'negative_marks_per_question' => $request->negative_marks_per_question,
+                    'question_generated_by' => $request->question_generated_by,
                 );
 
                 return response()->json([
@@ -290,7 +290,7 @@ class TestController extends Controller
 
     public function store(Request $request)
     {
-        //dd($request->question_marks_details);
+        // dd($request->all());
         $validator = Validator::make($request->all(), [
             'language' => 'required',
             'competitive_commission' => 'required',
@@ -396,6 +396,7 @@ class TestController extends Controller
                     'subjective_mark_per_question' => $request->subjective_mark_per_question,
                     'subjective_total_marks' => $request->subjective_total_marks,
                     'test_paper_type' => $testPaperType,
+                    'question_generated_by' => $request->question_generated_by ?? 'manual',
                 );
                 //echo "<pre>";print_r($testData);exit;
                 $test = Test::create($testData);
@@ -501,6 +502,7 @@ class TestController extends Controller
     }
     public function update(Request $request, $id)
     {
+        // dd($request->all());
         $validator = Validator::make($request->all(), [
             'language' => 'required',
             'competitive_commission' => 'required',

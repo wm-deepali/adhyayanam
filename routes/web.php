@@ -143,7 +143,6 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
 
 
         Route::middleware(['auth:teacher'])->group(function () {
-
             // teacher home route
             Route::get('/dashboard', function () {
                 return view('teachers.home');
@@ -168,11 +167,11 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
 
             // filter teacher mapped data
             Route::get('/fetch-categories-by-commission/{commission}', [QuestionBankController::class, 'fetchCategoriesByCommission'])
-                ->name('teacher.question.bank.fetch-categories');
+                ->name('question.bank.fetch-categories');
             Route::get('/fetch-subcategories-by-category/{category}', [QuestionBankController::class, 'fetchSubcategoriesByCategory'])
-                ->name('teacher.question.bank.fetch-subcategories');
+                ->name('question.bank.fetch-subcategories');
             Route::get('/fetch-subjects-by-subcategory/{sub_category}', [QuestionBankController::class, 'fetchSubjectsBySubcategory'])
-                ->name('teacher.question.bank.fetch-subjects');
+                ->name('question.bank.fetch-subjects');
             Route::get('fetch-chapter-by-subject/{subject}', 'TestController@fetchchapterbySubject')->name('fetch-chapter-by-subject');
             Route::get('fetch-topic-by-chapter/{subject}', 'TestController@fetchtopicbychapter')->name('fetch-topic-by-chapter');
 

@@ -52,62 +52,78 @@ class User extends Authenticatable implements HasMedia, MustVerifyEmail
      * @var array
      */
     protected $hidden = [
-        'password', 'remember_token',
+        'password',
+        'remember_token',
     ];
+
+    protected $appends = ['full_name'];
+
+    /**
+     * Accessor: get full_name attribute
+     */
+    public function getFullNameAttribute()
+    {
+        if ($this->first_name || $this->last_name) {
+            return trim("{$this->first_name} {$this->last_name}");
+        }
+
+        // fallback if first/last not set
+        return $this->name ?? '';
+    }
 
     public function orders()
     {
-        return $this->hasMany(Order::class,'student_id');
+        return $this->hasMany(Order::class, 'student_id');
     }
     public function transactions()
     {
-        return $this->hasMany(Transaction::class,'student_id');
+        return $this->hasMany(Transaction::class, 'student_id');
     }
 
     public function courseOrder()
     {
-        return $this->hasMany(Order::class,'student_id')->where('order_type', 'Course');
+        return $this->hasMany(Order::class, 'student_id')->where('order_type', 'Course');
     }
 
     public function courseOrderAttempt()
     {
-        return $this->hasMany(Order::class,'student_id')->where('order_type', 'Course')->where('attempt_status', 'completed');
+        return $this->hasMany(Order::class, 'student_id')->where('order_type', 'Course')->where('attempt_status', 'completed');
     }
 
     public function courseOrderPending()
     {
-        return $this->hasMany(Order::class,'student_id')->where('order_type', 'Course')->where('attempt_status', 'pending');
+        return $this->hasMany(Order::class, 'student_id')->where('order_type', 'Course')->where('attempt_status', 'pending');
     }
 
     public function testSeriesOrder()
     {
-        return $this->hasMany(Order::class,'student_id')->where('order_type', 'Test Series');
+        return $this->hasMany(Order::class, 'student_id')->where('order_type', 'Test Series');
     }
 
     public function testSeriesOrderAttempt()
     {
-        return $this->hasMany(Order::class,'student_id')->where('order_type', 'Test Series')->where('attempt_status', 'completed');
+        return $this->hasMany(Order::class, 'student_id')->where('order_type', 'Test Series')->where('attempt_status', 'completed');
     }
-    
+
     public function testSeriesOrderPending()
     {
-        return $this->hasMany(Order::class,'student_id')->where('order_type', 'Test Series')->where('attempt_status', 'pending');
+        return $this->hasMany(Order::class, 'student_id')->where('order_type', 'Test Series')->where('attempt_status', 'pending');
     }
 
 
     public function studyMaterialOrder()
     {
-        return $this->hasMany(Order::class,'student_id')->where('order_type', 'Study Material');
+        return $this->hasMany(Order::class, 'student_id')->where('order_type', 'Study Material');
     }
 
     public function studyMaterialOrderAttempt()
     {
-        return $this->hasMany(Order::class,'student_id')->where('order_type', 'Study Material')->where('attempt_status', 'completed');
+        return $this->hasMany(Order::class, 'student_id')->where('order_type', 'Study Material')->where('attempt_status', 'completed');
     }
-    
+
     public function studyMaterialOrderPending()
     {
-        return $this->hasMany(Order::class,'student_id')->where('order_type', 'Study Material')->where('attempt_status', 'pending');
+        return $this->hasMany(Order::class, 'student_id')->where('order_type', 'Study Material')->where('attempt_status', 'pending');
     }
 
 }

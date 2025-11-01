@@ -15,32 +15,32 @@ class Test extends Model
         'paper_type',
         'previous_year',
         'test_type',
-       
+
         'competitive_commission_id',
         'exam_category_id',
         'exam_subcategory_id',
-        
+
         'chapter_id',
         'topic_id',
         'subject_id',
         'name',
         'duration',
-        
+
         'total_questions',
         'total_marks',
         'test_instruction',
-        
-        
+
+
         'question_shuffling',
         'allow_re_attempt',
         'number_of_re_attempt_allowed',
         'has_negative_marks',
-       
+
         'total_questions_mcq',
         'total_marks_mcq',
-        
+
         'non_section_details',
-        
+
         'question_marks_details',
         'positive_marks_per_question',
         'negative_marks_per_question',
@@ -57,7 +57,7 @@ class Test extends Model
         'subjective_mark_per_question',
         'subjective_total_marks',
         'test_paper_type',
-    
+        'question_generated_by'
     ];
 
     public function subject()
@@ -77,7 +77,8 @@ class Test extends Model
     {
         return $this->belongsTo(Chapter::class, 'chapter_id');
     }
-    public function testDetails(){
+    public function testDetails()
+    {
         return $this->hasMany(TestDetail::class, 'test_id');
     }
 
@@ -91,5 +92,5 @@ class Test extends Model
         return $this->belongsTo(ExaminationCommission::class, 'competitive_commission_id');
     }
 
-   
+
 }

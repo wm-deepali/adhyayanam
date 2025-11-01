@@ -118,7 +118,7 @@
                                         <label for="has_instruction">Has an Instruction</label>
                                     </div>
                                     <div class="form-group instruction-group" style="display: none;">
-                                        <textarea class="form-control quill-editor ckeditor" name="instruction"></textarea>
+                                        <textarea class="form-control quill-editor ckeditor" name="instruction" id="instruction"></textarea>
                                         <label>Instruction</label>
                                     </div>
                                     <div class="form-group mt-2">
@@ -145,23 +145,23 @@
                                     </div>
                                     <div class="form-group">
                                         <label>Option A</label>
-                                        <textarea class="form-control quill-editor2 ckeditor" name="option_a[]"></textarea>
+                                        <textarea class="form-control quill-editor2 ckeditor" name="option_a[]"id="option_a_1"></textarea>
                                     </div>
                                     <div class="form-group">
                                         <label>Option B</label>
-                                        <textarea class="form-control quill-editor3 ckeditor" name="option_b[]"></textarea>
+                                        <textarea class="form-control quill-editor3 ckeditor" name="option_b[]" id="option_b_1"></textarea>
                                     </div>
                                     <div class="form-group">
                                         <label>Option C</label>
-                                        <textarea class="form-control quill-editor4 ckeditor" name="option_c[]"></textarea>
+                                        <textarea class="form-control quill-editor4 ckeditor" name="option_c[]" id="option_c_1"></textarea>
                                     </div>
                                     <div class="form-group">
                                         <label>Option D</label>
-                                        <textarea class="form-control quill-editor5 ckeditor" name="option_d[]"></textarea>
+                                        <textarea class="form-control quill-editor5 ckeditor" name="option_d[]" id="option_d_1"></textarea>
                                     </div>
                                     <div class="form-group option-e-group" style="display: none;">
                                         <label>Option E</label>
-                                        <textarea class="form-control quill-editor6 ckeditor" name="option_e[]"></textarea>
+                                        <textarea class="form-control quill-editor6 ckeditor" name="option_e[]" id="option_e_1"></textarea>
                                     </div>
                                 </div>
                                 <div class="col-md-6" id="subjective_question_form" style="display:none;">
@@ -592,20 +592,28 @@
             return el.id;
         }
 
+      document.addEventListener('DOMContentLoaded', function() {
+    initEditorsIn(document.getElementById('questions-container'));
+});
+
+
+
         function initEditorsIn(container) {
+    var scope = container || document;
+    if (typeof CKEDITOR === 'undefined') return;
 
-            var scope = container || document;
-            if (typeof CKEDITOR === 'undefined') return;
-            scope.querySelectorAll('textarea.ckeditor, textarea.quesckeditor').forEach(function (el) {
-                var id = ensureCkId(el);
-                console.log('it comes here', !CKEDITOR.instances[id]);
-                if (CKEDITOR.instances[id]) {
-                    CKEDITOR.instances[id].destroy(true);
-                }
-                CKEDITOR.replace(el);
-
-            });
+    var textareas = scope.querySelectorAll('textarea.ckeditor, textarea.quesckeditor');
+    textareas.forEach(function(el, index) {
+        if (!el.id) {
+            el.id = 'ckeditor_' + Math.random().toString(36).substring(2, 9);  // generate unique id
         }
+        if (CKEDITOR.instances[el.id]) {
+            CKEDITOR.instances[el.id].destroy(true);
+        }
+        CKEDITOR.replace(el.id);
+    });
+}
+
 
         function cleanupClonedEditorUi(container) {
             if (!container) return;

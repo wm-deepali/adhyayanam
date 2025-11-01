@@ -281,15 +281,33 @@
                             <div class="sec-instruction preview-questions-container">
                                 <div class="instruction-last-border"></div>
                                 <div class="question-sec">
-                                    <div class="qs-col last question-container-div" question_id='{{ $question->id }}' test_question_type="MCQ">
+                                    @php
+    $testDetail = \App\Models\TestDetail::where('test_id', $testData['id'] ?? null)
+        ->where('question_id', $question->id)
+        ->first();
+@endphp
+<div class="qs-col last question-container-div"
+     question_id="{{ $question->id }}"
+     test_question_type="MCQ">
 
-                                            <div>{{ $loop->iteration }}. {!! $question->question !!}</div>
-                                        
-                                        <input type="text" class="form-control mark positive_mark mcq_positive_mark" placeholder="enter positive marks" value="{{$testData['mcq_mark_per_question']}}" style="width: 40px;">
-                                        @if ($testData['has_negative_marks'] == 'yes')
-                                            <input type="text" class="form-control mark negative_mark"  placeholder="enter negative marks" value="{{$testData['negative_marks_per_question']}}" style="width: 40px;">
-                                        @endif
-                                    </div>
+    <div>{{ $loop->iteration }}. {!! $question->question !!}</div>
+
+    <input type="text"
+           class="form-control mark positive_mark mcq_positive_mark"
+           placeholder="enter positive marks"
+           value="{{ $testDetail->positive_mark ?? $testData['mcq_mark_per_question'] ?? '' }}"
+           style="width: 40px;">
+
+    @if ($testData['has_negative_marks'] == 'yes')
+        <input type="text"
+               class="form-control mark negative_mark"
+               placeholder="enter negative marks"
+               value="{{ $testDetail->negative_mark ?? $testData['negative_marks_per_question'] ?? '' }}"
+               style="width: 40px;">
+    @endif
+</div>
+
+                                    
                                     <label class="customradio"><span class="radiotextsty">i) {!! $question->option_a !!}</span>
                                             <input type="checkbox" name="checkbox" disabled>
                                             <span class="checkmark"></span>
@@ -320,6 +338,12 @@
  
                     @if (isset($subjectivequestions) && count($subjectivequestions) > 0)
                         @foreach ($subjectivequestions as $question)
+                         @php
+    $testDetail = \App\Models\TestDetail::where('test_id', $testData['id'] ?? null)
+        ->where('question_id', $question->id)
+        ->first();
+@endphp
+
                             <div class="sec-instruction preview-questions-container">
                                 <div class="instruction-last-border"></div>
                                 <div class="question-sec">
@@ -327,9 +351,9 @@
 
                                             <div>{{ $loop->iteration }}. {!! $question->question !!}</div>
                                         
-                                        <input type="text" class="form-control mark positive_mark subjective_positive_mark" placeholder="enter positive marks" value="{{$testData['subjective_mark_per_question']}}" style="width: 40px;">
+                                        <input type="text" class="form-control mark positive_mark subjective_positive_mark" placeholder="enter positive marks" value="{{$testDetail->positive_mark ?? $testData['subjective_mark_per_question']}}" style="width: 40px;">
                                         @if ($testData['has_negative_marks'] == 'yes')
-                                            <input type="text" class="form-control mark negative_mark"  placeholder="enter negative marks" value="{{$testData['negative_marks_per_question']}}" style="width: 40px;">
+                                            <input type="text" class="form-control mark negative_mark"  placeholder="enter negative marks" value="{{$testDetail->negative_mark ?? $testData['negative_marks_per_question']}}" style="width: 40px;">
                                         @endif
                                     </div>
                                     @if ($question->answer_format != '')
@@ -347,6 +371,12 @@
                     @if (isset($passagequestions) && count($passagequestions) > 0)
                    
                         @foreach ($passagequestions as $question)
+                         @php
+    $testDetail = \App\Models\TestDetail::where('test_id', $testData['id'] ?? null)
+        ->where('question_id', $question->id)
+        ->first();
+@endphp
+
                             <div class="sec-instruction preview-questions-container">
                                 <div class="instruction-last-border"></div>
                                 <div class="question-sec">
@@ -354,9 +384,9 @@
 
                                             <div>{{ $loop->iteration }}. {!! $question->question !!}</div>
                                         
-                                        <input type="text" class="form-control mark positive_mark passage_positive_mark" placeholder="enter positive marks" value="{{$testData['story_mark_per_question']}}" style="width: 40px;">
+                                        <input type="text" class="form-control mark positive_mark passage_positive_mark" placeholder="enter positive marks" value="{{$testDetail->positive_mark ?? $testData['story_mark_per_question']}}" style="width: 40px;">
                                         @if ($testData['has_negative_marks'] == 'yes')
-                                            <input type="text" class="form-control mark negative_mark"  placeholder="enter negative marks" value="{{$testData['negative_marks_per_question']}}" style="width: 40px;">
+                                            <input type="text" class="form-control mark negative_mark"  placeholder="enter negative marks" value="{{$testDetail->negative_mark ?? $testData['negative_marks_per_question']}}" style="width: 40px;">
                                         @endif
                                     </div>
                                     @if ($question->image != '')
@@ -443,23 +473,45 @@
     </div>
 </div>
 <script>
-    $(document).on("click",".close1",function(){
-    $(".modal").modal('hide');
-})
-$(document).ready(function(){
-    
-    addmark();
-})
-$(".positive_mark").keyup(function(){
-    addmark();
-})
-function addmark(){
-     let total_positive_marks = 0;
-    $('.positive_mark').each(function() {
-        let value = parseFloat($(this).val()) || 0;
-        total_positive_marks += value;
+    $(document).on("click", ".close1", function () {
+        $(".modal").modal('hide');
     });
-    $("#total-marks").html("Total Marks: "+ Math.round(total_positive_marks))
-    
-}
+
+    $(document).ready(function () {
+        calculateTotalMarks();
+    });
+
+    // whenever positive marks change
+    $(document).on("keyup change", ".positive_mark", function () {
+        calculateTotalMarks();
+    });
+
+    function calculateTotalMarks() {
+        let total_positive_marks = 0;
+
+        // sum all positive mark fields
+        $('.positive_mark').each(function () {
+            let value = parseFloat($(this).val()) || 0;
+            total_positive_marks += value;
+        });
+
+        // show total
+        $("#total-marks").html("Total Marks: " + Math.round(total_positive_marks));
+
+        // required total marks from test data
+        const required_total = parseFloat("{{ $testData['total_marks'] }}");
+        const diff = Math.round(total_positive_marks - required_total);
+
+        // check if total matches required marks
+        if (diff !== 0) {
+            let msg = diff > 0
+                ? `⚠️ You exceeded total marks by ${diff}.`
+                : `⚠️ You are short of total marks by ${Math.abs(diff)}.`;
+            $("#marks_related-err").html(msg).show();
+            $("#add-test-btn").prop("disabled", true);
+        } else {
+            $("#marks_related-err").html("").hide();
+            $("#add-test-btn").prop("disabled", false);
+        }
+    }
 </script>

@@ -223,7 +223,7 @@ class TestController extends Controller
 
                 $testData = array(
                     'language' => $request->language == 1 ? 'Hindi' : 'English',
-
+                    'id' => $request->id ?? null,
                     'competitive_commission_id' => $request->competitive_commission,
                     'competitive_commission_name' => ExaminationCommission::find($request->competitive_commission)->name ?? Null,
                     'exam_category_id' => $request->exam_category,
@@ -403,16 +403,14 @@ class TestController extends Controller
                 // print_r((json_decode($request->section_details,true)));
                 $datajson = json_decode($request->non_section_details, true);
 
-
-
-                foreach ($datajson['question_ids'] as $d) {
+                foreach (json_decode($request->question_marks_details) as $dt) {
                     TestDetail::create([
                         'test_id' => $test->id,
-                        'question_id' => $d,
+                        'question_id' => $dt->question_id,
+                        'positive_mark' => $dt->positive_mark ?? 0,
+                        'negative_mark' => $dt->negative_mark ?? 0,
                     ]);
                 }
-
-
 
                 $test->update([
                     'test_code' => 'TEST-' . $test->id,
@@ -438,6 +436,137 @@ class TestController extends Controller
             ]);
         }
     }
+
+    public function update(Request $request, $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'language' => 'required',
+            'competitive_commission' => 'required',
+            'exam_category' => 'required',
+            'exam_subcategory' => 'nullable',
+            'subject' => 'nullable',
+            'topic' => 'nullable',
+            'paper_type' => 'required',
+            'previous_year' => 'nullable|required_if:paper_type,previous_year',
+            'name' => 'required|max:255',
+            'duration' => 'required|numeric|gt:0',
+            'total_questions' => 'required|numeric|gte:0',
+            'total_marks' => 'required|numeric|gte:0',
+            'test_instruction' => 'required',
+            'question_shuffling' => 'required',
+            'allow_re_attempt' => 'required',
+            'number_of_re_attempt_allowed' => 'required_if:reattempt,yes|gte:0',
+            'has_negative_marks' => 'required',
+            'negative_marks_per_question' => 'required_if:has_negative_marks,yes|gte:0',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'code' => 422,
+                'errors' => $validator->errors(),
+            ]);
+        }
+
+        DB::beginTransaction();
+
+        try {
+            $test = Test::findOrFail($id);
+
+            // --- Determine paper type ---
+            $testPaperType = '';
+            if ($request->mcq_total_question > 0)
+                $testPaperType = 'MCQ';
+            if ($request->story_total_question > 0)
+                $testPaperType = $testPaperType ? 'Combined' : 'Passage';
+            if ($request->subjective_total_question > 0)
+                $testPaperType = $testPaperType ? 'Combined' : 'Subjective';
+
+            // --- Calculate marks summary ---
+            $total_marks_mcq = 0;
+            $positive_marks_per_question_mcq = 0;
+            $negative_marks_per_question_mcq = 0;
+
+            $questionMarks = json_decode($request->question_marks_details);
+
+            foreach ($questionMarks as $dt) {
+                $total_marks_mcq += $dt->positive_mark ?? 0;
+                $positive_marks_per_question_mcq = $dt->positive_mark ?? 0;
+                $negative_marks_per_question_mcq = $dt->negative_mark ?? 0;
+            }
+
+            // --- Prepare test data ---
+            $testData = [
+                'language' => $request->language,
+                'competitive_commission_id' => $request->competitive_commission,
+                'exam_category_id' => $request->exam_category,
+                'exam_subcategory_id' => $request->exam_subcategory,
+                'topic_id' => $request->topic,
+                'subject_id' => $request->subject,
+                'test_type' => $request->test_type,
+                'chapter_id' => $request->chapter_id,
+                'paper_type' => $request->paper_type,
+                'previous_year' => $request->paper_type == 0 ? null : $request->previous_year,
+                'name' => $request->name,
+                'duration' => $request->duration,
+                'total_questions' => $request->total_questions,
+                'total_marks' => $request->total_marks,
+                'test_instruction' => $request->test_instruction,
+                'question_shuffling' => $request->question_shuffling,
+                'allow_re_attempt' => $request->allow_re_attempt,
+                'number_of_re_attempt_allowed' => $request->number_of_re_attempt_allowed,
+                'has_negative_marks' => $request->has_negative_marks,
+                'non_section_details' => $request->non_section_details,
+                'question_marks_details' => $request->question_marks_details,
+                'total_positive_marks' => $request->total_positive_marks,
+                'total_negative_marks' => $request->total_negative_marks,
+                'positive_marks_per_question' => $positive_marks_per_question_mcq,
+                'negative_marks_per_question' => $negative_marks_per_question_mcq,
+                'mcq_total_question' => $request->mcq_total_question,
+                'mcq_mark_per_question' => $request->mcq_mark_per_question,
+                'mcq_total_marks' => $request->mcq_total_marks,
+                'story_total_question' => $request->story_total_question,
+                'story_mark_per_question' => $request->story_mark_per_question,
+                'story_total_marks' => $request->story_total_marks,
+                'subjective_total_question' => $request->subjective_total_question,
+                'subjective_mark_per_question' => $request->subjective_mark_per_question,
+                'subjective_total_marks' => $request->subjective_total_marks,
+                'test_paper_type' => $testPaperType,
+            ];
+
+            $test->update($testData);
+
+            // --- Update or insert TestDetail ---
+            foreach ($questionMarks as $dt) {
+                TestDetail::updateOrCreate(
+                    [
+                        'test_id' => $test->id,
+                        'question_id' => $dt->question_id,
+                    ],
+                    [
+                        'positive_mark' => $dt->positive_mark ?? 0,
+                        'negative_mark' => $dt->negative_mark ?? 0,
+                    ]
+                );
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'msgText' => 'Test Updated Successfully!',
+            ]);
+
+        } catch (\Exception $ex) {
+            DB::rollback();
+            return response()->json([
+                'success' => false,
+                'msgText' => $ex->getMessage() . ' - Line: ' . $ex->getLine(),
+            ]);
+        }
+    }
+
+
     public function view($id)
     {
         try {
@@ -500,134 +629,8 @@ class TestController extends Controller
             return redirect(route('test-paper.edit'))->with('error', 'Error Encountered ' . $ex->getMessage());
         }
     }
-    public function update(Request $request, $id)
-    {
-        // dd($request->all());
-        $validator = Validator::make($request->all(), [
-            'language' => 'required',
-            'competitive_commission' => 'required',
-            'exam_category' => 'required',
-            'exam_subcategory' => 'nullable',
-            'subject' => 'nullable',
-            'topic' => 'nullable',
-            'paper_type' => 'required',
-            'previous_year' => 'nullable|required_if:paper_type,previous_year',
-            'name' => 'required|max:255',
-            'duration' => 'required|numeric|gt:0',
-            'total_questions' => 'required|numeric|gte:0',
-            'total_marks' => 'required|numeric|gte:0',
-            'test_instruction' => 'required',
-            'question_shuffling' => 'required',
-            'allow_re_attempt' => 'required',
-            'number_of_re_attempt_allowed' => 'required_if:reattempt,yes|gte:0',
-            'has_negative_marks' => 'required',
-            'negative_marks_per_question' => 'required_if:has_negative_marks,yes|gte:0',
-
-        ]);
-        if ($validator->passes()) {
-            DB::beginTransaction();
-            try {
-                $test = Test::findOrFail($id);
-                $testPaperType = '';
-                if ($request->mcq_total_question > 0) {
-                    $testPaperType = 'MCQ';
-                }
-                if ($request->story_total_question > 0) {
-                    if ($testPaperType != "") {
-                        $testPaperType = 'Combined';
-                    } else {
-                        $testPaperType = 'Passage';
-                    }
-                }
-                if ($request->subjective_total_question > 0) {
-                    if ($testPaperType != "") {
-                        $testPaperType = 'Combined';
-                    } else {
-                        $testPaperType = 'Subjective';
-                    }
-                }
-
-                $total_marks_mcq = 0;
-                $positive_marks_per_question_mcq = 0;
-                $negative_marks_per_question_mcq = 0;
-
-                foreach (json_decode($request->question_marks_details) as $dt) {
-
-                    $total_marks_mcq += $dt->positive_mark ?? 0;
-                    $positive_marks_per_question_mcq = $dt->positive_mark ?? 0;
-                    $negative_marks_per_question_mcq = isset($dt->negative_mark) ? $dt->negative_mark : 0;
 
 
-                }
-                $testData = array(
-                    'language' => $request->language,
-                    'competitive_commission_id' => $request->competitive_commission,
-                    'exam_category_id' => $request->exam_category,
-                    'exam_subcategory_id' => $request->exam_subcategory,
-                    'topic_id' => $request->topic,
-                    'subject_id' => $request->subject,
-                    'test_type' => $request->test_type,
-                    'chapter_id' => $request->chapter_id,
-                    'paper_type' => $request->paper_type,
-                    'previous_year' => $request->paper_type == 0 ? NULL : $request->previous_year,
-                    'name' => $request->name,
-                    'duration' => $request->duration,
-
-                    'total_questions' => $request->total_questions,
-                    'total_marks' => $request->total_marks,
-
-                    'test_instruction' => $request->test_instruction,
-
-                    'question_shuffling' => $request->question_shuffling,
-                    'allow_re_attempt' => $request->allow_re_attempt,
-                    'number_of_re_attempt_allowed' => $request->number_of_re_attempt_allowed,
-                    'has_negative_marks' => $request->has_negative_marks,
-
-
-                    'non_section_details' => $request->non_section_details,
-
-                    'question_marks_details' => $request->question_marks_details,
-                    'total_positive_marks' => $request->total_positive_marks,
-                    'total_negative_marks' => $request->total_negative_marks,
-
-
-                    'positive_marks_per_question' => $positive_marks_per_question_mcq,
-                    'negative_marks_per_question' => $negative_marks_per_question_mcq,
-
-                    'mcq_total_question' => $request->mcq_total_question,
-                    'mcq_mark_per_question' => $request->mcq_mark_per_question,
-                    'mcq_total_marks' => $request->mcq_total_marks,
-                    'story_total_question' => $request->story_total_question,
-                    'story_mark_per_question' => $request->story_mark_per_question,
-                    'story_total_marks' => $request->story_total_marks,
-                    'subjective_total_question' => $request->subjective_total_question,
-                    'subjective_mark_per_question' => $request->subjective_mark_per_question,
-                    'subjective_total_marks' => $request->subjective_total_marks,
-                    'test_paper_type' => $testPaperType,
-                );
-
-                $test->update($testData);
-                DB::commit();
-                return response()->json([
-                    'success' => true,
-                    'msgText' => 'Test Updated !',
-                ]);
-            } catch (\Exception $ex) {
-                DB::rollback();
-                return response()->json([
-                    'success' => false,
-                    'msgText' => $ex->getMessage() . '-' . $ex->getLine(),
-                ]);
-            }
-        } else {
-            DB::rollback();
-            return response()->json([
-                'success' => false,
-                'code' => 422,
-                'errors' => $validator->errors(),
-            ]);
-        }
-    }
 
     public function destroy($id)
     {

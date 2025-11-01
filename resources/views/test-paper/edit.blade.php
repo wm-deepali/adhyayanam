@@ -1610,6 +1610,7 @@ ClassicEditor.create(document.querySelector('#test_instruction'))
                 formData.append('paper_type', $('#paper_type').val());
                 formData.append('previous_year', $('#previous_year').val());
                 formData.append('name', $('#name').val());
+                formData.append('id', $('#test_id').val());
                 formData.append('duration', $('#duration').val());
                 formData.append('per_question_marks', $('#per_question_marks').val());
                 formData.append('total_questions', $('#total_questions').val());

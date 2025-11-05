@@ -407,10 +407,30 @@
 
                                                                 <div>{{ $loop->iteration }}. {!! $questiondetail->question !!}</div>
                                                             
-                                                            <input type="text" class="form-control mark sub_positive_mark" placeholder="enter sub_positive marks" value="{{round($testData['story_mark_per_question']/count($questionDetails))}}" style="width: 40px;">
-                                                            @if ($testData['has_negative_marks'] == 'yes')
-                                                                <input type="text" class="form-control mark  sub_negative_mark"  placeholder="enter sub_negative marks" value="{{round($testData['negative_marks_per_question']/count($questionDetails))}}" style="width: 40px;">
-                                                            @endif
+                                                           @php
+    // Fetch existing test detail for sub-question if editing
+    $subTestDetail = \App\Models\TestDetail::where('test_id', $testData['id'] ?? null)
+        ->where('question_id', $questiondetail->id)
+        ->first();
+
+    $sub_positive_mark = $subTestDetail->positive_mark ?? round($testData['story_mark_per_question'] / count($questionDetails), 2);
+    $sub_negative_mark = $subTestDetail->negative_mark ?? round($testData['negative_marks_per_question'] / count($questionDetails), 2);
+@endphp
+
+<input type="text"
+       class="form-control mark sub_positive_mark"
+       placeholder="enter sub_positive marks"
+       value="{{ $sub_positive_mark }}"
+       style="width: 40px;">
+
+@if ($testData['has_negative_marks'] == 'yes')
+    <input type="text"
+           class="form-control mark sub_negative_mark"
+           placeholder="enter sub_negative marks"
+           value="{{ $sub_negative_mark }}"
+           style="width: 40px;">
+@endif
+
                                                         </div>
                                                         @if ($questiondetail->option_a != '')
                                                             <label class="customradio"><span class="radiotextsty">i) {!! $questiondetail->option_a !!}</span>
@@ -473,45 +493,70 @@
     </div>
 </div>
 <script>
-    $(document).on("click", ".close1", function () {
-        $(".modal").modal('hide');
+$(document).on("click", ".close1", function () {
+    $(".modal").modal('hide');
+});
+
+$(document).ready(function () {
+    calculateTotalMarks();
+});
+
+// whenever any marks change
+$(document).on("keyup change", ".positive_mark, .sub_positive_mark", function () {
+    calculateTotalMarks();
+});
+
+function calculateTotalMarks() {
+    let total_positive_marks = 0;
+
+    // 1️⃣ handle normal positive marks (MCQ, Subjective, etc.)
+    $('.positive_mark').each(function () {
+        let value = parseFloat($(this).val()) || 0;
+        total_positive_marks += value;
     });
 
-    $(document).ready(function () {
-        calculateTotalMarks();
-    });
+    // 2️⃣ handle sub-questions under passage and prevent exceeding passage mark
+    $(".question-container-div[test_question_type='Passage']").each(function () {
+        let passagePositive = parseFloat($(this).find(".passage_positive_mark").val()) || 0;
+        let subQuestions = $(this).closest(".question-sec").find(".sub_positive_mark");
+        let subTotal = 0;
 
-    // whenever positive marks change
-    $(document).on("keyup change", ".positive_mark", function () {
-        calculateTotalMarks();
-    });
-
-    function calculateTotalMarks() {
-        let total_positive_marks = 0;
-
-        // sum all positive mark fields
-        $('.positive_mark').each(function () {
-            let value = parseFloat($(this).val()) || 0;
-            total_positive_marks += value;
+        subQuestions.each(function () {
+            subTotal += parseFloat($(this).val()) || 0;
         });
 
-        // show total
-        $("#total-marks").html("Total Marks: " + Math.round(total_positive_marks));
-
-        // required total marks from test data
-        const required_total = parseFloat("{{ $testData['total_marks'] }}");
-        const diff = Math.round(total_positive_marks - required_total);
-
-        // check if total matches required marks
-        if (diff !== 0) {
-            let msg = diff > 0
-                ? `⚠️ You exceeded total marks by ${diff}.`
-                : `⚠️ You are short of total marks by ${Math.abs(diff)}.`;
-            $("#marks_related-err").html(msg).show();
+        if (subTotal > passagePositive) {
+            $(this).find(".passage_positive_mark").css("border", "2px solid red");
+            $("#marks_related-err").html(
+                `⚠️ Sub-question marks (${subTotal}) exceed total passage mark (${passagePositive}).`
+            ).show();
             $("#add-test-btn").prop("disabled", true);
         } else {
+            $(this).find(".passage_positive_mark").css("border", "");
             $("#marks_related-err").html("").hide();
             $("#add-test-btn").prop("disabled", false);
         }
+    });
+
+    // 3️⃣ Show total test marks
+    $("#total-marks").html("Total Marks: " + total_positive_marks.toFixed(2));
+
+    // 4️⃣ Compare with required total marks
+    const required_total = parseFloat("{{ $testData['total_marks'] }}");
+    const diff = parseFloat((total_positive_marks - required_total).toFixed(2));
+
+    if (diff !== 0) {
+        let msg =
+            diff > 0
+                ? `⚠️ You exceeded total marks by ${diff}.`
+                : `⚠️ You are short of total marks by ${Math.abs(diff)}.`;
+        $("#marks_related-err").html(msg).show();
+        $("#add-test-btn").prop("disabled", true);
+    } else {
+        if ($("#marks_related-err").html() === "") {
+            $("#marks_related-err").hide();
+        }
+        $("#add-test-btn").prop("disabled", false);
     }
+}
 </script>

@@ -13,7 +13,8 @@ class TestDetail extends Model
         'test_id',
         'question_id',
         'positive_mark',
-        'negative_mark'
+        'negative_mark',
+        'parent_question_id'
     ];
 
     public function question()

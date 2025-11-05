@@ -394,10 +394,10 @@
                             </div>
                             <div class="form-row">
                                 <!--div class="form-group col-md-4">
-                                            <label for="per_question_marks">Per Question Marks </label>
-                                                <input type="text" class="form-control" placeholder="Enter in no." name="per_question_marks" id="per_question_marks" >
-                                                <div class="text-danger validation-err" id="per_question_marks-err"></div>
-                                            </div-->
+                                                    <label for="per_question_marks">Per Question Marks </label>
+                                                        <input type="text" class="form-control" placeholder="Enter in no." name="per_question_marks" id="per_question_marks" >
+                                                        <div class="text-danger validation-err" id="per_question_marks-err"></div>
+                                                    </div-->
                                 <div class="form-group col-md-6">
                                     <label for="inputPassword4">Question Selections </label>
                                     <select id="question_generated_by" name="question_generated_by" class="form-control">
@@ -665,16 +665,24 @@
     <!-- CKEditor CDN -->
     <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
     <script>
- 
-            let testInstructionEditor;
-ClassicEditor.create(document.querySelector('#test_instruction'))
-    .then(editor => {
-        testInstructionEditor = editor;
-    })
-                .catch(error => {
-                    console.error('CKEditor initialization error:', error);
-                });
- 
+        document.addEventListener('DOMContentLoaded', function () {
+            const existingNegativeMarks = '{{ $paper->negative_marks_per_question ?? "" }}'; // blade variable from backend
+            toggleInputBox(existingNegativeMarks);
+            const existingReAttemptAllowed = '{{ $paper->number_of_re_attempt_allowed ?? ""}}'
+            toggleInputBox1(existingReAttemptAllowed)
+        });
+
+
+
+        let testInstructionEditor;
+        ClassicEditor.create(document.querySelector('#test_instruction'))
+            .then(editor => {
+                testInstructionEditor = editor;
+            })
+            .catch(error => {
+                console.error('CKEditor initialization error:', error);
+            });
+
     </script>
 
     <script>
@@ -789,32 +797,38 @@ ClassicEditor.create(document.querySelector('#test_instruction'))
         // }
     </script>
     <script>
-        function toggleInputBox() {
+        function toggleInputBox(prefillValue = '') {
             const negativeMarkingSelect = document.getElementById('has_negative_marks');
             const additionalInputContainer = document.getElementById('additionalInputContainer');
-
             if (negativeMarkingSelect.value === 'yes') {
                 additionalInputContainer.innerHTML = `
-                                    <label for="negative_marks_per_question">Enter Negative Mark Value</label>
-                                    <input type="number" id="negative_marks_per_question" name="negative_marks_per_question" min="0" step="1" required>
-                                `;
+          <label for="negative_marks_per_question">Enter Negative Mark Value</label>
+          <input 
+            type="number" 
+            id="negative_marks_per_question" 
+            name="negative_marks_per_question" 
+            min="0" step="1" required 
+            value="${prefillValue}"
+          >
+        `;
             } else {
                 additionalInputContainer.innerHTML = '';
             }
         }
 
+
     </script>
 
     <script>
-        function toggleInputBox1() {
+        function toggleInputBox1(prefillValue = '') {
             const negativeMarkingSelect = document.getElementById('allow_re_attempt');
             const additionalInputContainer = document.getElementById('additionalInputContainer1');
 
             if (negativeMarkingSelect.value === 'yes') {
                 additionalInputContainer.innerHTML = `
-                                    <label for="number_of_re_attempt_allowed">Number of Time</label>
-                                    <input type="number" id="number_of_re_attempt_allowed" name="number_of_re_attempt_allowed" min="0" step="0.01" required>
-                                `;
+                                            <label for="number_of_re_attempt_allowed">Number of Time</label>
+                                            <input type="number" id="number_of_re_attempt_allowed" name="number_of_re_attempt_allowed" min="0" step="0.01" required  value="${prefillValue}">
+                                        `;
             } else {
                 additionalInputContainer.innerHTML = '';
             }

@@ -1,8 +1,9 @@
 @if(isset($question) && !empty($question))
- <div class="col-md-12" style="display:ruby;">
-    {!! 'Q '.$question->question ?? "" !!}
+ <div class="col-md-12" style="display:flex;">
+    {!! 'Q ' . ' ' . $question->question ?? "" !!}
     <span class="text-right"><strong>(Marks : {{$marks}})</strong></span>
     </div>
+
     @if(strip_tags($question->option_a) !="")
     <div class="col-md-12">
         <p><strong>A)</strong> {!! $question->option_a ?? "" !!}</p>

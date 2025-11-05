@@ -1,7 +1,7 @@
 @if(isset($question) && !empty($question))
 
     @php
-        $qindex = $index + 1;
+        $qindex = $index;
     @endphp
 
     <div class="col-md-12" style="display:ruby;">

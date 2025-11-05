@@ -719,7 +719,7 @@ Question Bank | Create
 <div class="col-md-12">
                                                 <label for="">Question </label>
                                                 <div class="input-group">
-                                                    <textarea name="passage_mcq_questions[]" class="form-control multiple_choice_passage_question ckeditor rightContent" id="multiple_choice_passage_question" rows="2" cols="4"></textarea>
+                                                    <textarea name="passage_mcq_questions[]" class="form-control multiple_choice_passage_question ckeditor rightContent"  id="multiple_choice_passage_question_${id}" rows="2" cols="4"></textarea>
                                                     <div class="text-danger validation-err" id="passage_mcq_questions-err"></div>
                                                 </div>
                                             </div>
@@ -738,7 +738,7 @@ Question Bank | Create
                                             <div class="col-md-12">
                                                 <label for="">Option A </label>
                                                 <div class="input-group">
-                                                    <textarea class="form-control multiple_choice_passage_option_a ckeditor rightContent" name="multiple_choice_passage_option_a[]" id="multiple_choice_passage_option_a"  rows="2" cols="4" placeholder="Option A"></textarea>
+                                                    <textarea class="form-control multiple_choice_passage_option_a ckeditor rightContent" name="multiple_choice_passage_option_a[]" id="multiple_choice_passage_option_a_${id}"  rows="2" cols="4" placeholder="Option A"></textarea>
                                                     <div class="text-danger validation-err" id="multiple_choice_passage_option_a-err"></div>
                                                 </div>
                                             </div>
@@ -746,7 +746,7 @@ Question Bank | Create
                                             <div class="col-md-12">
                                                 <label for="">Option B </label>
                                                 <div class="input-group">
-                                                    <textarea class="form-control multiple_choice_passage_option_b ckeditor rightContent" rows="2" name="multiple_choice_passage_option_b[]" id="multiple_choice_passage_option_b" cols="4" placeholder="Option B"></textarea>
+                                                    <textarea class="form-control multiple_choice_passage_option_b ckeditor rightContent" rows="2" name="multiple_choice_passage_option_b[]" id="multiple_choice_passage_option_b_${id}" cols="4" placeholder="Option B"></textarea>
                                                     <div class="text-danger validation-err" id="multiple_choice_passage_option_b-err"></div>
                                                 </div>
                                             </div>
@@ -754,7 +754,7 @@ Question Bank | Create
                                             <div class="col-md-12">
                                                 <label for="">Option C </label>
                                                 <div class="input-group">
-                                                    <textarea class="form-control multiple_choice_passage_option_c ckeditor rightContent" name="multiple_choice_passage_option_c[]" id="multiple_choice_passage_option_c" rows="2" cols="4" placeholder="Option C"></textarea>
+                                                    <textarea class="form-control multiple_choice_passage_option_c ckeditor rightContent" name="multiple_choice_passage_option_c[]" id="multiple_choice_passage_option_c_${id}" rows="2" cols="4" placeholder="Option C"></textarea>
                                                     <div class="text-danger validation-err" id="multiple_choice_passage_option_c-err"></div>
                                                 </div>
                                             </div>
@@ -762,14 +762,14 @@ Question Bank | Create
                                             <div class="col-md-12">
                                                 <label for="">Option D </label>
                                                 <div class="input-group">
-                                                    <textarea class="form-control multiple_choice_passage_option_d ckeditor rightContent" name="multiple_choice_passage_option_d[]" id="multiple_choice_passage_option_d" rows="2" cols="4" placeholder="Option D"></textarea>
+                                                    <textarea class="form-control multiple_choice_passage_option_d ckeditor rightContent" name="multiple_choice_passage_option_d[]" id="multiple_choice_passage_option_d_${id}" rows="2" cols="4" placeholder="Option D"></textarea>
                                                     <div class="text-danger validation-err" id="multiple_choice_passage_option_d-err"></div>
                                                 </div>
                                             </div>
                                             <div class="col-md-12 solution-group" style="display: none;">
                                                 <label>Solution</label>
                                                 <div class="input-group">
-                                                    <textarea class="form-control ckeditor" name="passage_mcq_solution[]" rows="2" cols="4" placeholder="Solution"></textarea>
+                                                    <textarea class="form-control ckeditor" name="passage_mcq_solution[]" id="multiple_choice_passage_solution_${id}" rows="2" cols="4" placeholder="Solution"></textarea>
                                                 </div>
                                             </div>
 				<div class="col-sm-12">

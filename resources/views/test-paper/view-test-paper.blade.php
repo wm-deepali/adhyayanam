@@ -211,42 +211,51 @@
                     {{-- 20. Questions Section --}}
                     <div class="question-bank mt-4">
                         <h5><strong>All Questions in This Test Paper:</strong></h5>
-                        @php
-                            $testDetails = $paper->testDetails()->with('question')->get();
-                        @endphp
+                   @php
+    $testDetails = $paper->testDetails()->with('question')->get();
+    $mainIndex = 1;
+@endphp
 
-                        @if($testDetails->count())
-                            @foreach($testDetails as $key => $testDetail)
-                                    @if(isset($testDetail->sub_question_id) && $testDetail->sub_question_id != "")
-                                        @php
-                                            $subQuestion = \App\Helpers\Helper::getSubQuestionDetails(
-                                                $testDetail->sub_question_id,
-                                                $testDetail->test_question_type,
-                                                $testDetail->sub_negative_mark,
-                                                $testDetail->sub_positive_mark
-                                            );
-                                            $marks = $testDetail->sub_positive_mark;
-                                        @endphp
-                                        @include('test-series.sub-questions', [
-                                            'question' => $subQuestion,
-                                            'marks' => $marks,
-                                            'index' => $key
-                                        ])
-                                    @elseif(isset($testDetail->question))
-                                    @php
-                                        $question = $testDetail->question;
-                                        $marks = $testDetail->positive_mark ?? $paper->positive_marks_per_question;
-                                    @endphp
-                                            @include('test-series.questions', [
-                                                'question' => $question,
-                                                'marks' => $marks,
-                                                'index' => $key
-                                            ])
-                                @endif
-                            @endforeach
-                        @else
-                            <p class="text-center">No questions found for this test paper.</p>
-                        @endif
+@if($testDetails->count())
+    @foreach($testDetails as $testDetail)
+        @if(isset($testDetail->parent_question_id) && $testDetail->parent_question_id != "")
+            {{-- Sub Question --}}
+            @php
+                $subQuestion = \App\Helpers\Helper::getSubQuestionDetails(
+                    $testDetail->question_id,
+                    $testDetail->test_question_type,
+                    $testDetail->sub_negative_mark,
+                    $testDetail->sub_positive_mark
+                );
+                $marks = $testDetail->positive_mark ?? $paper->positive_marks_per_question;
+            @endphp
+
+            @include('test-series.sub-questions', [
+                'question' => $subQuestion,
+                'marks' => $marks,
+            ])
+        @elseif(isset($testDetail->question))
+            {{-- Main Question --}}
+            @php
+                $question = $testDetail->question;
+                $marks = $testDetail->positive_mark ?? $paper->positive_marks_per_question;
+                $indexLabel = $mainIndex;
+                $parentMainIndex[$testDetail->question_id] = $mainIndex; // store mapping for sub-questions
+            @endphp
+
+            @include('test-series.questions', [
+                'question' => $question,
+                'marks' => $marks,
+                'index' => $indexLabel
+            ])
+
+            @php $mainIndex++; @endphp
+        @endif
+    @endforeach
+@else
+    <p class="text-center">No questions found for this test paper.</p>
+@endif
+
                     </div>
                 </div>
             </div>

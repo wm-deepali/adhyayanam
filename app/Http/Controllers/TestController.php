@@ -343,13 +343,19 @@ class TestController extends Controller
                 $negative_marks_per_question_mcq = 0;
 
                 foreach (json_decode($request->question_marks_details) as $dt) {
+                    // Ignore sub-questions (only process main ones)
+                    if (!empty($dt->sub_question_id)) {
+                        continue;
+                    }
 
-                    $total_marks_mcq += $dt->positive_mark ?? 0;
-                    $positive_marks_per_question_mcq = $dt->positive_mark ?? 0;
-                    $negative_marks_per_question_mcq = isset($dt->negative_mark) ? $dt->negative_mark : 0;
+                    $positive = $dt->positive_mark ?? 0;
+                    $negative = $dt->negative_mark ?? 0;
 
-
+                    $total_marks_mcq += $positive;
+                    $positive_marks_per_question_mcq = $positive;
+                    $negative_marks_per_question_mcq = $negative;
                 }
+
                 $testData = array(
                     'language' => $request->language,
 
@@ -403,12 +409,46 @@ class TestController extends Controller
                 // print_r((json_decode($request->section_details,true)));
                 $datajson = json_decode($request->non_section_details, true);
 
+
+                $lastParentQuestionId = null;
+
                 foreach (json_decode($request->question_marks_details) as $dt) {
+                    $type = $dt->test_question_type ?? '';
+
+                    // ✅ For Passage (main question)
+                    if ($type === 'Passage') {
+                        TestDetail::create([
+                            'test_id' => $test->id,
+                            'question_id' => (int) $dt->question_id,
+                            'parent_question_id' => null,
+                            'positive_mark' => (float) ($dt->positive_mark ?? 0),
+                            'negative_mark' => (float) ($dt->negative_mark ?? 0),
+                        ]);
+
+                        // Remember this Passage as parent for next sub-questions
+                        $lastParentQuestionId = $dt->question_id;
+                        continue;
+                    }
+
+                    // ✅ For Sub Passage (child question)
+                    if ($type === 'Sub Passage') {
+                        TestDetail::create([
+                            'test_id' => $test->id,
+                            'question_id' => (int) $dt->sub_question_id,
+                            'parent_question_id' => (int) $lastParentQuestionId,
+                            'positive_mark' => (float) ($dt->sub_positive_mark ?? 0),
+                            'negative_mark' => (float) ($dt->sub_negative_mark ?? 0),
+                        ]);
+                        continue;
+                    }
+
+                    // ✅ For all other question types (MCQ, Subjective, etc.)
                     TestDetail::create([
                         'test_id' => $test->id,
-                        'question_id' => $dt->question_id,
-                        'positive_mark' => $dt->positive_mark ?? 0,
-                        'negative_mark' => $dt->negative_mark ?? 0,
+                        'question_id' => (int) $dt->question_id,
+                        'parent_question_id' => null,
+                        'positive_mark' => (float) ($dt->positive_mark ?? 0),
+                        'negative_mark' => (float) ($dt->negative_mark ?? 0),
                     ]);
                 }
 
@@ -490,11 +530,18 @@ class TestController extends Controller
             $questionMarks = json_decode($request->question_marks_details);
 
             foreach ($questionMarks as $dt) {
-                $total_marks_mcq += $dt->positive_mark ?? 0;
-                $positive_marks_per_question_mcq = $dt->positive_mark ?? 0;
-                $negative_marks_per_question_mcq = $dt->negative_mark ?? 0;
-            }
+                // Ignore sub-questions (only process main ones)
+                if (!empty($dt->sub_question_id)) {
+                    continue;
+                }
 
+                $positive = $dt->positive_mark ?? 0;
+                $negative = $dt->negative_mark ?? 0;
+
+                $total_marks_mcq += $positive;
+                $positive_marks_per_question_mcq = $positive;
+                $negative_marks_per_question_mcq = $negative;
+            }
             // --- Prepare test data ---
             $testData = [
                 'language' => $request->language,
@@ -535,20 +582,62 @@ class TestController extends Controller
             ];
 
             $test->update($testData);
-
             // --- Update or insert TestDetail ---
+            $last_parent_id = null;
+
             foreach ($questionMarks as $dt) {
+                $question_id = null;
+                $parent_question_id = null;
+
+                // Identify question id
+                if (!empty($dt->question_id)) {
+                    $question_id = (int) $dt->question_id;
+
+                    // store last Passage id only if type is Passage
+                    if (isset($dt->test_question_type) && $dt->test_question_type === 'Passage') {
+                        $last_parent_id = $question_id;
+                    }
+
+                } elseif (!empty($dt->sub_question_id)) {
+                    $question_id = (int) $dt->sub_question_id;
+
+                    // assign parent id only if this is a Sub Passage
+                    if (isset($dt->test_question_type) && $dt->test_question_type === 'Sub Passage') {
+                        $parent_question_id = $last_parent_id;
+                    }
+                } else {
+                    continue; // skip invalid entries
+                }
+
+                // determine marks
+                $positive_mark = 0;
+                $negative_mark = 0;
+
+                if (isset($dt->positive_mark) || isset($dt->negative_mark)) {
+                    $positive_mark = (float) ($dt->positive_mark ?? 0);
+                    $negative_mark = (float) ($dt->negative_mark ?? 0);
+                } elseif (isset($dt->sub_positive_mark) || isset($dt->sub_negative_mark)) {
+                    $positive_mark = (float) ($dt->sub_positive_mark ?? 0);
+                    $negative_mark = (float) ($dt->sub_negative_mark ?? 0);
+                }
+
+                $positive_mark = round($positive_mark, 2);
+                $negative_mark = round($negative_mark, 2);
+
                 TestDetail::updateOrCreate(
                     [
                         'test_id' => $test->id,
-                        'question_id' => $dt->question_id,
+                        'question_id' => $question_id,
                     ],
                     [
-                        'positive_mark' => $dt->positive_mark ?? 0,
-                        'negative_mark' => $dt->negative_mark ?? 0,
+                        'parent_question_id' => $parent_question_id,
+                        'positive_mark' => $positive_mark,
+                        'negative_mark' => $negative_mark,
                     ]
                 );
             }
+
+
 
             DB::commit();
 

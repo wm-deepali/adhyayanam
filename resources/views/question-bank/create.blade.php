@@ -127,6 +127,11 @@
                                         <label>Has option E</label>
                                     </div>
                                     <div class="form-group mt-2">
+                                        <input type="checkbox" class="form-check-input has-solution" name="has_solution"
+                                            onchange="toggleSolution(this)">
+                                        <label>Has Solution</label>
+                                    </div>
+                                    <div class="form-group mt-2">
                                         <input type="checkbox" class="form-check-input" name="show_on_pyq" value="yes">
                                         <label for="show_on_pyq">Show on PYQ</label>
                                     </div>
@@ -163,6 +168,10 @@
                                         <label>Option E</label>
                                         <textarea class="form-control quill-editor6 ckeditor" name="option_e[]" id="option_e_1"></textarea>
                                     </div>
+                                    <div class="form-group solution-group" style="display: none;">
+                                        <label>Solution</label>
+                                        <textarea class="form-control ckeditor" name="solution[]" id="mcq_solution_1"></textarea>
+                                    </div>
                                 </div>
                                 <div class="col-md-6" id="subjective_question_form" style="display:none;">
                                     <div class="question-count" class="form-group">
@@ -183,10 +192,9 @@
                                             <option value="text input">Text Input</option>
                                         </select>
                                     </div>
-                                    <div class="form-group">
+                                    <div class="form-group solution-group" style="display: none;">
                                         <label>Solution</label>
-                                        <input type="file" class="form-control" name="answerformatsolution[]"
-                                            placeholder="Solution">
+                                        <textarea class="form-control ckeditor" name="solution[]" id="subjective_solution_1"></textarea>
                                     </div>
 
                                 </div>
@@ -291,6 +299,13 @@
                                                     </div>
                                                 </div>
 
+                                                <div class="col-md-12 solution-group" style="display: none;">
+                                                    <label>Solution</label>
+                                                    <div class="input-group">
+                                                        <textarea class="form-control ckeditor" name="passage_mcq_solution[]" id="multiple_choice_passage_solution" rows="2" cols="4" placeholder="Solution"></textarea>
+                                                    </div>
+                                                </div>
+
                                                 <div class="col-sm-12">
                                                     <button type="button" class="btn btn-primary addbox add_mcp"><i
                                                             class="fa fa-plus"></i>
@@ -314,6 +329,12 @@
                                                             id="reasoning_passage_questions-err"></div>
                                                     </div>
                                                 </div>
+                                            <div class="col-md-12 solution-group" style="display: none;">
+                                                <label>Solution</label>
+                                                <div class="input-group">
+                                                    <textarea class="form-control ckeditor" name="reasoning_passage_solution[]" id="reasoning_subjective_passage_solution" rows="2" cols="4" placeholder="Solution"></textarea>
+                                                </div>
+                                            </div>
                                                 <div class="col-sm-3"><button type="button"
                                                         class="btn btn-primary addbox add_rp"><i class="fa fa-plus"></i> Add
                                                         More</button></div>
@@ -331,11 +352,11 @@
                                             <option value="text input">Text Input</option>
                                         </select>
                                     </div>
-                                    <div class="form-group" id="solution_div" style="display: none;">
+                                    <!-- <div class="form-group" id="solution_div" style="display: none;">
                                         <label>Solution</label>
                                         <input type="file" class="form-control" name="answerformatsolution[]"
                                             placeholder="Solution">
-                                    </div>
+                                    </div> -->
 
                                 </div>
                                 <div id="question-clone"></div>
@@ -542,22 +563,43 @@
                 setFormInputsEnabled(storyquestionType, false);
                 setFormInputsEnabled(subjectivequestionType, false);
                 if (typeof initEditorsIn === 'function') { initEditorsIn(mcqquestionType); }
+                // Reapply Has Solution toggle to initialize editors in the visible section
+                try {
+                    var qb = mcqquestionType.closest('.question-block');
+                    if (qb) {
+                        var chk = qb.querySelector('.has-solution');
+                        if (chk) { toggleSolution(chk); }
+                    }
+                } catch (e) {}
             }
-            else if (this.value == 'Subjective') {
-                // Tear down editors in hidden sections first
-                destroyEditorsIn(mcqquestionType);
-                destroyEditorsIn(storyquestionType);
-                subjectivequestionType.style.display = 'block';
-                storyquestionType.style.display = 'none';
-                mcqquestionType.style.display = 'none';
-                addmorediv.style.display = 'block';
+           else if (this.value == 'Subjective') {
+    // Destroy editors for other question types
+    destroyEditorsIn(mcqquestionType);
+    destroyEditorsIn(storyquestionType);
 
-                // Enable Subjective, disable others
-                setFormInputsEnabled(mcqquestionType, false);
-                setFormInputsEnabled(storyquestionType, false);
-                setFormInputsEnabled(subjectivequestionType, true);
-                if (typeof initEditorsIn === 'function') { initEditorsIn(subjectivequestionType); }
-            }
+    // Show subjective question section, hide others
+    subjectivequestionType.style.display = 'block';
+    storyquestionType.style.display = 'none';
+    mcqquestionType.style.display = 'none';
+    addmorediv.style.display = 'block';
+
+    // Enable subjective inputs only
+    setFormInputsEnabled(mcqquestionType, false);
+    setFormInputsEnabled(storyquestionType, false);
+    setFormInputsEnabled(subjectivequestionType, true);
+
+    
+    // Initialize CKEditor editors in subjective type container
+    if (typeof initEditorsIn === 'function') {
+        initEditorsIn(subjectivequestionType);
+    }
+    // Toggle the solution editor visibility and initialization for all subjective question blocks
+    try {
+        const checkboxes = subjectivequestionType.querySelectorAll('.has-solution');
+        checkboxes.forEach(chk => toggleSolution(chk));
+    } catch (e) {}
+}
+
             else if (this.value == 'Story Based') {
                 // Tear down editors in hidden sections first
                 destroyEditorsIn(mcqquestionType);
@@ -572,6 +614,14 @@
                 setFormInputsEnabled(storyquestionType, true);
                 setFormInputsEnabled(subjectivequestionType, false);
                 if (typeof initEditorsIn === 'function') { initEditorsIn(storyquestionType); }
+                // Reapply Has Solution toggle to initialize editors in the visible section
+                try {
+                    var qb = storyquestionType.closest('.question-block');
+                    if (qb) {
+                        var chk = qb.querySelector('.has-solution');
+                        if (chk) { toggleSolution(chk); }
+                    }
+                } catch (e) {}
             }
         });
 
@@ -732,6 +782,20 @@
             const optionEGroup = checkbox.closest('.question-block').querySelector('.option-e-group');
             optionEGroup.style.display = checkbox.checked ? 'block' : 'none';
         }
+
+        function toggleSolution(checkbox) {
+            const block = checkbox.closest('.question-block');
+            if (!block) return;
+            const groups = block.querySelectorAll('.solution-group');
+            groups.forEach(function (grp) {
+                grp.style.display = checkbox.checked ? 'block' : 'none';
+                if (checkbox.checked && typeof initEditorsIn === 'function') {
+                    initEditorsIn(grp);
+                } else if (!checkbox.checked && typeof destroyEditorsIn === 'function') {
+                    destroyEditorsIn(grp);
+                }
+            });
+        }
     </script>
     <script>
 
@@ -753,6 +817,14 @@
                 $("#solution_div").show();
                 // Initialize editors within the shown subsection
                 if (typeof initEditorsIn === 'function') { initEditorsIn(document.getElementById('reasoning_subjective_passage_div')); }
+                // Sync Has Solution toggle for newly visible solution editors
+                try {
+                    var qb = document.getElementById('story_question_form').closest('.question-block');
+                    if (qb) {
+                        var chk = qb.querySelector('.has-solution');
+                        if (chk) { toggleSolution(chk); }
+                    }
+                } catch (e) {}
             }
         });
         var id = 1;
@@ -810,6 +882,12 @@
                                                                         <div class="text-danger validation-err" id="multiple_choice_passage_option_d-err"></div>
                                                                     </div>
                                                                 </div>
+                                                                <div class="col-md-12 solution-group" style="display: none;">
+                                                                    <label>Solution</label>
+                                                                    <div class="input-group">
+                                                                        <textarea class="form-control ckeditor" name="passage_mcq_solution[]" id="multiple_choice_passage_solution_${id}" rows="2" cols="4" placeholder="Solution"></textarea>
+                                                                    </div>
+                                                                </div>
                                     <div class="col-sm-12">
                                         <button type="button" class="btn btn-danger removebox remove_mcp"><i class="fa fa-minus"></i> Remove</button>
                                         <button type="button" class="btn btn-primary addbox add_mcp"><i class="fa fa-plus"></i> Add More</button>
@@ -818,6 +896,14 @@
                             `);
             id = id + 1
             if (typeof initEditorsIn === 'function') { initEditorsIn(document.querySelector('.optionBox_mcp')); }
+            // Sync visibility with Has Solution toggle of the current question block
+            try {
+                var qb = event.currentTarget.closest('.question-block');
+                if (qb) {
+                    var chk = qb.querySelector('.has-solution');
+                    if (chk) { toggleSolution(chk); }
+                }
+            } catch (e) {}
             // $('.editor').summernote();
         });
        
@@ -838,6 +924,12 @@
                                                                         <div class="text-danger validation-err" id="reasoning_passage_questions-err"></div>
                                                                     </div>
                                                                 </div>
+                                    <div class="col-md-12 solution-group" style="display: none;">
+                                        <label>Solution</label>
+                                        <div class="input-group">
+                                            <textarea class="form-control ckeditor" name="reasoning_passage_solution[]" id="reasoning_subjective_passage_solution_${id}" rows="2" cols="4" placeholder="Solution"></textarea>
+                                        </div>
+                                    </div>
                                     <div class="col-sm-3">
                                         <button type="button" class="btn btn-danger removebox remove_rp"><i class="fa fa-minus"></i> Remove</button>
                                         <button type="button" class="btn btn-primary addbox add_rp"><i class="fa fa-plus"></i> Add More</button>
@@ -846,6 +938,14 @@
                             `);
             id = id + 1
             if (typeof initEditorsIn === 'function') { initEditorsIn(document.querySelector('.optionBox_rp')); }
+            // Sync visibility with Has Solution toggle of the current question block
+            try {
+                var qb = event.currentTarget.closest('.question-block');
+                if (qb) {
+                    var chk = qb.querySelector('.has-solution');
+                    if (chk) { toggleSolution(chk); }
+                }
+            } catch (e) {}
             // $('.editor').summernote();
         });
         $('.optionBox_rp').on('click', '.remove_rp', function () {

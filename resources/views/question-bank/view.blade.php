@@ -265,13 +265,25 @@ $catArr = array('0'=> 'Normal', '1'=> 'Previous Year', '2'=> 'Current Affair');
                                 <p><strong>Answer Format: </strong> {!! strip_tags($details->answer_format) ?? "" !!}</p>
                             </div>
                             @endif
+                            @if(isset($details->solution) && strip_tags($details->solution) != "")
+                            <div class="col-md-12">
+                                <p><strong>Solution: </strong> {!! $details->solution !!}</p>
+                            </div>
+                            @endif
                             @endforeach
                         @endif
                     
                     @endif
                     
-
-
+                    @if($question->has_solution == 'yes' && strip_tags($question->solution) != "")
+                    <div class="col-md-12">
+                        <h4 class="mt-3">Solution<hr></h4>
+                    </div>
+                    <div class="col-md-12">
+                        {!! $question->solution !!}
+                    </div>
+                    @endif
+                    
                     
                 </div>
             </div>

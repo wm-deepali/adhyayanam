@@ -2837,8 +2837,10 @@ class ContentManagementController extends Controller
 
                 $question->passage_question_type = $request->passage_question_type ?? NULL;
                 $question->answer_format = $request->answer_format[$key] ?? NULL;
-                $question->has_solution = (isset($request->hasFile('answerformatsolution')[$key])) ? 'yes' : 'no';
-                $question->solution = isset(($request->hasFile('answerformatsolution')[$key])) ? $request->answerformatsolution->store('answerformatsolution')[$key] : NULL;
+                // Save solution from text editor instead of file upload
+                $solutionText = $request->solution[$key] ?? null;
+                $question->has_solution = (!empty($request->has_solution) && !empty($solutionText)) ? 'yes' : 'no';
+                $question->solution = $solutionText;
                 // Save the question to the database
                 $question->added_by_id = auth()->id(); // teacher's ID
                 $question->added_by_type = 'user';
@@ -2850,12 +2852,15 @@ class ContentManagementController extends Controller
                     if ($request->passage_question_type == 'reasoning_subjective') {
                         foreach ($request->reasoning_passage_questions as $t => $passagequestionData) {
                             if (isset($passagequestionData) && $passagequestionData != "") {
-
-                                QuestionDetail::create([
+                                $detailData = [
                                     'question_id' => $question->id,
                                     'question' => $passagequestionData,
-                                ]);
-
+                                ];
+                                // Optional per-subquestion solution
+                                if (isset($request->reasoning_passage_solution[$t]) && $request->reasoning_passage_solution[$t] !== null) {
+                                    $detailData['solution'] = $request->reasoning_passage_solution[$t];
+                                }
+                                QuestionDetail::create($detailData);
                             }
 
                         }
@@ -2864,9 +2869,7 @@ class ContentManagementController extends Controller
 
                         foreach ($request->passage_mcq_questions as $k => $passagemcqquestionData) {
                             if (isset($passagemcqquestionData) && $passagemcqquestionData != "") {
-
-
-                                QuestionDetail::create([
+                                $detailData = [
                                     'question_id' => $question->id,
                                     'question' => $passagemcqquestionData,
                                     'answer' => strtoupper($request->multiple_choice_passage_answer[$k]) ?? NULL,
@@ -2874,7 +2877,12 @@ class ContentManagementController extends Controller
                                     'option_b' => $request->multiple_choice_passage_option_b[$k],
                                     'option_c' => $request->multiple_choice_passage_option_c[$k],
                                     'option_d' => $request->multiple_choice_passage_option_d[$k],
-                                ]);
+                                ];
+                                // Optional per-subquestion solution
+                                if (isset($request->passage_mcq_solution[$k]) && $request->passage_mcq_solution[$k] !== null) {
+                                    $detailData['solution'] = $request->passage_mcq_solution[$k];
+                                }
+                                QuestionDetail::create($detailData);
                             }
                         }
                     }
@@ -2969,8 +2977,10 @@ class ContentManagementController extends Controller
                 $question->option_e = $request->has_option_e ? $request->option_e[$key] ?? null : null;
                 $question->passage_question_type = $request->passage_question_type ?? NULL;
                 $question->answer_format = $request->answer_format[$key] ?? NULL;
-                $question->has_solution = (isset($request->hasFile('answerformatsolution')[$key])) ? 'yes' : 'no';
-                $question->solution = isset(($request->hasFile('answerformatsolution')[$key])) ? $request->answerformatsolution->store('answerformatsolution')[$key] : NULL;
+                // Save solution from text editor instead of file upload
+                $solutionText = $request->solution[$key] ?? null;
+                $question->has_solution = (!empty($request->has_solution) && !empty($solutionText)) ? 'yes' : 'no';
+                $question->solution = $solutionText;
 
                 // Save the question to the database
                 $question->save();
@@ -2981,12 +2991,14 @@ class ContentManagementController extends Controller
                     if ($request->passage_question_type == 'reasoning_subjective') {
                         foreach ($request->reasoning_passage_questions as $t => $passagequestionData) {
                             if (isset($passagequestionData) && $passagequestionData != "") {
-
-                                QuestionDetail::create([
+                                $detailData = [
                                     'question_id' => $question->id,
                                     'question' => $passagequestionData,
-                                ]);
-
+                                ];
+                                if (isset($request->reasoning_passage_solution[$t]) && $request->reasoning_passage_solution[$t] !== null) {
+                                    $detailData['solution'] = $request->reasoning_passage_solution[$t];
+                                }
+                                QuestionDetail::create($detailData);
                             }
 
                         }
@@ -2995,9 +3007,7 @@ class ContentManagementController extends Controller
 
                         foreach ($request->passage_mcq_questions as $k => $passagemcqquestionData) {
                             if (isset($passagemcqquestionData) && $passagemcqquestionData != "") {
-
-
-                                QuestionDetail::create([
+                                $detailData = [
                                     'question_id' => $question->id,
                                     'question' => $passagemcqquestionData,
                                     'answer' => strtoupper($request->multiple_choice_passage_answer[$k]) ?? NULL,
@@ -3005,7 +3015,11 @@ class ContentManagementController extends Controller
                                     'option_b' => $request->multiple_choice_passage_option_b[$k],
                                     'option_c' => $request->multiple_choice_passage_option_c[$k],
                                     'option_d' => $request->multiple_choice_passage_option_d[$k],
-                                ]);
+                                ];
+                                if (isset($request->passage_mcq_solution[$k]) && $request->passage_mcq_solution[$k] !== null) {
+                                    $detailData['solution'] = $request->passage_mcq_solution[$k];
+                                }
+                                QuestionDetail::create($detailData);
                             }
                         }
                     }
@@ -3153,6 +3167,23 @@ class ContentManagementController extends Controller
                             } else {
                                 $instruction = $td7->innerHtml;
                                 $has_instruction = true;
+                            }
+
+                            // Solution (optional) - try next rows after instruction
+                            $solution = null;
+                            $has_solution = 'no';
+                            $tryRows = [8, 9];
+                            foreach ($tryRows as $rowIdx) {
+                                $tr = $tables[$i]->find('tr', $rowIdx);
+                                $td = $tr ? $tr->find('td', 1) : null;
+                                if ($td) {
+                                    $content = $td->innerHtml;
+                                    if ($content !== null && trim($content) !== '' && $content !== '&nbsp;') {
+                                        $solution = $content;
+                                        $has_solution = 'yes';
+                                        break;
+                                    }
+                                }
                             }
 
                             // Finally, set status once
@@ -3351,7 +3382,7 @@ class ContentManagementController extends Controller
                         }
                     }
                 } elseif ($request->question_type == 'Story Based') {
-                    try {
+                    // try {
 
                         $question = $tables[1]->find('tr', 0)->find('td', 1)->innerHtml;
                         if ($tables[1]->find('tr', 1)->find('td', 1)->find('p')->innerHtml == '&nbsp;') {
@@ -3370,22 +3401,22 @@ class ContentManagementController extends Controller
 
 
                         }
-                        if ($tables[1]->find('tr', 2)->find('td', 1)->find('p')->innerHtml == '&nbsp;') {
+                        // if ($tables[1]->find('tr', 2)->find('td', 1)->find('p')->innerHtml == '&nbsp;') {
                             $solution = NULL;
                             $has_solution = 'no';
-                        } else {
-                            $solution = $tables[1]->find('tr', 2)->find('td', 1)->innerHtml;
-                            $has_solution = 'yes';
-                        }
-                        if ($tables[1]->find('tr', 3)->find('td', 1)->find('p')->innerHtml == '&nbsp;') {
+                        // } else {
+                        //     $solution = $tables[1]->find('tr', 2)->find('td', 1)->innerHtml;
+                        //     $has_solution = 'yes';
+                        // }
+                        if ($tables[1]->find('tr', 2)->find('td', 1)->find('p')->innerHtml == '&nbsp;') {
                             $instruction = NULL;
                             $has_instruction = false;
                         } else {
-                            $instruction = $tables[1]->find('tr', 3)->find('td', 1)->innerHtml;
+                            $instruction = $tables[1]->find('tr', 2)->find('td', 1)->innerHtml;
                             $has_instruction = true;
                         }
+                        $answer_format = NULL;
                         if ($request->passage_question_type == 'reasoning_subjective') {
-                            $answer_format = NULL;
                             if ($tables[1]->find('tr', 3)->find('td', 1)->find('p')->innerHtml == '&nbsp;') {
                                 $answer_format = NULL;
                             } else {
@@ -3445,11 +3476,21 @@ class ContentManagementController extends Controller
                                     } else {
                                         $passage_answer_format = $tables[$i]->find('tr', 1)->find('td', 1)->find('p');
                                     }
+                                    // Try to read per-subquestion solution at row 2
+                                    $detail_solution = NULL;
+                                    $solTr = $tables[$i]->find('tr', 2);
+                                    $solTd = $solTr ? $solTr->find('td', 1) : null;
+                                    if ($solTd && trim($solTd->innerHtml) !== '' && $solTd->innerHtml !== '&nbsp;') {
+                                        $detail_solution = $solTd->innerHtml;
+                                    }
                                     $question_detail = ([
                                         'question_id' => $ques->id,
                                         'question' => $passage_question,
                                         'answer_format' => $passage_answer_format,
                                     ]);
+                                    if ($detail_solution !== NULL) {
+                                        $question_detail['solution'] = $detail_solution;
+                                    }
                                     QuestionDetail::create($question_detail);
                                 } else {
                                     $passage_question = $tables[$i]->find('tr', 0)->find('td', 1)->innerHtml;
@@ -3465,6 +3506,19 @@ class ContentManagementController extends Controller
                                         $has_option_e = true;
                                     }
                                     $passage_answer = $tables[$i]->find('tr', 6)->find('td', 1)->find('p')->innerHtml;
+                                    // Try to read per-subquestion solution at row 7 or 8
+                                    $detail_solution = NULL;
+                                    $solTr = $tables[$i]->find('tr', 7);
+                                    $solTd = $solTr ? $solTr->find('td', 1) : null;
+                                    if ($solTd && trim($solTd->innerHtml) !== '' && $solTd->innerHtml !== '&nbsp;') {
+                                        $detail_solution = $solTd->innerHtml;
+                                    } else {
+                                        $solTr2 = $tables[$i]->find('tr', 8);
+                                        $solTd2 = $solTr2 ? $solTr2->find('td', 1) : null;
+                                        if ($solTd2 && trim($solTd2->innerHtml) !== '' && $solTd2->innerHtml !== '&nbsp;') {
+                                            $detail_solution = $solTd2->innerHtml;
+                                        }
+                                    }
                                     $question_detail = ([
                                         'question_id' => $ques->id,
                                         'question' => $passage_question,
@@ -3476,6 +3530,9 @@ class ContentManagementController extends Controller
                                         'option_e' => $option_e,
                                         'has_option_e' => $has_option_e,
                                     ]);
+                                    if ($detail_solution !== NULL) {
+                                        $question_detail['solution'] = $detail_solution;
+                                    }
                                     QuestionDetail::create($question_detail);
                                 }
 
@@ -3489,16 +3546,16 @@ class ContentManagementController extends Controller
                             // }
                         }
 
-                    } catch (\Exception $ex) {
-                        $question = $tables[1]->find('tr', 0)->find('td', 1)->innerHtml;
-                        $rejectedCount = $rejectedCount + 1;
-                        $questionData = [];
-                        $questionData['question'] = $question;
-                        $questionData['note'] = 'Question Format Issue';
-                        $questionData['question_type'] = $request->question_type;
-                        $questionData['status'] = "Rejected";
-                        $ques = Question::create($questionData);
-                    }
+                    // } catch (\Exception $ex) {
+                    //     $question = $tables[1]->find('tr', 0)->find('td', 1)->innerHtml;
+                    //     $rejectedCount = $rejectedCount + 1;
+                    //     $questionData = [];
+                    //     $questionData['question'] = $question;
+                    //     $questionData['note'] = 'Question Format Issue';
+                    //     $questionData['question_type'] = $request->question_type;
+                    //     $questionData['status'] = "Rejected";
+                    //     $ques = Question::create($questionData);
+                    // }
                 }
 
                 DB::commit();

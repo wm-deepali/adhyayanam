@@ -9,7 +9,7 @@ class QuestionDetail extends Model
 {
     use HasFactory;
 
-    protected $fillable=[
+    protected $fillable = [
         'question_id',
         'question',
         'answer',
@@ -19,6 +19,8 @@ class QuestionDetail extends Model
         'option_d',
         'option_e',
         'has_option_e',
-        'answer_format'
+        'answer_format',
+        'solution', // Added solution here
     ];
 }
+

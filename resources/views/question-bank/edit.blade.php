@@ -127,6 +127,10 @@ Question Bank | Create
                                     <input type="checkbox" class="form-check-input has-option-e" @if($question->has_option_e == 1) checked @endif name="has_option_e" onchange="toggleOptionE(this)">
                                     <label>Has option E</label>
                                 </div>
+                                <div class="form-group mt-2">
+                                    <input type="checkbox" class="form-check-input has-solution" @if($question->has_solution == 'yes') checked @endif name="has_solution" onchange="toggleSolution(this)">
+                                    <label>Has Solution</label>
+                                </div>
                                  <div class="form-group mt-2">
                                     <input type="checkbox" class="form-check-input" @if($question->show_on_pyq == "yes") checked @endif name="show_on_pyq" value="yes">
                                     <label for="show_on_pyq">Show on PYQ</label>
@@ -165,6 +169,10 @@ Question Bank | Create
                                     <label>Option E</label>
                                     <textarea class="form-control quill-editor6 ckeditor" name="option_e[]">{{$question->option_e}}</textarea>
                                 </div>
+                                <div class="form-group solution-group" @if($question->has_solution != 'yes') style="display: none;" @endif>
+                                    <label>Solution</label>
+                                    <textarea class="form-control ckeditor" name="solution[]">{!! $question->solution !!}</textarea>
+                                </div>
                             </div>
                             @elseif($question->question_type == "Subjective")
                             <div class="col-md-6" id="question_form">
@@ -186,9 +194,9 @@ Question Bank | Create
                                         <option value="text input" @if($question->answer_format == 'text input') selected @endif>Text Input</option>
                                     </select>
                                 </div>
-                                <div class="form-group">
+                                <div class="form-group solution-group" @if($question->has_solution != 'yes') style="display: none;" @endif>
                                     <label>Solution</label>
-                                    <input type="file" class="form-control" name="answerformatsolution[]" placeholder="Solution">
+                                    <textarea class="form-control ckeditor" name="solution[]">{!! $question->solution !!}</textarea>
                                 </div>
                             </div>
                             @elseif($question->question_type == "Story Based")
@@ -269,6 +277,13 @@ Question Bank | Create
                                                     <div class="text-danger validation-err" id="multiple_choice_passage_option_d-err"></div>
                                                 </div>
                                             </div>
+                                             <div class="col-md-12 solution-group" @if(empty($quesDetails->solution)) style="display: none;" @endif>
+                                                <label>Solution</label>
+                                                <div class="input-group">
+                                                    <textarea class="form-control ckeditor" name="passage_mcq_solution[]" rows="2" cols="4" placeholder="Solution">{!! $quesDetails->solution !!}</textarea>
+                                                </div>
+                                            </div>
+                                            
                                             @endforeach
                                             @endif
                                             <div class="col-sm-12">
@@ -292,6 +307,12 @@ Question Bank | Create
                                                     <div class="text-danger validation-err" id="reasoning_passage_questions-err"></div>
                                                 </div>
                                             </div>
+                                           <div class="col-md-12 solution-group" @if(empty($quesDetails->solution)) style="display: none;" @endif>
+                                                <label>Solution</label>
+                                                <div class="input-group">
+                                                    <textarea class="form-control ckeditor" name="reasoning_passage_solution[]" rows="2" cols="4" placeholder="Solution">{!! $quesDetails->solution !!}</textarea>
+                                                </div>
+                                            </div>
                                             @endforeach
                                             @endif
                                             <div class="col-sm-3"><button type="button" class="btn btn-primary addbox add_rp"><i class="fa fa-plus"></i> Add More</button></div>
@@ -308,10 +329,6 @@ Question Bank | Create
                                         <option value="document">Document</option>
                                         <option value="text input">Text Input</option>
                                     </select>
-                                </div>
-                                <div class="form-group" id="solution_div" style="display: none;">
-                                    <label>Solution</label>
-                                    <input type="file" class="form-control" name="answerformatsolution[]" placeholder="Solution">
                                 </div>
                             </div>
                             @endif
@@ -642,6 +659,22 @@ Question Bank | Create
         const optionEGroup = checkbox.closest('.question-block').querySelector('.option-e-group');
         optionEGroup.style.display = checkbox.checked ? 'block' : 'none';
     }
+    function toggleSolution(checkbox) {
+        const block = checkbox.closest('.question-block');
+        if (!block) return;
+        const groups = block.querySelectorAll('.solution-group');
+        groups.forEach(function(grp){
+            grp.style.display = checkbox.checked ? 'block' : 'none';
+            if (checkbox.checked) {
+                grp.querySelectorAll('textarea.ckeditor').forEach(function(el){
+                    if (!el.id) { el.id = 'ck_' + Math.random().toString(36).slice(2,9); }
+                    if (typeof CKEDITOR !== 'undefined') {
+                        if (!CKEDITOR.instances[el.id]) { CKEDITOR.replace(el.id); }
+                    }
+                });
+            }
+        });
+    }
 </script>
 <script>
     document.addEventListener("DOMContentLoaded", function() {
@@ -658,7 +691,10 @@ Question Bank | Create
     function loadeditor()
     {
         document.querySelectorAll('.ckeditor').forEach(function(el) {
-            CKEDITOR.replace(el);
+            if (!el.id) { el.id = 'ck_' + Math.random().toString(36).slice(2,9); }
+            if (typeof CKEDITOR !== 'undefined') {
+                if (!CKEDITOR.instances[el.id]) { CKEDITOR.replace(el.id); }
+            }
         });
     }
 
@@ -668,10 +704,11 @@ Question Bank | Create
             $("#reasoning_subjective_passage_div").hide();
             if (passage_question_type == 'multiple_choice') {
                 $("#multiple_choice_passage_div").show();
+                try { var qb = document.getElementById('question_form').closest('.question-block'); if (qb) { var chk = qb.querySelector('.has-solution'); if (chk) { toggleSolution(chk); } } } catch(e){}
             } else if (passage_question_type == 'reasoning_subjective') {
                 $("#reasoning_subjective_passage_div").show();
                 $("#answer_format_div").show();
-                $("#solution_div").show();
+                try { var qb = document.getElementById('question_form').closest('.question-block'); if (qb) { var chk = qb.querySelector('.has-solution'); if (chk) { toggleSolution(chk); } } } catch(e){}
             }
         });
         var id =1;
@@ -729,6 +766,12 @@ Question Bank | Create
                                                     <div class="text-danger validation-err" id="multiple_choice_passage_option_d-err"></div>
                                                 </div>
                                             </div>
+                                            <div class="col-md-12 solution-group" style="display: none;">
+                                                <label>Solution</label>
+                                                <div class="input-group">
+                                                    <textarea class="form-control ckeditor" name="passage_mcq_solution[]" rows="2" cols="4" placeholder="Solution"></textarea>
+                                                </div>
+                                            </div>
 				<div class="col-sm-12">
 					<button type="button" class="btn btn-danger removebox remove_mcp"><i class="fa fa-minus"></i> Remove</button>
 					<button type="button" class="btn btn-primary addbox add_mcp"><i class="fa fa-plus"></i> Add More</button>
@@ -737,6 +780,7 @@ Question Bank | Create
 		`);
 		id = id+1
 		loadeditor();
+            try { var qb = event.currentTarget.closest('.question-block'); if (qb) { var chk = qb.querySelector('.has-solution'); if (chk) { toggleSolution(chk); } } } catch(e){}
             // $('.editor').summernote();
         });
         $('.optionBox_mcp').on('click', '.remove_mcp', function() {
@@ -754,6 +798,12 @@ Question Bank | Create
                                                     <div class="text-danger validation-err" id="reasoning_passage_questions-err"></div>
                                                 </div>
                                             </div>
+                <div class="col-md-12 solution-group" style="display: none;">
+                    <label>Solution</label>
+                    <div class="input-group">
+                        <textarea class="form-control ckeditor" name="reasoning_passage_solution[]" rows="2" cols="4" placeholder="Solution"></textarea>
+                    </div>
+                </div>
 				<div class="col-sm-3">
 					<button type="button" class="btn btn-danger removebox remove_rp"><i class="fa fa-minus"></i> Remove</button>
 					<button type="button" class="btn btn-primary addbox add_rp"><i class="fa fa-plus"></i> Add More</button>
@@ -762,6 +812,7 @@ Question Bank | Create
 		`);
 		id = id+1
 		loadeditor();
+            try { var qb = event.currentTarget.closest('.question-block'); if (qb) { var chk = qb.querySelector('.has-solution'); if (chk) { toggleSolution(chk); } } } catch(e){}
             // $('.editor').summernote();
         });
         $('.optionBox_rp').on('click', '.remove_rp', function() {

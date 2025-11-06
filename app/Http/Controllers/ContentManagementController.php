@@ -2069,115 +2069,91 @@ class ContentManagementController extends Controller
     }
     public function testSeriesStore(Request $request)
     {
-
+        // ✅ Validate main test series fields
         $validator = Validator::make($request->all(), [
             'title' => 'required|string|max:512',
-            // 'category_id' => 'required',
-            // 'total_chapter' => 'required|integer|min:0',
-            // 'total_affairs' => 'required|integer|min:0',
-            // 'free_tests' => 'required|integer|min:0',
-            // 'total_subjects' => 'required|integer|min:0',
             'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
-            // 'total_marks' => 'required|integer|min:0',
-            // 'duration' => 'required|integer|min:1',
-            // 'description' => 'required',
-            'price' => 'required',
-            'mrp' => 'required',
-            'discount' => 'required',
+            'price' => 'required|numeric',
+            'mrp' => 'required|numeric',
+            'discount' => 'required|numeric',
         ]);
-        if ($validator->fails()) {
 
+        if ($validator->fails()) {
             return response()->json([
                 'success' => false,
                 'code' => 422,
                 'errors' => $validator->errors(),
             ]);
         }
-        $data = $request->all();
+
+        // ✅ Prepare data for saving Test Series
+        $data = $request->except(['_token', 'additionalData']);
 
         if ($request->hasFile('logo')) {
-            $logoPath = $request->file('logo')->store('logos', 'public');
-            $data['logo'] = $logoPath;
+            $data['logo'] = $request->file('logo')->store('logos', 'public');
         }
+
+        // ✅ Create Test Series record
         $testseries = TestSeries::create($data);
+
+        // ✅ Decode additionalData JSON
         $additionalData = json_decode($request->input('additionalData'), true);
-        //dd($additionalData);
-        // Loop through the additional data and save each entry
-        foreach ($additionalData['testType'] as $index => $testType) {
-            // Loop through each selected question for the current index
-            $testTypename = "";
-            if ($testType == 1) {
-                $testTypename = "Full Test";
-            }
-            if ($testType == 2) {
-                $testTypename = "Subject Wise";
-            }
-            if ($testType == 3) {
-                $testTypename = "Chapter Wise";
-            }
-            if ($testType == 4) {
-                $testTypename = "Topic Wise";
-            }
-            if ($testType == 5) {
-                $testTypename = "Current Affair";
-            }
-            if ($testType == 6) {
-                $testTypename = "Previous Year";
-            }
-            if (isset($additionalData['mcqselectedtestpaper'][$index]) && !empty($additionalData['mcqselectedtestpaper'][$index])) {
-                foreach ($additionalData['mcqselectedtestpaper'][$index] as $mcqselectedtestpaper) {
-                    $testSeriesDetail = new TestSeriesDetail();
-                    $testSeriesDetail->type = $testType;
-                    $testSeriesDetail->type_name = $testTypename;
-                    $testSeriesDetail->test_series_id = $testseries->id;
-                    $testSeriesDetail->test_id = $mcqselectedtestpaper; // Save selected questions as JSON
-                    $testSeriesDetail->test_paper_type = 'MCQ';
-                    $testSeriesDetail->save();
-                }
-            }
-            if (isset($additionalData['passageselectedtestpaper'][$index]) && !empty($additionalData['passageselectedtestpaper'][$index])) {
-                foreach ($additionalData['passageselectedtestpaper'][$index] as $passageselectedtestpaper) {
-                    $testSeriesDetail = new TestSeriesDetail();
-                    $testSeriesDetail->type = $testType;
-                    $testSeriesDetail->type_name = $testTypename;
-                    $testSeriesDetail->test_series_id = $testseries->id;
-                    $testSeriesDetail->test_id = $passageselectedtestpaper; // Save selected questions as JSON
-                    $testSeriesDetail->test_paper_type = 'Passage';
-                    $testSeriesDetail->save();
-                }
-            }
-            if (isset($additionalData['subjectiveselectedtestpaper'][$index]) && !empty($additionalData['subjectiveselectedtestpaper'][$index])) {
-                foreach ($additionalData['subjectiveselectedtestpaper'][$index] as $subjectiveselectedtestpaper) {
-                    $testSeriesDetail = new TestSeriesDetail();
-                    $testSeriesDetail->type = $testType;
-                    $testSeriesDetail->type_name = $testTypename;
-                    $testSeriesDetail->test_series_id = $testseries->id;
-                    $testSeriesDetail->test_id = $subjectiveselectedtestpaper; // Save selected questions as JSON
-                    $testSeriesDetail->test_paper_type = 'Subjective';
-                    $testSeriesDetail->save();
-                }
-            }
-            if (isset($additionalData['combinedselectedtestpaper'][$index]) && !empty($additionalData['combinedselectedtestpaper'][$index])) {
-                foreach ($additionalData['combinedselectedtestpaper'][$index] as $combinedselectedtestpaper) {
-                    $testSeriesDetail = new TestSeriesDetail();
-                    $testSeriesDetail->type = $testType;
-                    $testSeriesDetail->type_name = $testTypename;
-                    $testSeriesDetail->test_series_id = $testseries->id;
-                    $testSeriesDetail->test_id = $combinedselectedtestpaper; // Save selected questions as JSON
-                    $testSeriesDetail->test_paper_type = 'Combined';
-                    $testSeriesDetail->save();
-                }
+
+        // ✅ Define test type names
+        $typeNames = [
+            1 => "Full Test",
+            2 => "Subject Wise",
+            3 => "Chapter Wise",
+            4 => "Topic Wise",
+            5 => "Current Affair",
+            6 => "Previous Year",
+        ];
+
+        // ✅ Counter for total papers
+        $totalPaperCount = 0;
+
+        if (!empty($additionalData['testType'])) {
+            foreach ($additionalData['testType'] as $index => $testType) {
+                $testType = (int) $testType;
+                $testTypeName = $typeNames[$testType] ?? "Unknown Type";
+
+                $testGeneratedBy = $additionalData['testSelections'][$index] ?? ($data['test_generated_by'] ?? 'manual');
+
+                // ✅ Helper closure to save papers by type
+                $savePapers = function ($papers, $paperType) use ($testType, $testTypeName, $testGeneratedBy, $testseries, &$totalPaperCount) {
+                    if (isset($papers) && is_array($papers) && !empty($papers)) {
+                        foreach ($papers as $paperId) {
+                            TestSeriesDetail::create([
+                                'test_series_id' => $testseries->id,
+                                'type' => $testType,
+                                'type_name' => $testTypeName,
+                                'test_id' => $paperId,
+                                'test_paper_type' => $paperType,
+                                'test_generated_by' => $testGeneratedBy, // ✅ Added field
+                            ]);
+                            $totalPaperCount++; // ✅ Count total papers
+                        }
+                    }
+                };
+
+                // ✅ Save all types of papers dynamically
+                $savePapers($additionalData['mcqselectedtestpaper'][$index] ?? [], 'MCQ');
+                $savePapers($additionalData['passageselectedtestpaper'][$index] ?? [], 'Passage');
+                $savePapers($additionalData['subjectiveselectedtestpaper'][$index] ?? [], 'Subjective');
+                $savePapers($additionalData['combinedselectedtestpaper'][$index] ?? [], 'Combined');
             }
         }
 
-
+        // ✅ Update total_paper after saving details
+        $testseries->total_paper = $totalPaperCount;
+        $testseries->save();
 
         return response()->json([
             'success' => true,
-            'msgText' => 'Test Created !',
+            'msgText' => 'Test Series Created Successfully!',
         ]);
-
     }
+
     public function testSeriesEdit($id)
     {
         $series = TestSeries::with('category')->findOrFail($id);
@@ -2215,131 +2191,112 @@ class ContentManagementController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'title' => 'required|string|max:512',
-            // 'category_id' => 'required',
-            // 'total_chapter' => 'required|integer|min:0',
-            // 'total_affairs' => 'required|integer|min:0',
-            // 'free_tests' => 'required|integer|min:0',
-            // 'total_subjects' => 'required|integer|min:0',
             'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
-            // 'total_marks' => 'required|integer|min:0',
-            // 'duration' => 'required|integer|min:1',
-            // 'description' => 'required',
             'price' => 'required',
             'mrp' => 'required',
             'discount' => 'required',
         ]);
-        if ($validator->fails()) {
 
+        if ($validator->fails()) {
             return response()->json([
                 'success' => false,
                 'code' => 422,
                 'errors' => $validator->errors(),
             ]);
         }
+
         $test = TestSeries::findOrFail($id);
         $data = $request->all();
 
+        // Handle logo upload
         if ($request->hasFile('logo')) {
             $logoPath = $request->file('logo')->store('logos', 'public');
             $data['logo'] = $logoPath;
         } else {
             $data['logo'] = $test->logo;
         }
-        $test->language = $data['language'];
-        $test->exam_com_id = $data['exam_com_id'];
-        $test->title = $data['title'];
-        $test->category_id = $data['category_id'];
-        $test->sub_category_id = $data['sub_category_id'];
-        $test->slug = $data['slug'];
-        $test->short_description = $data['short_description'];
-        $test->mrp = $data['mrp'];
-        $test->discount = $data['discount'];
-        $test->price = $data['price'];
-        $test->description = $data['description'];
-        $test->logo = $data['logo'];
-        $test->fee_type = $data['fee_type'];
-        $test->test_generated_by = $data['test_generated_by'];
-        $test->total_paper = $data['total_paper'];
 
-        $test->save();
+        // Decode additional data
         $additionalData = json_decode($request->input('additionalData'), true);
 
-        // Loop through the additional data and save each entry
-        foreach ($additionalData['testType'] as $index => $testType) {
-            // Loop through each selected question for the current index
-            $testTypename = "";
-            if ($testType == 1) {
-                $testTypename = "Full Test";
-            }
-            if ($testType == 2) {
-                $testTypename = "Subject Wise";
-            }
-            if ($testType == 3) {
-                $testTypename = "Chapter Wise";
-            }
-            if ($testType == 4) {
-                $testTypename = "Topic Wise";
-            }
-            if ($testType == 5) {
-                $testTypename = "Current Affair";
-            }
-            if ($testType == 6) {
-                $testTypename = "Previous Year";
-            }
-            TestSeriesDetail::where('test_series_id', $id)->delete();
-            if (isset($additionalData['mcqselectedtestpaper'][$index]) && !empty($additionalData['mcqselectedtestpaper'][$index])) {
-                foreach ($additionalData['mcqselectedtestpaper'][$index] as $mcqselectedtestpaper) {
-                    $testSeriesDetail = new TestSeriesDetail();
-                    $testSeriesDetail->type = $testType;
-                    $testSeriesDetail->type_name = $testTypename;
-                    $testSeriesDetail->test_series_id = $id;
-                    $testSeriesDetail->test_id = $mcqselectedtestpaper; // Save selected questions as JSON
-                    $testSeriesDetail->test_paper_type = 'MCQ';
-                    $testSeriesDetail->save();
-                }
-            }
-            if (isset($additionalData['passageselectedtestpaper'][$index]) && !empty($additionalData['passageselectedtestpaper'][$index])) {
-                foreach ($additionalData['passageselectedtestpaper'][$index] as $passageselectedtestpaper) {
-                    $testSeriesDetail = new TestSeriesDetail();
-                    $testSeriesDetail->type = $testType;
-                    $testSeriesDetail->type_name = $testTypename;
-                    $testSeriesDetail->test_series_id = $id;
-                    $testSeriesDetail->test_id = $passageselectedtestpaper; // Save selected questions as JSON
-                    $testSeriesDetail->test_paper_type = 'Passage';
-                    $testSeriesDetail->save();
-                }
-            }
-            if (isset($additionalData['subjectiveselectedtestpaper'][$index]) && !empty($additionalData['subjectiveselectedtestpaper'][$index])) {
-                foreach ($additionalData['subjectiveselectedtestpaper'][$index] as $subjectiveselectedtestpaper) {
-                    $testSeriesDetail = new TestSeriesDetail();
-                    $testSeriesDetail->type = $testType;
-                    $testSeriesDetail->type_name = $testTypename;
-                    $testSeriesDetail->test_series_id = $id;
-                    $testSeriesDetail->test_id = $subjectiveselectedtestpaper; // Save selected questions as JSON
-                    $testSeriesDetail->test_paper_type = 'Subjective';
-                    $testSeriesDetail->save();
-                }
-            }
-            if (isset($additionalData['combinedselectedtestpaper'][$index]) && !empty($additionalData['combinedselectedtestpaper'][$index])) {
-                foreach ($additionalData['combinedselectedtestpaper'][$index] as $combinedselectedtestpaper) {
-                    $testSeriesDetail = new TestSeriesDetail();
-                    $testSeriesDetail->type = $testType;
-                    $testSeriesDetail->type_name = $testTypename;
-                    $testSeriesDetail->test_series_id = $id;
-                    $testSeriesDetail->test_id = $combinedselectedtestpaper; // Save selected questions as JSON
-                    $testSeriesDetail->test_paper_type = 'Combined';
-                    $testSeriesDetail->save();
+        // Type name mapping
+        $typeNames = [
+            1 => "Full Test",
+            2 => "Subject Wise",
+            3 => "Chapter Wise",
+            4 => "Topic Wise",
+            5 => "Current Affair",
+            6 => "Previous Year",
+        ];
+
+        // Delete old test details before adding new ones
+        TestSeriesDetail::where('test_series_id', $id)->delete();
+
+        // Variable to count total test papers
+        $totalPaperCount = 0;
+        
+        if (!empty($additionalData['testType'])) {
+            foreach ($additionalData['testType'] as $index => $testType) {
+                $testType = (int) $testType;
+                $testTypeName = $typeNames[$testType] ?? "Unknown Type";
+                
+                $testGeneratedBy = $additionalData['testSelections'][$index] ?? ($data['test_generated_by'] ?? 'manual');
+                // Helper array of paper types
+                $paperTypes = [
+                    'mcqselectedtestpaper' => 'MCQ',
+                    'passageselectedtestpaper' => 'Passage',
+                    'subjectiveselectedtestpaper' => 'Subjective',
+                    'combinedselectedtestpaper' => 'Combined',
+                ];
+                
+                foreach ($paperTypes as $key => $paperType) {
+                    if (!empty($additionalData[$key][$index])) {
+                        foreach ($additionalData[$key][$index] as $testPaperId) {
+                            $testSeriesDetail = new TestSeriesDetail();
+                            $testSeriesDetail->test_series_id = $id;
+                            $testSeriesDetail->type = $testType;
+                            $testSeriesDetail->type_name = $testTypeName;
+                            $testSeriesDetail->test_id = $testPaperId;
+                            $testSeriesDetail->test_paper_type = $paperType;
+                            $testSeriesDetail->test_generated_by = $testGeneratedBy; // ✅ new field
+                            $testSeriesDetail->save();
+                            
+                            $totalPaperCount++; // ✅ increment total
+                        }
+                    }
                 }
             }
         }
-
-
+        
+        // Update main TestSeries record
+        $test->fill([
+            'language' => $data['language'],
+            'exam_com_id' => $data['exam_com_id'],
+            'title' => $data['title'],
+            'category_id' => $data['category_id'],
+            'sub_category_id' => $data['sub_category_id'],
+            'slug' => $data['slug'],
+            'short_description' => $data['short_description'],
+            'mrp' => $data['mrp'],
+            'discount' => $data['discount'],
+            'price' => $data['price'],
+            'description' => $data['description'],
+            'logo' => $data['logo'],
+            'fee_type' => $data['fee_type'],
+            'test_generated_by' => $data['test_generated_by'] ?? null,
+            'total_paper' => $totalPaperCount, // ✅ updated total count
+        ]);
+        
+        // dd($data['test_generated_by']);
+        $test->save();
 
         return response()->json([
             'success' => true,
-            'msgText' => 'Test Created !',
+            'msgText' => 'Test Series Updated!',
         ]);
     }
+
+
 
     public function testSeriesDelete($id)
     {
@@ -3384,167 +3341,167 @@ class ContentManagementController extends Controller
                 } elseif ($request->question_type == 'Story Based') {
                     // try {
 
-                        $question = $tables[1]->find('tr', 0)->find('td', 1)->innerHtml;
-                        if ($tables[1]->find('tr', 1)->find('td', 1)->find('p')->innerHtml == '&nbsp;') {
+                    $question = $tables[1]->find('tr', 0)->find('td', 1)->innerHtml;
+                    if ($tables[1]->find('tr', 1)->find('td', 1)->find('p')->innerHtml == '&nbsp;') {
+                        $image = NULL;
+                    } else {
+                        $imageElement = $tables[1]->find('tr', 1)->find('td', 1)->find('p')->find('img');
+
+                        if (count($imageElement) > 0) {
+                            $image_64 = $tables[1]->find('tr', 1)->find('td', 1)->find('p')->find('img')->src;
+                            $extension = explode('/', explode(':', substr($image_64, 0, strpos($image_64, ';')))[1])[1];
+                            $image = 'question/' . Str::random(40) . '.' . $extension;
+                            Storage::put($image, file_get_contents($image_64));
+                        } else {
                             $image = NULL;
+                        }
+
+
+                    }
+                    // if ($tables[1]->find('tr', 2)->find('td', 1)->find('p')->innerHtml == '&nbsp;') {
+                    $solution = NULL;
+                    $has_solution = 'no';
+                    // } else {
+                    //     $solution = $tables[1]->find('tr', 2)->find('td', 1)->innerHtml;
+                    //     $has_solution = 'yes';
+                    // }
+                    if ($tables[1]->find('tr', 2)->find('td', 1)->find('p')->innerHtml == '&nbsp;') {
+                        $instruction = NULL;
+                        $has_instruction = false;
+                    } else {
+                        $instruction = $tables[1]->find('tr', 2)->find('td', 1)->innerHtml;
+                        $has_instruction = true;
+                    }
+                    $answer_format = NULL;
+                    if ($request->passage_question_type == 'reasoning_subjective') {
+                        if ($tables[1]->find('tr', 3)->find('td', 1)->find('p')->innerHtml == '&nbsp;') {
+                            $answer_format = NULL;
                         } else {
-                            $imageElement = $tables[1]->find('tr', 1)->find('td', 1)->find('p')->find('img');
-
-                            if (count($imageElement) > 0) {
-                                $image_64 = $tables[1]->find('tr', 1)->find('td', 1)->find('p')->find('img')->src;
-                                $extension = explode('/', explode(':', substr($image_64, 0, strpos($image_64, ';')))[1])[1];
-                                $image = 'question/' . Str::random(40) . '.' . $extension;
-                                Storage::put($image, file_get_contents($image_64));
-                            } else {
-                                $image = NULL;
-                            }
-
-
+                            $answer_format = $tables[1]->find('tr', 3)->find('td', 1)->find('p');
                         }
-                        // if ($tables[1]->find('tr', 2)->find('td', 1)->find('p')->innerHtml == '&nbsp;') {
-                            $solution = NULL;
-                            $has_solution = 'no';
-                        // } else {
-                        //     $solution = $tables[1]->find('tr', 2)->find('td', 1)->innerHtml;
-                        //     $has_solution = 'yes';
-                        // }
-                        if ($tables[1]->find('tr', 2)->find('td', 1)->find('p')->innerHtml == '&nbsp;') {
-                            $instruction = NULL;
-                            $has_instruction = false;
-                        } else {
-                            $instruction = $tables[1]->find('tr', 2)->find('td', 1)->innerHtml;
-                            $has_instruction = true;
-                        }
-                        $answer_format = NULL;
-                        if ($request->passage_question_type == 'reasoning_subjective') {
-                            if ($tables[1]->find('tr', 3)->find('td', 1)->find('p')->innerHtml == '&nbsp;') {
-                                $answer_format = NULL;
-                            } else {
-                                $answer_format = $tables[1]->find('tr', 3)->find('td', 1)->find('p');
-                            }
-                        }
+                    }
 
 
-                        $questionData['language'] = $request->language;
-                        $questionData['question_category'] = $request->question_category;
-                        $questionData['question_type'] = $request->question_type;
-                        $questionData['passage_question_type'] = $request->passage_question_type;
-                        $questionData['fee_type'] = $request->fee_type;
-                        $questionData['commission_id'] = $request->commission_id;
-                        $questionData['previous_year'] = $request->previous_year;
-                        $questionData['category_id'] = $request->category_id;
-                        $questionData['sub_category_id'] = $request->sub_category_id;
-                        $questionData['chapter_id'] = $request->chapter_id;
-                        $questionData['subject_id'] = $request->subject_id;
-                        $questionData['topic'] = $request->topic;
-                        $questionData['question'] = $question;
-                        $questionData['solution'] = $solution;
-                        $questionData['answer_format'] = $answer_format;
-                        $questionData['has_solution'] = $has_solution;
-                        $questionData['instruction'] = $instruction;
-                        $questionData['has_instruction'] = $has_instruction;
+                    $questionData['language'] = $request->language;
+                    $questionData['question_category'] = $request->question_category;
+                    $questionData['question_type'] = $request->question_type;
+                    $questionData['passage_question_type'] = $request->passage_question_type;
+                    $questionData['fee_type'] = $request->fee_type;
+                    $questionData['commission_id'] = $request->commission_id;
+                    $questionData['previous_year'] = $request->previous_year;
+                    $questionData['category_id'] = $request->category_id;
+                    $questionData['sub_category_id'] = $request->sub_category_id;
+                    $questionData['chapter_id'] = $request->chapter_id;
+                    $questionData['subject_id'] = $request->subject_id;
+                    $questionData['topic'] = $request->topic;
+                    $questionData['question'] = $question;
+                    $questionData['solution'] = $solution;
+                    $questionData['answer_format'] = $answer_format;
+                    $questionData['has_solution'] = $has_solution;
+                    $questionData['instruction'] = $instruction;
+                    $questionData['has_instruction'] = $has_instruction;
 
-                        $que = Question::where('question', $question)->where('commission_id', $request->commission_id)->where('category_id', $request->category_id)
-                            ->where('sub_category_id', $request->sub_category_id)
-                            ->where('chapter_id', $request->chapter_id);
-                        if ($request->previous_year) {
-                            $que = $que->where('previous_year', $request->previous_year);
-                        }
-                        $que = $que->first();
-                        if ($que) {
-                            $rejectedCount = $rejectedCount + 1;
-                            $questionData['status'] = "Rejected";
-                            $questionData['note'] = "Already Exists Question.";
-                            $ques = Question::create($questionData);
+                    $que = Question::where('question', $question)->where('commission_id', $request->commission_id)->where('category_id', $request->category_id)
+                        ->where('sub_category_id', $request->sub_category_id)
+                        ->where('chapter_id', $request->chapter_id);
+                    if ($request->previous_year) {
+                        $que = $que->where('previous_year', $request->previous_year);
+                    }
+                    $que = $que->first();
+                    if ($que) {
+                        $rejectedCount = $rejectedCount + 1;
+                        $questionData['status'] = "Rejected";
+                        $questionData['note'] = "Already Exists Question.";
+                        $ques = Question::create($questionData);
 
-                        } else {
-                            $successCount = $successCount + 1;
-                            $successdata[] = $questionData;
-                            $ques = Question::create($questionData);
-                        }
+                    } else {
+                        $successCount = $successCount + 1;
+                        $successdata[] = $questionData;
+                        $ques = Question::create($questionData);
+                    }
 
-                        if ($ques) {
-                            //if($request->passage_question_type == 'reasoning_subjective') {
-                            for ($i = 2; $i < count($tables); $i++) {
+                    if ($ques) {
+                        //if($request->passage_question_type == 'reasoning_subjective') {
+                        for ($i = 2; $i < count($tables); $i++) {
 
-                                $option_c = $tables[$i]->find('tr', 3);
-                                if (!isset($option_c) && $option_c == "") {
-                                    $passage_question = $tables[$i]->find('tr', 0)->find('td', 1)->innerHtml;
+                            $option_c = $tables[$i]->find('tr', 3);
+                            if (!isset($option_c) && $option_c == "") {
+                                $passage_question = $tables[$i]->find('tr', 0)->find('td', 1)->innerHtml;
+                                $passage_answer_format = NULL;
+                                if ($tables[$i]->find('tr', 1)->find('td', 1)->find('p')->innerHtml == '&nbsp;') {
                                     $passage_answer_format = NULL;
-                                    if ($tables[$i]->find('tr', 1)->find('td', 1)->find('p')->innerHtml == '&nbsp;') {
-                                        $passage_answer_format = NULL;
-                                    } else {
-                                        $passage_answer_format = $tables[$i]->find('tr', 1)->find('td', 1)->find('p');
-                                    }
-                                    // Try to read per-subquestion solution at row 2
-                                    $detail_solution = NULL;
-                                    $solTr = $tables[$i]->find('tr', 2);
-                                    $solTd = $solTr ? $solTr->find('td', 1) : null;
-                                    if ($solTd && trim($solTd->innerHtml) !== '' && $solTd->innerHtml !== '&nbsp;') {
-                                        $detail_solution = $solTd->innerHtml;
-                                    }
-                                    $question_detail = ([
-                                        'question_id' => $ques->id,
-                                        'question' => $passage_question,
-                                        'answer_format' => $passage_answer_format,
-                                    ]);
-                                    if ($detail_solution !== NULL) {
-                                        $question_detail['solution'] = $detail_solution;
-                                    }
-                                    QuestionDetail::create($question_detail);
                                 } else {
-                                    $passage_question = $tables[$i]->find('tr', 0)->find('td', 1)->innerHtml;
-                                    $option_a = $tables[$i]->find('tr', 1)->find('td', 1)->find('p')->innerHtml;
-                                    $option_b = $tables[$i]->find('tr', 2)->find('td', 1)->find('p')->innerHtml;
-                                    $option_c = $tables[$i]->find('tr', 3)->find('td', 1)->find('p')->innerHtml;
-                                    $option_d = $tables[$i]->find('tr', 4)->find('td', 1)->find('p')->innerHtml;
-                                    if ($tables[$i]->find('tr', 5)->find('td', 1)->find('p')->innerHtml == '&nbsp;') {
-                                        $option_e = NULL;
-                                        $has_option_e = false;
-                                    } else {
-                                        $option_e = $tables[$i]->find('tr', 5)->find('td', 1)->find('p')->innerHtml;
-                                        $has_option_e = true;
-                                    }
-                                    $passage_answer = $tables[$i]->find('tr', 6)->find('td', 1)->find('p')->innerHtml;
-                                    // Try to read per-subquestion solution at row 7 or 8
-                                    $detail_solution = NULL;
-                                    $solTr = $tables[$i]->find('tr', 7);
-                                    $solTd = $solTr ? $solTr->find('td', 1) : null;
-                                    if ($solTd && trim($solTd->innerHtml) !== '' && $solTd->innerHtml !== '&nbsp;') {
-                                        $detail_solution = $solTd->innerHtml;
-                                    } else {
-                                        $solTr2 = $tables[$i]->find('tr', 8);
-                                        $solTd2 = $solTr2 ? $solTr2->find('td', 1) : null;
-                                        if ($solTd2 && trim($solTd2->innerHtml) !== '' && $solTd2->innerHtml !== '&nbsp;') {
-                                            $detail_solution = $solTd2->innerHtml;
-                                        }
-                                    }
-                                    $question_detail = ([
-                                        'question_id' => $ques->id,
-                                        'question' => $passage_question,
-                                        'answer' => strtoupper(Str::of(strip_tags($passage_answer))->trim()),
-                                        'option_a' => $option_a,
-                                        'option_b' => $option_b,
-                                        'option_c' => $option_c,
-                                        'option_d' => $option_d,
-                                        'option_e' => $option_e,
-                                        'has_option_e' => $has_option_e,
-                                    ]);
-                                    if ($detail_solution !== NULL) {
-                                        $question_detail['solution'] = $detail_solution;
-                                    }
-                                    QuestionDetail::create($question_detail);
+                                    $passage_answer_format = $tables[$i]->find('tr', 1)->find('td', 1)->find('p');
                                 }
-
+                                // Try to read per-subquestion solution at row 2
+                                $detail_solution = NULL;
+                                $solTr = $tables[$i]->find('tr', 2);
+                                $solTd = $solTr ? $solTr->find('td', 1) : null;
+                                if ($solTd && trim($solTd->innerHtml) !== '' && $solTd->innerHtml !== '&nbsp;') {
+                                    $detail_solution = $solTd->innerHtml;
+                                }
+                                $question_detail = ([
+                                    'question_id' => $ques->id,
+                                    'question' => $passage_question,
+                                    'answer_format' => $passage_answer_format,
+                                ]);
+                                if ($detail_solution !== NULL) {
+                                    $question_detail['solution'] = $detail_solution;
+                                }
+                                QuestionDetail::create($question_detail);
+                            } else {
+                                $passage_question = $tables[$i]->find('tr', 0)->find('td', 1)->innerHtml;
+                                $option_a = $tables[$i]->find('tr', 1)->find('td', 1)->find('p')->innerHtml;
+                                $option_b = $tables[$i]->find('tr', 2)->find('td', 1)->find('p')->innerHtml;
+                                $option_c = $tables[$i]->find('tr', 3)->find('td', 1)->find('p')->innerHtml;
+                                $option_d = $tables[$i]->find('tr', 4)->find('td', 1)->find('p')->innerHtml;
+                                if ($tables[$i]->find('tr', 5)->find('td', 1)->find('p')->innerHtml == '&nbsp;') {
+                                    $option_e = NULL;
+                                    $has_option_e = false;
+                                } else {
+                                    $option_e = $tables[$i]->find('tr', 5)->find('td', 1)->find('p')->innerHtml;
+                                    $has_option_e = true;
+                                }
+                                $passage_answer = $tables[$i]->find('tr', 6)->find('td', 1)->find('p')->innerHtml;
+                                // Try to read per-subquestion solution at row 7 or 8
+                                $detail_solution = NULL;
+                                $solTr = $tables[$i]->find('tr', 7);
+                                $solTd = $solTr ? $solTr->find('td', 1) : null;
+                                if ($solTd && trim($solTd->innerHtml) !== '' && $solTd->innerHtml !== '&nbsp;') {
+                                    $detail_solution = $solTd->innerHtml;
+                                } else {
+                                    $solTr2 = $tables[$i]->find('tr', 8);
+                                    $solTd2 = $solTr2 ? $solTr2->find('td', 1) : null;
+                                    if ($solTd2 && trim($solTd2->innerHtml) !== '' && $solTd2->innerHtml !== '&nbsp;') {
+                                        $detail_solution = $solTd2->innerHtml;
+                                    }
+                                }
+                                $question_detail = ([
+                                    'question_id' => $ques->id,
+                                    'question' => $passage_question,
+                                    'answer' => strtoupper(Str::of(strip_tags($passage_answer))->trim()),
+                                    'option_a' => $option_a,
+                                    'option_b' => $option_b,
+                                    'option_c' => $option_c,
+                                    'option_d' => $option_d,
+                                    'option_e' => $option_e,
+                                    'has_option_e' => $has_option_e,
+                                ]);
+                                if ($detail_solution !== NULL) {
+                                    $question_detail['solution'] = $detail_solution;
+                                }
+                                QuestionDetail::create($question_detail);
                             }
 
-
-
-
-                            // } elseif($request->passage_question_type == 'multiple_choice') {
-
-                            // }
                         }
+
+
+
+
+                        // } elseif($request->passage_question_type == 'multiple_choice') {
+
+                        // }
+                    }
 
                     // } catch (\Exception $ex) {
                     //     $question = $tables[1]->find('tr', 0)->find('td', 1)->innerHtml;

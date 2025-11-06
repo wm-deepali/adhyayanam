@@ -15,6 +15,7 @@ class TestSeriesDetail extends Model
         'type_name',
         'test_id',
         'test_paper_type',
+        'test_generated_by'
         // 'is_previous',
     ];
 

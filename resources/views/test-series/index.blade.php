@@ -64,17 +64,15 @@ Test Series
                             <br/><span class="text-success">{{ $test->category->name  ?? "" }}</span>
                             </td>
                             
-                            @php
-                            if(isset($test->testseries) && count($test->testseries) >0)
-                            {
-                                $type = $test->testseries[0]->test_paper_type !="" ? '('.$test->testseries[0]->test_paper_type.')' : '';
-                            }
-                            else
-                            {
-                                $type = '';
-                            }
-                            
-                            @endphp
+                          @php
+if (isset($test->testseries) && count($test->testseries) > 0) {
+    $types = $test->testseries->pluck('test_paper_type')->unique()->filter()->toArray();
+    $type = count($types) ? '(' . implode(', ', $types) . ')' : '';
+} else {
+    $type = '';
+}
+@endphp
+
                             
                             <td>{{ $test->subcategory->name ?? "" }}<br/>{{$type}}</td>
                             

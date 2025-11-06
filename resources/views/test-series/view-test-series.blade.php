@@ -224,45 +224,66 @@
                 @endphp
 
                 @foreach($relatedTests as $testpaper)
-                    @php
-                        $testDatas = json_decode($testpaper->question_marks_details, true);
-                        $mainIndex = 1;
-                    @endphp
+                 @php
+    $testDetails = $testpaper->testDetails()->with('question')->get();
+    $mainIndex = 1;
+    $parentMainIndex = [];
+    $subIndex = [];
+@endphp
 
-                    @if(!empty($testDatas))
-                        @foreach($testDatas as $key => $paper)
-                            @if(!empty($paper['sub_question_id']))
-                                @php
-                                    $subquesDetails = Helper::getSubQuestionDetails(
-                                        $paper['sub_question_id'],
-                                        $paper['test_question_type'],
-                                        $paper['sub_negative_mark'],
-                                        $paper['sub_positive_mark']
-                                    );
-                                @endphp
-                                @include('test-series.sub-questions', [
-                                    'question' => $subquesDetails,
-                                    'marks' => $paper['sub_positive_mark'],
-                                    'index' => $key
-                                ])
-                            @else
-                                @php
-                                    $quesDetails = Helper::getQuestionDetails(
-                                        $paper['question_id'],
-                                        $paper['test_question_type'],
-                                        $paper['sub_negative_mark'],
-                                        $paper['positive_mark']
-                                    );
-                                @endphp
-                                @include('test-series.questions', [
-                                    'question' => $quesDetails,
-                                    'marks' => $paper['positive_mark'],
-                                    'index' => $mainIndex
-                                ])
-                                @php $mainIndex++; @endphp
-                            @endif
-                        @endforeach
-                    @endif
+@if($testDetails->count())
+    @foreach($testDetails as $testDetail)
+        @if(!empty($testDetail->parent_question_id))
+            {{-- ✅ Sub Question --}}
+            @php
+                $subQuestion = \App\Helpers\Helper::getSubQuestionDetails(
+                    $testDetail->question_id,
+                    $testDetail->test_question_type,
+                    $testDetail->sub_negative_mark,
+                    $testDetail->sub_positive_mark
+                );
+
+                $marks = $testDetail->positive_mark ?? $paper->positive_marks_per_question;
+                $negative_marks = $testDetail->sub_negative_mark ?? $paper->negative_marks_per_question;
+
+                // ✅ Parent index for main question
+                $parentIndex = $parentMainIndex[$testDetail->parent_question_id] ?? 0;
+
+                // ✅ Track sub-index per parent
+                $subIndex[$testDetail->parent_question_id] = ($subIndex[$testDetail->parent_question_id] ?? 0) + 1;
+
+                // ✅ Convert sub-index to Roman numerals
+                $romanIndex = strtolower(\App\Helpers\Helper::toRoman($subIndex[$testDetail->parent_question_id]));
+            @endphp
+
+            @include('test-series.sub-questions', [
+                'question' => $subQuestion,
+                'marks' => $marks,
+                'negative_marks' => $negative_marks,
+                'index' => $romanIndex,
+                'parentIndex' => $parentIndex
+            ])
+        @elseif($testDetail->question)
+            {{-- ✅ Main Question --}}
+            @php
+                $question = $testDetail->question;
+                $marks = $testDetail->positive_mark ?? $paper->positive_marks_per_question;
+                $negative_marks = $testDetail->negative_mark ?? $paper->negative_marks_per_question;
+
+                $parentMainIndex[$testDetail->question_id] = $mainIndex;
+            @endphp
+
+            @include('test-series.questions', [
+                'question' => $question,
+                'marks' => $marks,
+                'negative_marks' => $negative_marks,
+                'index' => $mainIndex
+            ])
+            @php $mainIndex++; @endphp
+        @endif
+    @endforeach
+@endif
+
                 @endforeach
             </div>
         </div>

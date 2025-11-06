@@ -122,27 +122,7 @@
     }
 </style>
 <meta name="csrf-token" content="{{ csrf_token() }}">
-@php
-    $testDatas = json_decode($paper->question_marks_details, true);
-    $mcqArr = [];
-    $subjectiveArr = [];
-    $passageArr = [];
-@endphp
-@if(isset($testDatas) && !empty($testDatas))
-    @foreach($testDatas as $key => $testpaper)
-        @if(isset($testpaper['question_id']) && $testpaper['question_id'] != "")
-            @if(isset($testpaper['test_question_type']) && $testpaper['test_question_type'] != "" && $testpaper['test_question_type'] == 'MCQ')
-                @php $mcqArr[] = $testpaper['question_id']; @endphp
-            @endif
-            @if(isset($testpaper['test_question_type']) && $testpaper['test_question_type'] != "" && $testpaper['test_question_type'] == 'Subjective')
-                @php $subjectiveArr[] = $testpaper['question_id']; @endphp
-            @endif
-            @if(isset($testpaper['test_question_type']) && $testpaper['test_question_type'] != "" && $testpaper['test_question_type'] == 'Passage')
-                @php $passageArr[] = $testpaper['question_id']; @endphp
-            @endif
-        @endif
-    @endforeach
-@endif
+
 
 @section('content')
     <div class="bg-light rounded">
@@ -807,7 +787,7 @@
             type="number" 
             id="negative_marks_per_question" 
             name="negative_marks_per_question" 
-            min="0" step="1" required 
+            min="0" step="1" required  
             value="${prefillValue}"
           >
         `;
@@ -1604,6 +1584,17 @@
 
 
             $(document).on('click', '#preview-test-btn', function (event) {
+                const hasNegativeMarking = document.getElementById('has_negative_marks').value;
+    const negativeMarksInput = document.getElementById('negative_marks_per_question');
+    if (hasNegativeMarking === 'yes') {
+        if (!negativeMarksInput || negativeMarksInput.value === '' || Number(negativeMarksInput.value) <= 0) {
+            alert('Please enter a negative marks value greater than zero.');
+            if (negativeMarksInput) {
+                negativeMarksInput.focus();
+            }
+            return false; // Prevent form submission
+        }
+    }
                 $(this).attr('disabled', true);
                 $(".validation-err").html('');
                 const mcqselectedqu = $('.master-question-item').find(".customquestionselectedbox-mcq .question").length;

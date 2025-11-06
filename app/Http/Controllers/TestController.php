@@ -509,10 +509,10 @@ class TestController extends Controller
         }
 
         DB::beginTransaction();
-
+        
         try {
             $test = Test::findOrFail($id);
-
+            
             // --- Determine paper type ---
             $testPaperType = '';
             if ($request->mcq_total_question > 0)
@@ -521,23 +521,23 @@ class TestController extends Controller
                 $testPaperType = $testPaperType ? 'Combined' : 'Passage';
             if ($request->subjective_total_question > 0)
                 $testPaperType = $testPaperType ? 'Combined' : 'Subjective';
-
+            
             // --- Calculate marks summary ---
             $total_marks_mcq = 0;
             $positive_marks_per_question_mcq = 0;
             $negative_marks_per_question_mcq = 0;
 
             $questionMarks = json_decode($request->question_marks_details);
-
+            
             foreach (json_decode($request->question_marks_details) as $dt) {
                 // Ignore sub-questions (only process main ones)
                 if (!empty($dt->sub_question_id)) {
                     continue;
                 }
-
+                
                 $positive = $dt->positive_mark ?? 0;
                 $negative = $dt->negative_mark ?? 0;
-
+                
                 $total_marks_mcq += $positive;
                 $positive_marks_per_question_mcq = $positive;
                 $negative_marks_per_question_mcq = $negative;
@@ -580,8 +580,9 @@ class TestController extends Controller
                 'subjective_mark_per_question' => $request->subjective_mark_per_question,
                 'subjective_total_marks' => $request->subjective_total_marks,
                 'test_paper_type' => $testPaperType,
+                'question_generated_by' => $request->question_generated_by
             ];
-
+            
             $test->update($testData);
             // --- Update or insert TestDetail ---
             $last_parent_id = null;
@@ -638,8 +639,6 @@ class TestController extends Controller
                 );
             }
 
-
-
             DB::commit();
 
             return response()->json([
@@ -677,48 +676,59 @@ class TestController extends Controller
         return $pdf->download($paper->name . '.pdf');
     }
 
+
+
     public function edit($id)
     {
         try {
-            $paper = Test::with('category', 'subcategory', 'commission', 'subject', 'topic', 'chapter')->findOrFail($id);
+            $paper = Test::with('category', 'subcategory', 'commission', 'subject', 'topic', 'chapter', 'testDetails.question')
+                ->findOrFail($id);
+
             $data['paper'] = $paper;
 
             $data['commissions'] = ExaminationCommission::get();
 
-            if ($paper->competitive_commission_id != "") {
-                $data['categories'] = Category::where('exam_com_id', $paper->competitive_commission_id)->get();
-            } else {
-                $data['categories'] = [];
-            }
+            $data['categories'] = $paper->competitive_commission_id != ""
+                ? Category::where('exam_com_id', $paper->competitive_commission_id)->get()
+                : [];
 
-            if ($paper->exam_category_id != "") {
-                $data['subcategories'] = SubCategory::where('category_id', $paper->exam_category_id)->get();
-            } else {
-                $data['subcategories'] = [];
-            }
+            $data['subcategories'] = $paper->exam_category_id != ""
+                ? SubCategory::where('category_id', $paper->exam_category_id)->get()
+                : [];
 
-            if ($paper->exam_subcategory_id != "") {
-                $data['subjects'] = Subject::where('sub_category_id', $paper->exam_subcategory_id)->get();
-            } else {
-                $data['subjects'] = [];
-            }
+            $data['subjects'] = $paper->exam_subcategory_id != ""
+                ? Subject::where('sub_category_id', $paper->exam_subcategory_id)->get()
+                : [];
 
-            if ($paper->subject_id != "") {
-                $data['chapters'] = Chapter::where('subject_id', $paper->subject_id)->get();
-            } else {
-                $data['chapters'] = [];
-            }
+            $data['chapters'] = $paper->subject_id != ""
+                ? Chapter::where('subject_id', $paper->subject_id)->get()
+                : [];
 
-            if ($paper->chapter_id != "") {
-                $data['topics'] = CourseTopic::where('chapter_id', $paper->chapter_id)->get();
-            } else {
-                $data['topics'] = [];
-            }
+            $data['topics'] = $paper->chapter_id != ""
+                ? CourseTopic::where('chapter_id', $paper->chapter_id)->get()
+                : [];
+
+            // ✅ Arrays of question IDs without foreach
+            $data['mcqArr'] = $paper->testDetails()->whereHas('question', function ($q) {
+                $q->where('question_type', 'MCQ');
+            })->pluck('question_id')->toArray();
+
+            $data['subjectiveArr'] = $paper->testDetails()->whereHas('question', function ($q) {
+                $q->where('question_type', 'Subjective');
+            })->pluck('question_id')->toArray();
+
+            $data['passageArr'] = $paper->testDetails()->whereHas('question', function ($q) {
+                $q->where('question_type', 'Story Based');
+            })->pluck('question_id')->toArray();
+
             return view('test-paper.edit', $data);
+
         } catch (\Exception $ex) {
             return redirect(route('test-paper.edit'))->with('error', 'Error Encountered ' . $ex->getMessage());
         }
     }
+
+
 
 
 

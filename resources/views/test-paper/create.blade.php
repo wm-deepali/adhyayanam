@@ -665,9 +665,8 @@ ClassicEditor.create(document.querySelector('#test_instruction'))
             }
         }
 
-    </script>
 
-    <script>
+
         function toggleInputBox1() {
             const negativeMarkingSelect = document.getElementById('allow_re_attempt');
             const additionalInputContainer = document.getElementById('additionalInputContainer1');
@@ -1452,8 +1451,20 @@ ClassicEditor.create(document.querySelector('#test_instruction'))
 
 
             $(document).on('click', '#preview-test-btn', function (event) {
+                const hasNegativeMarking = document.getElementById('has_negative_marks').value;
+                const negativeMarksInput = document.getElementById('negative_marks_per_question');
+                if (hasNegativeMarking === 'yes') {
+                    if (!negativeMarksInput || negativeMarksInput.value === '' || Number(negativeMarksInput.value) <= 0) {
+                        alert('Please enter a negative marks value greater than zero.');
+                        if (negativeMarksInput) {
+                            negativeMarksInput.focus();
+                        }
+                        return false; // Prevent form submission
+                    }
+                }
                 $(this).attr('disabled', true);
                 $(".validation-err").html('');
+
                 const mcqselectedqu = $('.master-question-item').find(".customquestionselectedbox-mcq .question").length;
                 const storyselectedqu = $('.master-question-item').find(".customquestionselectedbox-story .question").length;
                 const subjectiveselectedqu = $('.master-question-item').find(".customquestionselectedbox-subjective .question").length;

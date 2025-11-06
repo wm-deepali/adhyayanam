@@ -2187,114 +2187,122 @@ class ContentManagementController extends Controller
         return view('test-series.view-test-series', $data);
     }
 
-    public function testSeriesUpdate(Request $request, $id)
-    {
-        $validator = Validator::make($request->all(), [
-            'title' => 'required|string|max:512',
-            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
-            'price' => 'required',
-            'mrp' => 'required',
-            'discount' => 'required',
+   public function testSeriesUpdate(Request $request, $id)
+{
+    $validator = Validator::make($request->all(), [
+        'title' => 'required|string|max:512',
+        'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
+        'price' => 'required',
+        'mrp' => 'required',
+        'discount' => 'required',
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json([
+            'success' => false,
+            'code' => 422,
+            'errors' => $validator->errors(),
         ]);
+    }
 
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'code' => 422,
-                'errors' => $validator->errors(),
-            ]);
-        }
+    $test = TestSeries::findOrFail($id);
+    $data = $request->all();
 
-        $test = TestSeries::findOrFail($id);
-        $data = $request->all();
+    // ✅ Handle logo upload
+    if ($request->hasFile('logo')) {
+        $data['logo'] = $request->file('logo')->store('logos', 'public');
+    } else {
+        $data['logo'] = $test->logo;
+    }
 
-        // Handle logo upload
-        if ($request->hasFile('logo')) {
-            $logoPath = $request->file('logo')->store('logos', 'public');
-            $data['logo'] = $logoPath;
-        } else {
-            $data['logo'] = $test->logo;
-        }
+    // ✅ Decode JSON
+    $additionalData = json_decode($request->input('additionalData'), true);
 
-        // Decode additional data
-        $additionalData = json_decode($request->input('additionalData'), true);
+    // ✅ Type mapping
+    $typeNames = [
+        1 => "Full Test",
+        2 => "Subject Wise",
+        3 => "Chapter Wise",
+        4 => "Topic Wise",
+        5 => "Current Affair",
+        6 => "Previous Year",
+    ];
 
-        // Type name mapping
-        $typeNames = [
-            1 => "Full Test",
-            2 => "Subject Wise",
-            3 => "Chapter Wise",
-            4 => "Topic Wise",
-            5 => "Current Affair",
-            6 => "Previous Year",
-        ];
+    // ✅ Paper types
+    $paperTypes = [
+        'mcqselectedtestpaper' => 'MCQ',
+        'passageselectedtestpaper' => 'Passage',
+        'subjectiveselectedtestpaper' => 'Subjective',
+        'combinedselectedtestpaper' => 'Combined',
+    ];
 
-        // Delete old test details before adding new ones
-        TestSeriesDetail::where('test_series_id', $id)->delete();
+    $keptIds = [];
+    $totalPaperCount = 0;
 
-        // Variable to count total test papers
-        $totalPaperCount = 0;
-        
-        if (!empty($additionalData['testType'])) {
-            foreach ($additionalData['testType'] as $index => $testType) {
-                $testType = (int) $testType;
-                $testTypeName = $typeNames[$testType] ?? "Unknown Type";
-                
-                $testGeneratedBy = $additionalData['testSelections'][$index] ?? ($data['test_generated_by'] ?? 'manual');
-                // Helper array of paper types
-                $paperTypes = [
-                    'mcqselectedtestpaper' => 'MCQ',
-                    'passageselectedtestpaper' => 'Passage',
-                    'subjectiveselectedtestpaper' => 'Subjective',
-                    'combinedselectedtestpaper' => 'Combined',
-                ];
-                
-                foreach ($paperTypes as $key => $paperType) {
-                    if (!empty($additionalData[$key][$index])) {
-                        foreach ($additionalData[$key][$index] as $testPaperId) {
-                            $testSeriesDetail = new TestSeriesDetail();
-                            $testSeriesDetail->test_series_id = $id;
-                            $testSeriesDetail->type = $testType;
-                            $testSeriesDetail->type_name = $testTypeName;
-                            $testSeriesDetail->test_id = $testPaperId;
-                            $testSeriesDetail->test_paper_type = $paperType;
-                            $testSeriesDetail->test_generated_by = $testGeneratedBy; // ✅ new field
-                            $testSeriesDetail->save();
-                            
-                            $totalPaperCount++; // ✅ increment total
-                        }
+    if (!empty($additionalData['testType'])) {
+        foreach ($additionalData['testType'] as $index => $testType) {
+            $testType = (int) $testType;
+            $testTypeName = $typeNames[$testType] ?? 'Unknown Type';
+            $testGeneratedBy = $additionalData['testSelections'][$index] ?? ($data['test_generated_by'][$index] ?? 'manual');
+
+            foreach ($paperTypes as $key => $paperType) {
+                if (!empty($additionalData[$key][$index])) {
+                    foreach ($additionalData[$key][$index] as $testPaperId) {
+
+                        // ✅ Either update or create
+                        $detail = TestSeriesDetail::firstOrNew([
+                            'test_series_id' => $id,
+                            'test_id' => $testPaperId,
+                            'test_paper_type' => $paperType,
+                            'type' => $testType,
+                        ]);
+
+                        $detail->type_name = $testTypeName;
+                        $detail->test_generated_by = $testGeneratedBy;
+                        $detail->save();
+
+                        $keptIds[] = $detail->id;
+                        $totalPaperCount++;
                     }
                 }
             }
         }
-        
-        // Update main TestSeries record
-        $test->fill([
-            'language' => $data['language'],
-            'exam_com_id' => $data['exam_com_id'],
-            'title' => $data['title'],
-            'category_id' => $data['category_id'],
-            'sub_category_id' => $data['sub_category_id'],
-            'slug' => $data['slug'],
-            'short_description' => $data['short_description'],
-            'mrp' => $data['mrp'],
-            'discount' => $data['discount'],
-            'price' => $data['price'],
-            'description' => $data['description'],
-            'logo' => $data['logo'],
-            'fee_type' => $data['fee_type'],
-            'test_generated_by' => $data['test_generated_by'] ?? null,
-            'total_paper' => $totalPaperCount, // ✅ updated total count
-        ]);
-        
-        // dd($data['test_generated_by']);
-        $test->save();
-
-        return response()->json([
-            'success' => true,
-            'msgText' => 'Test Series Updated!',
-        ]);
     }
+
+    // ✅ Delete only removed ones
+    if (!empty($keptIds)) {
+        TestSeriesDetail::where('test_series_id', $id)
+            ->whereNotIn('id', $keptIds)
+            ->delete();
+    } else {
+        TestSeriesDetail::where('test_series_id', $id)->delete();
+    }
+
+    // ✅ Update TestSeries main table
+    $test->update([
+        'language' => $data['language'],
+        'exam_com_id' => $data['exam_com_id'],
+        'title' => $data['title'],
+        'category_id' => $data['category_id'],
+        'sub_category_id' => $data['sub_category_id'],
+        'slug' => $data['slug'],
+        'short_description' => $data['short_description'],
+        'mrp' => $data['mrp'],
+        'discount' => $data['discount'],
+        'price' => $data['price'],
+        'description' => $data['description'],
+        'logo' => $data['logo'],
+        'fee_type' => $data['fee_type'],
+        'test_generated_by' => $data['test_generated_by'][0] ?? 'manual',
+        'total_paper' => $totalPaperCount,
+    ]);
+
+    return response()->json([
+        'success' => true,
+        'msgText' => 'Test Series Updated Successfully!',
+    ]);
+}
+
 
 
 

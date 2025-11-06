@@ -529,7 +529,7 @@ class TestController extends Controller
 
             $questionMarks = json_decode($request->question_marks_details);
 
-            foreach ($questionMarks as $dt) {
+            foreach (json_decode($request->question_marks_details) as $dt) {
                 // Ignore sub-questions (only process main ones)
                 if (!empty($dt->sub_question_id)) {
                     continue;
@@ -542,6 +542,7 @@ class TestController extends Controller
                 $positive_marks_per_question_mcq = $positive;
                 $negative_marks_per_question_mcq = $negative;
             }
+
             // --- Prepare test data ---
             $testData = [
                 'language' => $request->language,

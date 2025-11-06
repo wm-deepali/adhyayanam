@@ -285,7 +285,24 @@
     $testDetail = \App\Models\TestDetail::where('test_id', $testData['id'] ?? null)
         ->where('question_id', $question->id)
         ->first();
+
+$test = \App\Models\Test::where('id', $testData['id'] ?? null)
+        ->first();
+
+    $default_positive = $testData['mcq_mark_per_question'] ?? '';
+    $default_negative = $testData['negative_marks_per_question'] ?? '';
+
+    $positive_mark_value = $testDetail->positive_mark ?? $default_positive;
+    if (isset($test->mcq_mark_per_question) && $test->mcq_mark_per_question != $default_positive) {
+        $positive_mark_value = $default_positive;
+    }
+
+    $negative_mark_value = $testDetail->negative_mark ?? $default_negative;
+    if (isset($test->negative_marks_per_question) && $test->negative_marks_per_question != $default_negative) {
+        $negative_mark_value = $default_negative;
+    }
 @endphp
+
 <div class="qs-col last question-container-div"
      question_id="{{ $question->id }}"
      test_question_type="MCQ">
@@ -295,15 +312,15 @@
     <input type="text"
            class="form-control mark positive_mark mcq_positive_mark"
            placeholder="enter positive marks"
-           value="{{ $testDetail->positive_mark ?? $testData['mcq_mark_per_question'] ?? '' }}"
-           style="width: 40px;">
+           value="{{ $positive_mark_value }}"
+           style="width: 50px;">
 
     @if ($testData['has_negative_marks'] == 'yes')
         <input type="text"
                class="form-control mark negative_mark"
                placeholder="enter negative marks"
-               value="{{ $testDetail->negative_mark ?? $testData['negative_marks_per_question'] ?? '' }}"
-               style="width: 40px;">
+               value="{{ $negative_mark_value }}"
+               style="width: 50px;">
     @endif
 </div>
 
@@ -342,6 +359,22 @@
     $testDetail = \App\Models\TestDetail::where('test_id', $testData['id'] ?? null)
         ->where('question_id', $question->id)
         ->first();
+
+$test = \App\Models\Test::where('id', $testData['id'] ?? null)
+        ->first();
+
+         $default_positive = $testData['subjective_mark_per_question'] ?? '';
+    $default_negative = $testData['negative_marks_per_question'] ?? '';
+
+    $positive_mark_value = $testDetail->positive_mark ?? $default_positive;
+    if (isset($test->subjective_mark_per_question) && $test->subjective_mark_per_question != $default_positive) {
+        $positive_mark_value = $default_positive;
+    }
+
+    $negative_mark_value = $testDetail->negative_mark ?? $default_negative;
+    if (isset($test->negative_marks_per_question) && $test->negative_marks_per_question != $default_negative) {
+        $negative_mark_value = $default_negative;
+    }
 @endphp
 
                             <div class="sec-instruction preview-questions-container">
@@ -351,9 +384,9 @@
 
                                             <div>{{ $loop->iteration }}. {!! $question->question !!}</div>
                                         
-                                        <input type="text" class="form-control mark positive_mark subjective_positive_mark" placeholder="enter positive marks" value="{{$testDetail->positive_mark ?? $testData['subjective_mark_per_question']}}" style="width: 40px;">
+                                        <input type="text" class="form-control mark positive_mark subjective_positive_mark" placeholder="enter positive marks" value="{{ $positive_mark_value  }}" style="width: 50px;">
                                         @if ($testData['has_negative_marks'] == 'yes')
-                                            <input type="text" class="form-control mark negative_mark"  placeholder="enter negative marks" value="{{$testDetail->negative_mark ?? $testData['negative_marks_per_question']}}" style="width: 40px;">
+                                            <input type="text" class="form-control mark negative_mark"  placeholder="enter negative marks" value="{{ $negative_mark_value }}" style="width: 50px;">
                                         @endif
                                     </div>
                                     @if ($question->answer_format != '')
@@ -375,6 +408,22 @@
     $testDetail = \App\Models\TestDetail::where('test_id', $testData['id'] ?? null)
         ->where('question_id', $question->id)
         ->first();
+
+$test = \App\Models\Test::where('id', $testData['id'] ?? null)
+        ->first();
+
+    $default_positive = $testData['story_mark_per_question'] ?? '';
+    $default_negative = $testData['negative_marks_per_question'] ?? '';
+
+    $positive_mark_value = $testDetail->positive_mark ?? $default_positive;
+    if (isset($test->story_mark_per_question) && $test->story_mark_per_question != $default_positive ) {
+        $positive_mark_value = $default_positive;
+    }
+
+    $negative_mark_value = $testDetail->negative_mark ?? $default_negative;
+    if (isset($test->negative_marks_per_question) && $test->negative_marks_per_question != $default_negative) {
+        $negative_mark_value = $default_negative;
+    }
 @endphp
 
                             <div class="sec-instruction preview-questions-container">
@@ -384,9 +433,9 @@
 
                                             <div>{{ $loop->iteration }}. {!! $question->question !!}</div>
                                         
-                                        <input type="text" class="form-control mark positive_mark passage_positive_mark" placeholder="enter positive marks" value="{{$testDetail->positive_mark ?? $testData['story_mark_per_question']}}" style="width: 40px;">
+                                        <input type="text" class="form-control mark positive_mark passage_positive_mark" placeholder="enter positive marks" value="{{ $positive_mark_value }}" style="width: 50px;">
                                         @if ($testData['has_negative_marks'] == 'yes')
-                                            <input type="text" class="form-control mark negative_mark"  placeholder="enter negative marks" value="{{$testDetail->negative_mark ?? $testData['negative_marks_per_question']}}" style="width: 40px;">
+                                            <input type="text" class="form-control mark negative_mark"  placeholder="enter negative marks" value="{{ $negative_mark_value }}" style="width: 50px;">
                                         @endif
                                     </div>
                                     @if ($question->image != '')
@@ -413,22 +462,34 @@
         ->where('question_id', $questiondetail->id)
         ->first();
 
-    $sub_positive_mark = $subTestDetail->positive_mark ?? round($testData['story_mark_per_question'] / count($questionDetails), 2);
-    $sub_negative_mark = $subTestDetail->negative_mark ?? round($testData['negative_marks_per_question'] / count($questionDetails), 2);
+        $test = \App\Models\Test::where('id', $testData['id'] ?? null)
+        ->first();
+
+ $default_positive = $testData['story_mark_per_question'] ?? '';
+    $default_negative = $testData['negative_marks_per_question'] ?? '';
+    
+    $sub_positive_mark = $subTestDetail->positive_mark ??  round($testData['story_mark_per_question'] / count($questionDetails), 2);;
+    if (isset($test->story_mark_per_question) && $test->story_mark_per_question != $default_positive) {
+        $sub_positive_mark = round($testData['story_mark_per_question'] / count($questionDetails), 2);
+    }
+    $sub_negative_mark = $subTestDetail->negative_mark ??  round($testData['negative_marks_per_question'] / count($questionDetails), 2);;
+      if (isset($test->negative_marks_per_question) && $test->negative_marks_per_question != $default_negative) {
+        $sub_negative_mark = round($negative_mark_value / count($questionDetails), 2);
+    }
 @endphp
 
 <input type="text"
        class="form-control mark sub_positive_mark"
        placeholder="enter sub_positive marks"
        value="{{ $sub_positive_mark }}"
-       style="width: 40px;">
+       style="width: 50px;">
 
 @if ($testData['has_negative_marks'] == 'yes')
     <input type="text"
            class="form-control mark sub_negative_mark"
            placeholder="enter sub_negative marks"
            value="{{ $sub_negative_mark }}"
-           style="width: 40px;">
+           style="width: 50px;">
 @endif
 
                                                         </div>

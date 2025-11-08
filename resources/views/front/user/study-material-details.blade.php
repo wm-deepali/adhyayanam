@@ -61,12 +61,27 @@
                 <li><b>Category:</b> {{ $studyMaterial->category->name }}</li>@endif
                 @if($studyMaterial->subcategory)
                 <li><b>Subcategory:</b> {{ $studyMaterial->subcategory->name }}</li>@endif
-                @if($studyMaterial->subject)
-                <li><b>Subject:</b> {{ $studyMaterial->subject->name }}</li>@endif
-                @if($studyMaterial->chapter)
-                <li><b>Chapter:</b> {{ $studyMaterial->chapter->name }}</li>@endif
-                @if($studyMaterial->topic)
-                <li><b>Topic:</b> {{ $studyMaterial->topic->name }}</li>@endif
+                
+                {{-- Multiple Subjects --}}
+                @if($studyMaterial->subjects->count())
+                  <li><b>Subjects:</b>
+                    {{ $studyMaterial->subjects->pluck('name')->implode(', ') }}
+                  </li>
+                @endif
+
+                {{-- Multiple Chapters --}}
+                @if($studyMaterial->chapters->count())
+                  <li><b>Chapters:</b>
+                    {{ $studyMaterial->chapters->pluck('name')->implode(', ') }}
+                  </li>
+                @endif
+
+                {{-- Multiple Topics --}}
+                @if($studyMaterial->topics->count())
+                  <li><b>Topics:</b>
+                    {{ $studyMaterial->topics->pluck('name')->implode(', ') }}
+                  </li>
+                @endif
               </ul>
 
               <!-- Short Description (full, no toggle) -->
@@ -132,7 +147,7 @@
             <div class="pdf-nt mt-3">
               @if($studyMaterial->is_pdf_downloadable)
                 @if(auth()->user())
-                  @if($studyMaterial->IsPaid == 0 || Helper::GetStudentOrder('Study Material', $studyMaterial->id, auth()->user()->id))
+                  @if($studyMaterial->IsPaid == 0 || App\Helpers\Helper::GetStudentOrder('Study Material', $studyMaterial->id, auth()->user()->id))
                     <a class="osd-cus s" href="{{ route('study.material.download', $studyMaterial->id) }}"
                       download="{{ $studyMaterial->topic }}">Download PDF</a>
                   @else

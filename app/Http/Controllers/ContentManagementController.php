@@ -1608,24 +1608,30 @@ class ContentManagementController extends Controller
             'commission_id' => 'required|integer',
             'category_id' => 'required|integer',
             'sub_category_id' => 'nullable|integer',
-            'subject_id' => 'required|integer',
-            'chapter_id' => 'nullable|integer',
-            'topic' => 'nullable|integer',
+            'subject_id' => 'nullable|array',
+            'subject_id.*' => 'integer',
+            'chapter_id' => 'nullable|array',
+            'chapter_id.*' => 'integer',
+            'topic_id' => 'nullable|array',
+            'topic_id.*' => 'integer',
             'is_pdf_downloadable' => 'required|boolean',
-            'title' => 'required',
+            'title' => 'required|string',
             'short_description' => 'required|string',
-            'detail_content' => 'required',
-            'status' => 'required',
+            'detail_content' => 'required|string',
+            'status' => 'required|string',
             'pdf' => 'nullable|file|mimes:pdf|max:2048',
             'meta_title' => 'nullable|string',
             'meta_keyword' => 'nullable|string',
             'meta_description' => 'nullable|string',
-            'banner' => 'required|file|image|max:2048', // make sure it's a file
+            'banner' => 'required|file|image|max:2048',
             'IsPaid' => 'required|boolean',
             'price' => 'nullable|numeric',
+            'mrp' => 'nullable|numeric',
+            'discount' => 'nullable|numeric',
+            'based_on' => 'nullable|string',
         ]);
 
-        // Upload PDF file (nullable)
+        // Upload PDF file (optional)
         $pdfPath = null;
         if ($request->hasFile('pdf')) {
             $pdfPath = $request->file('pdf')->store('pdfs', 'public');
@@ -1634,39 +1640,65 @@ class ContentManagementController extends Controller
         // Upload Banner (required)
         $bannerPath = $request->file('banner')->store('banners', 'public');
 
-        // Decide the type: subject/chapter/topic
+        /**
+         * 🧩 Determine Material Type
+         */
+        $basedOn = $validatedData['based_on'] ?? null;
         $materialType = 'general';
-        if (!empty($validatedData['topic'])) {
-            $materialType = 'topic_based';
-        } elseif (!empty($validatedData['chapter_id'])) {
-            $materialType = 'chapter_based';
-        } elseif (!empty($validatedData['subject_id'])) {
-            $materialType = 'subject_based';
+
+        if ($basedOn) {
+            switch (true) {
+                case str_contains($basedOn, 'Combined Topic'):
+                    $materialType = 'combined_topic_based';
+                    break;
+                case str_contains($basedOn, 'Topic'):
+                    $materialType = 'topic_based';
+                    break;
+                case str_contains($basedOn, 'Combined Chapter'):
+                    $materialType = 'combined_chapter_based';
+                    break;
+                case str_contains($basedOn, 'Chapter'):
+                    $materialType = 'chapter_based';
+                    break;
+                case str_contains($basedOn, 'Combined Subject'):
+                    $materialType = 'combined_subject_based';
+                    break;
+                case str_contains($basedOn, 'Subject'):
+                    $materialType = 'subject_based';
+                    break;
+                case str_contains($basedOn, 'Sub Category'):
+                    $materialType = 'sub_category_based';
+                    break;
+            }
         }
 
-        // Create StudyMaterial
+        /**
+         * 💾 Create Study Material
+         */
         $studyMaterial = new StudyMaterial();
         $studyMaterial->commission_id = $validatedData['commission_id'];
         $studyMaterial->category_id = $validatedData['category_id'];
-        $studyMaterial->sub_category_id = $validatedData['sub_category_id'];
-        $studyMaterial->chapter_id = $validatedData['chapter_id'];
-        $studyMaterial->subject_id = $validatedData['subject_id'];
-        $studyMaterial->topic_id = $validatedData['topic'];
+        $studyMaterial->sub_category_id = $validatedData['sub_category_id'] ?? null;
+        $studyMaterial->subject_id = $validatedData['subject_id'] ?? [];
+        $studyMaterial->chapter_id = $validatedData['chapter_id'] ?? [];
+        $studyMaterial->topic_id = $validatedData['topic_id'] ?? [];
+
         $studyMaterial->is_pdf_downloadable = $validatedData['is_pdf_downloadable'];
         $studyMaterial->material_type = $materialType;
         $studyMaterial->title = $validatedData['title'];
         $studyMaterial->short_description = $validatedData['short_description'];
         $studyMaterial->detail_content = $validatedData['detail_content'];
         $studyMaterial->status = $validatedData['status'];
-        $studyMaterial->pdf = $pdfPath; // nullable
+        $studyMaterial->pdf = $pdfPath;
         $studyMaterial->banner = $bannerPath;
         $studyMaterial->IsPaid = $validatedData['IsPaid'];
-        $studyMaterial->price = $validatedData['price'];
-        $studyMaterial->mrp = $request->mrp;
-        $studyMaterial->discount = $request->discount;
+        $studyMaterial->price = $validatedData['price'] ?? null;
+        $studyMaterial->mrp = $validatedData['mrp'] ?? null;
+        $studyMaterial->discount = $validatedData['discount'] ?? null;
         $studyMaterial->meta_title = $validatedData['meta_title'] ?? null;
         $studyMaterial->meta_keyword = $validatedData['meta_keyword'] ?? null;
         $studyMaterial->meta_description = $validatedData['meta_description'] ?? null;
+        $studyMaterial->based_on = $basedOn; // Optional, for reference
         $studyMaterial->save();
 
         return redirect()
@@ -1674,15 +1706,13 @@ class ContentManagementController extends Controller
             ->with('success', 'Study material has been created successfully.');
     }
 
+
     public function downloadPdf($id)
     {
         $material = StudyMaterial::with([
             'commission',
             'category',
             'subcategory',
-            'subject',
-            'chapter',
-            'topic'
         ])->findOrFail($id);
 
         // Define the PDF file path
@@ -1706,60 +1736,58 @@ class ContentManagementController extends Controller
     {
         $material = StudyMaterial::findOrFail($id);
 
-        $data['commissions'] = ExaminationCommission::get();
-        if ($material->commission_id != "") {
+        $data['commissions'] = ExaminationCommission::all();
 
-            $data['categories'] = Category::where('exam_com_id', $material->commission_id)->get();
-        } else {
-            $data['categories'] = [];
-        }
+        $data['categories'] = !empty($material->commission_id)
+            ? Category::where('exam_com_id', $material->commission_id)->get()
+            : collect();
 
-        if ($material->category_id != "") {
-            $data['subcategories'] = SubCategory::where('category_id', $material->category_id)->get();
-        } else {
-            $data['subcategories'] = [];
-        }
+        $data['subcategories'] = !empty($material->category_id)
+            ? SubCategory::where('category_id', $material->category_id)->get()
+            : collect();
 
-        if ($material->sub_category_id != "") {
-            $data['subjects'] = Subject::where('sub_category_id', $material->sub_category_id)->get();
-        } else {
-            $data['subjects'] = [];
-        }
+        $data['subjects'] = !empty($material->sub_category_id)
+            ? Subject::where('sub_category_id', $material->sub_category_id)->get()
+            : collect();
 
-        if ($material->subject_id != "") {
-            $data['chapters'] = Chapter::where('subject_id', $material->subject_id)->get();
-        } else {
-            $data['chapters'] = [];
-        }
+        // Get decoded arrays automatically (Laravel cast handles this)
+        $subjectIds = $material->subject_id ?? [];
+        $chapterIds = $material->chapter_id ?? [];
 
-        if ($material->chapter_id != "") {
-            $data['topics'] = CourseTopic::where('chapter_id', $material->chapter_id)->get();
-        } else {
-            $data['topics'] = [];
-        }
+        $data['chapters'] = !empty($subjectIds)
+            ? Chapter::whereIn('subject_id', $subjectIds)->get()
+            : collect();
+
+        $data['topics'] = !empty($chapterIds)
+            ? CourseTopic::whereIn('chapter_id', $chapterIds)->get()
+            : collect();
 
         $data['material'] = $material;
-        // dd($data['topics']->toArray());
+
         return view('study-material.edit', $data);
     }
 
     public function studyMaterialUpdate($id, Request $request)
     {
+        
         $material = StudyMaterial::findOrFail($id);
 
-        // Validation
+        // Validation: accept arrays for multi-select fields
         $validatedData = $request->validate([
             'commission_id' => 'required|integer',
             'category_id' => 'required|integer',
             'sub_category_id' => 'nullable|integer',
-            'subject_id' => 'required|integer',
-            'chapter_id' => 'nullable|integer',
-            'topic' => 'nullable|integer',
+            'subject_id' => 'required|array',
+            'subject_id.*' => 'integer',
+            'chapter_id' => 'nullable|array',
+            'chapter_id.*' => 'integer',
+            'topic_id' => 'nullable|array',
+            'topic_id.*' => 'integer',
 
             'title' => 'required|string|max:255',
             'short_description' => 'required|string',
             'detail_content' => 'required|string',
-            'status' => 'required',
+            'status' => 'required|string',
             'IsPaid' => 'required|boolean',
             'price' => 'nullable|numeric',
             'mrp' => 'nullable|numeric',
@@ -1767,46 +1795,64 @@ class ContentManagementController extends Controller
             'is_pdf_downloadable' => 'required|boolean',
 
             'pdf' => 'nullable|file|mimes:pdf|max:2048',
-            // 'banner' => 'nullable|file|image|max:2048',
+            'banner' => 'nullable|file|image|max:2048',
 
             'meta_title' => 'nullable|string|max:255',
             'meta_keyword' => 'nullable|string',
             'meta_description' => 'nullable|string',
+             'based_on' => 'nullable|string',
         ]);
 
-        // dd($request->all());
-        // Assign values
+        // Encode arrays as JSON to store in DB
         $material->commission_id = $validatedData['commission_id'];
         $material->category_id = $validatedData['category_id'];
-        $material->sub_category_id = $validatedData['sub_category_id'];
-        $material->chapter_id = $validatedData['chapter_id'];
-        $material->subject_id = $validatedData['subject_id'];
-        $material->topic_id = $validatedData['topic'];
+        $material->sub_category_id = $validatedData['sub_category_id'] ?? null;
+        $material->subject_id = $validatedData['subject_id'] ?? [];
+        $material->chapter_id = $validatedData['chapter_id'] ?? [];
+        $material->topic_id = $validatedData['topic_id'] ?? [];
 
         $material->title = $validatedData['title'];
         $material->short_description = $validatedData['short_description'];
         $material->detail_content = $validatedData['detail_content'];
         $material->IsPaid = $validatedData['IsPaid'];
-        $material->mrp = $validatedData['mrp'];
-        $material->discount = $validatedData['discount'];
-        $material->price = $validatedData['price'];
+        $material->mrp = $validatedData['mrp'] ?? null;
+        $material->discount = $validatedData['discount'] ?? null;
+        $material->price = $validatedData['price'] ?? null;
         $material->status = $validatedData['status'];
-        $material->meta_title = $validatedData['meta_title'];
-        $material->meta_keyword = $validatedData['meta_keyword'];
-        $material->meta_description = $validatedData['meta_description'];
+        $material->meta_title = $validatedData['meta_title'] ?? null;
+        $material->meta_keyword = $validatedData['meta_keyword'] ?? null;
+        $material->meta_description = $validatedData['meta_description'] ?? null;
         $material->is_pdf_downloadable = $validatedData['is_pdf_downloadable'];
-        // Decide material type again
-        if (!empty($validatedData['topic'])) {
-            $material->material_type = 'topic_based';
-        } elseif (!empty($validatedData['chapter_id'])) {
-            $material->material_type = 'chapter_based';
-        } elseif (!empty($validatedData['subject_id'])) {
-            $material->material_type = 'subject_based';
-        } else {
-            $material->material_type = 'general';
+
+        $basedOn = $validatedData['based_on'] ?? null;
+        $material->material_type = 'general';
+        if ($basedOn) {
+            switch (true) {
+                case str_contains($basedOn, 'Combined Topic'):
+                    $$material->material_type = 'combined_topic_based';
+                    break;
+                case str_contains($basedOn, 'Topic'):
+                    $material->material_type = 'topic_based';
+                    break;
+                case str_contains($basedOn, 'Combined Chapter'):
+                    $material->material_type = 'combined_chapter_based';
+                    break;
+                case str_contains($basedOn, 'Chapter'):
+                    $material->material_type = 'chapter_based';
+                    break;
+                case str_contains($basedOn, 'Combined Subject'):
+                    $material->material_type = 'combined_subject_based';
+                    break;
+                case str_contains($basedOn, 'Subject'):
+                    $material->material_type = 'subject_based';
+                    break;
+                case str_contains($basedOn, 'Sub Category'):
+                    $material->material_type = 'sub_category_based';
+                    break;
+            }
         }
 
-        // Handle file updates
+        // Handle banner update
         if ($request->hasFile('banner')) {
             if ($material->banner) {
                 Storage::disk('public')->delete($material->banner);
@@ -1814,6 +1860,7 @@ class ContentManagementController extends Controller
             $material->banner = $request->file('banner')->store('banners', 'public');
         }
 
+        // Handle PDF update
         if ($request->hasFile('pdf')) {
             if ($material->pdf) {
                 Storage::disk('public')->delete($material->pdf);
@@ -1821,8 +1868,8 @@ class ContentManagementController extends Controller
             $material->pdf = $request->file('pdf')->store('pdfs', 'public');
         }
 
-        // dd($material->toArray(), $request->hasFile('banner'));
         $material->save();
+
         return redirect()->route('study.material.index')->with('success', 'Study Material updated successfully');
     }
 
@@ -2187,121 +2234,121 @@ class ContentManagementController extends Controller
         return view('test-series.view-test-series', $data);
     }
 
-   public function testSeriesUpdate(Request $request, $id)
-{
-    $validator = Validator::make($request->all(), [
-        'title' => 'required|string|max:512',
-        'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
-        'price' => 'required',
-        'mrp' => 'required',
-        'discount' => 'required',
-    ]);
-
-    if ($validator->fails()) {
-        return response()->json([
-            'success' => false,
-            'code' => 422,
-            'errors' => $validator->errors(),
+    public function testSeriesUpdate(Request $request, $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'title' => 'required|string|max:512',
+            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
+            'price' => 'required',
+            'mrp' => 'required',
+            'discount' => 'required',
         ]);
-    }
 
-    $test = TestSeries::findOrFail($id);
-    $data = $request->all();
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'code' => 422,
+                'errors' => $validator->errors(),
+            ]);
+        }
 
-    // ✅ Handle logo upload
-    if ($request->hasFile('logo')) {
-        $data['logo'] = $request->file('logo')->store('logos', 'public');
-    } else {
-        $data['logo'] = $test->logo;
-    }
+        $test = TestSeries::findOrFail($id);
+        $data = $request->all();
 
-    // ✅ Decode JSON
-    $additionalData = json_decode($request->input('additionalData'), true);
+        // ✅ Handle logo upload
+        if ($request->hasFile('logo')) {
+            $data['logo'] = $request->file('logo')->store('logos', 'public');
+        } else {
+            $data['logo'] = $test->logo;
+        }
 
-    // ✅ Type mapping
-    $typeNames = [
-        1 => "Full Test",
-        2 => "Subject Wise",
-        3 => "Chapter Wise",
-        4 => "Topic Wise",
-        5 => "Current Affair",
-        6 => "Previous Year",
-    ];
+        // ✅ Decode JSON
+        $additionalData = json_decode($request->input('additionalData'), true);
 
-    // ✅ Paper types
-    $paperTypes = [
-        'mcqselectedtestpaper' => 'MCQ',
-        'passageselectedtestpaper' => 'Passage',
-        'subjectiveselectedtestpaper' => 'Subjective',
-        'combinedselectedtestpaper' => 'Combined',
-    ];
+        // ✅ Type mapping
+        $typeNames = [
+            1 => "Full Test",
+            2 => "Subject Wise",
+            3 => "Chapter Wise",
+            4 => "Topic Wise",
+            5 => "Current Affair",
+            6 => "Previous Year",
+        ];
 
-    $keptIds = [];
-    $totalPaperCount = 0;
+        // ✅ Paper types
+        $paperTypes = [
+            'mcqselectedtestpaper' => 'MCQ',
+            'passageselectedtestpaper' => 'Passage',
+            'subjectiveselectedtestpaper' => 'Subjective',
+            'combinedselectedtestpaper' => 'Combined',
+        ];
 
-    if (!empty($additionalData['testType'])) {
-        foreach ($additionalData['testType'] as $index => $testType) {
-            $testType = (int) $testType;
-            $testTypeName = $typeNames[$testType] ?? 'Unknown Type';
-            $testGeneratedBy = $additionalData['testSelections'][$index] ?? ($data['test_generated_by'][$index] ?? 'manual');
+        $keptIds = [];
+        $totalPaperCount = 0;
 
-            foreach ($paperTypes as $key => $paperType) {
-                if (!empty($additionalData[$key][$index])) {
-                    foreach ($additionalData[$key][$index] as $testPaperId) {
+        if (!empty($additionalData['testType'])) {
+            foreach ($additionalData['testType'] as $index => $testType) {
+                $testType = (int) $testType;
+                $testTypeName = $typeNames[$testType] ?? 'Unknown Type';
+                $testGeneratedBy = $additionalData['testSelections'][$index] ?? ($data['test_generated_by'][$index] ?? 'manual');
 
-                        // ✅ Either update or create
-                        $detail = TestSeriesDetail::firstOrNew([
-                            'test_series_id' => $id,
-                            'test_id' => $testPaperId,
-                            'test_paper_type' => $paperType,
-                            'type' => $testType,
-                        ]);
+                foreach ($paperTypes as $key => $paperType) {
+                    if (!empty($additionalData[$key][$index])) {
+                        foreach ($additionalData[$key][$index] as $testPaperId) {
 
-                        $detail->type_name = $testTypeName;
-                        $detail->test_generated_by = $testGeneratedBy;
-                        $detail->save();
+                            // ✅ Either update or create
+                            $detail = TestSeriesDetail::firstOrNew([
+                                'test_series_id' => $id,
+                                'test_id' => $testPaperId,
+                                'test_paper_type' => $paperType,
+                                'type' => $testType,
+                            ]);
 
-                        $keptIds[] = $detail->id;
-                        $totalPaperCount++;
+                            $detail->type_name = $testTypeName;
+                            $detail->test_generated_by = $testGeneratedBy;
+                            $detail->save();
+
+                            $keptIds[] = $detail->id;
+                            $totalPaperCount++;
+                        }
                     }
                 }
             }
         }
+
+        // ✅ Delete only removed ones
+        if (!empty($keptIds)) {
+            TestSeriesDetail::where('test_series_id', $id)
+                ->whereNotIn('id', $keptIds)
+                ->delete();
+        } else {
+            TestSeriesDetail::where('test_series_id', $id)->delete();
+        }
+
+        // ✅ Update TestSeries main table
+        $test->update([
+            'language' => $data['language'],
+            'exam_com_id' => $data['exam_com_id'],
+            'title' => $data['title'],
+            'category_id' => $data['category_id'],
+            'sub_category_id' => $data['sub_category_id'],
+            'slug' => $data['slug'],
+            'short_description' => $data['short_description'],
+            'mrp' => $data['mrp'],
+            'discount' => $data['discount'],
+            'price' => $data['price'],
+            'description' => $data['description'],
+            'logo' => $data['logo'],
+            'fee_type' => $data['fee_type'],
+            'test_generated_by' => $data['test_generated_by'][0] ?? 'manual',
+            'total_paper' => $totalPaperCount,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'msgText' => 'Test Series Updated Successfully!',
+        ]);
     }
-
-    // ✅ Delete only removed ones
-    if (!empty($keptIds)) {
-        TestSeriesDetail::where('test_series_id', $id)
-            ->whereNotIn('id', $keptIds)
-            ->delete();
-    } else {
-        TestSeriesDetail::where('test_series_id', $id)->delete();
-    }
-
-    // ✅ Update TestSeries main table
-    $test->update([
-        'language' => $data['language'],
-        'exam_com_id' => $data['exam_com_id'],
-        'title' => $data['title'],
-        'category_id' => $data['category_id'],
-        'sub_category_id' => $data['sub_category_id'],
-        'slug' => $data['slug'],
-        'short_description' => $data['short_description'],
-        'mrp' => $data['mrp'],
-        'discount' => $data['discount'],
-        'price' => $data['price'],
-        'description' => $data['description'],
-        'logo' => $data['logo'],
-        'fee_type' => $data['fee_type'],
-        'test_generated_by' => $data['test_generated_by'][0] ?? 'manual',
-        'total_paper' => $totalPaperCount,
-    ]);
-
-    return response()->json([
-        'success' => true,
-        'msgText' => 'Test Series Updated Successfully!',
-    ]);
-}
 
 
 
@@ -2524,9 +2571,6 @@ class ContentManagementController extends Controller
         } catch (\Exception $ex) {
             dd($ex->getMessage());
         }
-
-
-
 
     }
 

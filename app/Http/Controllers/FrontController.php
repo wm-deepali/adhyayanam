@@ -315,7 +315,6 @@ class FrontController extends Controller
         $data['data'] = TestPlanner::findOrFail($id);
         return view('front.user.test-planner-details', $data);
     }
-
     public function studyMaterialIndex(Request $request, $examid = null, $catid = null, $subcat = null)
     {
         $subject_id = $request->query('subject_id');
@@ -323,7 +322,7 @@ class FrontController extends Controller
         $topic_id = $request->query('topic_id');
         $search = $request->query('search');
 
-        // Filter Subjects
+        // ===== SUBJECT FILTERS =====
         $subjectQuery = Subject::with(['chapters']);
         if ($examid)
             $subjectQuery->where('exam_com_id', $examid);
@@ -333,7 +332,7 @@ class FrontController extends Controller
             $subjectQuery->where('sub_category_id', $subcat);
         $data['subjects'] = $subjectQuery->get();
 
-        // Filter Chapters
+        // ===== CHAPTER FILTERS =====
         $chapterQuery = Chapter::with(['subject']);
         if ($examid)
             $chapterQuery->where('exam_com_id', $examid);
@@ -343,7 +342,7 @@ class FrontController extends Controller
             $chapterQuery->where('sub_category_id', $subcat);
         $data['chapters'] = $chapterQuery->get();
 
-        // Filter Topics
+        // ===== TOPIC FILTERS =====
         $topicQuery = CourseTopic::with(['subject', 'chapter']);
         if ($examid)
             $topicQuery->where('exam_com_id', $examid);
@@ -353,22 +352,30 @@ class FrontController extends Controller
             $topicQuery->where('sub_category_id', $subcat);
         $data['topics'] = $topicQuery->get();
 
-        // Study Materials
-        $studyMaterialsQuery = StudyMaterial::with(['commission', 'category', 'subcategory', 'subject', 'chapter', 'topic']);
+        // ===== STUDY MATERIALS =====
+        $studyMaterialsQuery = StudyMaterial::with(['commission', 'category', 'subcategory']);
+
         if ($examid)
             $studyMaterialsQuery->where('commission_id', $examid);
         if ($catid)
             $studyMaterialsQuery->where('category_id', $catid);
         if ($subcat)
             $studyMaterialsQuery->where('sub_category_id', $subcat);
-        if ($subject_id)
-            $studyMaterialsQuery->where('subject_id', $subject_id);
-        if ($chapter_id)
-            $studyMaterialsQuery->where('chapter_id', $chapter_id);
-        if ($topic_id)
-            $studyMaterialsQuery->where('topic_id', $topic_id);
 
-        // Safe search
+        // ---- FILTERS BASED ON MULTIPLE IDs ----
+        if (!empty($subject_id)) {
+            $studyMaterialsQuery->whereJsonContains('subject_id', (string) $subject_id);
+        }
+
+        if (!empty($chapter_id)) {
+            $studyMaterialsQuery->whereJsonContains('chapter_id', (string) $chapter_id);
+        }
+
+        if (!empty($topic_id)) {
+            $studyMaterialsQuery->whereJsonContains('topic_id', (string) $topic_id);
+        }
+
+        // ---- SAFE SEARCH ----
         if ($search) {
             $studyMaterialsQuery->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
@@ -378,15 +385,13 @@ class FrontController extends Controller
 
         $data['studyMaterials'] = $studyMaterialsQuery->paginate(10)->withQueryString();
 
-        // Pass the route parameters so Blade can build URLs
+        // Keep the route parameters for pagination and filters
         $data['examid'] = $examid;
         $data['catid'] = $catid;
         $data['subcat'] = $subcat;
 
         return view('front.user.study-material', $data);
     }
-
-
 
 
     public function studyMaterialAllTopics($id)
@@ -400,27 +405,46 @@ class FrontController extends Controller
         // Get the main study material
         $studyMaterial = StudyMaterial::findOrFail($id);
 
-        // Related study materials: try to match topic first, then chapter, then subject
+        // Directly use arrays (since they're stored as arrays, not JSON)
+        $topicIds = $studyMaterial->topic_id ?? [];
+        $chapterIds = $studyMaterial->chapter_id ?? [];
+        $subjectIds = $studyMaterial->subject_id ?? [];
+
+        // Build related materials query
         $related = StudyMaterial::where('id', '!=', $studyMaterial->id)
-            ->where(function ($query) use ($studyMaterial) {
-                if ($studyMaterial->topic_id) {
-                    $query->where('topic_id', $studyMaterial->topic_id);
-                } elseif ($studyMaterial->chapter_id) {
-                    $query->where('chapter_id', $studyMaterial->chapter_id);
-                } elseif ($studyMaterial->subject_id) {
-                    $query->where('subject_id', $studyMaterial->subject_id);
+            ->where(function ($query) use ($studyMaterial, $topicIds, $chapterIds, $subjectIds) {
+
+                if (!empty($topicIds)) {
+                    $query->where(function ($q) use ($topicIds) {
+                        foreach ($topicIds as $topicId) {
+                            $q->orWhereJsonContains('topic_id', (string) $topicId);
+                        }
+                    });
+                } elseif (!empty($chapterIds)) {
+                    $query->where(function ($q) use ($chapterIds) {
+                        foreach ($chapterIds as $chapterId) {
+                            $q->orWhereJsonContains('chapter_id', (string) $chapterId);
+                        }
+                    });
+                } elseif (!empty($subjectIds)) {
+                    $query->where(function ($q) use ($subjectIds) {
+                        foreach ($subjectIds as $subjectId) {
+                            $q->orWhereJsonContains('subject_id', (string) $subjectId);
+                        }
+                    });
                 } else {
                     $query->where('category_id', $studyMaterial->category_id);
                 }
             })
-            ->take(5) // Limit to 5 related items
+            ->take(5)
             ->get();
 
         return view('front.user.study-material-details', [
             'studyMaterial' => $studyMaterial,
-            'relatedMaterials' => $related
+            'relatedMaterials' => $related,
         ]);
     }
+
 
     public function studyMaterialFilter(Request $request)
     {

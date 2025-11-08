@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Collection;
 
 class StudyMaterial extends Model
 {
@@ -33,29 +34,21 @@ class StudyMaterial extends Model
         'mrp',
         'discount',
         'price',
+        'based_on'
     ];
 
 
     protected $casts = [
         'is_pdf_downloadable' => 'boolean',
+        'subject_id' => 'array',
+        'chapter_id' => 'array',
+        'topic_id' => 'array',
     ];
 
-    public function chapter()
-    {
-        return $this->belongsTo(Chapter::class, 'chapter_id');
-    }
-    public function subject()
-    {
-        return $this->belongsTo(Subject::class, 'subject_id');
-    }
+
     public function category()
     {
         return $this->belongsTo(Category::class, 'category_id');
-    }
-
-    public function topic()
-    {
-        return $this->belongsTo(CourseTopic::class, 'topic_id');
     }
 
     public function subcategory()
@@ -67,5 +60,24 @@ class StudyMaterial extends Model
     {
         return $this->belongsTo(ExaminationCommission::class, 'commission_id');
     }
+
+    public function getSubjectsAttribute(): mixed
+    {
+        $subjectIds = $this->subject_id ?? [];
+        return Subject::whereIn('id', $subjectIds)->get();
+    }
+
+    public function getChaptersAttribute()
+    {
+        $chapterIds = $this->chapter_id ?? [];
+        return Chapter::whereIn('id', $chapterIds)->get();
+    }
+
+    public function getTopicsAttribute()
+    {
+        $topicIds = $this->topic_id ?? [];
+        return CourseTopic::whereIn('id', $topicIds)->get();
+    }
+
 
 }

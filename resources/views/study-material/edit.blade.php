@@ -23,20 +23,21 @@
 
                     <div class="mb-3">
                         <label>Select Examination Commission</label>
-                        <select class="form-control" name="commission_id" id="exam_com_id">
+                        <select class="form-control select2" name="commission_id" id="exam_com_id" required>
                             <option value="">--Select--</option>
                             @foreach($commissions as $commission)
-                                <option @if($material->commission_id == $commission->id) selected @endif
-                                    value="{{ $commission->id }}">{{ $commission->name }}</option>
+                                <option value="{{ $commission->id }}" {{ $material->commission_id == $commission->id ? 'selected' : '' }}>
+                                    {{ $commission->name }}
+                                </option>
                             @endforeach
                         </select>
                     </div>
                     <div class="mb-3">
                         <label>Select Category</label>
-                        <select class="form-control" name="category_id" id="category_id">
+                        <select class="form-control select2" name="category_id" id="category_id" required>
                             <option value="">--Select--</option>
                             @foreach($categories as $category)
-                                <option @if($material->category_id == $category->id) selected @endif value="{{ $category->id }}">
+                                <option value="{{ $category->id }}" {{ $material->category_id == $category->id ? 'selected' : '' }}>
                                     {{ $category->name }}
                                 </option>
                             @endforeach
@@ -44,47 +45,61 @@
                     </div>
                     <div class="mb-3 sub-cat">
                         <label>Sub Category</label>
-                        <select class="form-control" name="sub_category_id" id="sub_category_id">
+                        <select class="form-control select2" name="sub_category_id" id="sub_category_id">
                             <option value="">--Select--</option>
                             @foreach($subcategories as $subcategory)
-                                <option @if($material->sub_category_id == $subcategory->id) selected @endif
-                                    value="{{ $subcategory->id }}">{{ $subcategory->name }}</option>
+                                <option value="{{ $subcategory->id }}" {{ $material->sub_category_id == $subcategory->id ? 'selected' : '' }}>
+                                    {{ $subcategory->name }}
+                                </option>
                             @endforeach
                         </select>
                     </div>
 
                     <div class="mb-3">
                         <label>Select Subject</label>
-                        <select class="form-control" name="subject_id" id="subject_id">
-                            <option value="">--Select--</option>
+                        <select class="form-control select2" name="subject_id[]" id="subject_id" multiple>
+                            @php
+                                $selectedSubjects = $material->subject_id ?? [];
+                            @endphp
                             @foreach($subjects as $subject)
-                                <option @if($material->subject_id == $subject->id) selected @endif value="{{ $subject->id }}">
+                                <option value="{{ $subject->id }}" {{ in_array($subject->id, $selectedSubjects) ? 'selected' : '' }}>
                                     {{ $subject->name }}
                                 </option>
                             @endforeach
                         </select>
                     </div>
+
                     <div class="mb-3">
                         <label>Select Chapter</label>
-                        <select class="form-control" name="chapter_id" id="chapter_id">
-                            <option value="">--Select--</option>
-                            @foreach($subjects as $chapter)
-                                <option @if($material->chapter_id == $chapter->id) selected @endif value="{{ $chapter->id }}">
+                        <select class="form-control select2" name="chapter_id[]" id="chapter_id" multiple>
+                            @php
+                                $selectedChapters = $material->chapter_id ?? [];
+                            @endphp
+                            @foreach($chapters as $chapter)
+                                <option value="{{ $chapter->id }}" {{ in_array($chapter->id, $selectedChapters) ? 'selected' : '' }}>
                                     {{ $chapter->name }}
                                 </option>
                             @endforeach
                         </select>
                     </div>
+
                     <div class="mb-3">
                         <label>Select Topic</label>
-                        <select class="form-control" name="topic" id="topic_id">
-                            <option value="">--Select--</option>
+                        <select class="form-control select2" name="topic_id[]" id="topic_id" multiple>
+                            @php
+                                $selectedTopics = $material->topic_id ?? [];
+                            @endphp
                             @foreach($topics as $topic)
-                                <option @if($material->topic_id == $topic->id) selected @endif value="{{ $topic->id }}">
+                                <option value="{{ $topic->id }}" {{ in_array($topic->id, $selectedTopics) ? 'selected' : '' }}>
                                     {{ $topic->name }}
                                 </option>
                             @endforeach
                         </select>
+                    </div>
+
+                     <input type="hidden" name="based_on" id="based_on" value="">
+                    <div class="alert alert-info mt-2" id="based-on-text" style="display:none;">
+                        <strong>Based On:</strong> <span id="based-on-value"></span>
                     </div>
 
 
@@ -169,7 +184,7 @@
                         @if ($errors->has('banner'))
                             <span class="text-danger text-left">{{ $errors->first('banner') }}</span>
                         @endif
-                        @if($material->banner)
+                        @if ($material->banner)
                             <div class="mt-2">
                                 <img src="{{ asset('storage/' . $material->banner) }}" alt="Current Banner"
                                     style="height: 100px;">
@@ -178,11 +193,10 @@
                     </div>
 
                     <div class="mb-3 form-check">
-                        <input type="checkbox" class="form-check-input" id="is_pdf_downloadable" name="is_pdf_downloadable"
-                            value="1" {{ $material->is_pdf_downloadable ? 'checked' : '' }}>
+                        <input type="checkbox" class="form-check-input" id="is_pdf_downloadable"
+                            name="is_pdf_downloadable" value="1" {{ $material->is_pdf_downloadable ? 'checked' : '' }}>
                         <label class="form-check-label" for="is_pdf_downloadable">PDF Downloadable</label>
                     </div>
-
 
                     <div class="mb-3">
                         <label for="meta_title" class="form-label">Meta Title</label>
@@ -218,224 +232,196 @@
             </div>
         </div>
     </div>
+
     <script src="https://cdn.ckeditor.com/4.16.2/standard/ckeditor.js"></script>
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.full.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
     <script>
-        $(document).ready(function () {
-            $(document).on('change', '#exam_com_id', function (event) {
 
-                $('#category_id').html("");
-                $('#subject_id').html("");
-                $('#chapter_id').html("");
-                $('#topic_id').html("");
-                let competitive_commission = $(this).val();
-                $.ajax({
-                    url: `{{ URL::to('fetch-exam-category-by-commission/${competitive_commission}') }}`,
-                    type: 'GET',
-                    dataType: 'json',
-                    success: function (result) {
-                        if (result.success) {
-                            $('#category_id').html(result.html);
-                        } else {
-                            toastr.error('error encountered ' + result.msgText);
-                        }
-                    },
-                });
+        function updateDisableSelects() {
+    let subjects = $('#subject_id').val() || [];
+    let chapters = $('#chapter_id').val() || [];
+
+    // Enable all by default
+    $('#chapter_id').prop('disabled', false).trigger('change.select2');
+    $('#topic_id').prop('disabled', false).trigger('change.select2');
+
+    if (subjects.length > 1) {
+        $('#chapter_id').val(null).trigger('change');
+        $('#chapter_id').prop('disabled', true).trigger('change.select2');
+        $('#topic_id').val(null).trigger('change');
+        $('#topic_id').prop('disabled', true).trigger('change.select2');
+    } else if (chapters.length > 1) {
+        $('#topic_id').val(null).trigger('change');
+        $('#topic_id').prop('disabled', true).trigger('change.select2');
+    }
+}
+
+        $(document).ready(function () {
+            
+            // Initialize Select2 on all selects with .select2 class
+            $('.select2').select2({
+                width: '100%',
+                placeholder: '--Select--',
+                allowClear: true
             });
 
-            $(document).on('change', '#category_id', function (event) {
+// Initialize Based On on page load from PHP model value
+    let initialBasedOn = @json($material->based_on ?? '');
+    if (initialBasedOn) {
+        $('#based_on').val(initialBasedOn);
+        $('#based-on-value').text(initialBasedOn);
+        $('#based-on-text').show();
+    } else {
+        $('#based-on-text').hide();
+    }
 
-                $('#sub_category_id').html("");
-                let exam_category = $(this).val();
-                if (exam_category != '') {
-                    $.ajax({
-                        url: `{{ URL::to('fetch-sub-category-by-exam-category/${exam_category}') }}`,
-                        type: 'GET',
-                        dataType: 'json',
-                        success: function (result) {
-                            if (result.success) {
-                                if (result.html != '') {
-                                    $('#sub_category_id').html(result.html);
-                                    $('.sub-cat').removeClass('hidecls');
-                                    $('#sub_category_id').attr("required", true);
-                                }
-                                else {
-                                    $('#sub_category_id').val("").trigger('change');
-                                    $('.sub-cat').addClass('hidecls');
-                                    $('#sub_category_id').attr("required", false);
-                                }
+              updateDisableSelects();
 
-                            } else {
-                                toastr.error('error encountered ' + result.msgText);
-                            }
-                        },
+    // Bind to change events
+    $('#subject_id, #chapter_id').on('change', function() {
+        updateDisableSelects();
+   let subCategory = $('#sub_category_id').val();
+
+let subjects = $('#subject_id').val();
+if (!Array.isArray(subjects)) subjects = subjects ? [subjects] : [];
+
+let chapters = $('#chapter_id').val();
+if (!Array.isArray(chapters)) chapters = chapters ? [chapters] : [];
+
+let topics = $('#topic_id').val();
+if (!Array.isArray(topics)) topics = topics ? [topics] : [];
+
+let basedOn = '';
+
+if (subjects.length === 0 && subCategory) {
+    basedOn = 'Sub Category Based';
+} else if (subjects.length > 1) {
+    basedOn = 'Combined Subject Based';
+} else if (subjects.length === 1 && chapters.length === 0) {
+    basedOn = 'Subject Based';
+} else if (chapters.length > 1 && topics.length === 0) {
+    basedOn = 'Combined Chapter Based';
+} else if (chapters.length === 1 && topics.length === 0) {
+    basedOn = 'Chapter Based';
+} else if (topics.length >= 1) {
+    basedOn = (topics.length > 1) ? 'Combined Topic Based' : 'Topic Based';
+} else {
+    basedOn = '';
+}
+
+$('#based_on').val(basedOn);
+if (basedOn) {
+    $('#based-on-value').text(basedOn);
+    $('#based-on-text').show();
+} else {
+    $('#based-on-text').hide();
+}
+
+    });
+
+
+            // Chained dropdown AJAX updates on edit
+            $(document).on('change', '#exam_com_id', function () {
+                let commission = $(this).val();
+                $('#category_id').html('').trigger('change');
+                $('#sub_category_id').html('').trigger('change');
+                $('#subject_id').html('').trigger('change');
+                $('#chapter_id').html('').trigger('change');
+                $('#topic_id').html('').trigger('change');
+                if (commission) {
+                    $.get(`{{ url('fetch-exam-category-by-commission') }}/${commission}`, function (result) {
+                        if (result.success) {
+                            $('#category_id').html(result.html).trigger('change');
+                        }
                     });
                 }
-                else {
-                    $('#sub_category_id').val("").trigger('change');
-                    $('.sub-cat').addClass('hidecls');
-                    $('#sub_category_id').attr("required", false);
-                }
-
             });
 
-            $(document).on('change', '#exam_com_id,#category_id,#sub_category_id', function (e) {
-                e.preventDefault(e);
-
-                $('#subject_id').val("").trigger('change');
-                let competitive_commission = $('#exam_com_id').val();
-                let category_id = $('#category_id').val();
-                let sub_category_id = $('#sub_category_id').val();
-                $.ajax({
-                    headers: { "Access-Control-Allow-Origin": "*" },
-                    url: `{{ URL::to('fetch-subject-by-subcategory/${sub_category_id}') }}`,
-                    type: 'GET',
-                    dataType: 'json',
-                    success: function (result) {
+            $(document).on('change', '#category_id', function () {
+                let category = $(this).val();
+                $('#sub_category_id').html('').trigger('change');
+                $('#subject_id').html('').trigger('change');
+                $('#chapter_id').html('').trigger('change');
+                $('#topic_id').html('').trigger('change');
+                if (category) {
+                    $.get(`{{ url('fetch-sub-category-by-exam-category') }}/${category}`, function (result) {
                         if (result.success) {
-                            $('#subject_id').html(result.html);
-                        } else {
-                            //alert(result.msgText);
-                            //toastr.error('error encountered ' + result.msgText);
+                            if (result.html) {
+                                $('#sub_category_id').html(result.html).trigger('change');
+                                $('.sub-cat').removeClass('hidecls');
+                            } else {
+                                $('.sub-cat').addClass('hidecls');
+                            }
                         }
-                    },
-                });
+                    });
+                }
             });
-            $(document).on('change', '#subject_id', function (event) {
 
-                $('#chapter_id').val("").trigger('change');
+            $(document).on('change', '#sub_category_id', function () {
+                let subcat = $(this).val();
+                $('#subject_id').html('').trigger('change');
+                $('#chapter_id').html('').trigger('change');
+                $('#topic_id').html('').trigger('change');
+                if (subcat) {
+                    $.get(`{{ url('fetch-subject-by-subcategory') }}/${subcat}`, function (result) {
+                        if (result.success) {
+                            $('#subject_id').html(result.html).trigger('change');
+                        }
+                    });
+                }
+            });
+
+            $(document).on('change', '#subject_id', function () {
                 let subject = $(this).val();
-                if (subject != '') {
-                    $.ajax({
-                        url: `{{ URL::to('fetch-chapter-by-subject/${subject}') }}`,
-                        type: 'GET',
-                        dataType: 'json',
-                        success: function (result) {
-                            if (result.success) {
-                                if (result.html != '') {
-                                    $('#chapter_id').html(result.html);
-                                }
-                                else {
-                                    $('#chapter_id').val("").trigger('change');
-                                }
-
-                            } else {
-                                toastr.error('error encountered ' + result.msgText);
-                            }
-                        },
+                $('#chapter_id').html('').trigger('change');
+                $('#topic_id').html('').trigger('change');
+                if (subject) {
+                    $.get(`{{ url('fetch-chapter-by-subject') }}/${subject}`, function (result) {
+                        if (result.success) {
+                            $('#chapter_id').html(result.html).trigger('change');
+                        }
                     });
                 }
-                else {
-                    // $('#sub_category_id').val("").trigger('change');
-                    // $('.sub-cat').addClass('hidecls');
-                    // $('#sub_category_id').attr("required", false);
-                }
-
             });
-            $(document).on('change', '#chapter_id', function (event) {
 
-                $('#topic_id').val("").trigger('change');
+            $(document).on('change', '#chapter_id', function () {
                 let chapter = $(this).val();
-                if (chapter != '') {
-                    $.ajax({
-                        url: `{{ URL::to('fetch-topic-by-chapter/${chapter}') }}`,
-                        type: 'GET',
-                        dataType: 'json',
-                        success: function (result) {
-                            if (result.success) {
-                                if (result.html != '') {
-                                    $('#topic_id').html(result.html);
-                                }
-                                else {
-                                    $('#topic_id').val("").trigger('change');
-                                }
-
-                            } else {
-                                toastr.error('error encountered ' + result.msgText);
-                            }
-                        },
+                $('#topic_id').html('').trigger('change');
+                if (chapter) {
+                    $.get(`{{ url('fetch-topic-by-chapter') }}/${chapter}`, function (result) {
+                        if (result.success) {
+                            $('#topic_id').html(result.html).trigger('change');
+                        }
                     });
                 }
-
             });
-        });
 
-        $(document).ready(function () {
+            // Show/hide price fields based on paid select
             $("#IsPaid").change(function () {
-                var data = $(this).val();
-                if (data == 1) {
+                if ($(this).val() == 1) {
                     $(".priceField").show();
                 } else {
                     $(".priceField").hide();
                 }
-            });
+            }).trigger('change');
 
+            // Calculate offered price dynamically
             function calculateOfferedPrice() {
-                var mrp = parseFloat($('#mrp').val());
-                var discount = parseFloat($('#discount').val());
-
-                if (isNaN(mrp) || isNaN(discount)) {
-                    $('#offered-price').val(mrp);
-                    return;
-                }
-
-                var offeredPrice = mrp - (mrp * (discount / 100));
+                let mrp = parseFloat($('#mrp').val());
+                let discount = parseFloat($('#discount').val());
+                if (isNaN(mrp)) mrp = 0;
+                if (isNaN(discount)) discount = 0;
+                let offeredPrice = mrp - (mrp * (discount / 100));
                 $('#offered-price').val(offeredPrice.toFixed(2));
             }
-
             $('#mrp, #discount').on('input', calculateOfferedPrice);
-        });
+            calculateOfferedPrice();
 
-        document.addEventListener('DOMContentLoaded', function () {
+            // Initialize CKEditor
             CKEDITOR.replace('editor');
-        });
-    </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // const examinationCommissionSelect = document.getElementById('commission_id');
-            // const categorySelect = document.getElementById('category_id');
-
-            // examinationCommissionSelect.addEventListener('change', function() {
-            //     const examinationCommissionId = this.value;
-            //     if (examinationCommissionId) {
-            //         fetchCategories(examinationCommissionId);
-            //     }
-            // });
-
-            // function fetchCategories(examinationCommissionId) {
-            //     $.ajax({
-            //         url: `{{ route('settings.categories', '') }}/${examinationCommissionId}`,
-            //         type: 'GET',
-            //         dataType: 'json',
-            //         success: function(response) {
-            //             categorySelect.innerHTML = '<option value="" selected disabled>None</option>';
-            //             response.categories.forEach(category => {
-            //                 categorySelect.innerHTML += `<option value="${category.id}">${category.name}</option>`;
-            //             });
-            //         },
-            //         error: function(error) {
-            //             console.error('Error fetching categories:', error);
-            //         }
-            //     });
-            // }
-        });
-        $(document).on('change', '#category_id', function (event) {
-
-            $('#topic_id').val("");
-            let category = $(this).val();
-            $.ajax({
-                url: `{{ URL::to('study-material/main-topic/fetch-topic-by-category/${category}') }}`,
-                type: 'GET',
-                dataType: 'json',
-                success: function (result) {
-                    if (result.success) {
-                        $('#topic_id').html(result.html);
-                    } else {
-                        //toastr.error('error encountered ' + result.msgText);
-                    }
-                },
-            });
         });
     </script>
 @endsection

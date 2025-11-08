@@ -420,6 +420,8 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
 
 
         Route::get('test-paper', [App\Http\Controllers\TestController::class, 'TestBankIndex'])->name('test.bank.index');
+        Route::get('/test-paper/filter', [App\Http\Controllers\TestController::class, 'filter'])->name('test.paper.filter');
+
         Route::get('test-paper/create', [App\Http\Controllers\TestController::class, 'testPaperCreate'])->name('test.paper.create');
         Route::delete('test-paper/delete/{id}', [App\Http\Controllers\TestController::class, 'destroy'])->name('test.paper.delete');
         Route::get('test-paper/view/{id}', [App\Http\Controllers\TestController::class, 'view'])->name('test.paper.view');

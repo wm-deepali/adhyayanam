@@ -14,7 +14,7 @@ Manage Video
             <div class="mt-2">
                 @include('layouts.includes.messages')
             </div>
-       @include('video.form', ['topic' => new App\Models\Video()])
+       @include('video.form', ['video' => new App\Models\Video()])
           </div>
     </div>
 </div>

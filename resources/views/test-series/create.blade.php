@@ -4,115 +4,115 @@
     Test Series | Create
 @endsection
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <style>
-        .question-bank-main-page {
-            width: 100%;
-            height: auto;
-            display: grid;
-            grid-template-columns: 1fr 2fr 1fr;
-            gap: 10px
-        }
+<style>
+    .question-bank-main-page {
+        width: 100%;
+        height: auto;
+        display: grid;
+        grid-template-columns: 1fr 2fr 1fr;
+        gap: 10px
+    }
 
-        .button-actns-questn {
-            text-align: center;
-            padding: 107px 0;
-        }
+    .button-actns-questn {
+        text-align: center;
+        padding: 107px 0;
+    }
 
-        .button-actns-questn i {
-            display: block;
-            width: 100%;
-            padding: 10px;
-            color: #fff;
-        }
+    .button-actns-questn i {
+        display: block;
+        width: 100%;
+        padding: 10px;
+        color: #fff;
+    }
 
-        form {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
+    form {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
 
-        .box-questns ul li {
-            padding: 2px 10px;
-            border-bottom: 1px dashed #ccc;
-        }
+    .box-questns ul li {
+        padding: 2px 10px;
+        border-bottom: 1px dashed #ccc;
+    }
 
-        .box-questns {
-            border: 1px solid gray;
-            border-radius: 10px;
-        }
+    .box-questns {
+        border: 1px solid gray;
+        border-radius: 10px;
+    }
 
-        .box-questns ul {
-            padding: 0px;
-            list-style: none;
-            margin: 0;
-            max-height: 300px;
-            overflow: auto;
-            height: 300px;
-        }
+    .box-questns ul {
+        padding: 0px;
+        list-style: none;
+        margin: 0;
+        max-height: 300px;
+        overflow: auto;
+        height: 300px;
+    }
 
-        .form-section {
-            border: 1px solid #ccc;
-            padding: 20px;
-            border-radius: 7px;
-            /*background-color: #fafafa;*/
-        }
+    .form-section {
+        border: 1px solid #ccc;
+        padding: 20px;
+        border-radius: 7px;
+        /*background-color: #fafafa;*/
+    }
 
-        label {
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
+    label {
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
 
-        input[type="text"],
-        input[type="number"],
-        input[type="file"],
-        select,
-        textarea {
-            width: 100%;
-            padding: 8px;
-            margin-bottom: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
+    input[type="text"],
+    input[type="number"],
+    input[type="file"],
+    select,
+    textarea {
+        width: 100%;
+        padding: 8px;
+        margin-bottom: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
 
-        input[type="checkbox"] {
-            margin-right: 10px;
-        }
+    input[type="checkbox"] {
+        margin-right: 10px;
+    }
 
-        button {
-            padding: 10px 15px;
-            background-color: #28a745;
-            color: #fff;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
+    button {
+        padding: 10px 15px;
+        background-color: #28a745;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
 
-        .question-bank {
-            width: 100%;
-            height: auto;
-            display: flex;
-            /*grid-template-columns:1fr 1fr 1fr;*/
-            flex-direction: row;
-            gap: 20px;
-            border-top: 1px solid gray;
-            margin-top: 30px;
-            padding-top: 20px;
-        }
+    .question-bank {
+        width: 100%;
+        height: auto;
+        display: flex;
+        /*grid-template-columns:1fr 1fr 1fr;*/
+        flex-direction: row;
+        gap: 20px;
+        border-top: 1px solid gray;
+        margin-top: 30px;
+        padding-top: 20px;
+    }
 
-        .hidden {
-            display: none;
-        }
+    .hidden {
+        display: none;
+    }
 
-        .right-side-question::-webkit-scrollbar {
-            display: none;
-        }
+    .right-side-question::-webkit-scrollbar {
+        display: none;
+    }
 
-        #image-preview {
-            width: 100%;
-            max-width: 300px;
-            height: auto;
-        }
-    </style>
+    #image-preview {
+        width: 100%;
+        max-width: 300px;
+        height: auto;
+    }
+</style>
 
 @section('content')
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -467,163 +467,163 @@
             });
         });
 
-      // ✅ MCQ Section
-$(document).on('click', '.addquestiontoselected-mcq', function (event) {
-    const questionRow = $(this).closest('.question-row');
-    const selQuestions = questionRow.find('.customquestionbox-mcq li.questn-selected');
-    const total = parseInt(questionRow.find(".total_paper").val(), 10);
+        // ✅ MCQ Section
+        $(document).on('click', '.addquestiontoselected-mcq', function (event) {
+            const questionRow = $(this).closest('.question-row');
+            const selQuestions = questionRow.find('.customquestionbox-mcq li.questn-selected');
+            const total = parseInt(questionRow.find(".total_paper").val(), 10);
 
-    if (questionRow.find(".customquestionselectedbox-mcq .question").length + selQuestions.length > total) {
-        alert(`You can select a maximum of ${total} questions.`);
-        return false;
-    }
+            if (questionRow.find(".customquestionselectedbox-mcq .question").length + selQuestions.length > total) {
+                alert(`You can select a maximum of ${total} questions.`);
+                return false;
+            }
 
-    let temp = questionRow.find('.customquestionselectedbox-mcq').html();
-    let testTemp = '';
+            let temp = questionRow.find('.customquestionselectedbox-mcq').html();
+            let testTemp = '';
 
-    selQuestions.each(function () {
-        $(this).removeClass('questn-selected');
-        temp += this.outerHTML;
-        testTemp += `<li>${$(this).find('span span').text()}</li>`;
-        $(this).remove();
-    });
+            selQuestions.each(function () {
+                $(this).removeClass('questn-selected');
+                temp += this.outerHTML;
+                testTemp += `<li>${$(this).find('span span').text()}</li>`;
+                $(this).remove();
+            });
 
-    questionRow.find('.customquestionselectedbox-mcq').html(temp);
-    questionRow.find('.slide-menu-mcq').append(testTemp);
-});
+            questionRow.find('.customquestionselectedbox-mcq').html(temp);
+            questionRow.find('.slide-menu-mcq').append(testTemp);
+        });
 
-$(document).on('click', '.removequestionfromselected-mcq', function (event) {
-    const questionRow = $(this).closest('.question-row');
-    const selQuestions = questionRow.find('.customquestionselectedbox-mcq li.questn-selected');
-    let temp = questionRow.find('.customquestionbox-mcq').html();
+        $(document).on('click', '.removequestionfromselected-mcq', function (event) {
+            const questionRow = $(this).closest('.question-row');
+            const selQuestions = questionRow.find('.customquestionselectedbox-mcq li.questn-selected');
+            let temp = questionRow.find('.customquestionbox-mcq').html();
 
-    selQuestions.each(function () {
-        $(this).removeClass('questn-selected');
-        temp += this.outerHTML;
-        $(this).remove();
-    });
+            selQuestions.each(function () {
+                $(this).removeClass('questn-selected');
+                temp += this.outerHTML;
+                $(this).remove();
+            });
 
-    questionRow.find('.customquestionbox-mcq').html(temp);
-});
-
-
-// ✅ Passage Section
-$(document).on('click', '.addquestiontoselected-passage', function (event) {
-    const questionRow = $(this).closest('.question-row');
-    const selQuestions = questionRow.find('.customquestionbox-passage li.questn-selected');
-    const total = parseInt(questionRow.find(".total_paper").val(), 10);
-
-    if (questionRow.find(".customquestionselectedbox-passage .question").length + selQuestions.length > total) {
-        alert(`You can select a maximum of ${total} questions.`);
-        return false;
-    }
-
-    let temp = questionRow.find('.customquestionselectedbox-passage').html();
-    let testTemp = '';
-
-    selQuestions.each(function () {
-        $(this).removeClass('questn-selected');
-        temp += this.outerHTML;
-        testTemp += `<li>${$(this).find('span span').text()}</li>`;
-        $(this).remove();
-    });
-
-    questionRow.find('.customquestionselectedbox-passage').html(temp);
-    questionRow.find('.slide-menu-passage').append(testTemp);
-});
-
-$(document).on('click', '.removequestionfromselected-passage', function (event) {
-    const questionRow = $(this).closest('.question-row');
-    const selQuestions = questionRow.find('.customquestionselectedbox-passage li.questn-selected');
-    let temp = questionRow.find('.customquestionbox-passage').html();
-
-    selQuestions.each(function () {
-        $(this).removeClass('questn-selected');
-        temp += this.outerHTML;
-        $(this).remove();
-    });
-
-    questionRow.find('.customquestionbox-passage').html(temp);
-});
+            questionRow.find('.customquestionbox-mcq').html(temp);
+        });
 
 
-// ✅ Subjective Section
-$(document).on('click', '.addquestiontoselected-subjective', function (event) {
-    const questionRow = $(this).closest('.question-row');
-    const selQuestions = questionRow.find('.customquestionbox-subjective li.questn-selected');
-    const total = parseInt(questionRow.find(".total_paper").val(), 10);
+        // ✅ Passage Section
+        $(document).on('click', '.addquestiontoselected-passage', function (event) {
+            const questionRow = $(this).closest('.question-row');
+            const selQuestions = questionRow.find('.customquestionbox-passage li.questn-selected');
+            const total = parseInt(questionRow.find(".total_paper").val(), 10);
 
-    if (questionRow.find(".customquestionselectedbox-subjective .question").length + selQuestions.length > total) {
-        alert(`You can select a maximum of ${total} questions.`);
-        return false;
-    }
+            if (questionRow.find(".customquestionselectedbox-passage .question").length + selQuestions.length > total) {
+                alert(`You can select a maximum of ${total} questions.`);
+                return false;
+            }
 
-    let temp = questionRow.find('.customquestionselectedbox-subjective').html();
-    let testTemp = '';
+            let temp = questionRow.find('.customquestionselectedbox-passage').html();
+            let testTemp = '';
 
-    selQuestions.each(function () {
-        $(this).removeClass('questn-selected');
-        temp += this.outerHTML;
-        testTemp += `<li>${$(this).find('span span').text()}</li>`;
-        $(this).remove();
-    });
+            selQuestions.each(function () {
+                $(this).removeClass('questn-selected');
+                temp += this.outerHTML;
+                testTemp += `<li>${$(this).find('span span').text()}</li>`;
+                $(this).remove();
+            });
 
-    questionRow.find('.customquestionselectedbox-subjective').html(temp);
-    questionRow.find('.slide-menu-subjective').append(testTemp);
-});
+            questionRow.find('.customquestionselectedbox-passage').html(temp);
+            questionRow.find('.slide-menu-passage').append(testTemp);
+        });
 
-$(document).on('click', '.removequestionfromselected-subjective', function (event) {
-    const questionRow = $(this).closest('.question-row');
-    const selQuestions = questionRow.find('.customquestionselectedbox-subjective li.questn-selected');
-    let temp = questionRow.find('.customquestionbox-subjective').html();
+        $(document).on('click', '.removequestionfromselected-passage', function (event) {
+            const questionRow = $(this).closest('.question-row');
+            const selQuestions = questionRow.find('.customquestionselectedbox-passage li.questn-selected');
+            let temp = questionRow.find('.customquestionbox-passage').html();
 
-    selQuestions.each(function () {
-        $(this).removeClass('questn-selected');
-        temp += this.outerHTML;
-        $(this).remove();
-    });
+            selQuestions.each(function () {
+                $(this).removeClass('questn-selected');
+                temp += this.outerHTML;
+                $(this).remove();
+            });
 
-    questionRow.find('.customquestionbox-subjective').html(temp);
-});
+            questionRow.find('.customquestionbox-passage').html(temp);
+        });
 
-// ✅ Combined Section
-$(document).on('click', '.addquestiontoselected-combined', function (event) {
-    const questionRow = $(this).closest('.question-row');
-    const selQuestions = questionRow.find('.customquestionbox-combined li.questn-selected');
-    const total = parseInt(questionRow.find(".total_paper").val(), 10);
 
-    if (questionRow.find(".customquestionselectedbox-combined .question").length + selQuestions.length > total) {
-        alert(`You can select a maximum of ${total} questions.`);
-        return false;
-    }
+        // ✅ Subjective Section
+        $(document).on('click', '.addquestiontoselected-subjective', function (event) {
+            const questionRow = $(this).closest('.question-row');
+            const selQuestions = questionRow.find('.customquestionbox-subjective li.questn-selected');
+            const total = parseInt(questionRow.find(".total_paper").val(), 10);
 
-    let temp = questionRow.find('.customquestionselectedbox-combined').html();
-    let testTemp = '';
+            if (questionRow.find(".customquestionselectedbox-subjective .question").length + selQuestions.length > total) {
+                alert(`You can select a maximum of ${total} questions.`);
+                return false;
+            }
 
-    selQuestions.each(function () {
-        $(this).removeClass('questn-selected');
-        temp += this.outerHTML;
-        testTemp += `<li>${$(this).find('span span').text()}</li>`;
-        $(this).remove();
-    });
+            let temp = questionRow.find('.customquestionselectedbox-subjective').html();
+            let testTemp = '';
 
-    questionRow.find('.customquestionselectedbox-combined').html(temp);
-    questionRow.find('.slide-menu-combined').append(testTemp);
-});
+            selQuestions.each(function () {
+                $(this).removeClass('questn-selected');
+                temp += this.outerHTML;
+                testTemp += `<li>${$(this).find('span span').text()}</li>`;
+                $(this).remove();
+            });
 
-$(document).on('click', '.removequestionfromselected-combined', function (event) {
-    const questionRow = $(this).closest('.question-row');
-    const selQuestions = questionRow.find('.customquestionselectedbox-combined li.questn-selected');
-    let temp = questionRow.find('.customquestionbox-combined').html();
+            questionRow.find('.customquestionselectedbox-subjective').html(temp);
+            questionRow.find('.slide-menu-subjective').append(testTemp);
+        });
 
-    selQuestions.each(function () {
-        $(this).removeClass('questn-selected');
-        temp += this.outerHTML;
-        $(this).remove();
-    });
+        $(document).on('click', '.removequestionfromselected-subjective', function (event) {
+            const questionRow = $(this).closest('.question-row');
+            const selQuestions = questionRow.find('.customquestionselectedbox-subjective li.questn-selected');
+            let temp = questionRow.find('.customquestionbox-subjective').html();
 
-    questionRow.find('.customquestionbox-combined').html(temp);
-});
+            selQuestions.each(function () {
+                $(this).removeClass('questn-selected');
+                temp += this.outerHTML;
+                $(this).remove();
+            });
+
+            questionRow.find('.customquestionbox-subjective').html(temp);
+        });
+
+        // ✅ Combined Section
+        $(document).on('click', '.addquestiontoselected-combined', function (event) {
+            const questionRow = $(this).closest('.question-row');
+            const selQuestions = questionRow.find('.customquestionbox-combined li.questn-selected');
+            const total = parseInt(questionRow.find(".total_paper").val(), 10);
+
+            if (questionRow.find(".customquestionselectedbox-combined .question").length + selQuestions.length > total) {
+                alert(`You can select a maximum of ${total} questions.`);
+                return false;
+            }
+
+            let temp = questionRow.find('.customquestionselectedbox-combined').html();
+            let testTemp = '';
+
+            selQuestions.each(function () {
+                $(this).removeClass('questn-selected');
+                temp += this.outerHTML;
+                testTemp += `<li>${$(this).find('span span').text()}</li>`;
+                $(this).remove();
+            });
+
+            questionRow.find('.customquestionselectedbox-combined').html(temp);
+            questionRow.find('.slide-menu-combined').append(testTemp);
+        });
+
+        $(document).on('click', '.removequestionfromselected-combined', function (event) {
+            const questionRow = $(this).closest('.question-row');
+            const selQuestions = questionRow.find('.customquestionselectedbox-combined li.questn-selected');
+            let temp = questionRow.find('.customquestionbox-combined').html();
+
+            selQuestions.each(function () {
+                $(this).removeClass('questn-selected');
+                temp += this.outerHTML;
+                $(this).remove();
+            });
+
+            questionRow.find('.customquestionbox-combined').html(temp);
+        });
 
         $(document).ready(function () {
             $('#title').on('input', function () {
@@ -670,45 +670,45 @@ $(document).on('click', '.removequestionfromselected-combined', function (event)
                 reader.readAsDataURL(input.files[0]);
             }
         });
-      $(document).ready(function () {
-    let rowIndex = 1;
+        $(document).ready(function () {
+            let rowIndex = 1;
 
-    $('#add-row').on('click', function () {
-        let $original = $('.question-row:first');
-        let $clone = $original.clone();
+            $('#add-row').on('click', function () {
+                let $original = $('.question-row:first');
+                let $clone = $original.clone();
 
-        rowIndex++;
+                rowIndex++;
 
-        // Clear all input fields
-        $clone.find('input[type="text"], select').val('');
-        $clone.find('ul').empty();
-        $clone.find('span[id^="questioncount"]').text('');
+                // Clear all input fields
+                $clone.find('input[type="text"], select').val('');
+                $clone.find('ul').empty();
+                $clone.find('span[id^="questioncount"]').text('');
 
-        // Generate unique IDs for all repeated elements
-        $clone.find('[id]').each(function () {
-            const oldId = $(this).attr('id');
-            $(this).attr('id', oldId + '-' + rowIndex);
+                // Generate unique IDs for all repeated elements
+                $clone.find('[id]').each(function () {
+                    const oldId = $(this).attr('id');
+                    $(this).attr('id', oldId + '-' + rowIndex);
+                });
+
+                // Also fix label 'for' attributes (optional)
+                $clone.find('label[for]').each(function () {
+                    const oldFor = $(this).attr('for');
+                    $(this).attr('for', oldFor + '-' + rowIndex);
+                });
+
+                // Append the cloned block
+                $('#question-rows').append($clone);
+            });
+
+            // Remove block
+            $(document).on('click', '.remove-row', function () {
+                if ($('.question-row').length > 1) {
+                    $(this).closest('.question-row').remove();
+                } else {
+                    alert('At least one test section is required.');
+                }
+            });
         });
-
-        // Also fix label 'for' attributes (optional)
-        $clone.find('label[for]').each(function () {
-            const oldFor = $(this).attr('for');
-            $(this).attr('for', oldFor + '-' + rowIndex);
-        });
-
-        // Append the cloned block
-        $('#question-rows').append($clone);
-    });
-
-    // Remove block
-    $(document).on('click', '.remove-row', function () {
-        if ($('.question-row').length > 1) {
-            $(this).closest('.question-row').remove();
-        } else {
-            alert('At least one test section is required.');
-        }
-    });
-});
 
 
         $(document).on('change', '#exam_com_id', function (event) {
@@ -794,35 +794,32 @@ $(document).on('click', '.removequestionfromselected-combined', function (event)
                 success: function (result) {
                     if (result.success) {
                         $(this).attr('disabled', false);
+                            if (test_generated_by == 'manual') {
+                                btn.closest('.question-row').find('.customquestionselectedbox-mcq').html('');
+                                btn.closest('.question-row').find('.customquestionbox-mcq').html(result.mcq_html);
 
-                        if (test_generated_by == 'manual') {
+                                btn.closest('.question-row').find('.customquestionselectedbox-passage').html('');
+                                btn.closest('.question-row').find('.customquestionbox-passage').html(result.passage_html);
 
-                            btn.closest('.question-row').find('.customquestionselectedbox-mcq').html('');
-                            btn.closest('.question-row').find('.customquestionbox-mcq').html(result.mcq_html);
+                                btn.closest('.question-row').find('.customquestionselectedbox-subjective').html('');
+                                btn.closest('.question-row').find('.customquestionbox-subjective').html(result.subjective_html);
 
-                            btn.closest('.question-row').find('.customquestionselectedbox-passage').html('');
-                            btn.closest('.question-row').find('.customquestionbox-passage').html(result.passage_html);
+                                btn.closest('.question-row').find('.customquestionselectedbox-combined').html('');
+                                btn.closest('.question-row').find('.customquestionbox-combined').html(result.combined_html);
+                            } else {
+                                btn.closest('.question-row').find('.customquestionbox-mcq').html('');
+                                btn.closest('.question-row').find('.customquestionselectedbox-mcq').html(result.mcq_html);
 
-                            btn.closest('.question-row').find('.customquestionselectedbox-subjective').html('');
-                            btn.closest('.question-row').find('.customquestionbox-subjective').html(result.subjective_html);
+                                btn.closest('.question-row').find('.customquestionbox-passage').html('');
+                                btn.closest('.question-row').find('.customquestionselectedbox-passage').html(result.passage_html);
 
-                            btn.closest('.question-row').find('.customquestionselectedbox-combined').html('');
-                            btn.closest('.question-row').find('.customquestionbox-combined').html(result.combined_html);
+                                btn.closest('.question-row').find('.customquestionbox-subjective').html('');
+                                btn.closest('.question-row').find('.customquestionselectedbox-subjective').html(result.subjective_html);
 
-                        } else {
-                            btn.closest('question-row').find('.customquestionbox-mcq').html('');
-                            btn.closest('question-row').find('.customquestionselectedbox-mcq').html(result.mcq_html);
+                                btn.closest('.question-row').find('.customquestionbox-combined').html('');
+                                btn.closest('.question-row').find('.customquestionselectedbox-combined').html(result.combined_html);
+                            }
 
-                            btn.closest('question-row').find('.customquestionbox-passage').html('');
-                            btn.closest('question-row').find('.customquestionselectedbox-passage').html(result.passage_html);
-
-                            btn.closest('question-row').find('.customquestionbox-subjective').html('');
-                            btn.closest('question-row').find('.customquestionselectedbox-subjective').html(result.subjective_html);
-
-                            btn.closest('question-row').find('.customquestionbox-combined').html('');
-                            btn.closest('question-row').find('.customquestionselectedbox-combined').html(result.combined_html);
-
-                        }
                     } else {
                         $(this).attr('disabled', false);
                         if (result.code == 422) {
@@ -909,8 +906,6 @@ $(document).on('click', '.removequestionfromselected-combined', function (event)
                 }
             })
         });
-
-
 
     </script>
 @endsection

@@ -160,7 +160,7 @@
                             <div class="text-danger validation-err" id="paper_type-err"></div>
                             <div class="form-group previous-year-group" id="previous-year" style="display: none;">
                                 <label>Previous Year</label>
-                                <input type="number" class="form-control" name="previous_year" placeholder="Ex. 2014">
+                                <input type="number" class="form-control" name="previous_year"  id="previous_year" placeholder="Ex. 2014">
                             </div>
 
                             <label class="mt-2" for="paper_type">Test Type *</label>

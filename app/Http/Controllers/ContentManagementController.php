@@ -1096,7 +1096,7 @@ class ContentManagementController extends Controller
                 ->addColumn('subcat', function ($row) {
                     return $row->subCategory->name ?? '--';
                 })
-                 ->addColumn('type', function ($row) {
+                ->addColumn('type', function ($row) {
                     return $row->based_on ?? '--';
                 })
                 ->addColumn('action', function ($row) {
@@ -1178,6 +1178,7 @@ class ContentManagementController extends Controller
         // ✅ Course Type Logic (Based On)
         $basedOn = $request->based_on ?? 'general';
         $course->based_on = $basedOn;
+        $course->course_mode = $request->course_mode;
 
         if ($request->hasFile('thumbnail_image')) {
             $thumbnailPath = $request->file('thumbnail_image')->store('thumbnails', 'public');
@@ -1236,6 +1237,7 @@ class ContentManagementController extends Controller
             'meta_description' => 'nullable|string|max:255',
             'image_alt_tag' => 'nullable|string|max:255',
             'feature' => 'nullable',
+            'course_mode' => 'required|in:Online,Video Learning', // ✅ validate
         ]);
 
         // ✅ Handle file uploads
@@ -1277,7 +1279,7 @@ class ContentManagementController extends Controller
         $course->meta_keyword = $request->meta_keyword;
         $course->meta_description = $request->meta_description;
         $course->image_alt_tag = $request->image_alt_tag;
-
+        $course->course_mode = $request->course_mode;
         $course->save();
 
         return redirect()->route('courses.course.index')->with('success', 'Course created successfully');
@@ -2220,7 +2222,7 @@ class ContentManagementController extends Controller
 
     public function testSeriesIndex()
     {
-        $data['test_series'] = TestSeries::with('category')->get();
+        $data['test_series'] = TestSeries::with('category')->orderBy('created_at', 'desc')->paginate(10);
         return view('test-series.index', $data);
     }
     public function testSeriesCreate()

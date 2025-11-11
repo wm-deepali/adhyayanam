@@ -125,6 +125,9 @@
                             @include('test-paper.table-rows', ["test" => $test])
                         </tbody>
                     </table>
+                    <div class="d-flex justify-content-center mt-3">
+                        {{ $test->links() }}
+                    </div>
                 </div>
             </div>
         </div>

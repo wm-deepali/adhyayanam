@@ -2,27 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Test;
 use Illuminate\Http\Request;
 use App\Models\PyqSubject;
 use App\Models\PYQ;
-use App\Models\Career;
 use App\Models\Category;
-use App\Models\Chapter;
-use App\Models\Course;
 use App\Models\ExaminationCommission;
 use App\Models\SubCategory;
 use App\Models\Subject;
-use App\Models\Topic;
-use App\Models\UpcomingExam;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\Rule;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
-use Illuminate\Support\Arr;
 
 class PYQController extends Controller
 {
@@ -31,11 +18,11 @@ class PYQController extends Controller
      */
     public function index()
     {
-        $data['pyq'] = PYQ::with('pyqSub', 'pyqSub.subject', 'commission','category')->orderBy('created_at','DESC')->get();
- 
-        return view('pyq.index',$data);
+        $data['test'] = Test::with('subject', 'topic', 'commission', 'category', 'testDetails')->where('paper_type', 1)->get();
+
+        return view('pyq.index', $data);
     }
-    
+
     /**
      * Show the form for creating a new resource.
      */
@@ -43,8 +30,8 @@ class PYQController extends Controller
     {
         //
         $data['commissions'] = ExaminationCommission::all();
-        
-        return view('pyq.create',$data);
+
+        return view('pyq.create', $data);
     }
 
     /**
@@ -66,54 +53,48 @@ class PYQController extends Controller
 
         // Handle image upload
         if ($request->hasFile('pdf')) {
-            $getFileExt   = $request->file('pdf')->getClientOriginalExtension();
-            $year =$request->year;
-            $pdf_name = time().'-'.$year.'.'.$getFileExt;
+            $getFileExt = $request->file('pdf')->getClientOriginalExtension();
+            $year = $request->year;
+            $pdf_name = time() . '-' . $year . '.' . $getFileExt;
             $pdfPath = $request->file('pdf')->storeAs('pyq-pdf', $pdf_name);
         } else {
             $pdf_name = null;
         }
-        if(!empty($request->subject_id))
-        {
+        if (!empty($request->subject_id)) {
             $has_subject = 1;
-        }
-        else{
+        } else {
             $has_subject = 0;
         }
 
-        if(!empty($request->subject_id) && isset($request->subject_id))
-        {
-            $paper_type="Subject Based";
-            
+        if (!empty($request->subject_id) && isset($request->subject_id)) {
+            $paper_type = "Subject Based";
+
+        } else if (isset($request->sub_category_id) && $request->sub_category_id != '') {
+            $paper_type = "Sub-Cat Based";
+        } else {
+            $paper_type = "Category Wise";
         }
-        else if(isset($request->sub_category_id) && $request->sub_category_id !='')
-        {
-            $paper_type="Sub-Cat Based";
-        }else{
-            $paper_type ="Category Wise";
-        }
-    
-        
+
+
         $PYQ = new PYQ();
         $PYQ->commission_id = $request->commission_id;
         $PYQ->category_id = $request->category_id;
-        $PYQ->sub_cat_id =$request->sub_category_id ?? NULL;
+        $PYQ->sub_cat_id = $request->sub_category_id ?? NULL;
         $PYQ->has_subject = $has_subject;
         $PYQ->title = $request->title;
         $PYQ->year = $request->year;
         $PYQ->paper_type = $paper_type;
         $PYQ->pdf = $pdf_name;
         $PYQ->status = $request->status;
-        
+
         // Save the ExaminationCommission instance to the database
         $PYQ->save();
-        
-        if($has_subject == 1)
-        {
+
+        if ($has_subject == 1) {
             PyqSubject::create([
-                'pyq_id'=>$PYQ->id,
-                'subject_id'=>$request->subject_id,
-                ]);
+                'pyq_id' => $PYQ->id,
+                'subject_id' => $request->subject_id,
+            ]);
         }
 
 
@@ -138,12 +119,10 @@ class PYQController extends Controller
         $selectSubjects = PyqSubject::where('pyq_id', $id)->first();
         $selectSub = $selectSubjects;
         $commissions = ExaminationCommission::get();
-        $categories = Category::where('exam_com_id',$pyq->commission_id)->get();
-        if($pyq->sub_category_id != NULL)
-        {
-            $subcategories = SubCategory::where('category_id',$pyq->category_id)->get();
-        }
-        else{
+        $categories = Category::where('exam_com_id', $pyq->commission_id)->get();
+        if ($pyq->sub_category_id != NULL) {
+            $subcategories = SubCategory::where('category_id', $pyq->category_id)->get();
+        } else {
             $subcategories = array();
         }
         $subjects = Subject::where('sub_category_id', $pyq->sub_category_id)->get();
@@ -172,34 +151,29 @@ class PYQController extends Controller
         $pyq = PYQ::findOrFail($id);
         // Handle image upload
         if ($request->hasFile('pdf')) {
-            $getFileExt   = $request->file('pdf')->getClientOriginalExtension();
-            $year =$request->year;
-            $pdf_name = time().'-'.$year.'.'.$getFileExt;
+            $getFileExt = $request->file('pdf')->getClientOriginalExtension();
+            $year = $request->year;
+            $pdf_name = time() . '-' . $year . '.' . $getFileExt;
             $pdfPath = $request->file('pdf')->storeAs('pyq-pdf', $pdf_name);
         } else {
             $pdf_name = $pyq->pdf;
         }
-        if(!empty($request->subject_id))
-        {
+        if (!empty($request->subject_id)) {
             $has_subject = 1;
-        }
-        else{
+        } else {
             $has_subject = 0;
         }
 
-        if(!empty($request->subject_id) && isset($request->subject_id))
-        {
-            $paper_type="Subject Based";
-            
+        if (!empty($request->subject_id) && isset($request->subject_id)) {
+            $paper_type = "Subject Based";
+
+        } else if (isset($request->sub_category_id) && $request->sub_category_id != '') {
+            $paper_type = "Sub-Cat Based";
+        } else {
+            $paper_type = "Category Wise";
         }
-        else if(isset($request->sub_category_id) && $request->sub_category_id !='')
-        {
-            $paper_type="Sub-Cat Based";
-        }else{
-            $paper_type ="Category Wise";
-        }
-    
-        $testData = array (
+
+        $testData = array(
             'commission_id' => $request->commission_id,
             'category_id' => $request->category_id,
             'sub_cat_id' => $request->sub_category_id ?? NULL,
@@ -211,15 +185,14 @@ class PYQController extends Controller
             'status' => $request->status,
         );
         $pyq->update($testData);
-       
-        
-        if($has_subject == 1)
-        {
-            PyqSubject::where('pyq_id',$pyq->id)->delete();
+
+
+        if ($has_subject == 1) {
+            PyqSubject::where('pyq_id', $pyq->id)->delete();
             PyqSubject::create([
-                'pyq_id'=>$pyq->id,
-                'subject_id'=>$request->subject_id,
-                ]);
+                'pyq_id' => $pyq->id,
+                'subject_id' => $request->subject_id,
+            ]);
         }
 
 
@@ -232,15 +205,15 @@ class PYQController extends Controller
     public function destroy(string $id)
     {
         //
-        $pyq=PYQ::findOrFail($id);
-        PyqSubject::where('pyq_id',$pyq->id)->delete();
+        $pyq = PYQ::findOrFail($id);
+        PyqSubject::where('pyq_id', $pyq->id)->delete();
         $pyq->delete();
         return redirect()->route('pyq.index')->with('success', 'PYQ deleted successfully!');
     }
 
     function check($array, $key)
     {
-        if(array_key_exists($key, $array)) {
+        if (array_key_exists($key, $array)) {
             if (is_null($array[$key])) {
                 return 0;
             } else {

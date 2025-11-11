@@ -191,7 +191,7 @@
             <svg class="nav-icon">
                 <use xlink:href="{{ asset('icons/coreui.svg#cil-book') }}"></use>
             </svg>
-            {{ __('LMS') }}
+            {{ __('Video/Live Class') }}
         </a>
         <ul class="nav-group-items" style="height: 0px;">
             <li class="nav-item">
@@ -199,18 +199,9 @@
                     <svg class="nav-icon">
                         <use xlink:href="{{ asset('icons/coreui.svg#cil-bug') }}"></use>
                     </svg>
-                    {{__('Manage Videos')}}
+                    {{__('Manage Videos/Live Class')}}
                 </a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{{ route('video.create') }}" target="_top">
-                    <svg class="nav-icon">
-                        <use xlink:href="{{ asset('icons/coreui.svg#cil-bug') }}"></use>
-                    </svg>
-                    {{__('Add New Video')}}
-                </a>
-            </li>
-
         </ul>
     </li>
     <li class="nav-group" aria-expanded="false">
@@ -241,6 +232,25 @@
 
         </ul>
     </li>
+    <li class="nav-group" aria-expanded="false">
+        <a class="nav-link nav-group-toggle" href="#">
+            <svg class="nav-icon">
+                <use xlink:href="{{ asset('icons/coreui.svg#cil-library') }}"></use>
+            </svg>
+            Syllabus
+        </a>
+        <ul class="nav-group-items" style="height: 0px;">
+            <li class="nav-item">
+                <a class="nav-link" href="{{ route('syllabus.index') }}" target="_top">
+                    <svg class="nav-icon">
+                        <use xlink:href="{{ asset('icons/coreui.svg#cil-description') }}"></use>
+                    </svg>
+                    Manage Syllabus
+                </a>
+            </li>
+        </ul>
+    </li>
+
     <li class="nav-group" aria-expanded="false">
         <a class="nav-link nav-group-toggle" href="#">
             <svg class="nav-icon">

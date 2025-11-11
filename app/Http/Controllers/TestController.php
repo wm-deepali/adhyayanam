@@ -59,7 +59,7 @@ class TestController extends Controller
 
     public function testBankIndex()
     {
-        $data['test'] = Test::with('subject', 'topic', 'commission', 'category', 'testDetails')->get();
+        $data['test'] = Test::with('subject', 'topic', 'commission', 'category', 'testDetails')->orderBy('created_at', 'desc')->paginate(10);
 
         $data['commissions'] = ExaminationCommission::get();
         return view('test-paper.index', $data);
@@ -303,7 +303,7 @@ class TestController extends Controller
             }
             DB::beginTransaction();
             try {
-                $previous_year = Null;
+                $previous_year = $request->paper_type == 0 ? NULL : $request->previous_year;
 
                 $testData = array(
                     'language' => $request->language == 1 ? 'Hindi' : 'English',
@@ -346,7 +346,6 @@ class TestController extends Controller
                     'question_generated_by' => $request->question_generated_by,
                 );
 
-                // dd($testData);
                 return response()->json([
                     'success' => true,
                     'testData' => $testData,
@@ -2570,192 +2569,97 @@ class TestController extends Controller
             'total_paper' => 'required',
             'test_type' => 'required',
         ]);
-        if ($validator->passes()) {
-            try {
-                $test_generated_by = $request->test_generated_by;
-                $language = $request->language;
-                $fee_type = $request->fee_type;
-                $category_id = $request->exam_category;
-                $paper_type = $request->test_type;
-                $commission_id = $request->competitive_commission;
-                $total_paper = $request->total_paper;
-                $mcqtestpaper = Test::where('competitive_commission_id', $commission_id)
-                    ->where('language', $language)
-                    ->where('exam_category_id', $category_id)
-                    ->where('test_type', $fee_type);
-                // full test
-                if ($paper_type == 1) {
-                    $mcqtestpaper = $mcqtestpaper->where('paper_type', 0)->whereNull('topic_id')->whereNull('subject_id')->whereNull('chapter_id');
-                }
-                //subject wise
-                if ($paper_type == 2) {
-                    $mcqtestpaper = $mcqtestpaper->where('paper_type', 0)->whereNull('topic_id')->whereNotNull('subject_id')->whereNull('chapter_id');
-                }
-                // chapter wise
-                if ($paper_type == 3) {
-                    $mcqtestpaper = $mcqtestpaper->where('paper_type', 0)->whereNull('topic_id')->whereNotNull('chapter_id');
-                }
-                //topic wise
-                if ($paper_type == 4) {
-                    $mcqtestpaper = $mcqtestpaper->where('paper_type', 0)->whereNotNull('topic_id');
-                }
 
-                //current affair
-                if ($paper_type == 5) {
-                    $mcqtestpaper = $mcqtestpaper->where('paper_type', 2);
-                }
-                //previous year
-                if ($paper_type == 6) {
-                    $mcqtestpaper = $mcqtestpaper->where('paper_type', 1);
-                }
-                $mcqtestpaper = $mcqtestpaper->where('test_paper_type', 'MCQ')->limit($total_paper)->get();
-                $passagetestpaper = Test::where('competitive_commission_id', $commission_id)
-                    ->where('language', $language)
-                    ->where('exam_category_id', $category_id)
-                    ->where('test_type', $fee_type);
-                // full test
-                if ($paper_type == 1) {
-                    $passagetestpaper = $passagetestpaper->where('paper_type', 0)->whereNull('topic_id')->whereNull('subject_id')->whereNull('chapter_id');
-                }
-                //subject wise
-                if ($paper_type == 2) {
-                    $passagetestpaper = $passagetestpaper->where('paper_type', 0)->whereNull('topic_id')->whereNotNull('subject_id')->whereNull('chapter_id');
-                }
-                // chapter wise
-                if ($paper_type == 3) {
-                    $passagetestpaper = $passagetestpaper->where('paper_type', 0)->whereNull('topic_id')->whereNotNull('chapter_id');
-                }
-                //topic wise
-                if ($paper_type == 4) {
-                    $passagetestpaper = $passagetestpaper->where('paper_type', 0)->whereNotNull('topic_id');
-                }
-
-                //current affair
-                if ($paper_type == 5) {
-                    $passagetestpaper = $passagetestpaper->where('paper_type', 2);
-                }
-                //previous year
-                if ($paper_type == 6) {
-                    $passagetestpaper = $passagetestpaper->where('paper_type', 1);
-                }
-                $passagetestpaper = $passagetestpaper->where('test_paper_type', 'Passage')->limit($total_paper)->get();
-
-                $combinedtestpaper = Test::where('competitive_commission_id', $commission_id)
-                    ->where('language', $language)
-                    ->where('exam_category_id', $category_id)
-                    ->where('test_type', $fee_type);
-                // full test
-                if ($paper_type == 1) {
-                    $combinedtestpaper = $combinedtestpaper->where('paper_type', 0)->whereNull('topic_id')->whereNull('subject_id')->whereNull('chapter_id');
-                }
-                //subject wise
-                if ($paper_type == 2) {
-                    $combinedtestpaper = $combinedtestpaper->where('paper_type', 0)->whereNull('topic_id')->whereNotNull('subject_id')->whereNull('chapter_id');
-                }
-                // chapter wise
-                if ($paper_type == 3) {
-                    $combinedtestpaper = $combinedtestpaper->where('paper_type', 0)->whereNull('topic_id')->whereNotNull('chapter_id');
-                }
-                //topic wise
-                if ($paper_type == 4) {
-                    $combinedtestpaper = $combinedtestpaper->where('paper_type', 0)->whereNotNull('topic_id');
-                }
-
-                //current affair
-                if ($paper_type == 5) {
-                    $combinedtestpaper = $combinedtestpaper->where('paper_type', 2);
-                }
-                //previous year
-                if ($paper_type == 6) {
-                    $combinedtestpaper = $combinedtestpaper->where('paper_type', 1);
-                }
-                $combinedtestpaper = $combinedtestpaper->where('test_paper_type', 'Combined')->limit($total_paper)->get();
-
-                $subjectivetestpaper = Test::where('competitive_commission_id', $commission_id)
-                    ->where('language', $language)
-                    ->where('exam_category_id', $category_id)
-                    ->where('test_type', $fee_type);
-                // full test
-                if ($paper_type == 1) {
-                    $subjectivetestpaper = $subjectivetestpaper->where('paper_type', 0)->whereNull('topic_id')->whereNull('subject_id')->whereNull('chapter_id');
-                }
-                //subject wise
-                if ($paper_type == 2) {
-                    $subjectivetestpaper = $subjectivetestpaper->where('paper_type', 0)->whereNull('topic_id')->whereNotNull('subject_id')->whereNull('chapter_id');
-                }
-                // chapter wise
-                if ($paper_type == 3) {
-                    $subjectivetestpaper = $subjectivetestpaper->where('paper_type', 0)->whereNull('topic_id')->whereNotNull('chapter_id');
-                }
-                //topic wise
-                if ($paper_type == 4) {
-                    $subjectivetestpaper = $subjectivetestpaper->where('paper_type', 0)->whereNotNull('topic_id');
-                }
-
-                //current affair
-                if ($paper_type == 5) {
-                    $subjectivetestpaper = $subjectivetestpaper->where('paper_type', 2);
-                }
-                //previous year
-                if ($paper_type == 6) {
-                    $subjectivetestpaper = $subjectivetestpaper->where('paper_type', 1);
-                }
-                $subjectivetestpaper = $subjectivetestpaper->where('test_paper_type', 'Subjective')->limit($total_paper)->get();
-                // $mcqtestpaper =  $testpapers;
-                // $passagetestpaper =  $testpapers;
-                // $combinedtestpaper =  $testpapers;
-                // $subjectivetestpaper =  $testpapers;
-                //$testpaper =  $testpapers->limit($total_paper)->get();
-
-
-
-
-                return response()->json([
-                    'success' => true,
-                    'mcq_html' => view('admin.ajax.testpaperoptions')->with('testpapers', $mcqtestpaper)->render(),
-                    'passage_html' => view('admin.ajax.testpaperoptions')->with('testpapers', $passagetestpaper)->render(),
-                    'combined_html' => view('admin.ajax.testpaperoptions')->with('testpapers', $combinedtestpaper)->render(),
-                    'subjective_html' => view('admin.ajax.testpaperoptions')->with('testpapers', $subjectivetestpaper)->render(),
-                    'questions_count' => $combinedtestpaper->count(),
-                ]);
-                // if($question_generated_by == 'manual') {
-
-                // } else {
-                //     $questions = Question::where('commission_id',$commission_id)
-                //         ->where('subject_id',$request->subject)
-                //         ->where('language',$language)
-                //         ->where('category_id',$category_id)
-                //         //->where('sub_category_id',$sub_category_id)
-                //         // ->where('question_type', $paper_type)
-                //         ->where('topic',$request->topic)
-                //             // ->when($paper_type == 1,function($query) use($previous_year){
-                //             //     return $query->where('previous_year', $previous_year);
-                //             // })
-                //             ->limit($question_count)
-                //             ->inRandomOrder()
-                //             ->get();
-                //     return response()->json([
-                //         'success' => true,
-                //         'html' => view('admin.ajax.questionoptions')->with('questions',$questions)->render(),
-                //         'questions_count' => $questions->count(),
-                //     ]);
-
-                // }
-
-            } catch (\Exception $ex) {
-                return response()->json([
-                    'success' => false,
-                    'msgText' => $ex->getMessage(),
-                ]);
-            }
-        } else {
+        if ($validator->fails()) {
             return response()->json([
                 'success' => false,
                 'code' => 422,
                 'errors' => $validator->errors(),
             ]);
         }
+
+        try {
+            $test_generated_by = $request->test_generated_by; // manual or random
+            $language = $request->language;
+            $fee_type = $request->fee_type;
+            $category_id = $request->exam_category;
+            $paper_type = $request->test_type;
+            $commission_id = $request->competitive_commission;
+            $total_paper = $request->total_paper;
+
+            // Function to apply filters dynamically (avoiding code repetition)
+            $applyFilters = function ($query) use ($paper_type) {
+                // Full test
+                if ($paper_type == 1) {
+                    $query->where('paper_type', 0)->whereNull('topic_id')->whereNull('subject_id')->whereNull('chapter_id');
+                }
+                // Subject wise
+                elseif ($paper_type == 2) {
+                    $query->where('paper_type', 0)->whereNull('topic_id')->whereNotNull('subject_id')->whereNull('chapter_id');
+                }
+                // Chapter wise
+                elseif ($paper_type == 3) {
+                    $query->where('paper_type', 0)->whereNull('topic_id')->whereNotNull('chapter_id');
+                }
+                // Topic wise
+                elseif ($paper_type == 4) {
+                    $query->where('paper_type', 0)->whereNotNull('topic_id');
+                }
+                // Current affair
+                elseif ($paper_type == 5) {
+                    $query->where('paper_type', 2);
+                }
+                // Previous year
+                elseif ($paper_type == 6) {
+                    $query->where('paper_type', 1);
+                }
+
+                return $query;
+            };
+
+            // Common base query
+            $baseQuery = function ($type) use ($commission_id, $language, $category_id, $fee_type, $applyFilters, $test_generated_by, $total_paper) {
+                $query = Test::where('competitive_commission_id', $commission_id)
+                    ->where('language', $language)
+                    ->where('exam_category_id', $category_id)
+                    ->where('test_type', $fee_type)
+                    ->where('test_paper_type', $type);
+
+                $query = $applyFilters($query);
+
+                // Randomize only if test_generated_by == random
+                if ($test_generated_by === 'random') {
+                    $query->inRandomOrder();
+                } else {
+                    $query->orderBy('created_at', 'desc'); // latest first if manual
+                }
+
+                return $query->limit($total_paper)->get();
+            };
+
+            // Get papers by type
+            $mcqtestpaper = $baseQuery('MCQ');
+            $passagetestpaper = $baseQuery('Passage');
+            $combinedtestpaper = $baseQuery('Combined');
+            $subjectivetestpaper = $baseQuery('Subjective');
+
+            return response()->json([
+                'success' => true,
+                'mcq_html' => view('admin.ajax.testpaperoptions', ['testpapers' => $mcqtestpaper])->render(),
+                'passage_html' => view('admin.ajax.testpaperoptions', ['testpapers' => $passagetestpaper])->render(),
+                'combined_html' => view('admin.ajax.testpaperoptions', ['testpapers' => $combinedtestpaper])->render(),
+                'subjective_html' => view('admin.ajax.testpaperoptions', ['testpapers' => $subjectivetestpaper])->render(),
+                'questions_count' => $combinedtestpaper->count(),
+            ]);
+
+        } catch (\Exception $ex) {
+            return response()->json([
+                'success' => false,
+                'msgText' => $ex->getMessage(),
+            ]);
+        }
     }
+
     public function generatetestsidepanelquestionslist(Request $request)
     {
         try {

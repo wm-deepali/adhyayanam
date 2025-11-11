@@ -164,7 +164,7 @@
                             <div class="form-group previous-year-group" id="previous-year" @if($paper->paper_type != 1)
                             style="display: none;" @endif>
                                 <label>Previous Year</label>
-                                <input type="number" class="form-control" name="previous_year"
+                                <input type="number" class="form-control" name="previous_year" id="previous_year"
                                     value="{{$paper->previous_year ?? ''}}" placeholder="Ex. 2014">
                             </div>
 
@@ -1399,7 +1399,6 @@
 
 
                 var selQuestion = $(this).closest('.master-question-item').find('#customquestionbox-mcq li.questn-selected');
-                console.log(selQuestion);
                 const total = $("#mcq_total_question").val();
                 if ($(this).closest('.master-question-item').find(".customquestionselectedbox-mcq .question").length + selQuestion.length > total) {
                     alert(`You can maximum ${total} question select`)
@@ -1440,7 +1439,6 @@
 
 
                 var selQuestion = $(this).closest('.master-question-item').find('#customquestionbox-story li.questn-selected');
-                console.log(selQuestion);
                 const total = $("#story_total_question").val();
                 if ($(this).closest('.master-question-item').find(".customquestionselectedbox-story .question").length + selQuestion.length > total) {
                     alert(`You can maximum ${total} question select`)
@@ -1481,7 +1479,6 @@
 
 
                 var selQuestion = $(this).closest('.master-question-item').find('#customquestionbox-subjective li.questn-selected');
-                console.log(selQuestion);
                 const total = $("#subjective_total_question").val();
                 if ($(this).closest('.master-question-item').find(".customquestionselectedbox-subjective .question").length + selQuestion.length > total) {
                     alert(`You can maximum ${total} question select`)
@@ -1535,7 +1532,6 @@
                 const mcqselectedqu = $('.master-question-item').find(".customquestionselectedbox-mcq .question").length;
                 const storyselectedqu = $('.master-question-item').find(".customquestionselectedbox-story .question").length;
                 const subjectiveselectedqu = $('.master-question-item').find(".customquestionselectedbox-subjective .question").length;
-console.log(mcqselectedqu,storyselectedqu,subjectiveselectedqu);
 
                 const selectedqu = mcqselectedqu + storyselectedqu + subjectiveselectedqu;
                 // alert(selectedqu);
@@ -1550,6 +1546,7 @@ console.log(mcqselectedqu,storyselectedqu,subjectiveselectedqu);
                 formData.append('topic', (typeof $('#topic').val() == 'undefined') ? '' : $('#topic').val());
                 formData.append('paper_type', $('#paper_type').val());
                 formData.append('previous_year', $('#previous_year').val());
+                
                 formData.append('name', $('#name').val());
                 formData.append('id', $('#test_id').val());
                 formData.append('duration', $('#duration').val());

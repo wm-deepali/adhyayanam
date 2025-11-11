@@ -29,6 +29,20 @@
                                     data-offstyle="danger" data-width="100">
                             </div>
                         </div>
+                        <div class="col-md-6">
+    <div class="mb-3">
+        <label for="course_mode" class="form-label">Course Mode</label>
+        <select class="form-select" name="course_mode" id="course_mode" required>
+            <option value="" disabled {{ empty($course->course_mode) ? 'selected' : '' }}>None</option>
+            <option value="Online" {{ $course->course_mode == 'Online' ? 'selected' : '' }}>Online</option>
+            <option value="Video Learning" {{ $course->course_mode == 'Video Learning' ? 'selected' : '' }}>Video Learning</option>
+        </select>
+        @error('course_mode')
+            <span class="text-danger">{{ $message }}</span>
+        @enderror
+    </div>
+</div>
+
                     </div>
                     <div class="row">
                         <div class="col-md-6">

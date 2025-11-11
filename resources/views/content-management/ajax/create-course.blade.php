@@ -28,6 +28,20 @@
                                     data-onstyle="success" data-offstyle="danger" data-width="100">
                             </div>
                         </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="course_mode" class="form-label">Course Mode</label>
+                                <select class="form-select" name="course_mode" id="course_mode" required>
+                                    <option value="" selected disabled>None</option>
+                                    <option value="Online">Online</option>
+                                    <option value="Video Learning">Video Learning</option>
+                                </select>
+                                @error('course_mode')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
+                        </div>
+
                     </div>
                     <div class="row">
                         <div class="col-md-6">

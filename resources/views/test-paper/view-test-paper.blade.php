@@ -245,7 +245,7 @@
                                             @include('test-series.sub-questions', [
                                                 'question' => $subQuestion,
                                                 'marks' => $marks,
-                                                'negative_marks' => $testDetail->sub_negative_mark ?? $paper->negative_marks_per_question,
+                                                'negative_marks' => $testDetail->negative_mark ?? $paper->negative_marks_per_question,
                                                 'index' => $romanIndex,
                                                 'parentIndex' => $parentIndex
                                             ])

@@ -871,17 +871,17 @@
                             btn.closest('.question-row').find('.customquestionbox-combined').html(result.combined_html);
 
                         } else {
-                            btn.closest('question-row').find('.customquestionbox-mcq').html('');
-                            btn.closest('question-row').find('.customquestionselectedbox-mcq').html(result.mcq_html);
+                            btn.closest('.question-row').find('.customquestionbox-mcq').html('');
+                            btn.closest('.question-row').find('.customquestionselectedbox-mcq').html(result.mcq_html);
 
-                            btn.closest('question-row').find('.customquestionbox-passage').html('');
-                            btn.closest('question-row').find('.customquestionselectedbox-passage').html(result.passage_html);
+                            btn.closest('.question-row').find('.customquestionbox-passage').html('');
+                            btn.closest('.question-row').find('.customquestionselectedbox-passage').html(result.passage_html);
 
-                            btn.closest('question-row').find('.customquestionbox-subjective').html('');
-                            btn.closest('question-row').find('.customquestionselectedbox-subjective').html(result.subjective_html);
+                            btn.closest('.question-row').find('.customquestionbox-subjective').html('');
+                            btn.closest('.question-row').find('.customquestionselectedbox-subjective').html(result.subjective_html);
 
-                            btn.closest('question-row').find('.customquestionbox-combined').html('');
-                            btn.closest('question-row').find('.customquestionselectedbox-combined').html(result.combined_html);
+                            btn.closest('.question-row').find('.customquestionbox-combined').html('');
+                            btn.closest('.question-row').find('.customquestionselectedbox-combined').html(result.combined_html);
 
                         }
                     } else {

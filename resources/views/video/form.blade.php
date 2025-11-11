@@ -7,14 +7,13 @@
 
 <form id="categoryForm" enctype="multipart/form-data">
     @csrf
-    @if(isset($video) && $video->id) @method('PUT') @endif
     <div class="row mx-1">
         <div class="col-md-6 mb-2">
             <label for="type">Type</label>
             <select class="form-control" id="type" name="type">
                 <option value="">Select Type</option>
-                <option value="video" @if($video->type == "video") selected @endif>Video</option>
-                <option value="live_class" @if($video->type == "live_class") selected @endif>Live Class</option>
+                <option value="video">Video</option>
+                <option value="live_class">Live Class</option>
             </select>
             <div class="text-danger validation-err" id="type-err"></div>
         </div>
@@ -23,7 +22,7 @@
             <select class="form-control" name="course_type" id="courseType">
                 <option value="">Select Examination Commission</option>
                 @foreach(\App\Models\ExaminationCommission::all() as $commission)
-                    <option {{ $video->course_type == $commission->id ? 'selected' : '' }} value="{{ $commission->id }}">
+                    <option value="{{ $commission->id }}">
                         {{ $commission->name }}
                     </option>
                 @endforeach
@@ -35,7 +34,7 @@
             <select class="form-control" name="course_category" id="courseCategory">
                 <option value="">Select Category</option>
                 @foreach($categories as $category)
-                    <option value="{{ $category->id }}" {{ $video->course_category == $category->id ? 'selected' : '' }}>
+                    <option value="{{ $category->id }}">
                         {{ $category->name }}
                     </option>
                 @endforeach
@@ -57,7 +56,7 @@
             <select class="form-control" name="course" id="course">
                 <option value="">Select Course</option>
                 @foreach($courses as $course)
-                    <option value="{{ $course->id }}" {{ $video->course_id == $course->id ? 'selected' : '' }}>
+                    <option value="{{ $course->id }}">
                         {{ $course->name }}
                     </option>
                 @endforeach
@@ -83,37 +82,38 @@
             </select>
         </div>
 
-        <div class="col-md-6 mb-2">
-            <label for="name">Title</label>
-            <input type="text" class="form-control" id="title" name="title"
-                value="{{ old('title', $video->title ?? '') }}">
-            <div class="text-danger validation-err" id="title-err"></div>
-        </div>
-        <div class="col-md-6 mb-2">
-            <label for="slug">Slug:</label>
-            <input type="text" class="form-control" id="slug" name="slug" value="{{ old('slug', $video->slug ?? '') }}">
-            <div class="text-danger validation-err" id="slug-err"></div>
-        </div>
-        <div class="col-md-6 mb-2 wa " @if($video->type != "" && $video->type == "live_class") style="display:none" @endif>
+        <div class="col-md-6 mb-2 wa ">
             <label for="slug">Access Till:</label>
-            <input type="date" class="form-control" id="access_till" name="access_till"
-                value="{{ old('access_till', $video->access_till ?? '') }}">
+            <input type="date" class="form-control" id="access_till" name="access_till">
             <div class="text-danger validation-err" id="access_till-err"></div>
         </div>
-        <div class="col-md-6 mb-2 video_div " @if($video->type != "" && $video->type == "live_class") style="display:none"
-        @endif>
+        <div class="col-md-6 mb-2 video_div">
             <label for="slug">No. Of times can view:</label>
-            <input type="number" class="form-control" id="no_of_times_can_view" name="no_of_times_can_view"
-                value="{{ old('no_of_times_can_view', $video->no_of_times_can_view ?? '') }}">
+            <input type="number" class="form-control" id="no_of_times_can_view" name="no_of_times_can_view">
             <div class="text-danger validation-err" id="no_of_times_can_view-err"></div>
         </div>
         <!-- VIDEO CONTAINER -->
-        <div class="video-container" style="@if($video->type != 'video') display:none; @endif">
+        <div class="video-container" style="display:none;">
             <h5>Video Details</h5>
 
             <div id="videoWrapper">
                 <div class="video-block border p-3 mb-3">
                     <div class="row">
+
+                        <!-- Title -->
+                        <div class="col-md-6 mb-2">
+                            <label>Title</label>
+                            <input type="text" class="form-control video_title" name="video_title[]"
+                                placeholder="Enter video title">
+                        </div>
+
+                        <!-- Slug -->
+                        <div class="col-md-6 mb-2">
+                            <label>Slug</label>
+                            <input type="text" class="form-control video_slug" name="video_slug[]"
+                                placeholder="Auto generated slug">
+                        </div>
+
 
                         <!-- Thumb Image -->
                         <div class="col-md-6 mb-2">
@@ -189,99 +189,82 @@
             <button type="button" class="btn btn-primary mt-2 mb-2" id="addVideo">Add More Video</button>
         </div>
 
-
-
         <!-- LIVE CLASS CONTAINER -->
-        <div class="live-container" style="@if($video->type != 'live') display:none; @endif">
+        <div class="live-container" style="display:none;">
             <h5>Live Class Details</h5>
-            <div class="row">
 
-                <!-- Thumb Image -->
-                <div class="col-md-6 mb-2">
-                    <label for="image">Thumb Image:</label>
-                    <img id="live_thumb_preview"
-                        src="{{ isset($video) && $video->image ? asset('storage/' . $video->image) : '#' }}"
-                        style="max-width:200px; margin-bottom:10px; @if(!isset($video->image)) display:none; @endif">
-                    <input type="file" class="form-control-file" id="image" name="image" accept="image/*">
-                    <div class="text-danger validation-err" id="image-err"></div>
+            <div id="liveWrapper">
+                <div class="live-block border p-3 mb-3">
+                    <div class="row">
+
+                        <!-- Title -->
+                        <div class="col-md-6 mb-2">
+                            <label for="live_title">Title:</label>
+                            <input type="text" class="form-control" name="live_title[]"
+                                placeholder="Enter Live Class Title">
+                        </div>
+
+                        <!-- Assignment Image -->
+                        <div class="col-md-6 mb-2">
+                            <label for="assignment">Assignment Image (optional):</label>
+                            <input type="file" class="form-control-file" name="live_assignment[]">
+                        </div>
+
+                        <!-- Schedule Date -->
+                        <div class="col-md-6 mb-2">
+                            <label for="schedule_date">Schedule Date:</label>
+                            <input type="date" class="form-control" name="schedule_date[]">
+                        </div>
+
+                        <!-- Start Time -->
+                        <div class="col-md-6 mb-2">
+                            <label for="start_time">Start Time:</label>
+                            <input type="time" class="form-control" name="start_time[]">
+                        </div>
+
+                        <!-- End Time -->
+                        <div class="col-md-6 mb-2">
+                            <label for="end_time">End Time:</label>
+                            <input type="time" class="form-control" name="end_time[]">
+                        </div>
+
+                        <!-- Teacher -->
+                        <div class="col-md-6 mb-2">
+                            <label for="teacher">Select Teacher:</label>
+                            <select class="form-control" name="teacher_id[]">
+                                <option value="">Select Teacher</option>
+                                @foreach(\App\Models\Teacher::all() as $teacher)
+                                    <option value="{{ $teacher->id }}">{{ $teacher->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <!-- Status -->
+                        <div class="col-md-6 mb-2">
+                            <label for="status">Status:</label>
+                            <select class="form-control" name="live_status[]">
+                                <option value="active">Active</option>
+                                <option value="block">Inactive</option>
+                            </select>
+                        </div>
+
+                        <!-- Content -->
+                        <div class="col-md-12 mb-2">
+                            <label for="content">Content</label>
+                            <textarea class="form-control" name="live_content[]" rows="3"></textarea>
+                        </div>
+
+                        <div class="col-md-12">
+                            <button type="button" class="btn btn-danger remove-live">Remove</button>
+                        </div>
+
+                    </div>
                 </div>
-
-                <!-- Cover Image -->
-                <div class="col-md-6 mb-2">
-                    <label for="cover_image">Cover Image:</label>
-                    <img id="live_cover_preview"
-                        src="{{ isset($video) && $video->cover_image ? asset('storage/' . $video->cover_image) : '#' }}"
-                        style="max-width:200px; margin-bottom:10px; @if(!isset($video->cover_image)) display:none; @endif">
-                    <input type="file" class="form-control-file" id="cover_image" name="cover_image" accept="image/*">
-                    <div class="text-danger validation-err" id="cover_image-err"></div>
-                </div>
-
-                <!-- Assignment Image -->
-                <div class="col-md-6 mb-2">
-                    <label for="assignment">Assignment Image (optional):</label>
-                    <img id="live_assignment_preview"
-                        src="{{ isset($video) && $video->assignment ? asset('storage/' . $video->assignment) : '#' }}"
-                        style="max-width:200px; margin-bottom:10px; @if(!isset($video->assignment)) display:none; @endif">
-                    <input type="file" class="form-control-file" id="assignment" name="assignment">
-                    <div class="text-danger validation-err" id="assignment-err"></div>
-                </div>
-
-                <!-- Schedule Date -->
-                <div class="col-md-6 mb-2 schedule_date_div" style="display:none">
-                    <label for="schedule_date">Schedule Date:</label>
-                    <input type="date" class="form-control" id="schedule_date" name="schedule_date"
-                        value="{{ $video->schedule_date ?? '' }}">
-                </div>
-
-                <!-- Start Time -->
-                <div class="col-md-6 mb-2 start_time_div" style="display:none">
-                    <label for="start_time">Start Time:</label>
-                    <input type="time" class="form-control" id="start_time" name="start_time"
-                        value="{{ $video->start_time ?? '' }}">
-                </div>
-
-                <!-- End Time -->
-                <div class="col-md-6 mb-2 end_time_div" style="display:none">
-                    <label for="end_time">End Time:</label>
-                    <input type="time" class="form-control" id="end_time" name="end_time"
-                        value="{{ $video->end_time ?? '' }}">
-                </div>
-
-                <!-- Teacher -->
-                <div class="col-md-6 mb-2 teacher_div" style="display:none">
-                    <label for="teacher">Select Teacher:</label>
-                    <select class="form-control" name="teacher" id="teacher">
-                        <option value="">Select Teacher</option>
-                        @foreach($teachers as $teacher)
-                            <option value="{{ $teacher->id }}" {{ isset($video) && $video->teacher_id == $teacher->id ? 'selected' : '' }}>
-                                {{ $teacher->name }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-
-                Status
-                <div class="col-md-6 mb-2">
-                    <label for="status">Status:</label>
-                    <select class="form-control" id="status" name="status[]">
-                        <option value="active" {{ isset($video) && $video->status == "active" ? 'selected' : '' }}>Active
-                        </option>
-                        <option value="block" {{ isset($video) && $video->status == "block" ? 'selected' : '' }}>Inactive
-                        </option>
-                    </select>
-                    <div class="text-danger validation-err" id="status-err"></div>
-                </div>
-
-                <!-- Content -->
-                <div class="col-md-12 mb-2">
-                    <label for="content">Content</label>
-                    <textarea class="form-control" id="content" name="content[]"
-                        rows="3">{{ old('content', $video->content ?? '') }}</textarea>
-                    <div class="text-danger validation-err" id="content-err"></div>
-                </div>
-
             </div>
+
+            <button type="button" class="btn btn-primary mt-2 mb-2" id="addLive">Add More Live Class</button>
         </div>
+
 
 
         <button type="submit" class="btn btn-primary">Submit</button>
@@ -292,10 +275,18 @@
 <script>
     CKEDITOR.replace('content');
 
+    // Auto-generate slug per video title
+    $(document).on("input", ".video_title", function () {
+        var title = $(this).val().toLowerCase().replace(/\s+/g, '-');
+        $(this).closest('.video-block').find('.video_slug').val(title);
+    });
+
+
     setInterval(function () {
         $(document).find(".cke_notifications_area").remove();
     }, 100);
 
+    // When type changes
     // When type changes
     $("#type").on("change", function () {
         var data = this.value;
@@ -303,13 +294,18 @@
         if (data == "video") {
             $(".video-container").show();
             $(".live-container").hide();
+            $(".wa, .video_div").show(); // Show Access Till & No. of times
         } else if (data == "live_class") {
             $(".live-container").show();
             $(".video-container").hide();
+            $(".wa, .video_div").hide(); // Hide Access Till & No. of times
+            filterTeachers(); // Trigger teacher filtering
         } else {
             $(".video-container, .live-container").hide();
+            $(".wa, .video_div").show();
         }
 
+        fetchCoursesBySubCategory(); // refresh courses when type changes
     });
 
     // Add new video block
@@ -329,6 +325,25 @@
             alert("At least one video is required.");
         }
     });
+
+
+    // Add new Live Class block
+    $('#addLive').on('click', function () {
+        var newBlock = $('.live-block:first').clone(); // clone first block
+        newBlock.find('input, textarea').val(''); // clear text fields
+        newBlock.find('select').prop('selectedIndex', 0); // reset dropdowns
+        $('#liveWrapper').append(newBlock);
+    });
+
+    // Remove Live Class block
+    $(document).on('click', '.remove-live', function () {
+        if ($('.live-block').length > 1) {
+            $(this).closest('.live-block').remove();
+        } else {
+            alert("At least one live class is required.");
+        }
+    });
+
 
     // Show/hide file or URL based on video type
     $(document).on('change', '.video_type', function () {
@@ -374,19 +389,36 @@
         });
     });
 
-    $(document).on('change', '#sub_category_id', function (e) {
-        e.preventDefault(e);
-        var data = this.value;
-        $("#course").html('');
+    function fetchCoursesBySubCategory() {
+        var subCategoryId = $('#sub_category_id').val();
+        var selectedType = $('#type').val();
+
+        if (!subCategoryId) return; // do nothing if no sub-category selected
+
+        $("#course").html(''); // clear previous options
+
         $.ajax({
-            url: `{{url('fetch-course/${data}')}}`,
+            url: `{{ url('fetch-course') }}/${subCategoryId}`,
             type: "GET",
+            data: { type: selectedType }, // send type along
             success: function (result) {
                 $('#course').html(result.html);
-                $("#chapter").html('');
+                $("#chapter").html(''); // clear dependent dropdowns
+                $("#topic_id").html('');
+            },
+            error: function (err) {
+                console.error(err);
             }
         });
+    }
+
+    // When sub-category changes
+    $(document).on('change', '#sub_category_id', function (e) {
+        e.preventDefault();
+        fetchCoursesBySubCategory();
     });
+
+
     // When course changes (already done)
     $('#course').on('change', function () {
         var courseId = this.value;
@@ -498,7 +530,7 @@
             $(".validation-err").html('');
             $.ajax({
                 type: 'POST',
-                url: '{{ (isset($video) && $video->id) ? route("video.update", $video->id) : route("video.store") }}',
+                url: '{{ route("video.store") }}',
                 data: new FormData(this),
                 processData: false,
                 contentType: false,
@@ -524,4 +556,43 @@
             });
         });
     });
+
+    $(document).on('change', '#courseType, #courseCategory, #sub_category_id, #subject_id', function () {
+        if ($('#type').val() === 'live_class') {
+            filterTeachers();
+        }
+    });
+
+
+    function filterTeachers() {
+        var examTypeId = $('#courseType').val();
+        var categoryId = $('#courseCategory').val();
+        var subCategoryId = $('#sub_category_id').val();
+        var subjectId = $('#subject_id').val();
+
+        if (!examTypeId && !categoryId && !subCategoryId && !subjectId) return;
+
+        $.ajax({
+            url: `{{ url('fetch-teachers-by-filters') }}`,
+            type: "GET",
+            data: {
+                exam_type_id: examTypeId,
+                category_id: categoryId,
+                sub_category_id: subCategoryId,
+                subject_id: subjectId
+            },
+            success: function (response) {
+                if (response.success) {
+                    $('.live-container select[name="teacher_id[]"]').each(function () {
+                        $(this).html(response.html);
+                    });
+                }
+            },
+            error: function (xhr) {
+                console.error('Error fetching teachers:', xhr.responseText);
+            }
+        });
+    }
+
+
 </script>

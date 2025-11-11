@@ -126,6 +126,9 @@ if (isset($test->testseries) && count($test->testseries) > 0) {
                     @endforeach
                 </tbody>
             </table>
+              <div class="d-flex justify-content-center mt-3">
+                {{ $test_series->links() }}
+            </div>
         </div>
     </div>
 </div>

@@ -443,6 +443,8 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
         Route::post('get-all-subjects', 'TestController@allSubject')->name('get-all-subjects');
         Route::post('get-all-subjects-multi', 'TestController@allSubjectMulti')->name('get-all-subjects-multi');
 
+         Route::resource('syllabus', 'SyllabusController');
+
         Route::resource('pyq', 'PYQController');
         Route::resource('study-material/category', 'StudyMaterialCategoryController');
         Route::resource('study-material/main-topic', 'MainTopicController');
@@ -456,7 +458,7 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
 
         Route::patch('/feed/{id}/updateStatus', [App\Http\Controllers\ContentManagementController::class, 'updateFeedStatus'])->name('feed.updateStatus');
 
-        Route::resource('manage-courses/topic', CourseTopicController::class);
+        Route::resource('manage-courses/topic', App\Http\Controllers\CourseTopicController::class);
         //seo
         Route::get('seo/index', [App\Http\Controllers\ContentManagementController::class, 'seoIndex'])->name('seo.index');
         Route::get('seo/create', [App\Http\Controllers\ContentManagementController::class, 'seoCreate'])->name('seo.create');
@@ -469,6 +471,7 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
         Route::get('fetch-category/{type}', 'VideoController@fetchcategory')->name('fetch-category');
         Route::get('fetch-course/{id}', 'VideoController@fetchcourse')->name('fetch-course');
         Route::get('fetch-chapter/{id}', 'VideoController@fetchchapter')->name('fetch-chapter');
+        Route::get('fetch-teachers-by-filters', 'VideoController@fetchTeachersByFilters');
 
         /************************Page Url for design***************/
         Route::get('order/student-all-orders', [App\Http\Controllers\OrderController::class, 'allOrder'])->name('order.student-all-orders');

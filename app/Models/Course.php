@@ -38,7 +38,8 @@ class Course extends Model
         'subject_id',
         'chapter_id',
         'topic_id',
-        'based_on'
+        'based_on',
+        'course_mode'
     ];
 
     protected $casts = [

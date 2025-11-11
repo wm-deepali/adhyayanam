@@ -290,17 +290,14 @@ $test = \App\Models\Test::where('id', $testData['id'] ?? null)
         ->first();
 
     $default_positive = $testData['mcq_mark_per_question'] ?? '';
-    $default_negative = $testData['negative_marks_per_question'] ?? '';
 
     $positive_mark_value = $testDetail->positive_mark ?? $default_positive;
     if (isset($test->mcq_mark_per_question) && $test->mcq_mark_per_question != $default_positive) {
         $positive_mark_value = $default_positive;
     }
 
-    $negative_mark_value = $testDetail->negative_mark ?? $default_negative;
-    if (isset($test->negative_marks_per_question) && $test->negative_marks_per_question != $default_negative) {
-        $negative_mark_value = $default_negative;
-    }
+   $negative_percentage = $testData['negative_marks_per_question'] ?? 0;
+    $negative_mark_value = round(($positive_mark_value * $negative_percentage) / 100, 2);
 @endphp
 
 <div class="qs-col last question-container-div"
@@ -319,6 +316,7 @@ $test = \App\Models\Test::where('id', $testData['id'] ?? null)
         <input type="text"
                class="form-control mark negative_mark"
                placeholder="enter negative marks"
+               readonly
                value="{{ $negative_mark_value }}"
                style="width: 50px;">
     @endif
@@ -360,21 +358,18 @@ $test = \App\Models\Test::where('id', $testData['id'] ?? null)
         ->where('question_id', $question->id)
         ->first();
 
-$test = \App\Models\Test::where('id', $testData['id'] ?? null)
+    $test = \App\Models\Test::where('id', $testData['id'] ?? null)
         ->first();
 
-         $default_positive = $testData['subjective_mark_per_question'] ?? '';
-    $default_negative = $testData['negative_marks_per_question'] ?? '';
-
+    $default_positive = $testData['subjective_mark_per_question'] ?? '';
     $positive_mark_value = $testDetail->positive_mark ?? $default_positive;
     if (isset($test->subjective_mark_per_question) && $test->subjective_mark_per_question != $default_positive) {
         $positive_mark_value = $default_positive;
     }
 
-    $negative_mark_value = $testDetail->negative_mark ?? $default_negative;
-    if (isset($test->negative_marks_per_question) && $test->negative_marks_per_question != $default_negative) {
-        $negative_mark_value = $default_negative;
-    }
+    $negative_percentage = $testData['negative_marks_per_question'] ?? 0;
+    $negative_mark_value = round(($positive_mark_value * $negative_percentage) / 100, 2);
+
 @endphp
 
                             <div class="sec-instruction preview-questions-container">
@@ -386,7 +381,7 @@ $test = \App\Models\Test::where('id', $testData['id'] ?? null)
                                         
                                         <input type="text" class="form-control mark positive_mark subjective_positive_mark" placeholder="enter positive marks" value="{{ $positive_mark_value  }}" style="width: 50px;">
                                         @if ($testData['has_negative_marks'] == 'yes')
-                                            <input type="text" class="form-control mark negative_mark"  placeholder="enter negative marks" value="{{ $negative_mark_value }}" style="width: 50px;">
+                                            <input type="text" class="form-control mark negative_mark"  placeholder="enter negative marks"  readonly value="{{ $negative_mark_value }}" style="width: 50px;">
                                         @endif
                                     </div>
                                     @if ($question->answer_format != '')
@@ -413,17 +408,13 @@ $test = \App\Models\Test::where('id', $testData['id'] ?? null)
         ->first();
 
     $default_positive = $testData['story_mark_per_question'] ?? '';
-    $default_negative = $testData['negative_marks_per_question'] ?? '';
-
     $positive_mark_value = $testDetail->positive_mark ?? $default_positive;
     if (isset($test->story_mark_per_question) && $test->story_mark_per_question != $default_positive ) {
         $positive_mark_value = $default_positive;
     }
 
-    $negative_mark_value = $testDetail->negative_mark ?? $default_negative;
-    if (isset($test->negative_marks_per_question) && $test->negative_marks_per_question != $default_negative) {
-        $negative_mark_value = $default_negative;
-    }
+ $negative_percentage = $testData['negative_marks_per_question'] ?? 0;
+    $negative_mark_value = round(($positive_mark_value * $negative_percentage) / 100, 2);
 @endphp
 
                             <div class="sec-instruction preview-questions-container">
@@ -435,7 +426,7 @@ $test = \App\Models\Test::where('id', $testData['id'] ?? null)
                                         
                                         <input type="text" class="form-control mark positive_mark passage_positive_mark" placeholder="enter positive marks" value="{{ $positive_mark_value }}" style="width: 50px;">
                                         @if ($testData['has_negative_marks'] == 'yes')
-                                            <input type="text" class="form-control mark negative_mark"  placeholder="enter negative marks" value="{{ $negative_mark_value }}" style="width: 50px;">
+                                            <input type="text" class="form-control mark negative_mark"  placeholder="enter negative marks"  readonly value="{{ $negative_mark_value }}" style="width: 50px;">
                                         @endif
                                     </div>
                                     @if ($question->image != '')
@@ -466,16 +457,14 @@ $test = \App\Models\Test::where('id', $testData['id'] ?? null)
         ->first();
 
  $default_positive = $testData['story_mark_per_question'] ?? '';
-    $default_negative = $testData['negative_marks_per_question'] ?? '';
     
     $sub_positive_mark = $subTestDetail->positive_mark ??  round($testData['story_mark_per_question'] / count($questionDetails), 2);;
     if (isset($test->story_mark_per_question) && $test->story_mark_per_question != $default_positive) {
         $sub_positive_mark = round($testData['story_mark_per_question'] / count($questionDetails), 2);
     }
-    $sub_negative_mark = $subTestDetail->negative_mark ??  round($testData['negative_marks_per_question'] / count($questionDetails), 2);;
-      if (isset($test->negative_marks_per_question) && $test->negative_marks_per_question != $default_negative) {
-        $sub_negative_mark = round($negative_mark_value / count($questionDetails), 2);
-    }
+
+     $negative_percentage = $testData['negative_marks_per_question'] ?? 0;
+    $sub_negative_mark = round(($sub_positive_mark * $negative_percentage) / 100, 2);
 @endphp
 
 <input type="text"
@@ -488,6 +477,7 @@ $test = \App\Models\Test::where('id', $testData['id'] ?? null)
     <input type="text"
            class="form-control mark sub_negative_mark"
            placeholder="enter sub_negative marks"
+            readonly
            value="{{ $sub_negative_mark }}"
            style="width: 50px;">
 @endif

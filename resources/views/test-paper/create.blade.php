@@ -333,10 +333,10 @@
                             </div>
                             <div class="form-row">
                                 <!--div class="form-group col-md-4">
-                            <label for="per_question_marks">Per Question Marks </label>
-                                <input type="text" class="form-control" placeholder="Enter in no." name="per_question_marks" id="per_question_marks" >
-                                <div class="text-danger validation-err" id="per_question_marks-err"></div>
-                            </div-->
+                                <label for="per_question_marks">Per Question Marks </label>
+                                    <input type="text" class="form-control" placeholder="Enter in no." name="per_question_marks" id="per_question_marks" >
+                                    <div class="text-danger validation-err" id="per_question_marks-err"></div>
+                                </div-->
                                 <div class="form-group col-md-6">
                                     <label for="inputPassword4">Question Selections </label>
                                     <select id="question_generated_by" name="question_generated_by" class="form-control">
@@ -529,15 +529,15 @@
     <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
     <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
     <script>
-           let testInstructionEditor;
-ClassicEditor.create(document.querySelector('#test_instruction'))
-    .then(editor => {
-        testInstructionEditor = editor;
-    })
-                .catch(error => {
-                    console.error('CKEditor initialization error:', error);
-                });
- 
+        let testInstructionEditor;
+        ClassicEditor.create(document.querySelector('#test_instruction'))
+            .then(editor => {
+                testInstructionEditor = editor;
+            })
+            .catch(error => {
+                console.error('CKEditor initialization error:', error);
+            });
+
     </script>
     <script>
         $(document).on('change', '#subject', function (event) {
@@ -657,9 +657,10 @@ ClassicEditor.create(document.querySelector('#test_instruction'))
 
             if (negativeMarkingSelect.value === 'yes') {
                 additionalInputContainer.innerHTML = `
-                        <label for="negative_marks_per_question">Enter Negative Mark Value</label>
-                        <input type="number" id="negative_marks_per_question" name="negative_marks_per_question" min="0" step="1" required>
-                    `;
+                        <label for="negative_marks_per_question">Negative Mark (%)</label>
+    <input type="number" id="negative_marks_per_question" name="negative_marks_per_question" min="0" max="100" step="0.01">
+    <small>Enter negative marking as a percentage of the positive mark per question.</small>
+                        `;
             } else {
                 additionalInputContainer.innerHTML = '';
             }
@@ -673,9 +674,9 @@ ClassicEditor.create(document.querySelector('#test_instruction'))
 
             if (negativeMarkingSelect.value === 'yes') {
                 additionalInputContainer.innerHTML = `
-                        <label for="number_of_re_attempt_allowed">Number of Time</label>
-                        <input type="number" id="number_of_re_attempt_allowed" name="number_of_re_attempt_allowed" min="0" step="0.01" required>
-                    `;
+                            <label for="number_of_re_attempt_allowed">Number of Time</label>
+                            <input type="number" id="number_of_re_attempt_allowed" name="number_of_re_attempt_allowed" min="0" step="0.01" required>
+                        `;
             } else {
                 additionalInputContainer.innerHTML = '';
             }

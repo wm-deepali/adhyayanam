@@ -73,7 +73,7 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="title" class="form-label">Title</label>
+                        <label for="title" class="form-label">Study Material Heading</label>
                         <input type="text" class="form-control" name="title" placeholder="Title" required>
                         @error('title') <span class="text-danger text-left">{{ $message }}</span> @enderror
                     </div>
@@ -86,10 +86,39 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="detail_content" class="form-label">Description</label>
+                        <label for="detail_content" class="form-label">Detail Content</label>
                         <textarea id="editor" name="detail_content" style="height: 200px;"></textarea>
                         @error('detail_content') <span class="text-danger text-left">{{ $message }}</span> @enderror
                     </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Title & Description</label>
+
+                        <div id="title-description-wrapper">
+                            <div class="title-description-group mb-2 border rounded p-2">
+                                <div class="row">
+                                    <div class="col-md-12 mb-2">
+                                        <input type="text" class="form-control" name="titles[]" placeholder="Title"
+                                            required>
+                                    </div>
+                                    <div class="col-md-12 mb-2">
+                                        <textarea class="form-control description-editor" id="desc-editor-1"
+                                            name="descriptions[]" placeholder="Description" rows="3" required></textarea>
+                                    </div>
+                                    <div class="col-md-1 d-flex align-items-center">
+                                         <button type="button" class="btn btn-danger btn-sm remove-group">Remove</button>
+                                       
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="button" id="add-more-group" class="btn btn-success btn-sm mt-2">
+                            <i class="fa fa-plus"></i> Add More
+                        </button>
+                    </div>
+
+
 
                     <div class="mb-3">
                         <label for="IsPaid" class="form-label">Paid</label>
@@ -258,61 +287,53 @@
                 });
             });
             $(document).on('change', '#subject_id', function (event) {
-
-                $('#chapter_id').val("").trigger('change');
                 let subject = $(this).val();
-                if (subject != '') {
+
+                if (subject && subject.length > 0) {
+                    // Only reset and fetch chapters if subjects are selected
+                    $('#chapter_id').html('<option value="">--Select--</option>').trigger('change');
                     $.ajax({
                         url: `{{ URL::to('fetch-chapter-by-subject/${subject}') }}`,
                         type: 'GET',
                         dataType: 'json',
                         success: function (result) {
-                            if (result.success) {
-                                if (result.html != '') {
-                                    $('#chapter_id').html(result.html);
-                                }
-                                else {
-                                    $('#chapter_id').val("").trigger('change');
-                                }
-
+                            if (result.success && result.html) {
+                                $('#chapter_id').html(result.html);
                             } else {
-                                toastr.error('error encountered ' + result.msgText);
+                                $('#chapter_id').html('<option value="">--Select--</option>').trigger('change');
                             }
                         },
                     });
+                } else {
+                    // 🧹 If all subjects are cleared, just clear chapters and topics
+                    $('#chapter_id').html('<option value="">--Select--</option>').trigger('change');
+                    $('#topic_id').html('<option value="">--Select--</option>').trigger('change');
                 }
-                else {
-                    // $('#sub_category_id').val("").trigger('change');
-                    // $('.sub-cat').addClass('hidecls');
-                    // $('#sub_category_id').attr("required", false);
-                }
-
             });
-            $(document).on('change', '#chapter_id', function (event) {
 
-                $('#topic_id').val("").trigger('change');
+            $(document).on('change', '#chapter_id', function (event) {
                 let chapter = $(this).val();
-                if (chapter != '') {
+
+                if (chapter && chapter.length > 0) {
+                    // Only reset and fetch topics if chapters are selected
+                    $('#topic_id').html('<option value="">--Select--</option>').trigger('change');
+
                     $.ajax({
                         url: `{{ URL::to('fetch-topic-by-chapter/${chapter}') }}`,
                         type: 'GET',
                         dataType: 'json',
                         success: function (result) {
-                            if (result.success) {
-                                if (result.html != '') {
-                                    $('#topic_id').html(result.html);
-                                }
-                                else {
-                                    $('#topic_id').val("").trigger('change');
-                                }
-
+                            if (result.success && result.html) {
+                                $('#topic_id').html(result.html);
                             } else {
-                                toastr.error('error encountered ' + result.msgText);
+                                $('#topic_id').html('<option value="">--Select--</option>').trigger('change');
                             }
                         },
                     });
+                } else {
+                    // 🧹 If all chapters are cleared, just clear topics quietly
+                    $('#topic_id').html('<option value="">--Select--</option>').trigger('change');
                 }
-
             });
 
             $(document).on('change', '#sub_category_id, #subject_id, #chapter_id, #topic_id', function () {
@@ -407,5 +428,61 @@
                 $('#offered-price').val(offeredPrice.toFixed(2));
             });
         });
+        
+let descEditorCount = 1; // track number of CKEditor instances
+
+// Initialize CKEditor for the first description
+CKEDITOR.replace('desc-editor-1');
+
+// Add More / Remove functionality for Title & Description
+$(document).on('click', '#add-more-group', function () {
+    descEditorCount++;
+    const newEditorId = `desc-editor-${descEditorCount}`;
+
+    const newGroup = `
+        <div class="title-description-group mb-2 border rounded p-2">
+            <div class="row">
+                <div class="col-md-12 mb-2">
+                    <input type="text" class="form-control" name="titles[]" placeholder="Title" required>
+                </div>
+                <div class="col-md-12 mb-2">
+                    <textarea class="form-control description-editor" id="${newEditorId}" name="descriptions[]" placeholder="Description" rows="3" required></textarea>
+                </div>
+                <div class="col-md-1 d-flex align-items-center">
+                    <div class="col-md-1 d-flex align-items-center">
+                                         <button type="button" class="btn btn-danger btn-sm remove-group">Remove</button>
+                                       
+                                    </div>
+                </div>
+            </div>
+        </div>`;
+
+    $('#title-description-wrapper').append(newGroup);
+
+    // Initialize CKEditor for the new textarea
+    CKEDITOR.replace(newEditorId);
+});
+
+// Remove specific group (with CKEditor cleanup)
+$(document).on('click', '.remove-group', function () {
+    const textarea = $(this).closest('.title-description-group').find('textarea');
+    const editorId = textarea.attr('id');
+
+    // Destroy CKEditor instance safely
+    if (CKEDITOR.instances[editorId]) {
+        CKEDITOR.instances[editorId].destroy(true);
+    }
+
+    $(this).closest('.title-description-group').remove();
+});
+
+// ✅ Ensure CKEditor content is synced to textarea before submitting form
+$('#study-form').on('submit', function () {
+    for (let instance in CKEDITOR.instances) {
+        CKEDITOR.instances[instance].updateElement();
+    }
+});
+
+
     </script>
 @endsection

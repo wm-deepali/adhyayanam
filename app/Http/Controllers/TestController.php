@@ -269,6 +269,7 @@ class TestController extends Controller
 
     public function previewTest(Request $request)
     {
+        //   dd($request->all());
         $validator = Validator::make($request->all(), [
             'language' => 'required',
             'competitive_commission' => 'required',
@@ -345,6 +346,7 @@ class TestController extends Controller
                     'question_generated_by' => $request->question_generated_by,
                 );
 
+                // dd($testData);
                 return response()->json([
                     'success' => true,
                     'testData' => $testData,
@@ -423,7 +425,7 @@ class TestController extends Controller
 
                 $total_marks_mcq = 0;
                 $positive_marks_per_question_mcq = 0;
-                $negative_marks_per_question_mcq = 0;
+                // $negative_marks_per_question_mcq = 0;
 
                 foreach (json_decode($request->question_marks_details) as $dt) {
                     // Ignore sub-questions (only process main ones)
@@ -436,7 +438,7 @@ class TestController extends Controller
 
                     $total_marks_mcq += $positive;
                     $positive_marks_per_question_mcq = $positive;
-                    $negative_marks_per_question_mcq = $negative;
+                    // $negative_marks_per_question_mcq = $negative;
                 }
 
                 $testData = array(
@@ -473,7 +475,7 @@ class TestController extends Controller
 
 
                     'positive_marks_per_question' => $positive_marks_per_question_mcq,
-                    'negative_marks_per_question' => $negative_marks_per_question_mcq,
+                    'negative_marks_per_question' => $request->negative_marks_per_question,
 
                     'mcq_total_question' => $request->mcq_total_question,
                     'mcq_mark_per_question' => $request->mcq_mark_per_question,
@@ -596,7 +598,7 @@ class TestController extends Controller
         try {
             $test = Test::findOrFail($id);
 
-            // --- Determine paper type ---
+            // Determine test paper type
             $testPaperType = '';
             if ($request->mcq_total_question > 0)
                 $testPaperType = 'MCQ';
@@ -605,28 +607,7 @@ class TestController extends Controller
             if ($request->subjective_total_question > 0)
                 $testPaperType = $testPaperType ? 'Combined' : 'Subjective';
 
-            // --- Calculate marks summary ---
-            $total_marks_mcq = 0;
-            $positive_marks_per_question_mcq = 0;
-            $negative_marks_per_question_mcq = 0;
-
-            $questionMarks = json_decode($request->question_marks_details);
-
-            foreach (json_decode($request->question_marks_details) as $dt) {
-                // Ignore sub-questions (only process main ones)
-                if (!empty($dt->sub_question_id)) {
-                    continue;
-                }
-
-                $positive = $dt->positive_mark ?? 0;
-                $negative = $dt->negative_mark ?? 0;
-
-                $total_marks_mcq += $positive;
-                $positive_marks_per_question_mcq = $positive;
-                $negative_marks_per_question_mcq = $negative;
-            }
-
-            // --- Prepare test data ---
+            // Prepare test data
             $testData = [
                 'language' => $request->language,
                 'competitive_commission_id' => $request->competitive_commission,
@@ -651,8 +632,8 @@ class TestController extends Controller
                 'question_marks_details' => $request->question_marks_details,
                 'total_positive_marks' => $request->total_positive_marks,
                 'total_negative_marks' => $request->total_negative_marks,
-                'positive_marks_per_question' => $positive_marks_per_question_mcq,
-                'negative_marks_per_question' => $negative_marks_per_question_mcq,
+                'positive_marks_per_question' => $request->mcq_mark_per_question,
+                'negative_marks_per_question' => $request->negative_marks_per_question,
                 'mcq_total_question' => $request->mcq_total_question,
                 'mcq_mark_per_question' => $request->mcq_mark_per_question,
                 'mcq_total_marks' => $request->mcq_total_marks,
@@ -667,44 +648,37 @@ class TestController extends Controller
             ];
 
             $test->update($testData);
-            // --- Update or insert TestDetail ---
+
+            $questionMarks = json_decode($request->question_marks_details);
+
+            $submitted_question_ids = [];
             $last_parent_id = null;
 
             foreach ($questionMarks as $dt) {
                 $question_id = null;
                 $parent_question_id = null;
 
-                // Identify question id
                 if (!empty($dt->question_id)) {
                     $question_id = (int) $dt->question_id;
+                    $submitted_question_ids[] = $question_id;
 
-                    // store last Passage id only if type is Passage
                     if (isset($dt->test_question_type) && $dt->test_question_type === 'Passage') {
                         $last_parent_id = $question_id;
                     }
-
                 } elseif (!empty($dt->sub_question_id)) {
                     $question_id = (int) $dt->sub_question_id;
+                    $submitted_question_ids[] = $question_id;
 
-                    // assign parent id only if this is a Sub Passage
                     if (isset($dt->test_question_type) && $dt->test_question_type === 'Sub Passage') {
                         $parent_question_id = $last_parent_id;
                     }
                 } else {
-                    continue; // skip invalid entries
+                    continue;
                 }
 
-                // determine marks
-                $positive_mark = 0;
-                $negative_mark = 0;
-
-                if (isset($dt->positive_mark) || isset($dt->negative_mark)) {
-                    $positive_mark = (float) ($dt->positive_mark ?? 0);
-                    $negative_mark = (float) ($dt->negative_mark ?? 0);
-                } elseif (isset($dt->sub_positive_mark) || isset($dt->sub_negative_mark)) {
-                    $positive_mark = (float) ($dt->sub_positive_mark ?? 0);
-                    $negative_mark = (float) ($dt->sub_negative_mark ?? 0);
-                }
+                // Determine marks
+                $positive_mark = (float) ($dt->positive_mark ?? $dt->sub_positive_mark ?? 0);
+                $negative_mark = (float) ($dt->negative_mark ?? $dt->sub_negative_mark ?? 0);
 
                 $positive_mark = round($positive_mark, 2);
                 $negative_mark = round($negative_mark, 2);
@@ -722,6 +696,11 @@ class TestController extends Controller
                 );
             }
 
+            // Delete TestDetail that are no longer submitted
+            TestDetail::where('test_id', $test->id)
+                ->whereNotIn('question_id', $submitted_question_ids)
+                ->delete();
+
             DB::commit();
 
             return response()->json([
@@ -737,6 +716,7 @@ class TestController extends Controller
             ]);
         }
     }
+
 
 
     public function view($id)
@@ -792,18 +772,18 @@ class TestController extends Controller
                 : [];
 
             // ✅ Arrays of question IDs without foreach
-            $data['mcqArr'] = $paper->testDetails()->whereHas('question', function ($q) {
-                $q->where('question_type', 'MCQ');
+            $data['mcqArr'] = $paper->testDetails()->whereNull('parent_question_id')->whereHas('question', function ($q) {
+                $q->where('question_type', 'MCQ')->where('status', 'Done');
             })->pluck('question_id')->toArray();
 
-            $data['subjectiveArr'] = $paper->testDetails()->whereHas('question', function ($q) {
-                $q->where('question_type', 'Subjective');
+            $data['subjectiveArr'] = $paper->testDetails()->whereNull('parent_question_id')->whereHas('question', function ($q) {
+                $q->where('question_type', 'Subjective')->where('status', 'Done');
+
             })->pluck('question_id')->toArray();
 
-            $data['passageArr'] = $paper->testDetails()->whereHas('question', function ($q) {
-                $q->where('question_type', 'Story Based');
+            $data['passageArr'] = $paper->testDetails()->whereNull('parent_question_id')->whereHas('question', function ($q) {
+                $q->where('question_type', 'Story Based')->where('status', 'Done');
             })->pluck('question_id')->toArray();
-
             return view('test-paper.edit', $data);
 
         } catch (\Exception $ex) {
@@ -2417,6 +2397,7 @@ class TestController extends Controller
                         ->where('language', $language)
                         ->where('category_id', $category_id)
                         ->where('fee_type', $test_type)
+                        ->where('status', 'Done')
                         ->where('sub_category_id', $sub_category_id)
                         ->where('question_category', $paper_type)
                         ->when($chapter_id, function ($query, $chapter_id) {
@@ -2440,6 +2421,7 @@ class TestController extends Controller
                         //->where('sub_category_id',$sub_category_id)
                         ->where('question_category', $paper_type)
                         ->where('fee_type', $test_type)
+                        ->where('status', 'Done')
                         ->when($chapter_id, function ($query, $chapter_id) {
                             return $query->where('chapter_id', $chapter_id);
                         })
@@ -2458,6 +2440,7 @@ class TestController extends Controller
                         ->where('language', $language)
                         ->where('category_id', $category_id)
                         //->where('sub_category_id',$sub_category_id)
+                        ->where('status', 'Done')
                         ->where('question_category', $paper_type)
                         ->where('fee_type', $test_type)
                         ->when($chapter_id, function ($query, $chapter_id) {
@@ -2472,6 +2455,7 @@ class TestController extends Controller
                         ->limit($subjective_question_total)
                         ->get();
 
+                    // dd($mcqquestions->toArray());
                     return response()->json([
                         'success' => true,
                         'mcq_html' => view('admin.ajax.questionoptions')->with('questions', $mcqquestions)->render(),
@@ -2487,6 +2471,7 @@ class TestController extends Controller
                         ->where('question_type', 'MCQ')
                         ->where('language', $language)
                         ->where('category_id', $category_id)
+                        ->where('status', 'Done')
                         //->where('sub_category_id',$sub_category_id)
                         ->where('question_category', $paper_type)
 
@@ -2509,6 +2494,7 @@ class TestController extends Controller
                         ->where('question_type', 'Story Based')
                         ->where('language', $language)
                         ->where('category_id', $category_id)
+                        ->where('status', 'Done')
                         //->where('sub_category_id',$sub_category_id)
                         ->where('question_category', $paper_type)
                         ->where('fee_type', $test_type)
@@ -2528,6 +2514,7 @@ class TestController extends Controller
                     $subjectivequestions = Question::where('commission_id', $commission_id)
                         ->where('subject_id', $request->subject)
                         ->where('question_type', 'Subjective')
+                        ->where('status', 'Done')
                         ->where('language', $language)
                         ->where('category_id', $category_id)
                         //->where('sub_category_id',$sub_category_id)
@@ -2545,6 +2532,7 @@ class TestController extends Controller
                         ->limit($subjective_question_total)
                         ->inRandomOrder()
                         ->get();
+                    //  dd($mcqquestions->toArray());
                     return response()->json([
                         'success' => true,
                         'mcq_html' => view('admin.ajax.questionoptions')->with('questions', $mcqquestions)->render(),

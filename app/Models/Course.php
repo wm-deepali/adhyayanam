@@ -35,6 +35,16 @@ class Course extends Model
         'meta_description',
         'image_alt_tag',
         'feature',
+        'subject_id',
+        'chapter_id',
+        'topic_id',
+        'based_on'
+    ];
+
+    protected $casts = [
+        'subject_id' => 'array',
+        'chapter_id' => 'array',
+        'topic_id' => 'array',
     ];
 
     // Define relationships

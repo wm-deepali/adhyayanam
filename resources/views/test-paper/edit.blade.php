@@ -374,10 +374,10 @@
                             </div>
                             <div class="form-row">
                                 <!--div class="form-group col-md-4">
-                                                    <label for="per_question_marks">Per Question Marks </label>
-                                                        <input type="text" class="form-control" placeholder="Enter in no." name="per_question_marks" id="per_question_marks" >
-                                                        <div class="text-danger validation-err" id="per_question_marks-err"></div>
-                                                    </div-->
+                                                        <label for="per_question_marks">Per Question Marks </label>
+                                                            <input type="text" class="form-control" placeholder="Enter in no." name="per_question_marks" id="per_question_marks" >
+                                                            <div class="text-danger validation-err" id="per_question_marks-err"></div>
+                                                        </div-->
                                 <div class="form-group col-md-6">
                                     <label for="inputPassword4">Question Selections </label>
                                     <select id="question_generated_by" name="question_generated_by" class="form-control">
@@ -652,8 +652,6 @@
             toggleInputBox1(existingReAttemptAllowed)
         });
 
-
-
         let testInstructionEditor;
         ClassicEditor.create(document.querySelector('#test_instruction'))
             .then(editor => {
@@ -690,12 +688,6 @@
                     },
                 });
             }
-            else {
-                // $('#sub_category_id').val("").trigger('change');
-                // $('.sub-cat').addClass('hidecls');
-                // $('#sub_category_id').attr("required", false);
-            }
-
         });
 
         $(document).on('change', '#chapter_id', function (event) {
@@ -737,44 +729,8 @@
         document.getElementById('add-more').addEventListener('click', function () {
             let questionBlock = document.getElementById('question_form');
             let newQuestionBlock = questionBlock.cloneNode(true);
-
-            // Update question count
-            // let count = document.querySelectorAll('.question-block').length + 1;
-            // newQuestionBlock.querySelector('.question-count').innerHTML = '<h4 class="mt-4">Question ' + count + '</h4>';
-
-            // // Add remove button to the new question block
-            // let removeButton = document.createElement('button');
-            // removeButton.type = 'button';
-            // removeButton.className = 'btn btn-danger remove-question';
-            // removeButton.innerText = 'Remove';
-            // removeButton.addEventListener('click', function () {
-            //     newQuestionBlock.remove();
-            //     updateQuestionNumbers(); // Update question numbers after removing
-            // });
-
-            // // Append the remove button
-            // newQuestionBlock.appendChild(removeButton);
-
-            // Append the cloned question block
-            //document.getElementById('question-clone').appendChild(newQuestionBlock);
         });
 
-        // Function to update question numbers
-        // function updateQuestionNumbers() {
-        //     document.querySelectorAll('.question-block').forEach((block, index) => {
-        //         block.querySelector('.question-count').innerHTML = '<h4 class="mt-4">Question ' + (index + 1) + '</h4>';
-        //     });
-        // }
-
-        // function toggleInstruction(checkbox) {
-        //     const instructionGroup = checkbox.closest('.question-block').querySelector('.instruction-group');
-        //     instructionGroup.style.display = checkbox.checked ? 'block' : 'none';
-        // }
-
-        // function toggleOptionE(checkbox) {
-        //     const optionEGroup = checkbox.closest('.question-block').querySelector('.option-e-group');
-        //     optionEGroup.style.display = checkbox.checked ? 'block' : 'none';
-        // }
     </script>
     <script>
         function toggleInputBox(prefillValue = '') {
@@ -782,15 +738,10 @@
             const additionalInputContainer = document.getElementById('additionalInputContainer');
             if (negativeMarkingSelect.value === 'yes') {
                 additionalInputContainer.innerHTML = `
-          <label for="negative_marks_per_question">Enter Negative Mark Value</label>
-          <input 
-            type="number" 
-            id="negative_marks_per_question" 
-            name="negative_marks_per_question" 
-            min="0" step="1" required  
-            value="${prefillValue}"
-          >
-        `;
+                    <label for="negative_marks_per_question">Negative Mark (%)</label>
+    <input type="number" id="negative_marks_per_question" name="negative_marks_per_question" min="0" max="100" step="0.01" value="{{ old('negative_marks_per_question', $paper->negative_marks_per_question ?? '') }}">
+    <small>Enter negative marking as a percentage of the positive mark per question.</small>
+            `;
             } else {
                 additionalInputContainer.innerHTML = '';
             }
@@ -806,20 +757,13 @@
 
             if (negativeMarkingSelect.value === 'yes') {
                 additionalInputContainer.innerHTML = `
-                                            <label for="number_of_re_attempt_allowed">Number of Time</label>
-                                            <input type="number" id="number_of_re_attempt_allowed" name="number_of_re_attempt_allowed" min="0" step="0.01" required  value="${prefillValue}">
-                                        `;
+                                                <label for="number_of_re_attempt_allowed">Number of Time</label>
+                                                <input type="number" id="number_of_re_attempt_allowed" name="number_of_re_attempt_allowed" min="0" step="0.01" required  value="${prefillValue}">
+                                            `;
             } else {
                 additionalInputContainer.innerHTML = '';
             }
         }
-
-    </script>
-
-
-    <script>
-
-
 
         function reset_data_and_remove_tab_mcq() {
             $(".number_of_questions_mcq").attr('disabled', true);
@@ -834,9 +778,6 @@
             $('.total_marks_mcq').html('0');
 
         }
-
-
-
         function calculate_total_questions_remaining_summary() {
             let total_questions = $("#total_questions").val();
             let number_of_questions_mcq;
@@ -849,12 +790,6 @@
             } else {
                 number_of_questions_mcq = 0;
             }
-
-
-
-
-
-
             let summary_total = parseFloat(total_questions) - (parseFloat(number_of_questions_mcq));
             return summary_total;
         }
@@ -1585,21 +1520,22 @@
 
             $(document).on('click', '#preview-test-btn', function (event) {
                 const hasNegativeMarking = document.getElementById('has_negative_marks').value;
-    const negativeMarksInput = document.getElementById('negative_marks_per_question');
-    if (hasNegativeMarking === 'yes') {
-        if (!negativeMarksInput || negativeMarksInput.value === '' || Number(negativeMarksInput.value) <= 0) {
-            alert('Please enter a negative marks value greater than zero.');
-            if (negativeMarksInput) {
-                negativeMarksInput.focus();
-            }
-            return false; // Prevent form submission
-        }
-    }
+                const negativeMarksInput = document.getElementById('negative_marks_per_question');
+                if (hasNegativeMarking === 'yes') {
+                    if (!negativeMarksInput || negativeMarksInput.value === '' || Number(negativeMarksInput.value) <= 0) {
+                        alert('Please enter a negative marks value greater than zero.');
+                        if (negativeMarksInput) {
+                            negativeMarksInput.focus();
+                        }
+                        return false; // Prevent form submission
+                    }
+                }
                 $(this).attr('disabled', true);
                 $(".validation-err").html('');
                 const mcqselectedqu = $('.master-question-item').find(".customquestionselectedbox-mcq .question").length;
                 const storyselectedqu = $('.master-question-item').find(".customquestionselectedbox-story .question").length;
                 const subjectiveselectedqu = $('.master-question-item').find(".customquestionselectedbox-subjective .question").length;
+console.log(mcqselectedqu,storyselectedqu,subjectiveselectedqu);
 
                 const selectedqu = mcqselectedqu + storyselectedqu + subjectiveselectedqu;
                 // alert(selectedqu);

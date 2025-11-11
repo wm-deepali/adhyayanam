@@ -14,6 +14,7 @@ class Video extends Model
        'course_type','course_category','access_till','duration','rating','cover_image','course_id',
        'chapter_id', 'type','title','image','content','assignment','slug','video_url','video_type',
        'schedule_date','start_time','end_time','teacher_id','status','support','no_of_times_can_view','asignment',
+       'sub_category_id', 'subject_id', 'topic_id'
         
         ]; 
         

@@ -79,5 +79,10 @@ class StudyMaterial extends Model
         return CourseTopic::whereIn('id', $topicIds)->get();
     }
 
+    public function sections()
+    {
+        return $this->hasMany(StudyMaterialSection::class, 'study_material_id');
+    }
+
 
 }

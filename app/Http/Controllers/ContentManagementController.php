@@ -9,6 +9,7 @@ use App\Models\Feature;
 use App\Models\Marquee;
 use App\Models\StudyMaterialCategory;
 use App\Models\MainTopic;
+use App\Models\StudyMaterialSection;
 use App\Models\TestSeriesDetail;
 use App\Models\ProgrammeFeature;
 use App\Models\PopUp;
@@ -1095,7 +1096,9 @@ class ContentManagementController extends Controller
                 ->addColumn('subcat', function ($row) {
                     return $row->subCategory->name ?? '--';
                 })
-
+                 ->addColumn('type', function ($row) {
+                    return $row->based_on ?? '--';
+                })
                 ->addColumn('action', function ($row) {
                     $editUrl = route('courses.course.edit', $row->id);
                     $actionBtn = ' <a href="' . $editUrl . '" class="btn btn-sm btn-primary" title="Edit"><i class="fa fa-file"></i></a>
@@ -1125,6 +1128,22 @@ class ContentManagementController extends Controller
     {
         $data['examinationCommissions'] = ExaminationCommission::all();
         $data['course'] = Course::with('category', 'subCategory')->findOrFail($id);
+        $data['subjects'] = !empty($data['course']->sub_category_id)
+            ? Subject::where('sub_category_id', $data['course']->sub_category_id)->get()
+            : collect();
+
+        // Get decoded arrays automatically (Laravel cast handles this)
+        $subjectIds = $data['course']->subject_id ?? [];
+        $chapterIds = $data['course']->chapter_id ?? [];
+
+        $data['chapters'] = !empty($subjectIds)
+            ? Chapter::whereIn('subject_id', $subjectIds)->get()
+            : collect();
+
+        $data['topics'] = !empty($chapterIds)
+            ? CourseTopic::whereIn('chapter_id', $chapterIds)->get()
+            : collect();
+
         return view('content-management.ajax.edit-course', $data);
     }
 
@@ -1153,6 +1172,12 @@ class ContentManagementController extends Controller
         $course->meta_keyword = $request->meta_keyword;
         $course->meta_description = $request->meta_description;
         $course->image_alt_tag = $request->image_alt_tag;
+        $course->subject_id = $request->subject_id ?? [];
+        $course->chapter_id = $request->chapter_id ?? [];
+        $course->topic_id = $request->topic_id ?? [];
+        // ✅ Course Type Logic (Based On)
+        $basedOn = $request->based_on ?? 'general';
+        $course->based_on = $basedOn;
 
         if ($request->hasFile('thumbnail_image')) {
             $thumbnailPath = $request->file('thumbnail_image')->store('thumbnails', 'public');
@@ -1169,8 +1194,6 @@ class ContentManagementController extends Controller
         return redirect()->route('courses.course.index')->with('success', 'Course updated successfully');
     }
 
-
-
     public function courseStore(Request $request)
     {
         $request->validate([
@@ -1184,14 +1207,29 @@ class ContentManagementController extends Controller
             'offered_price' => 'required|numeric',
             'num_classes' => 'required|integer',
             'num_topics' => 'required|integer',
+
+            'subject_id' => 'required|array',
+            'subject_id.*' => 'integer',
+
+            'chapter_id' => 'nullable|array',
+            'chapter_id.*' => 'integer',
+
+            'topic_id' => 'nullable|array',
+            'topic_id.*' => 'integer',
+
             'language_of_teaching' => 'required|array',
             'language_of_teaching.*' => 'required|string',
+
+            'based_on' => 'nullable|string|max:255', // 👈 new field
+
             'course_heading' => 'required|string|max:255',
             'short_description' => 'required|string',
             'course_overview' => 'required|string',
             'detail_content' => 'required|string',
+
             'thumbnail_image' => 'required|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
             'banner_image' => 'required|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
+
             'youtube_url' => 'nullable|url',
             'meta_title' => 'nullable|string|max:255',
             'meta_keyword' => 'nullable|string|max:255',
@@ -1200,11 +1238,11 @@ class ContentManagementController extends Controller
             'feature' => 'nullable',
         ]);
 
-        // Handle the file uploads
+        // ✅ Handle file uploads
         $thumbnailImagePath = $request->file('thumbnail_image')->store('thumbnails', 'public');
         $bannerImagePath = $request->file('banner_image')->store('banners', 'public');
 
-        // Create a new course record
+        // ✅ Create new course
         $course = new Course();
         $course->examination_commission_id = $request->examination_commission_id;
         $course->category_id = $request->category_id;
@@ -1217,7 +1255,17 @@ class ContentManagementController extends Controller
         $course->offered_price = $request->offered_price;
         $course->num_classes = $request->num_classes;
         $course->num_topics = $request->num_topics;
-        $course->language_of_teaching = implode(',', $request->language_of_teaching); // Storing as comma-separated values
+
+        // ✅ Store multi-select arrays as comma-separated strings
+        $course->subject_id = $request->subject_id ?? [];
+        $course->chapter_id = $request->chapter_id ?? [];
+        $course->topic_id = $request->topic_id ?? [];
+        $course->language_of_teaching = implode(',', $request->language_of_teaching);
+
+        // ✅ Course Type Logic (Based On)
+        $basedOn = $request->based_on ?? 'general';
+        $course->based_on = $basedOn;
+
         $course->course_heading = $request->course_heading;
         $course->short_description = $request->short_description;
         $course->course_overview = $request->course_overview;
@@ -1232,9 +1280,9 @@ class ContentManagementController extends Controller
 
         $course->save();
 
-        // Redirect to a relevant page with a success message
         return redirect()->route('courses.course.index')->with('success', 'Course created successfully');
     }
+
 
     public function courseDelete($id)
     {
@@ -1629,6 +1677,12 @@ class ContentManagementController extends Controller
             'mrp' => 'nullable|numeric',
             'discount' => 'nullable|numeric',
             'based_on' => 'nullable|string',
+
+            // 🧩 New validation for Title & Description groups
+            'titles' => 'required|array|min:1',
+            'titles.*' => 'required|string',
+            'descriptions' => 'required|array|min:1',
+            'descriptions.*' => 'required|string',
         ]);
 
         // Upload PDF file (optional)
@@ -1682,7 +1736,6 @@ class ContentManagementController extends Controller
         $studyMaterial->subject_id = $validatedData['subject_id'] ?? [];
         $studyMaterial->chapter_id = $validatedData['chapter_id'] ?? [];
         $studyMaterial->topic_id = $validatedData['topic_id'] ?? [];
-
         $studyMaterial->is_pdf_downloadable = $validatedData['is_pdf_downloadable'];
         $studyMaterial->material_type = $materialType;
         $studyMaterial->title = $validatedData['title'];
@@ -1700,6 +1753,16 @@ class ContentManagementController extends Controller
         $studyMaterial->meta_description = $validatedData['meta_description'] ?? null;
         $studyMaterial->based_on = $basedOn; // Optional, for reference
         $studyMaterial->save();
+
+        if (!empty($validatedData['titles']) && !empty($validatedData['descriptions'])) {
+            foreach ($validatedData['titles'] as $index => $title) {
+                StudyMaterialSection::create([
+                    'study_material_id' => $studyMaterial->id,
+                    'title' => $title,
+                    'description' => $validatedData['descriptions'][$index] ?? '',
+                ]);
+            }
+        }
 
         return redirect()
             ->route('study.material.index')
@@ -1734,7 +1797,7 @@ class ContentManagementController extends Controller
 
     public function studyMaterialEdit($id)
     {
-        $material = StudyMaterial::findOrFail($id);
+        $material = StudyMaterial::with('sections')->findOrFail($id);
 
         $data['commissions'] = ExaminationCommission::all();
 
@@ -1764,15 +1827,18 @@ class ContentManagementController extends Controller
 
         $data['material'] = $material;
 
+        // ✅ Include sections (title + description)
+        $data['sections'] = $material->sections ?? collect();
+
         return view('study-material.edit', $data);
     }
 
+
     public function studyMaterialUpdate($id, Request $request)
     {
-        
         $material = StudyMaterial::findOrFail($id);
 
-        // Validation: accept arrays for multi-select fields
+        // Validation
         $validatedData = $request->validate([
             'commission_id' => 'required|integer',
             'category_id' => 'required|integer',
@@ -1800,36 +1866,46 @@ class ContentManagementController extends Controller
             'meta_title' => 'nullable|string|max:255',
             'meta_keyword' => 'nullable|string',
             'meta_description' => 'nullable|string',
-             'based_on' => 'nullable|string',
+            'based_on' => 'nullable|string',
+
+            // Section validation
+            'section_ids' => 'nullable|array',
+            'section_ids.*' => 'nullable|integer|exists:study_material_sections,id',
+            'titles' => 'nullable|array',
+            'titles.*' => 'nullable|string|max:255',
+            'descriptions' => 'nullable|array',
+            'descriptions.*' => 'nullable|string',
         ]);
 
-        // Encode arrays as JSON to store in DB
-        $material->commission_id = $validatedData['commission_id'];
-        $material->category_id = $validatedData['category_id'];
-        $material->sub_category_id = $validatedData['sub_category_id'] ?? null;
-        $material->subject_id = $validatedData['subject_id'] ?? [];
-        $material->chapter_id = $validatedData['chapter_id'] ?? [];
-        $material->topic_id = $validatedData['topic_id'] ?? [];
+        // Update main material
+        $material->fill([
+            'commission_id' => $validatedData['commission_id'],
+            'category_id' => $validatedData['category_id'],
+            'sub_category_id' => $validatedData['sub_category_id'] ?? null,
+            'subject_id' => $validatedData['subject_id'] ?? [],
+            'chapter_id' => $validatedData['chapter_id'] ?? [],
+            'topic_id' => $validatedData['topic_id'] ?? [],
+            'title' => $validatedData['title'],
+            'short_description' => $validatedData['short_description'],
+            'detail_content' => $validatedData['detail_content'],
+            'IsPaid' => $validatedData['IsPaid'],
+            'mrp' => $validatedData['mrp'] ?? null,
+            'discount' => $validatedData['discount'] ?? null,
+            'price' => $validatedData['price'] ?? null,
+            'status' => $validatedData['status'],
+            'meta_title' => $validatedData['meta_title'] ?? null,
+            'meta_keyword' => $validatedData['meta_keyword'] ?? null,
+            'meta_description' => $validatedData['meta_description'] ?? null,
+            'is_pdf_downloadable' => $validatedData['is_pdf_downloadable'],
+        ]);
 
-        $material->title = $validatedData['title'];
-        $material->short_description = $validatedData['short_description'];
-        $material->detail_content = $validatedData['detail_content'];
-        $material->IsPaid = $validatedData['IsPaid'];
-        $material->mrp = $validatedData['mrp'] ?? null;
-        $material->discount = $validatedData['discount'] ?? null;
-        $material->price = $validatedData['price'] ?? null;
-        $material->status = $validatedData['status'];
-        $material->meta_title = $validatedData['meta_title'] ?? null;
-        $material->meta_keyword = $validatedData['meta_keyword'] ?? null;
-        $material->meta_description = $validatedData['meta_description'] ?? null;
-        $material->is_pdf_downloadable = $validatedData['is_pdf_downloadable'];
-
+        // Determine material type
         $basedOn = $validatedData['based_on'] ?? null;
         $material->material_type = 'general';
         if ($basedOn) {
             switch (true) {
                 case str_contains($basedOn, 'Combined Topic'):
-                    $$material->material_type = 'combined_topic_based';
+                    $material->material_type = 'combined_topic_based';
                     break;
                 case str_contains($basedOn, 'Topic'):
                     $material->material_type = 'topic_based';
@@ -1852,26 +1928,67 @@ class ContentManagementController extends Controller
             }
         }
 
-        // Handle banner update
+        // Handle file updates
         if ($request->hasFile('banner')) {
-            if ($material->banner) {
+            if ($material->banner)
                 Storage::disk('public')->delete($material->banner);
-            }
             $material->banner = $request->file('banner')->store('banners', 'public');
         }
-
-        // Handle PDF update
         if ($request->hasFile('pdf')) {
-            if ($material->pdf) {
+            if ($material->pdf)
                 Storage::disk('public')->delete($material->pdf);
-            }
             $material->pdf = $request->file('pdf')->store('pdfs', 'public');
         }
 
         $material->save();
 
-        return redirect()->route('study.material.index')->with('success', 'Study Material updated successfully');
+        /**
+         * ✅ Handle Sections (Update / Create / Delete missing)
+         */
+        $sectionIds = $request->input('section_ids', []);
+        $titles = $request->input('titles', []);
+        $descriptions = $request->input('descriptions', []);
+
+        $existingSectionIds = $material->sections()->pluck('id')->toArray();
+        $submittedSectionIds = array_filter($sectionIds);
+
+        // 🔸 Delete sections that are no longer submitted
+        $toDelete = array_diff($existingSectionIds, $submittedSectionIds);
+        if (!empty($toDelete)) {
+            StudyMaterialSection::whereIn('id', $toDelete)->delete();
+        }
+
+        // 🔸 Loop through and update or create
+        foreach ($titles as $index => $title) {
+            $sectionId = $sectionIds[$index] ?? null;
+            $description = $descriptions[$index] ?? '';
+
+            if ($sectionId && in_array($sectionId, $existingSectionIds)) {
+                // Update existing section
+                $section = StudyMaterialSection::find($sectionId);
+                if ($section) {
+                    $section->update([
+                        'title' => $title,
+                        'description' => $description,
+                    ]);
+                }
+            } else {
+                // Create new section
+                if (!empty($title) || !empty($description)) {
+                    StudyMaterialSection::create([
+                        'study_material_id' => $material->id,
+                        'title' => $title,
+                        'description' => $description,
+                    ]);
+                }
+            }
+        }
+
+        return redirect()
+            ->route('study.material.index')
+            ->with('success', 'Study Material updated successfully with sections');
     }
+
 
 
     public function studyMaterialDelete($id)

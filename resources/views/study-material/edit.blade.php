@@ -122,13 +122,50 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="detail_content" class="form-label">Description</label>
+                        <label for="detail_content" class="form-label">Detail Content</label>
                         <textarea id="editor" name="detail_content"
                             style="height: 200px;">{!! $material->detail_content !!}</textarea>
                         @if ($errors->has('detail_content'))
                             <span class="text-danger text-left">{{ $errors->first('detail_content') }}</span>
                         @endif
                     </div>
+
+                     <!-- ✅ NEW SECTION: Dynamic Material Sections -->
+                    <hr>
+                    <h5>Study Material Sections</h5>
+                    <div id="section-wrapper">
+    @if(isset($sections) && count($sections) > 0)
+        @foreach($sections as $index => $section)
+            <div class="section-block border p-3 mb-3 rounded">
+                <input type="hidden" name="section_ids[]" value="{{ $section->id }}">
+                <div class="d-flex justify-content-between align-items-center">
+                    <strong>Section {{ $loop->iteration }}</strong>
+                    <button type="button" class="btn btn-danger btn-sm remove-section">Remove</button>
+                </div>
+                <div class="mt-2">
+                    <input type="text" name="titles[]" class="form-control mb-2"
+                        value="{{ $section->title }}" placeholder="Section Title" required>
+                    <textarea name="descriptions[]" id="section_description_{{ $loop->index }}" class="form-control ckeditor-section" rows="3" placeholder="Section Description" required>{{ $section->description }}</textarea>
+                </div>
+            </div>
+        @endforeach
+    @else
+        <div class="section-block border p-3 mb-3 rounded">
+            <div class="d-flex justify-content-between align-items-center">
+                <strong>Section 1</strong>
+                <button type="button" class="btn btn-danger btn-sm remove-section">Remove</button>
+            </div>
+            <div class="mt-2">
+                <input type="text" name="titles[]" class="form-control mb-2"
+                    placeholder="Section Title" required>
+                <textarea name="descriptions[]" id="section_description_0" class="form-control ckeditor-section" rows="3" placeholder="Section Description" required></textarea>
+            </div>
+        </div>
+    @endif
+</div>
+
+                    <button type="button" class="btn btn-success btn-sm" id="add-section">+ Add Section</button>
+                    <!-- ✅ END NEW SECTION -->
 
                     <div class="mb-3">
                         <label for="IsPaid" class="form-label">Paid</label>
@@ -239,6 +276,57 @@
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
     <script>
+
+ // Initialize CKEditor for existing section descriptions
+function initCKEditors() {
+    $('.ckeditor-section').each(function() {
+        if (!this.id) {
+            this.id = 'section_description_' + Date.now();
+        }
+        if (!CKEDITOR.instances[this.id]) {
+            CKEDITOR.replace(this.id);
+        }
+    });
+}
+
+// Run on page load
+initCKEditors();
+
+// When new section is added
+$('#add-section').on('click', function () {
+    let sectionCount = $('.section-block').length + 1;
+    let uniqueId = 'section_description_' + Date.now();
+
+    let sectionHtml = `
+        <div class="section-block border p-3 mb-3 rounded">
+            <input type="hidden" name="section_ids[]" value="">
+            <div class="d-flex justify-content-between align-items-center">
+                <strong>Section ${sectionCount}</strong>
+                <button type="button" class="btn btn-danger btn-sm remove-section">Remove</button>
+            </div>
+            <div class="mt-2">
+                <input type="text" name="titles[]" class="form-control mb-2" placeholder="Section Title" required>
+                <textarea name="descriptions[]" id="${uniqueId}" class="form-control ckeditor-section" rows="3" placeholder="Section Description" required></textarea>
+            </div>
+        </div>
+    `;
+
+    $('#section-wrapper').append(sectionHtml);
+
+    // Initialize CKEditor for the newly added textarea
+    CKEDITOR.replace(uniqueId);
+});
+
+// When section is removed
+$(document).on('click', '.remove-section', function () {
+    let textarea = $(this).closest('.section-block').find('textarea')[0];
+    if (textarea && CKEDITOR.instances[textarea.id]) {
+        CKEDITOR.instances[textarea.id].destroy(true);
+    }
+    $(this).closest('.section-block').remove();
+});
+
+
 
         function updateDisableSelects() {
     let subjects = $('#subject_id').val() || [];

@@ -346,6 +346,43 @@
                                         </div>
                                     </div>
                                 </li>
+                                   <li class="dropdown">
+                                    <a href="#">Syllabus</a>
+                                    <div class="mega-menu-container">
+                                        <div class="mega-menu-left">
+                                            @foreach($examinationCommission as $index => $commission)
+                                            <div class="mega-menu-tab {{ $loop->first ? 'active' : '' }}" data-tab="tab-test-{{ $commission->id }}">
+                                                {{ $commission->name }}
+                                            </div>
+                                            @endforeach
+                                        </div>
+                                        <div class="mega-menu-right">
+                                            @foreach($examinationCommission as $commission)
+                                            <div class="mega-menu-panel {{ $loop->first ? 'active' : '' }}" id="tab-test-{{ $commission->id }}" style="width: 100%;
+    display: grid; grid-template-columns: 1fr 1fr 1fr;">
+                                                @foreach($commission->categories as $category)
+                                                <div> <!-- Each category is a grid item -->
+                                                    <h5>{{ $category->name }}</h5>
+                                                    <ul>
+                                                        @foreach($category->subCategories as $subCat)
+                                                      <li>
+  <a href="{{ route('syllabus.front', [
+      'examid' => $commission->id,
+      'catid' => $category->id,
+      'subcat' => $subCat->id
+  ]) }}">
+    {{ $subCat->name }}
+  </a>
+</li>
+                                                        @endforeach
+                                                    </ul>
+                                                </div>
+                                                @endforeach
+                                            </div>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                </li>
                                 <li class="dropdown">
                                     <a href="#">Student Corner</a>
                                     <div class="mega-menu-container">

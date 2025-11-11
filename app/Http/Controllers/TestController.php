@@ -396,6 +396,10 @@ class TestController extends Controller
             'negative_marks_per_question' => 'required_if:has_negative_marks,yes|gte:0',
             'total_positive_marks' => 'required|gte:0',
             'total_negative_marks' => 'required|gte:0',
+            // Optional numeric validation for price fields
+            'mrp' => 'nullable|numeric|gte:0',
+            'discount' => 'nullable|numeric|gte:0',
+            'offer_price' => 'nullable|numeric|gte:0',
         ]);
 
         if ($validator->passes()) {
@@ -438,6 +442,16 @@ class TestController extends Controller
                     $total_marks_mcq += $positive;
                     $positive_marks_per_question_mcq = $positive;
                     // $negative_marks_per_question_mcq = $negative;
+                }
+
+                // ✅ Handle pricing only for paid + previous year tests
+                $mrp = null;
+                $discount = null;
+                $offer_price = null;
+                if ($request->test_type === 'paid' && $request->paper_type == '1') {
+                    $mrp = $request->mrp;
+                    $discount = $request->discount;
+                    $offer_price = $request->offer_price;
                 }
 
                 $testData = array(
@@ -487,7 +501,12 @@ class TestController extends Controller
                     'subjective_total_marks' => $request->subjective_total_marks,
                     'test_paper_type' => $testPaperType,
                     'question_generated_by' => $request->question_generated_by ?? 'manual',
+                    // ✅ New pricing fields
+                    'mrp' => $mrp,
+                    'discount' => $discount,
+                    'offer_price' => $offer_price,
                 );
+
                 //echo "<pre>";print_r($testData);exit;
                 $test = Test::create($testData);
                 // print_r((json_decode($request->section_details,true)));
@@ -582,6 +601,10 @@ class TestController extends Controller
             'number_of_re_attempt_allowed' => 'required_if:reattempt,yes|gte:0',
             'has_negative_marks' => 'required',
             'negative_marks_per_question' => 'required_if:has_negative_marks,yes|gte:0',
+            // Optional numeric validation for price fields
+            'mrp' => 'nullable|numeric|gte:0',
+            'discount' => 'nullable|numeric|gte:0',
+            'offer_price' => 'nullable|numeric|gte:0',
         ]);
 
         if ($validator->fails()) {
@@ -606,6 +629,15 @@ class TestController extends Controller
             if ($request->subjective_total_question > 0)
                 $testPaperType = $testPaperType ? 'Combined' : 'Subjective';
 
+            // ✅ Handle pricing only for paid + previous year tests
+            $mrp = null;
+            $discount = null;
+            $offer_price = null;
+            if ($request->test_type === 'paid' && $request->paper_type == '1') {
+                $mrp = $request->mrp;
+                $discount = $request->discount;
+                $offer_price = $request->offer_price;
+            }
             // Prepare test data
             $testData = [
                 'language' => $request->language,
@@ -643,7 +675,11 @@ class TestController extends Controller
                 'subjective_mark_per_question' => $request->subjective_mark_per_question,
                 'subjective_total_marks' => $request->subjective_total_marks,
                 'test_paper_type' => $testPaperType,
-                'question_generated_by' => $request->question_generated_by
+                'question_generated_by' => $request->question_generated_by,
+                // ✅ New pricing fields
+                'mrp' => $mrp,
+                'discount' => $discount,
+                'offer_price' => $offer_price,
             ];
 
             $test->update($testData);

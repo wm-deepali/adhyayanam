@@ -37,8 +37,8 @@ class Video extends Model
         'asignment',
         'sub_category_id',
         'subject_id',
-        'topic_id'
-
+        'topic_id',
+        'live_link'
     ];
 
     public function coursecategory()

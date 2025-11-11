@@ -111,6 +111,7 @@ class VideoController extends Controller
                     'video_type' => $request->video_type[$i] ?? null,
                     'video_url' => $request->video_url[$i] ?? null,
                     'duration' => $request->duration[$i] ?? null,
+
                 ];
 
                 // ✅ Handle image uploads
@@ -151,6 +152,7 @@ class VideoController extends Controller
                     'teacher_id' => $request->teacher_id[$i] ?? null,
                     'status' => $request->live_status[$i] ?? 'active',
                     'content' => $request->live_content[$i] ?? null,
+                    'live_link' => $request->live_link[$i] ?? null, // ✅ Add this line
                 ];
 
                 // ✅ Handle optional assignment image
@@ -264,6 +266,7 @@ class VideoController extends Controller
                 $rules['start_time'] = 'required';
                 $rules['end_time'] = 'required';
                 $rules['teacher'] = 'required';
+                $rules['live_link'] = 'nullable|url';
             }
 
             $validator = Validator::make($requestData, $rules);
@@ -348,6 +351,7 @@ class VideoController extends Controller
             if ($request->type === "live_class") {
                 $requestData['start_time'] = date('H:i:s', strtotime($request->start_time));
                 $requestData['end_time'] = date('H:i:s', strtotime($request->end_time));
+                $requestData['live_link'] = $request->live_link ?? $video->live_link; // ✅ Add this line
             }
 
             // ✅ Update Video
@@ -395,7 +399,7 @@ class VideoController extends Controller
         $datas = Video::where('course_id', $id)->latest()->get();
         return view('video.index', compact('datas'));
     }
-    
+
     public function live_class_schedule()
     {
         $datas = Video::where('type', 'live_class')->latest()->get();

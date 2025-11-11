@@ -288,8 +288,30 @@
                                         id="total_marks" value="{{$paper->total_marks ?? 0}}" readonly>
                                     <div class="text-danger validation-err" id="total_marks-err"></div>
                                 </div>
+                            </div>
 
+                            <div class="form-row price-fields" style="display:none;">
+                                <div class="form-group col-md-4">
+                                    <label for="mrp">MRP <b class="text-danger">*</b></label>
+                                    <input type="number" step="0.01" class="form-control" name="mrp" id="mrp"
+                                        placeholder="Enter MRP" value="{{ $paper->mrp ?? '' }}">
+                                    <div class="text-danger validation-err" id="mrp-err"></div>
+                                </div>
 
+                                <div class="form-group col-md-4">
+                                    <label for="discount">Discount (%)</label>
+                                    <input type="number" step="0.01" class="form-control" name="discount" id="discount"
+                                        placeholder="Enter Discount" value="{{ $paper->discount ?? '' }}">
+                                    <div class="text-danger validation-err" id="discount-err"></div>
+                                </div>
+
+                                <div class="form-group col-md-4">
+                                    <label for="offer_price">Offer Price</label>
+                                    <input type="number" step="0.01" class="form-control" name="offer_price"
+                                        id="offer_price" placeholder="Enter Offer Price"
+                                        value="{{ $paper->offer_price ?? '' }}">
+                                    <div class="text-danger validation-err" id="offer_price-err"></div>
+                                </div>
                             </div>
 
                             <div class="form-row">
@@ -374,10 +396,10 @@
                             </div>
                             <div class="form-row">
                                 <!--div class="form-group col-md-4">
-                                                        <label for="per_question_marks">Per Question Marks </label>
-                                                            <input type="text" class="form-control" placeholder="Enter in no." name="per_question_marks" id="per_question_marks" >
-                                                            <div class="text-danger validation-err" id="per_question_marks-err"></div>
-                                                        </div-->
+                                                                    <label for="per_question_marks">Per Question Marks </label>
+                                                                        <input type="text" class="form-control" placeholder="Enter in no." name="per_question_marks" id="per_question_marks" >
+                                                                        <div class="text-danger validation-err" id="per_question_marks-err"></div>
+                                                                    </div-->
                                 <div class="form-group col-md-6">
                                     <label for="inputPassword4">Question Selections </label>
                                     <select id="question_generated_by" name="question_generated_by" class="form-control">
@@ -644,6 +666,51 @@
     <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
     <!-- CKEditor CDN -->
     <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const testType = document.getElementById('test_type');
+            const paperType = document.getElementById('paper_type');
+            const priceFields = document.querySelector('.price-fields');
+
+            const mrpInput = document.getElementById('mrp');
+            const discountInput = document.getElementById('discount');
+            const offerPriceInput = document.getElementById('offer_price');
+
+            // 🔹 Function to show/hide price fields
+            function togglePriceFields() {
+                const isPaid = testType.value === 'paid';
+                const isPreviousYear = paperType.value === '1';
+                if (isPaid && isPreviousYear) {
+                    priceFields.style.display = 'flex';
+                } else {
+                    priceFields.style.display = 'none';
+                    mrpInput.value = '';
+                    discountInput.value = '';
+                    offerPriceInput.value = '';
+                }
+            }
+
+            // 🔹 Function to auto-calculate offer price
+            function calculateOfferPrice() {
+                const mrp = parseFloat(mrpInput.value) || 0;
+                const discount = parseFloat(discountInput.value) || 0;
+                const offerPrice = mrp - (mrp * (discount / 100));
+                offerPriceInput.value = offerPrice.toFixed(2);
+            }
+
+            // 🔹 Event listeners
+            testType.addEventListener('change', togglePriceFields);
+            paperType.addEventListener('change', togglePriceFields);
+            mrpInput.addEventListener('input', calculateOfferPrice);
+            discountInput.addEventListener('input', calculateOfferPrice);
+
+            // Initialize on page load
+            togglePriceFields();
+        });
+    </script>
+
+
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const existingNegativeMarks = '{{ $paper->negative_marks_per_question ?? "" }}'; // blade variable from backend
@@ -738,10 +805,10 @@
             const additionalInputContainer = document.getElementById('additionalInputContainer');
             if (negativeMarkingSelect.value === 'yes') {
                 additionalInputContainer.innerHTML = `
-                    <label for="negative_marks_per_question">Negative Mark (%)</label>
-    <input type="number" id="negative_marks_per_question" name="negative_marks_per_question" min="0" max="100" step="0.01" value="{{ old('negative_marks_per_question', $paper->negative_marks_per_question ?? '') }}">
-    <small>Enter negative marking as a percentage of the positive mark per question.</small>
-            `;
+                                <label for="negative_marks_per_question">Negative Mark (%)</label>
+                <input type="number" id="negative_marks_per_question" name="negative_marks_per_question" min="0" max="100" step="0.01" value="{{ old('negative_marks_per_question', $paper->negative_marks_per_question ?? '') }}">
+                <small>Enter negative marking as a percentage of the positive mark per question.</small>
+                        `;
             } else {
                 additionalInputContainer.innerHTML = '';
             }
@@ -757,9 +824,9 @@
 
             if (negativeMarkingSelect.value === 'yes') {
                 additionalInputContainer.innerHTML = `
-                                                <label for="number_of_re_attempt_allowed">Number of Time</label>
-                                                <input type="number" id="number_of_re_attempt_allowed" name="number_of_re_attempt_allowed" min="0" step="0.01" required  value="${prefillValue}">
-                                            `;
+                                                            <label for="number_of_re_attempt_allowed">Number of Time</label>
+                                                            <input type="number" id="number_of_re_attempt_allowed" name="number_of_re_attempt_allowed" min="0" step="0.01" required  value="${prefillValue}">
+                                                        `;
             } else {
                 additionalInputContainer.innerHTML = '';
             }
@@ -1546,7 +1613,7 @@
                 formData.append('topic', (typeof $('#topic').val() == 'undefined') ? '' : $('#topic').val());
                 formData.append('paper_type', $('#paper_type').val());
                 formData.append('previous_year', $('#previous_year').val());
-                
+
                 formData.append('name', $('#name').val());
                 formData.append('id', $('#test_id').val());
                 formData.append('duration', $('#duration').val());
@@ -1728,9 +1795,16 @@
                 formData.append('non_section_details', JSON.stringify(non_section_details));
 
 
-
-
-
+                // Add price fields only when test type is paid and paper type is Previous Year
+                if ($('#test_type').val() === 'paid' && $('#paper_type').val() === '1') {
+                    formData.append('mrp', $('#mrp').val());
+                    formData.append('discount', $('#discount').val());
+                    formData.append('offer_price', $('#offer_price').val());
+                } else {
+                    formData.append('mrp', '');
+                    formData.append('discount', '');
+                    formData.append('offer_price', '');
+                }
 
                 let marks_by_section_detail = $('.question-container-div').map(function () {
                     var quesattr = $(this).attr('question_id');

@@ -546,6 +546,18 @@ class QuestionBankController extends Controller
                 $time = microtime();
                 $outputPath = storage_path($time . '.html');
 
+                $filename = $request->file->getRealPath();
+                // unzip .docx temporarily
+                $zip = new \ZipArchive;
+                if ($zip->open($filename) === TRUE) {
+                    $xml = $zip->getFromName('word/document.xml');
+                    // remove Office Math tags
+                    $xml = preg_replace('/<m:oMath[^>]*>.*?<\/m:oMath>/is', '', $xml);
+                    $xml = preg_replace('/<m:oMathPara[^>]*>.*?<\/m:oMathPara>/is', '', $xml);
+                    $zip->addFromString('word/document.xml', $xml);
+                    $zip->close();
+                }
+
                 $phpWord = \PhpOffice\PhpWord\IOFactory::load($filename);
                 $htmlWriter = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord, 'HTML');
                 $htmlWriter->save($outputPath);

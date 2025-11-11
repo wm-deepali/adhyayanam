@@ -57,7 +57,11 @@ class Test extends Model
         'subjective_mark_per_question',
         'subjective_total_marks',
         'test_paper_type',
-        'question_generated_by'
+        'question_generated_by',
+
+        'mrp',
+        'discount',
+        'offer_price'
     ];
 
     public function subject()

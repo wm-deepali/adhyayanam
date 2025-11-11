@@ -6,6 +6,7 @@ use App\Models\BatchProgramme;
 use App\Models\Blog;
 use App\Models\Chapter;
 use App\Models\Question;
+use App\Models\Syllabus;
 use App\Models\Test;
 use App\Models\CallBack;
 use App\Models\Category;
@@ -463,6 +464,37 @@ class FrontController extends Controller
         return view('front.user.study-material', $data);
     }
 
+    public function syllabusIndex($commissionId = null, $categoryId = null, $subCategoryId = null, Request $request)
+    {
+        // Get subjects for sidebar, optionally filtered by category/subcategory
+        $subjects = Subject::when($categoryId, fn($q) => $q->where('category_id', $categoryId))
+            ->when($subCategoryId, fn($q) => $q->where('sub_category_id', $subCategoryId))
+            ->get();
+
+        // Base query for syllabus
+        $syllabusQuery = Syllabus::with(['commission', 'category', 'subcategory']);
+
+        if ($commissionId) {
+            $syllabusQuery->where('commission_id', $commissionId);
+        }
+        if ($categoryId) {
+            $syllabusQuery->where('category_id', $categoryId);
+        }
+        if ($subCategoryId) {
+            $syllabusQuery->where('sub_category_id', $subCategoryId);
+        }
+
+        // Optional filter by subject (from query string)
+        if ($request->has('subject') && $request->subject != null) {
+            $syllabusQuery->where('subject_id', $request->subject);
+        }
+
+        $syllabus = $syllabusQuery->get();
+
+        return view('front.syllabus', compact('subjects', 'syllabus', 'commissionId', 'categoryId', 'subCategoryId'));
+    }
+
+
     public function upcomingExamsIndex()
     {
         $data['upcomingExams'] = UpcomingExam::with('exam_commission')->orderBy('created_at', 'DESC')->get();
@@ -513,10 +545,10 @@ class FrontController extends Controller
     public function pyqPapers($examid, $catid, $subcat)
     {
         $data['subcat'] = SubCategory::findOrFail($subcat);
-        $data['papers'] = PYQ::where('sub_cat_id', $subcat)->where('has_subject', 0)->get();
+        $data['papers'] = Test::where('paper_type', 1)->where('competitive_commission_id', $examid)->where('exam_category_id', $catid)->where('exam_subcategory_id', $subcat)->get();
         $data['subjects'] = Subject::where('sub_category_id', $subcat)->get();
         $data['pyq_content'] = PyqContent::where('commission_id', $examid)->where('category_id', $catid)->where('sub_category_id', $subcat)->first();
-        $data['questions'] = Question::where('commission_id', $examid)->where('category_id', $catid)->where('sub_category_id', $subcat)->get();
+        // dd($data['papers']->toArray());
         return view('front.pyq-papers', $data);
     }
 
@@ -555,9 +587,8 @@ class FrontController extends Controller
     public function subjectPapers($id)
     {
         $data['subject'] = Subject::findOrFail($id);
-        $data['papers'] = PyqSubject::with('pyq')->where('subject_id', $id)->get();
+        $data['papers'] = Test::where('paper_type', 1)->where('subject_id', $id)->get();
         $data['pyq_content'] = PyqContent::where('subject_id', $id)->first();
-        $data['questions'] = Question::where('subject_id', $id)->get();
         return view('front.pyq-subjects', $data);
     }
     public function sendotopstudent(Request $request)

@@ -3178,28 +3178,25 @@ class ContentManagementController extends Controller
             'file' => 'required|mimes:docx,xlsx',
         ]);
 
-        // Create a new instance of QuestionBank model
-        // $questionBank = new QuestionBank();
-
-        // // Assign values to the model properties
-        // $questionBank->language = $request->language;
-        // $questionBank->question_category = $request->question_category;
-        // $questionBank->commission_id = $request->commission_id;
-        // $questionBank->previous_year = $request->previous_year;
-        // $questionBank->category_id = $request->category_id;
-        // $questionBank->sub_category_id = $request->sub_category_id;
-        // $questionBank->chapter_id = $request->chapter_id;
-        // $questionBank->subject_id = $request->subject_id;
-        // $questionBank->topic = $request->topic;
-
-
-
         try {
             $questionData = array();
             if ($request->file->getClientOriginalExtension() == 'docx') {
                 $filename = $request->file;
                 $time = microtime();
                 $outputPath = storage_path($time . '.html');
+
+                $filename = $request->file->getRealPath();
+
+                // unzip .docx temporarily
+                $zip = new \ZipArchive;
+                if ($zip->open($filename) === TRUE) {
+                    $xml = $zip->getFromName('word/document.xml');
+                    // remove Office Math tags
+                    $xml = preg_replace('/<m:oMath[^>]*>.*?<\/m:oMath>/is', '', $xml);
+                    $xml = preg_replace('/<m:oMathPara[^>]*>.*?<\/m:oMathPara>/is', '', $xml);
+                    $zip->addFromString('word/document.xml', $xml);
+                    $zip->close();
+                }
 
                 $phpWord = \PhpOffice\PhpWord\IOFactory::load($filename);
                 $htmlWriter = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord, 'HTML');
@@ -3379,7 +3376,7 @@ class ContentManagementController extends Controller
 
                             $que = Question::where('question', $question)->where('commission_id', $request->commission_id)->where('category_id', $request->category_id)
                                 ->where('sub_category_id', $request->sub_category_id)
-                                ->where('chapter_id', $request->chapter_id);
+                                ->where('subject_id', $request->subject_id);
                             if ($request->previous_year) {
                                 $que = $que->where('previous_year', $request->previous_year);
                             }
@@ -3474,7 +3471,7 @@ class ContentManagementController extends Controller
 
                             $que = Question::where('question', $question)->where('commission_id', $request->commission_id)->where('category_id', $request->category_id)
                                 ->where('sub_category_id', $request->sub_category_id)
-                                ->where('chapter_id', $request->chapter_id);
+                                ->where('subject_id', $request->subject_id);
                             if ($request->previous_year) {
                                 $que = $que->where('previous_year', $request->previous_year);
                             }
@@ -3574,7 +3571,7 @@ class ContentManagementController extends Controller
 
                     $que = Question::where('question', $question)->where('commission_id', $request->commission_id)->where('category_id', $request->category_id)
                         ->where('sub_category_id', $request->sub_category_id)
-                        ->where('chapter_id', $request->chapter_id);
+                        ->where('subject_id', $request->subject_id);
                     if ($request->previous_year) {
                         $que = $que->where('previous_year', $request->previous_year);
                     }

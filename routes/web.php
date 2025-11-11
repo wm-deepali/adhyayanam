@@ -121,6 +121,7 @@ Route::get('user/adhyayanam-corner', [App\Http\Controllers\FrontController::clas
 Route::get('user/feed-back-testimonial', [App\Http\Controllers\FrontController::class, 'feedBackIndex'])->name('feed.back.index');
 Route::post('user/feed-back-testimonial/store', [App\Http\Controllers\FrontController::class, 'feedBackStore'])->name('feed.back.store');
 Route::get('user/batches-and-programme', [App\Http\Controllers\FrontController::class, 'batchesIndex'])->name('batches.index');
+Route::get('user/syllabus/{examid?}/{catid?}/{subcat?}', [App\Http\Controllers\FrontController::class, 'syllabusIndex'])->name('syllabus.front');
 /**
  * Auth Routes
  */

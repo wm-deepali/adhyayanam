@@ -160,7 +160,8 @@
                             <div class="text-danger validation-err" id="paper_type-err"></div>
                             <div class="form-group previous-year-group" id="previous-year" style="display: none;">
                                 <label>Previous Year</label>
-                                <input type="number" class="form-control" name="previous_year"  id="previous_year" placeholder="Ex. 2014">
+                                <input type="number" class="form-control" name="previous_year" id="previous_year"
+                                    placeholder="Ex. 2014">
                             </div>
 
                             <label class="mt-2" for="paper_type">Test Type *</label>
@@ -259,6 +260,28 @@
 
                             </div>
 
+                            <!-- Add this inside your form, preferably after Total Marks section -->
+                            <div class="form-row price-section" id="price-section" style="display: none;">
+                                <div class="form-group col-md-4">
+                                    <label for="mrp">MRP <b class="text-danger">*</b></label>
+                                    <input type="number" class="form-control" name="mrp" id="mrp" placeholder="Enter MRP">
+                                    <div class="text-danger validation-err" id="mrp-err"></div>
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <label for="discount">Discount (%)</label>
+                                    <input type="number" class="form-control" name="discount" id="discount"
+                                        placeholder="Enter Discount %">
+                                    <div class="text-danger validation-err" id="discount-err"></div>
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <label for="offer_price">Offered Price</label>
+                                    <input type="number" class="form-control" name="offer_price" id="offer_price"
+                                        placeholder="Calculated Automatically" readonly>
+                                    <div class="text-danger validation-err" id="offer_price-err"></div>
+                                </div>
+                            </div>
+
+
                             <div class="form-row">
                                 <div class="form-group col-md-6">
                                     <label for="text">Question Type</label><br>
@@ -333,10 +356,10 @@
                             </div>
                             <div class="form-row">
                                 <!--div class="form-group col-md-4">
-                                <label for="per_question_marks">Per Question Marks </label>
-                                    <input type="text" class="form-control" placeholder="Enter in no." name="per_question_marks" id="per_question_marks" >
-                                    <div class="text-danger validation-err" id="per_question_marks-err"></div>
-                                </div-->
+                                        <label for="per_question_marks">Per Question Marks </label>
+                                            <input type="text" class="form-control" placeholder="Enter in no." name="per_question_marks" id="per_question_marks" >
+                                            <div class="text-danger validation-err" id="per_question_marks-err"></div>
+                                        </div-->
                                 <div class="form-group col-md-6">
                                     <label for="inputPassword4">Question Selections </label>
                                     <select id="question_generated_by" name="question_generated_by" class="form-control">
@@ -538,8 +561,31 @@
                 console.error('CKEditor initialization error:', error);
             });
 
-    </script>
-    <script>
+
+        function togglePriceSection() {
+            const paperType = $('#paper_type').val();
+            const testType = $('#test_type').val();
+
+            // Show section only if both conditions match
+            if (paperType == '1' && testType === 'paid') {
+                $('#price-section').slideDown();
+            } else {
+                $('#price-section').slideUp();
+            }
+        }
+
+        // Trigger check on change
+        $('#paper_type, #test_type').on('change', togglePriceSection);
+
+        // Auto-calculate offered price when MRP or discount changes
+        $('#mrp, #discount').on('input', function () {
+            const mrp = parseFloat($('#mrp').val()) || 0;
+            const discount = parseFloat($('#discount').val()) || 0;
+            const offerPrice = mrp - (mrp * discount / 100);
+            $('#offer_price').val(offerPrice.toFixed(2));
+        });
+
+
         $(document).on('change', '#subject', function (event) {
             $('#question_generated_by').val("").trigger('change');
             $('#chapter_id').val("").trigger('change');
@@ -657,10 +703,10 @@
 
             if (negativeMarkingSelect.value === 'yes') {
                 additionalInputContainer.innerHTML = `
-                        <label for="negative_marks_per_question">Negative Mark (%)</label>
-    <input type="number" id="negative_marks_per_question" name="negative_marks_per_question" min="0" max="100" step="0.01">
-    <small>Enter negative marking as a percentage of the positive mark per question.</small>
-                        `;
+                                <label for="negative_marks_per_question">Negative Mark (%)</label>
+            <input type="number" id="negative_marks_per_question" name="negative_marks_per_question" min="0" max="100" step="0.01">
+            <small>Enter negative marking as a percentage of the positive mark per question.</small>
+                                `;
             } else {
                 additionalInputContainer.innerHTML = '';
             }
@@ -674,21 +720,16 @@
 
             if (negativeMarkingSelect.value === 'yes') {
                 additionalInputContainer.innerHTML = `
-                            <label for="number_of_re_attempt_allowed">Number of Time</label>
-                            <input type="number" id="number_of_re_attempt_allowed" name="number_of_re_attempt_allowed" min="0" step="0.01" required>
-                        `;
+                                    <label for="number_of_re_attempt_allowed">Number of Time</label>
+                                    <input type="number" id="number_of_re_attempt_allowed" name="number_of_re_attempt_allowed" min="0" step="0.01" required>
+                                `;
             } else {
                 additionalInputContainer.innerHTML = '';
             }
         }
 
     </script>
-
-
     <script>
-
-
-
         function reset_data_and_remove_tab_mcq() {
             $(".number_of_questions_mcq").attr('disabled', true);
             $('.number_of_questions_mcq').val('0');
@@ -1513,6 +1554,8 @@
                 formData.append('positive_per_question_marks', $('#per_question_marks').val());
                 formData.append('negative_marks_per_question', $('#negative_marks_per_question').val() ?? 0);
 
+
+
                 let non_section_details = {
                     question_ids: $('.selected-questions .question').map(function () {
                         return $(this).val()
@@ -1663,7 +1706,16 @@
 
 
 
-
+                // Add price fields only when test type is paid and paper type is Previous Year
+                if ($('#test_type').val() === 'paid' && $('#paper_type').val() === '1') {
+                    formData.append('mrp', $('#mrp').val());
+                    formData.append('discount', $('#discount').val());
+                    formData.append('offer_price', $('#offer_price').val());
+                } else {
+                    formData.append('mrp', '');
+                    formData.append('discount', '');
+                    formData.append('offer_price', '');
+                }
 
 
                 let marks_by_section_detail = $('.question-container-div').map(function () {

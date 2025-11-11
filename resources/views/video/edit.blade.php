@@ -284,6 +284,15 @@
                                     </select>
                                 </div>
 
+                                 <!-- Live Class Link -->
+                        <div class="col-md-6 mb-2">
+                            <label for="live_link">Live Class Link (URL):</label>
+                            <input type="url" class="form-control" name="live_link"
+                            value="{{ $video->live_link }}"
+                                placeholder="Enter live class URL">
+                        </div>
+
+
                                 {{-- Status --}}
                                 <div class="col-md-6 mb-2">
                                     <label>Status:</label>

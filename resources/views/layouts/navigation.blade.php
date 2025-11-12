@@ -679,6 +679,15 @@
                     Feature Settings
                 </a>
             </li>
+
+            <li class="nav-item">
+                <a class="nav-link" href="{{route('settings.user-wallet.index')}}" target="_top">
+                    <svg class="nav-icon">
+                        <use xlink:href="{{ asset('icons/coreui.svg#cil-header') }}"></use>
+                    </svg>
+                    User Wallet
+                </a>
+            </li>
         </ul>
     </li>
 </ul>

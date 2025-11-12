@@ -62,6 +62,7 @@ use Maatwebsite\Excel\HeadingRowImport;
 use Yajra\DataTables\Facades\DataTables;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\WalletTransaction;
+use App\Models\WalletSetting;
 
 class ContentManagementController extends Controller
 {
@@ -3174,7 +3175,6 @@ class ContentManagementController extends Controller
             'category_id' => 'required',
             'subject_id' => 'required',
             'topic' => 'nullable',
-
             'file' => 'required|mimes:docx,xlsx',
         ]);
 
@@ -3204,7 +3204,6 @@ class ContentManagementController extends Controller
                 $this->replaceThWithTd($outputPath);
                 $dom = new Dom;
                 $dom->loadFromFile($outputPath);
-
 
                 $tables = $dom->find('table');
                 $successCount = 0;
@@ -4140,6 +4139,68 @@ class ContentManagementController extends Controller
 
         // Redirect back with success message
         return redirect()->back()->with('success', 'Feature updated successfully!');
+    }
+
+    public function userWalletIndex()
+    {
+        $settings = WalletSetting::with('bonusRules')->first();
+
+        // If no setting exists yet, create a blank one for convenience
+        if (!$settings) {
+            $settings = WalletSetting::create(['welcome_bonus' => 0]);
+        }
+
+        return view('admin-settings.user-wallet', compact('settings'));
+    }
+
+
+    public function userWalletStore(Request $request)
+    {
+        $request->validate([
+            'welcome_bonus' => 'required|numeric|min:0',
+            'min_deposit.*' => 'required|numeric|min:0',
+            'extra_bonus_value.*' => 'required|numeric|min:0',
+            'bonus_type.*' => 'required|in:percentage,fixed',
+        ]);
+
+        // Save or update main wallet setting
+        $setting = WalletSetting::updateOrCreate(
+            ['id' => 1],
+            ['welcome_bonus' => $request->welcome_bonus]
+        );
+
+        $existingIds = $setting->bonusRules()->pluck('id')->toArray();
+        $submittedIds = [];
+
+        // Loop through all submitted rules
+        foreach ($request->min_deposit as $index => $minDeposit) {
+            $ruleId = $request->rule_id[$index] ?? null;
+
+            if ($ruleId && in_array($ruleId, $existingIds)) {
+                // ✅ Update existing rule
+                $setting->bonusRules()->where('id', $ruleId)->update([
+                    'min_deposit' => $minDeposit,
+                    'extra_bonus_value' => $request->extra_bonus_value[$index],
+                    'bonus_type' => $request->bonus_type[$index],
+                ]);
+
+                $submittedIds[] = $ruleId;
+            } else {
+                // ✅ Create new rule
+                $newRule = $setting->bonusRules()->create([
+                    'min_deposit' => $minDeposit,
+                    'extra_bonus_value' => $request->extra_bonus_value[$index],
+                    'bonus_type' => $request->bonus_type[$index],
+                ]);
+
+                $submittedIds[] = $newRule->id;
+            }
+        }
+
+        // ✅ Delete only rules that were removed in the form
+        $setting->bonusRules()->whereNotIn('id', $submittedIds)->delete();
+
+        return back()->with('success', 'User wallet settings updated successfully!');
     }
 
     public function getCategories($id)

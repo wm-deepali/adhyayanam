@@ -231,6 +231,8 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
         Route::get('user/process-order/{type}/{id}', [App\Http\Controllers\PaymentController::class, 'orderProcess'])->name('user.process-order');
         Route::any('order/status', [App\Http\Controllers\PaymentController::class, 'orderStatus'])->name('order.status');
 
+        Route::get('student/wallet', [App\Http\Controllers\StudentWalletController::class, 'index'])->name('student.wallet');
+
     });
 
     Route::middleware('auth', 'isAdmin')->group(function () {
@@ -444,7 +446,7 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
         Route::post('get-all-subjects', 'TestController@allSubject')->name('get-all-subjects');
         Route::post('get-all-subjects-multi', 'TestController@allSubjectMulti')->name('get-all-subjects-multi');
 
-         Route::resource('syllabus', 'SyllabusController');
+        Route::resource('syllabus', 'SyllabusController');
 
         Route::resource('pyq', 'PYQController');
         Route::resource('study-material/category', 'StudyMaterialCategoryController');
@@ -548,6 +550,10 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
 
         Route::get('admin/settings/feature-settings', [App\Http\Controllers\ContentManagementController::class, 'featureSettingsIndex'])->name('settings.feature.index');
         Route::post('admin/settings/feature-settings/store', [App\Http\Controllers\ContentManagementController::class, 'featureSettingsStore'])->name('settings.feature.store');
+
+        Route::get('admin/settings/user-wallet', [App\Http\Controllers\ContentManagementController::class, 'userWalletIndex'])->name('settings.user-wallet.index');
+        Route::post('admin/settings/user-wallet/store', [App\Http\Controllers\ContentManagementController::class, 'userWalletStore'])->name('settings.user-wallet.store');
+
 
         Route::get('admin/get-categories/{id}', [App\Http\Controllers\ContentManagementController::class, 'getCategories'])->name('settings.categories');
 

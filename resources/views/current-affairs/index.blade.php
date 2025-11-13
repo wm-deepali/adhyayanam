@@ -16,7 +16,18 @@
                 </div>
 
                 <div class="container mt-4">
-                    <a href="{{ route('current.affairs.create') }}" class="btn btn-primary">Add New</a>
+
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <!-- Search Box -->
+                        <form method="GET" action="{{ route('current.affairs.index') }}" class="d-flex">
+                            <input type="text" name="search" class="form-control me-2"
+                                placeholder="Search"
+                                value="{{ request('search') }}">
+                            <button type="submit" class="btn btn-success">Search</button>
+                        </form>
+
+                        <a href="{{ route('current.affairs.create') }}" class="btn btn-primary">Add New</a>
+                    </div>
 
                     <table class="table table-striped mt-5">
                         <thead>

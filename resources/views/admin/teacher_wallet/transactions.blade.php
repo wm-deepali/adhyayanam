@@ -14,6 +14,16 @@
         </div>
         <div class="card-body">
 
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <!-- Search Box -->
+                <form method="GET" action="{{ route('teacher.transactions.index', $teacher->id ?? '') }}" class="d-flex">
+                    <input type="text" name="search" class="form-control me-2"
+                        placeholder="Search by source, details, or amount" value="{{ request('search') }}">
+                    <button type="submit" class="btn btn-success">Search</button>
+                </form>
+            </div>
+
+
             {{-- Optional Summary --}}
             @if($teacher)
                 <div class="mb-3 d-flex flex-wrap gap-3">

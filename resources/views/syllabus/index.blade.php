@@ -26,11 +26,19 @@
                     <div>
                         <h5 class="card-title">Syllabus</h5>
                     </div>
-                    <div>
-                        <a href="{{ route('syllabus.create') }}" class="btn btn-primary">
-                            &#43; Create Syllabus
-                        </a>
-                    </div>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <!-- Search Box -->
+                    <form method="GET" action="{{ route('syllabus.index') }}" class="d-flex">
+                        <input type="text" name="search" class="form-control me-2" placeholder="Search by title"
+                            value="{{ request('search') }}">
+                        <button type="submit" class="btn btn-success">Search</button>
+                    </form>
+
+                    <!-- Create Button -->
+                    <a href="{{ route('syllabus.create') }}" class="btn btn-primary">
+                        &#43; Create Syllabus
+                    </a>
                 </div>
 
                 <div class="mt-2">@include('layouts.includes.messages')</div>

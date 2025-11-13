@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\CourseTopic;
 use App\Models\ExaminationCommission;
+use Yajra\DataTables\Facades\DataTables;
 use App\Models\Subject;
 use App\Models\Chapter;
 use App\Models\Category;
@@ -14,10 +15,47 @@ class CourseTopicController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $data['topics'] = CourseTopic::all();
-        return view('content-management.course-topic',$data);
+        if ($request->ajax()) {
+            $data = CourseTopic::all();
+
+            return Datatables::of($data)
+                ->addIndexColumn()
+                ->addColumn('checkbox', function ($row) {
+                    return '<input type="checkbox" class="column_checkbox career_checkbox" id="' . $row->id . '" name="career_checkbox[]" />';
+                })
+
+                ->addColumn('subject', function ($row) {
+                    return $row->subject->name ?? '';
+                })
+
+                ->addColumn('chapter', function ($row) {
+                    return $row->chapter->name ?? '';
+                })
+
+                ->addColumn('status', function ($row) {
+                    if ($row->status == 1) {
+                        $status = '<span class="badge badge-success">Active</span>';
+                    } else {
+                        $status = '<span class="badge badge-secondary">Inactive</span>';
+                    }
+                    return $status;
+                })
+                ->addColumn('action', function ($row) {
+                    $editUrl = route('cm.chapter.edit', $row->id);
+                    $actionBtn = ' <a href="' . $editUrl . '" class="btn btn-sm btn-primary" title="Edit"><i class="fa fa-file"></i></a>
+                            <form action="' . route('cm.chapter.delete', $row->id) . '" method="POST" style="display:inline">
+                                ' . csrf_field() . '
+                                ' . method_field("DELETE") . '
+                                <button type="submit" class="btn btn-sm btn-danger" title="Delete"><i class="fa fa-trash"></i></button>
+                            </form>';
+                    return $actionBtn;
+                })
+                ->rawColumns(['checkbox', 'subject', 'status', 'action'])
+                ->make(true);
+        }
+        return view('content-management.course-topic');
     }
 
     /**
@@ -28,7 +66,7 @@ class CourseTopicController extends Controller
         $data['commissions'] = ExaminationCommission::all();
         $data['subjects'] = Subject::all();
         $data['chapter'] = Chapter::all();
-        return view('content-management.course-topic-add',$data);
+        return view('content-management.course-topic-add', $data);
     }
 
     /**
@@ -81,8 +119,8 @@ class CourseTopicController extends Controller
         $data['subcategories'] = Category::all();
         $data['subjects'] = Subject::all();
         $data['chapters'] = Chapter::all();
-        $data['topic'] = CourseTopic::where('id',$id)->first();
-        return view('content-management.course-topic-edit',$data);
+        $data['topic'] = CourseTopic::where('id', $id)->first();
+        return view('content-management.course-topic-edit', $data);
     }
 
     /**
@@ -102,7 +140,7 @@ class CourseTopicController extends Controller
             'status' => 'required|boolean',
         ]);
 
-        CourseTopic::where('id',$id)->update([
+        CourseTopic::where('id', $id)->update([
             'exam_com_id' => $request->exam_com_id,
             'category_id' => $request->category_id,
             'sub_category_id' => $request->sub_category_id ?? NULL,
@@ -121,8 +159,9 @@ class CourseTopicController extends Controller
      * Remove the specified resource from storage.
      */
     public function destroy($id)
-    { $exam = CourseTopic::findOrFail($id);
+    {
+        $exam = CourseTopic::findOrFail($id);
         $exam->delete();
-        return redirect()->back()->with('success','Topic deleted successfully.');//
+        return redirect()->back()->with('success', 'Topic deleted successfully.');//
     }
 }

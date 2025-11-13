@@ -243,8 +243,8 @@
                     $testDetail->sub_positive_mark
                 );
 
-                $marks = $testDetail->positive_mark ?? $paper->positive_marks_per_question;
-                $negative_marks = $testDetail->sub_negative_mark ?? $paper->negative_marks_per_question;
+                $marks = $testDetail->positive_mark ?? $testpaper->positive_marks_per_question;
+                $negative_marks = $testDetail->sub_negative_mark ?? $testpaper->negative_marks_per_question;
 
                 // ✅ Parent index for main question
                 $parentIndex = $parentMainIndex[$testDetail->parent_question_id] ?? 0;
@@ -267,8 +267,8 @@
             {{-- ✅ Main Question --}}
             @php
                 $question = $testDetail->question;
-                $marks = $testDetail->positive_mark ?? $paper->positive_marks_per_question;
-                $negative_marks = $testDetail->negative_mark ?? $paper->negative_marks_per_question;
+                $marks = $testDetail->positive_mark ?? $testpaper->positive_marks_per_question;
+                $negative_marks = $testDetail->negative_mark ?? $testpaper->negative_marks_per_question;
 
                 $parentMainIndex[$testDetail->question_id] = $mainIndex;
             @endphp

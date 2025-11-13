@@ -28,6 +28,74 @@
                     @include('layouts.includes.messages')
                 </div>
                 <div class="table-responsive-lg">
+                    <div class="row">
+                        <h4 class="form-section">Filter by</h4>
+
+                        {{-- Examination Commission --}}
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Examination Commission</label>
+                                <select class="form-control" id="exam_com_id" name="commission_id">
+                                    <option value="">--Select--</option>
+                                    @foreach($commissions as $commission)
+                                        <option value="{{ $commission->id }}">{{ $commission->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+
+                        {{-- Category --}}
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Category</label>
+                                <select class="form-control" id="category_id" name="category_id">
+                                    <option value="">--Select--</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        {{-- Sub Category --}}
+                        <div class="col-md-3 sub-cat hidecls">
+                            <div class="form-group">
+                                <label>Sub Category</label>
+                                <select class="form-control" id="sub_category_id" name="sub_category_id">
+                                    <option value="">--Select--</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        {{-- Test Type --}}
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Test Type</label>
+                                <select class="form-control" id="test_type" name="test_type">
+                                    <option value="">--Select--</option>
+                                    <option value="0">Full Test / Combined Paper</option>
+                                    <option value="1">Subject Wise</option>
+                                    <option value="2">Chapter Wise</option>
+                                    <option value="3">Topic Wise</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        {{-- Search --}}
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Search</label>
+                                <input type="text" id="search" name="search" class="form-control"
+                                    placeholder="Search test papers...">
+                            </div>
+                        </div>
+
+                        {{-- Buttons --}}
+                        <div class="col-md-6" style="margin-top: 25px;">
+                            <div class="form-group">
+                                <button type="button" class="btn btn-primary filterbtn">Filter Now</button>
+                                <button type="button" class="btn btn-danger resetbtn">Reset</button>
+                            </div>
+                        </div>
+                    </div>
+
                     <table class="table table-striped mt-5">
                         <thead>
                             <tr>
@@ -44,63 +112,8 @@
                                 <th scope="col">Action</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            @foreach($test as $res)
-                                <tr>
-                                    <th scope="row">{{ $loop->iteration }}</th>
-                                    <td>{{ $res->created_at }}</td>
-                                    <td>{{ $res->name }}<br /><span
-                                            class="badge badge-success">{{ $res->test_code ?? "" }}</span></td>
-                                    <td>{{ $res->test_paper_type ?? "" }}</td>
-                                    <td>{{ $res->previous_year }}</td>
-                                    <td>
-                                        {{ $res->commission->name ?? "_" }} <br />
-                                        {{ $res->category->name ?? "_" }}<br />
-                                        <span class="text-success">{{ $res->subcategory->name ?? "_" }}</span>
-                                    </td>
-                                    <td>{{ $res->total_questions }}</td>
-                                    <td>{{ $res->total_marks }}<br />
-                                        <span class="badge badge-secondary">{{ $res->duration ?? "" }} mins</span>
-                                    </td>
-                                    <td>
-                                        <a href="{{ route('test-papers.download', $res->id) }}" target="_blank">
-                                            <img height="80px" src="{{ asset('img/pdficon.png') }}" />
-                                        </a>
-
-                                    </td>
-                                    <td>Active</td>
-                                    <td>
-                                        <div class="dropdown">
-                                            <button class="btn btn-secondary dropdown-toggle btn-sm" type="button"
-                                                data-bs-toggle="dropdown" aria-expanded="false">
-                                                Actions
-                                            </button>
-                                            <ul class="dropdown-menu">
-                                                <li>
-                                                    <a class="dropdown-item" href="{{ route('test.paper.view', $res->id) }}">
-                                                        <i class="fas fa-eye"></i> View
-                                                    </a>
-                                                </li>
-                                                <li>
-                                                    <a class="dropdown-item" href="{{ route('test.paper.edit', $res->id) }}">
-                                                        <i class="fas fa-edit"></i> Edit
-                                                    </a>
-                                                </li>
-                                                <li>
-                                                    <form action="{{ route('test.paper.delete', $res->id) }}" method="POST"
-                                                        class="delete-form" style="display:inline;">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="button" class="dropdown-item text-danger delete-btn">
-                                                            <i class="fas fa-trash" style="color: #dc3545!important"></i> Delete
-                                                        </button>
-                                                    </form>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </td>
-                                </tr>
-                            @endforeach
+                        <tbody id="testPaperTableBody">
+                            @include('pyq.table-rows', ["test" => $test])
                         </tbody>
                     </table>
                 </div>
@@ -108,6 +121,108 @@
         </div>
     </div>
 
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+    <script>
+        $(document).ready(function () {
+            $(document).on('change', '#exam_com_id', function (event) {
+
+                $('#category_id').html("");
+                $('#subject_id').html("");
+                $('#chapter_id').html("");
+                $('#topic_id').html("");
+                let competitive_commission = $(this).val();
+                $.ajax({
+                    url: `{{ URL::to('fetch-exam-category-by-commission/${competitive_commission}') }}`,
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function (result) {
+                        if (result.success) {
+                            $('#category_id').html(result.html);
+                        } else {
+                            toastr.error('error encountered ' + result.msgText);
+                        }
+                    },
+                });
+            });
+
+            $(document).on('change', '#category_id', function (event) {
+
+                $('#sub_category_id').html("");
+                let exam_category = $(this).val();
+                if (exam_category != '') {
+                    $.ajax({
+                        url: `{{ URL::to('fetch-sub-category-by-exam-category/${exam_category}') }}`,
+                        type: 'GET',
+                        dataType: 'json',
+                        success: function (result) {
+                            if (result.success) {
+                                if (result.html != '') {
+                                    $('#sub_category_id').html(result.html);
+                                    $('.sub-cat').removeClass('hidecls');
+
+                                }
+                                else {
+                                    $('#sub_category_id').val("").trigger('change');
+                                    $('.sub-cat').addClass('hidecls');
+
+                                }
+
+                            } else {
+                                toastr.error('error encountered ' + result.msgText);
+                            }
+                        },
+                    });
+                }
+                else {
+                    $('#sub_category_id').val("").trigger('change');
+                    $('.sub-cat').addClass('hidecls');
+
+                }
+
+            });
+
+            // 🔹 Filter Now
+            $('.filterbtn').on('click', function () {
+                let data = {
+                    commission_id: $('#exam_com_id').val(),
+                    category_id: $('#category_id').val(),
+                    sub_category_id: $('#sub_category_id').val(),
+                    test_type: $('#test_type').val(),
+                    search: $('#search').val(),
+                };
+
+                $.ajax({
+                    url: "{{ route('pyq.filter') }}",
+                    type: "GET",
+                    data: data,
+                    beforeSend: function () {
+                        $('#testPaperTableBody').html(`<tr><td colspan="9" class="text-center">Loading...</td></tr>`);
+                    },
+                    success: function (response) {
+                        $('#testPaperTableBody').html(response.html);
+                    },
+                    error: function () {
+                        $('#testPaperTableBody').html(`<tr><td colspan="9" class="text-center text-danger">Error loading data</td></tr>`);
+                    }
+                });
+            });
+
+            // 🔹 Reset Filters
+            $('.resetbtn').on('click', function () {
+                $('#exam_com_id').val('');
+                $('#category_id').val('');
+                $('#sub_category_id').val('');
+                $('#test_type').val('');
+                $('#search').val('');
+                $('.sub-cat').addClass('hidecls');
+                $('.filterbtn').click(); // reload default listing
+            });
+
+        });
+
+    </script>
     {{-- SweetAlert2 confirmation --}}
     <script>
         document.addEventListener('DOMContentLoaded', function () {

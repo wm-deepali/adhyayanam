@@ -19,15 +19,41 @@ class VideoController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        // Fetch all videos
-        $videos = Video::where('type', 'video')->latest()->get();
+        $search = $request->input('search');
+        // VIDEOS
+        $videosQuery = Video::where('type', 'video')
+            ->with(['examinationCommission', 'category', 'subCategory', 'subject', 'chapter']);
 
-        // Fetch all live classes
-        $liveClasses = Video::where('type', 'live_class')->latest()->get();
+        if ($search) {
+            $videosQuery->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                    ->orWhereHas('examinationCommission', fn($q2) => $q2->where('name', 'like', "%{$search}%"))
+                    ->orWhereHas('category', fn($q2) => $q2->where('name', 'like', "%{$search}%"))
+                    ->orWhereHas('subCategory', fn($q2) => $q2->where('name', 'like', "%{$search}%"))
+                    ->orWhereHas('subject', fn($q2) => $q2->where('name', 'like', "%{$search}%"));
+            });
+        }
 
-        // Send both collections to the view
+        $videos = $videosQuery->latest()->get();
+
+        // LIVE CLASSES
+        $liveQuery = Video::where('type', 'live_class')
+            ->with(['examinationCommission', 'category', 'subCategory', 'subject', 'teacher']);
+
+        if ($search) {
+            $liveQuery->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                    ->orWhereHas('examinationCommission', fn($q2) => $q2->where('name', 'like', "%{$search}%"))
+                    ->orWhereHas('category', fn($q2) => $q2->where('name', 'like', "%{$search}%"))
+                    ->orWhereHas('subCategory', fn($q2) => $q2->where('name', 'like', "%{$search}%"))
+                    ->orWhereHas('subject', fn($q2) => $q2->where('name', 'like', "%{$search}%"));
+            });
+        }
+
+        $liveClasses = $liveQuery->latest()->get();
+
         return view('video.index', compact('videos', 'liveClasses'));
     }
 
@@ -175,19 +201,19 @@ class VideoController extends Controller
     {
         // dd('here');
         // try {
-            // Fetch video with relationships
-            $video = Video::with([
-                'examinationCommission:id,name',
-                'category:id,name',
-                'subCategory:id,name',
-                'course:id,name',
-                'subject:id,name',
-                'chapter:id,name',
-                'topic:id,name',
-                'teacher:id,full_name',
-            ])->findOrFail($id);
+        // Fetch video with relationships
+        $video = Video::with([
+            'examinationCommission:id,name',
+            'category:id,name',
+            'subCategory:id,name',
+            'course:id,name',
+            'subject:id,name',
+            'chapter:id,name',
+            'topic:id,name',
+            'teacher:id,full_name',
+        ])->findOrFail($id);
 
-            return view('video.show', compact('video'));
+        return view('video.show', compact('video'));
 
         // } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
         //     return redirect()->route('video.index')->with('error', 'Video not found.');

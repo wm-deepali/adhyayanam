@@ -28,13 +28,11 @@ class TestSeries extends Model
         'test_generated_by',
         'total_paper'
     ];
- 
+
     public function category()
     {
         return $this->belongsTo(Category::class, 'category_id');
     }
-
-    
 
     public function subcategory()
     {
@@ -45,11 +43,13 @@ class TestSeries extends Model
     {
         return $this->belongsTo(ExaminationCommission::class, 'exam_com_id');
     }
-    
-    public function testseries(){
+
+    public function testseries()
+    {
         return $this->hasMany(TestSeriesDetail::class, 'test_series_id');
     }
-      public function tests()
+
+    public function tests()
     {
         return $this->hasManyThrough(Test::class, TestSeriesDetail::class, 'test_series_id', 'id', 'id', 'test_id');
     }

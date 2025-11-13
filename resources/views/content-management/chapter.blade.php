@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title')
-NETIIAS|Chapter
+Adhyayanam Education|Chapter
 @endsection
 
 @section('content')

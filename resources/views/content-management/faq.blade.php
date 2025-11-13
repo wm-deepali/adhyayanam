@@ -53,6 +53,7 @@ FAQ Management
             
                     <button type="submit" class="btn btn-primary">Save FAQ</button>
                 </form>
+
                 <table class="table table-striped mt-5">
                     <thead>
                         <tr>
@@ -60,7 +61,7 @@ FAQ Management
                             <th scope="col" width="15%">Question</th>
                             <th scope="col">Answer</th>
                             <th scope="col" width="10%">Type</th>
-                            <th scope="col">Actions</th>
+                            <th scope="col" width="10%">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -71,11 +72,29 @@ FAQ Management
                             <td>{{ $faq->answer }}</td>
                             <td>{{ $faq->type ?? "--" }}</td>
                             <td>
+                                <div class="dropdown">
+                                    <button class="btn btn-secondary dropdown-toggle btn-sm" type="button" id="actionDropdown{{ $faq->id }}" data-bs-toggle="dropdown" aria-expanded="false">
+                                        Actions
+                                    </button>
+                                    <ul class="dropdown-menu" aria-labelledby="actionDropdown{{ $faq->id }}">
+                                        <li>
+                                            <a class="dropdown-item" href="{{ route('faq.edit', $faq->id) }}">Edit</a>
+                                        </li>
+                                        <li>
+                                            <form action="{{ route('faq.destroy', $faq->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this FAQ?');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button class="dropdown-item text-danger" type="submit">Delete</button>
+                                            </form>
+                                        </li>
+                                    </ul>
+                                </div>
                             </td>
                         </tr>
                         @endforeach
                     </tbody>
                 </table>
+
             </div>
         </div>
     </div>

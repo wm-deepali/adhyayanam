@@ -1,6 +1,6 @@
 @extends('front.partials.app')
 @section('header')
-		<title>{{'Neti Corner'}}</title>
+		<title>{{'Adhyayanam Education Corner'}}</title>
 @endsection
 @section('content')
 <body class="hidden-bar-wrapper">

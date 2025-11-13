@@ -49,7 +49,7 @@
 							<li><a href="{{route('upcoming.exam.front')}}">Upcoming Exams</a></li>
 							<li><a href="{{route('batches.index')}}">Batches & Online Programme</a></li>
 							<li><a href="#">Workshops & Open Sessions</a></li>
-							<li><a href="{{route('neti.corner.index')}}">NETI Corner</a></li>
+							<li><a href="{{route('neti.corner.index')}}">Adhyayanam Education Corner</a></li>
 							<li><a href="{{route('callback.inquiry')}}">Call Back Request</a></li>
 							<li><a href="{{route('faq')}}">FAQ</a></li>
 						</ul>

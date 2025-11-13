@@ -20,11 +20,26 @@ use Illuminate\Support\Facades\Hash;
 class OrderController extends Controller
 {
     //
-    public function AllOrder()
+    public function AllOrder(Request $request)
     {
-        $data['orders'] = Order::all();
-        return view('order-subscriptions.student-all-orders', $data);
+        $query = Order::query();
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where('order_code', 'like', "%{$search}%")
+                ->orWhere('package_name', 'like', "%{$search}%")
+                ->orWhere('order_type', 'like', "%{$search}%")
+                ->orWhere('payment_status', 'like', "%{$search}%")
+                ->orWhereHas('student', function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%");
+                });
+        }
+
+        $orders = $query->orderBy('created_at', 'DESC')->get();
+
+        return view('order-subscriptions.student-all-orders', compact('orders'));
     }
+
     public function allTestSeriesOrder()
     {
         $data['orders'] = Order::with('student', 'transaction')->where('order_type', 'Test Series')->get();

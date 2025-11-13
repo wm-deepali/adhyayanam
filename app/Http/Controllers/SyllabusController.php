@@ -15,14 +15,33 @@ class SyllabusController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $syllabusList = Syllabus::with(['commission', 'category', 'subCategory', 'subject'])
-            ->orderBy('created_at', 'DESC')
-            ->get();
+        $query = Syllabus::with(['commission', 'category', 'subCategory', 'subject']);
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+
+            $query->where('title', 'like', "%{$search}%")
+                ->orWhereHas('subject', function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%");
+                })
+                ->orWhereHas('commission', function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%");
+                })
+                ->orWhereHas('category', function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%");
+                })
+                ->orWhereHas('subCategory', function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%");
+                });
+        }
+
+        $syllabusList = $query->orderBy('created_at', 'DESC')->get();
 
         return view('syllabus.index', compact('syllabusList'));
     }
+
 
     /**
      * Display the specified resource.

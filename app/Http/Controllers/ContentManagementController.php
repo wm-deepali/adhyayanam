@@ -213,11 +213,13 @@ class ContentManagementController extends Controller
         $career->delete();
         return redirect()->route('cm.career')->with('success', 'Career deleted successfully!');
     }
+
     public function blogArticles()
     {
         $data['blogs'] = Blog::all();
         return view('content-management.blog-articles', $data);
     }
+
     public function blogStore(Request $request)
     {
         $request->validate([
@@ -244,12 +246,65 @@ class ContentManagementController extends Controller
 
         return redirect()->route('cm.blog.articles')->with('success', 'Blog created successfully!');
     }
+
+    public function blogEdit($id)
+    {
+        $blog = Blog::findOrFail($id);
+        return view('content-management.blog-articles-edit', compact('blog'));
+    }
+
+    public function blogUpdate(Request $request, $id)
+    {
+        $blog = Blog::findOrFail($id);
+
+        $request->validate([
+            'heading' => 'required|string|max:255',
+            'short_description' => 'nullable|string|max:255',
+            'description' => 'required|string',
+            'type' => 'nullable|string|max:255',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
+            'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
+        ]);
+
+        $data = $request->all();
+
+        if ($request->hasFile('image')) {
+            // Delete old image if exists
+            if ($blog->image) {
+                \Storage::disk('public')->delete($blog->image);
+            }
+            $data['image'] = $request->file('image')->store('images', 'public');
+        }
+
+        if ($request->hasFile('thumbnail')) {
+            // Delete old thumbnail if exists
+            if ($blog->thumbnail) {
+                \Storage::disk('public')->delete($blog->thumbnail);
+            }
+            $data['thumbnail'] = $request->file('thumbnail')->store('thumbnails', 'public');
+        }
+
+        $blog->update($data);
+
+        return redirect()->route('cm.blog.articles')->with('success', 'Blog updated successfully!');
+    }
+
     public function blogDelete($id)
     {
         $blog = Blog::findOrFail($id);
+
+        // Delete images from storage
+        if ($blog->image) {
+            \Storage::disk('public')->delete($blog->image);
+        }
+        if ($blog->thumbnail) {
+            \Storage::disk('public')->delete($blog->thumbnail);
+        }
+
         $blog->delete();
         return redirect()->route('cm.blog.articles')->with('success', 'Blog deleted successfully!');
     }
+
     public function ourTeam()
     {
         $data['teams'] = Team::orderBy('created_at', 'DESC')->get();
@@ -351,13 +406,15 @@ class ContentManagementController extends Controller
         );
         return redirect()->route('cm.vision.mission')->with('success', 'Vision and Mission updated successfully!');
     }
+
+    // Existing methods
     public function faq()
     {
         $data['faqs'] = Faq::all();
         return view('content-management.faq', $data);
     }
 
-    public function faqStore(Request $request)
+    public function storeFaq(Request $request)
     {
         $request->validate([
             'question' => 'required|string|max:500',
@@ -368,6 +425,37 @@ class ContentManagementController extends Controller
         Faq::create($request->all());
 
         return redirect()->route('cm.faq')->with('success', 'FAQ added successfully!');
+    }
+
+    // Edit method
+    public function editFaq($id)
+    {
+        $faq = Faq::findOrFail($id);
+        return view('content-management.edit-faq', compact('faq'));
+    }
+
+    // Update method
+    public function updateFaq(Request $request, $id)
+    {
+        $request->validate([
+            'question' => 'required|string|max:500',
+            'answer' => 'required|string',
+            'type' => 'nullable|string',
+        ]);
+
+        $faq = Faq::findOrFail($id);
+        $faq->update($request->all());
+
+        return redirect()->route('cm.faq')->with('success', 'FAQ updated successfully!');
+    }
+
+    // Delete method
+    public function destroyFaq($id)
+    {
+        $faq = Faq::findOrFail($id);
+        $faq->delete();
+
+        return redirect()->route('cm.faq')->with('success', 'FAQ deleted successfully!');
     }
 
     public function seoIndex()
@@ -1447,10 +1535,23 @@ class ContentManagementController extends Controller
         return redirect()->back()->with('success', 'Topic deleted successfully!');
     }
 
-    public function currentAffairIndex()
+    public function currentAffairIndex(Request $request)
     {
-        $data['currentAffairs'] = CurrentAffair::with('topic')->get();
-        return view('current-affairs.index', $data);
+        $query = CurrentAffair::with('topic');
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+
+            $query->where('title', 'like', "%{$search}%")
+                ->orWhere('short_description', 'like', "%{$search}%")
+                ->orWhereHas('topic', function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%");
+                });
+        }
+
+        $currentAffairs = $query->orderBy('publishing_date', 'DESC')->get();
+
+        return view('current-affairs.index', compact('currentAffairs'));
     }
 
     public function currentAffairCreate()
@@ -2327,8 +2428,53 @@ class ContentManagementController extends Controller
     public function testSeriesIndex()
     {
         $data['test_series'] = TestSeries::with('category')->orderBy('created_at', 'desc')->paginate(10);
+        $data['commissions'] = ExaminationCommission::get();
         return view('test-series.index', $data);
     }
+
+    public function testSeriesFilter(Request $request)
+    {
+        $query = TestSeries::with(['category'])
+            ->latest();
+
+        if ($request->commission_id) {
+            $query->where('exam_com_id', $request->commission_id);
+        }
+
+        if ($request->category_id) {
+            $query->where('category_id', $request->category_id);
+        }
+
+        if ($request->sub_category_id) {
+            $query->where('sub_category_id', $request->sub_category_id);
+        }
+
+
+        if ($request->search) {
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'LIKE', "%{$search}%")
+                    ->orWhereHas('commission', function ($sub) use ($search) {
+                        $sub->where('name', 'LIKE', "%{$search}%");
+                    })
+                    ->orWhereHas('category', function ($sub) use ($search) {
+                        $sub->where('name', 'LIKE', "%{$search}%");
+                    })
+                    ->orWhereHas('subcategory', function ($sub) use ($search) {
+                        $sub->where('name', 'LIKE', "%{$search}%");
+                    });
+            });
+        }
+
+
+        $test_series = $query->paginate(10);
+
+        $html = view('test-series.table-rows', compact('test_series'))->render();
+
+        return response()->json(['html' => $html]);
+    }
+
     public function testSeriesCreate()
     {
         $data['commissions'] = ExaminationCommission::get();
@@ -3880,11 +4026,20 @@ class ContentManagementController extends Controller
     }
 
 
-
-    public function batchesProgrammeIndex()
+    public function batchesProgrammeIndex(Request $request)
     {
-        $data['batches'] = BatchProgramme::all();
-        return view('batches-programme.index', $data);
+        $query = BatchProgramme::query();
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where('name', 'like', "%{$search}%")
+                ->orWhere('batch_heading', 'like', "%{$search}%")
+                ->orWhere('short_description', 'like', "%{$search}%");
+        }
+
+        $batches = $query->orderBy('start_date', 'DESC')->get();
+
+        return view('batches-programme.index', compact('batches'));
     }
 
     public function batchesProgrammeCreate()

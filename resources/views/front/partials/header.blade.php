@@ -485,76 +485,80 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    const tabs = document.querySelectorAll('.mega-menu-tab');
-    const panels = document.querySelectorAll('.mega-menu-panel');
-    const dropdowns = document.querySelectorAll('.dropdown');
-    const headerLower = document.querySelector('.header-lower');
+    // Function to initialize a header's mega menu
+    function initMegaMenu(headerSelector) {
+        const header = document.querySelector(headerSelector);
+        if (!header) return;
 
-    // Calculate the top position of the mega menu based on the header height
-    const headerHeight = headerLower.offsetHeight;
-    const megaMenus = document.querySelectorAll('.mega-menu-container');
-    megaMenus.forEach(menu => {
-        menu.style.top = `${headerHeight}px`;
-    });
+        const dropdowns = header.querySelectorAll('.dropdown');
+        const tabs = header.querySelectorAll('.mega-menu-tab');
 
-    // Choose activation method: 'hover' or 'click'
-    const activationMethod = 'hover';
-
-    // Handle activation for dropdowns
-    dropdowns.forEach(dropdown => {
-        if (activationMethod === 'hover') {
-            dropdown.addEventListener('mouseenter', handleDropdownActivation);
-            dropdown.addEventListener('mouseleave', handleDropdownDeactivation);
-        } else {
-            dropdown.addEventListener('click', function (e) {
-                e.preventDefault();
-                const isActive = this.classList.contains('active');
-                dropdowns.forEach(d => d.classList.remove('active'));
-                if (!isActive) {
-                    this.classList.add('active');
-                }
+        // Calculate and set the top for each mega menu container
+        function updateMegaMenuTop() {
+            const headerHeight = header.offsetHeight;
+            header.querySelectorAll('.mega-menu-container').forEach(menu => {
+                menu.style.top = `${headerHeight}px`;
             });
         }
-    });
 
-    // Handle activation for mega menu tabs
-    tabs.forEach(tab => {
-        tab.addEventListener('mouseenter', handleTabActivation);
-    });
+        updateMegaMenuTop();
+        window.addEventListener('resize', updateMegaMenuTop);
 
-    function handleDropdownActivation(e) {
-        dropdowns.forEach(d => d.classList.remove('active'));
-        this.classList.add('active');
-    }
+        // Choose activation method: 'hover' or 'click'
+        const activationMethod = 'hover';
 
-    function handleDropdownDeactivation(e) {
-        this.classList.remove('active');
-    }
-
-    function handleTabActivation(e) {
-        const parentContainer = this.closest('.mega-menu-container');
-        const siblingTabs = parentContainer.querySelectorAll('.mega-menu-tab');
-        const siblingPanels = parentContainer.querySelectorAll('.mega-menu-panel');
-
-        siblingTabs.forEach(t => t.classList.remove('active'));
-        siblingPanels.forEach(p => p.classList.remove('active'));
-
-        const tabId = this.getAttribute('data-tab');
-        const activePanel = document.getElementById(tabId);
-
-        this.classList.add('active');
-        if (activePanel) activePanel.classList.add('active');
-    }
-
-    // Close dropdowns when clicking outside (for click mode)
-    if (activationMethod === 'click') {
-        document.addEventListener('click', function (e) {
-            if (!e.target.closest('.dropdown')) {
-                dropdowns.forEach(dropdown => {
+        // Dropdown activation
+        dropdowns.forEach(dropdown => {
+            if (activationMethod === 'hover') {
+                dropdown.addEventListener('mouseenter', () => {
+                    dropdowns.forEach(d => d.classList.remove('active'));
+                    dropdown.classList.add('active');
+                });
+                dropdown.addEventListener('mouseleave', () => {
                     dropdown.classList.remove('active');
+                });
+            } else { // click mode
+                dropdown.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const isActive = this.classList.contains('active');
+                    dropdowns.forEach(d => d.classList.remove('active'));
+                    if (!isActive) {
+                        this.classList.add('active');
+                    }
                 });
             }
         });
+
+        // Tab activation
+        tabs.forEach(tab => {
+            tab.addEventListener('mouseenter', function () {
+                const parentContainer = this.closest('.mega-menu-container');
+                const siblingTabs = parentContainer.querySelectorAll('.mega-menu-tab');
+                const siblingPanels = parentContainer.querySelectorAll('.mega-menu-panel');
+
+                siblingTabs.forEach(t => t.classList.remove('active'));
+                siblingPanels.forEach(p => p.classList.remove('active'));
+
+                const tabId = this.getAttribute('data-tab');
+                const activePanel = parentContainer.querySelector(`#${tabId}`);
+
+                this.classList.add('active');
+                if (activePanel) activePanel.classList.add('active');
+            });
+        });
+
+        // Close dropdowns when clicking outside (for click mode)
+        if (activationMethod === 'click') {
+            document.addEventListener('click', function (e) {
+                if (!e.target.closest(headerSelector + ' .dropdown')) {
+                    dropdowns.forEach(d => d.classList.remove('active'));
+                }
+            });
+        }
     }
+
+    // Initialize mega menus for both main header and sticky header
+    initMegaMenu('.header-lower');
+    initMegaMenu('.sticky-header');
 });
 </script>

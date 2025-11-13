@@ -180,10 +180,20 @@
                         </div>
                         <div class="col-md-6">
                             <label for="logo" class="form-label">Upload Logo</label>
-                            <input type="file" class="form-control" name="logo" id="image" accept="image/*" required>
-                            <img id="image-preview" src="#" alt="Your Image" style="display:none;">
+                            <input type="file" class="form-control" name="logo" id="image" accept="image/*">
+
+                            @if(isset($test_series) && $test_series->logo)
+                                <img id="image-preview" src="{{ asset('storage/' . $test_series->logo) }}" alt="Your Image"
+                                    style="max-width: 200px; display:block; margin-top:10px;">
+                            @else
+                                <img id="image-preview" src="#" alt="Your Image"
+                                    style="display:none; max-width: 200px; margin-top:10px;">
+                            @endif
+
                             <div class="text-danger validation-err" id="logo-err"></div>
                         </div>
+
+
                         <div class="col-md-6">
                             <label for="fee_type" class="form-label">Fee Type</label>
                             <select class="form-control" name="fee_type" id="fee_type" required>

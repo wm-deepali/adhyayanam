@@ -27,6 +27,7 @@ class TeacherWalletController extends Controller
     public function transactions(Request $request)
     {
         $teacher = null;
+        $search = $request->search;
 
         // Check if teacher_id is provided in query string
         if ($request->has('teacher_id')) {
@@ -34,18 +35,40 @@ class TeacherWalletController extends Controller
         }
 
         if ($teacher) {
-            $transactions = $teacher->transactions()->latest()->paginate(20);
+            // Teacher-specific transactions
+            $query = $teacher->transactions()->latest();
+
+            if ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('source', 'like', "%{$search}%")
+                        ->orWhere('details', 'like', "%{$search}%")
+                        ->orWhere('amount', 'like', "%{$search}%");
+                });
+            }
+
+            $transactions = $query->paginate(20);
             $balance = $teacher->wallet_balance;
             $totalCredits = $teacher->transactions()->where('type', 'credit')->sum('amount');
             $totalDebits = $teacher->transactions()->where('type', 'debit')->sum('amount');
         } else {
-            $transactions = WalletTransaction::with('teacher')->latest()->paginate(20);
+            // Admin view for all transactions
+            $query = WalletTransaction::with('teacher')->latest();
+
+            if ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('source', 'like', "%{$search}%")
+                        ->orWhere('details', 'like', "%{$search}%")
+                        ->orWhere('amount', 'like', "%{$search}%");
+                });
+            }
+
+            $transactions = $query->paginate(20);
             $balance = null;
             $totalCredits = null;
             $totalDebits = null;
         }
 
-        return view('admin.teacher_wallet.transactions', compact('transactions', 'teacher', 'balance', 'totalCredits', 'totalDebits'));
+        return view('admin.teacher_wallet.transactions', compact('transactions', 'teacher', 'balance', 'totalCredits', 'totalDebits', 'search'));
     }
 
 

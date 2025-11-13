@@ -28,18 +28,26 @@
                         <strong>Sub Category:</strong>
                         <p>{{ $material->subcategory->name ?? 'N/A' }}</p>
                     </div>
-                    <div class="col-md-6 mb-3">
-                        <strong>Subject:</strong>
-                        <p>{{ $material->subject->name ?? 'N/A' }}</p>
-                    </div>
-                    <div class="col-md-6 mb-3">
+                    @if($material->subjects->count())
+                        <div class="col-md-6 mb-3">
+                            <strong>Subject:</strong>
+                            <p> {{ $material->subjects->pluck('name')->implode(', ') }}</p>
+                        </div>
+                    @endif
+                    {{-- Multiple Chapters --}}
+                    @if($material->chapters->count())
                         <strong>Chapter:</strong>
-                        <p>{{ $material->chapter->name ?? 'N/A' }}</p>
-                    </div>
-                    <div class="col-md-6 mb-3">
+                        <p>
+                            {{ $material->chapters->pluck('name')->implode(', ') }}
+                        </p>
+                    @endif
+
+                    {{-- Multiple Topics --}}
+                    @if($material->topics->count())
                         <strong>Topic:</strong>
                         <p>{{ $material->topic->name ?? 'N/A' }}</p>
-                    </div>
+                    @endif
+
 
                     <div class="col-md-12 mb-3">
                         <strong>Material Type:</strong>

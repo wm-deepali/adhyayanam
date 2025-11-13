@@ -18,30 +18,31 @@ Manage Video
             <div class="container mt-4">
                 <a href="{{ route('video.create') }}" class="btn btn-primary mb-3">Add New</a>
 
-                <!-- Tabs Navigation -->
+                <!-- Tabs -->
                 <ul class="nav nav-tabs" id="videoTab" role="tablist">
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="videos-tab" data-bs-toggle="tab" data-bs-target="#videos" type="button" role="tab" aria-controls="videos" aria-selected="true">
+                        <button class="nav-link active" id="videos-tab" data-bs-toggle="tab" data-bs-target="#videos" type="button" role="tab">
                             🎥 Videos
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="live-tab" data-bs-toggle="tab" data-bs-target="#live" type="button" role="tab" aria-controls="live" aria-selected="false">
+                        <button class="nav-link" id="live-tab" data-bs-toggle="tab" data-bs-target="#live" type="button" role="tab">
                             📡 Live Classes
                         </button>
                     </li>
                 </ul>
 
-                <!-- Tabs Content -->
+                <!-- Tab Content -->
                 <div class="tab-content mt-3" id="videoTabContent">
+
                     {{-- ===================== VIDEOS TAB ===================== --}}
-                    <div class="tab-pane fade show active" id="videos" role="tabpanel" aria-labelledby="videos-tab">
+                    <div class="tab-pane fade show active" id="videos" role="tabpanel">
                         @if($videos->count())
                             <table class="table table-striped mt-3">
                                 <thead>
                                     <tr>
                                         <th>Date & Time</th>
-                                        <th>Video Title</th>
+                                        <th>Title</th>
                                         <th>Chapter</th>
                                         <th>Course</th>
                                         <th>Category</th>
@@ -91,12 +92,32 @@ Manage Video
                                         </td>
                                         <td>{{ $topic->status ? 'Active' : 'Inactive' }}</td>
                                         <td>
-                                            <a href="{{ route('video.edit', $topic->id) }}" class="btn btn-sm btn-primary">Edit</a>
-                                            <form action="{{ route('video.destroy', $topic->id) }}" method="POST" style="display:inline;">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</button>
-                                            </form>
+                                            <div class="dropdown">
+                                                <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                                    Actions
+                                                </button>
+                                                <ul class="dropdown-menu">
+                                                    <li>
+                                                        <a class="dropdown-item" href="{{ route('video.show', $topic->id) }}">
+                                                            <i class="fa fa-eye text-primary me-2"></i> View
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a class="dropdown-item" href="{{ route('video.edit', $topic->id) }}">
+                                                            <i class="fa fa-edit text-success me-2"></i> Edit
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <form action="{{ route('video.destroy', $topic->id) }}" method="POST" onsubmit="return confirm('Are you sure?')">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button type="submit" class="dropdown-item text-danger">
+                                                                <i class="fa fa-trash me-2"></i> Delete
+                                                            </button>
+                                                        </form>
+                                                    </li>
+                                                </ul>
+                                            </div>
                                         </td>
                                     </tr>
                                     @endforeach
@@ -108,7 +129,7 @@ Manage Video
                     </div>
 
                     {{-- ===================== LIVE CLASSES TAB ===================== --}}
-                    <div class="tab-pane fade" id="live" role="tabpanel" aria-labelledby="live-tab">
+                    <div class="tab-pane fade" id="live" role="tabpanel">
                         @if($liveClasses->count())
                             <table class="table table-striped mt-3">
                                 <thead>
@@ -136,12 +157,32 @@ Manage Video
                                         <td>{{ $class->end_time }}</td>
                                         <td>{{ $class->status ? 'Active' : 'Inactive' }}</td>
                                         <td>
-                                            <a href="{{ route('video.edit', $class->id) }}" class="btn btn-sm btn-primary">Edit</a>
-                                            <form action="{{ route('video.destroy', $class->id) }}" method="POST" style="display:inline;">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</button>
-                                            </form>
+                                            <div class="dropdown">
+                                                <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                                    Actions
+                                                </button>
+                                                <ul class="dropdown-menu">
+                                                    <li>
+                                                        <a class="dropdown-item" href="{{ route('video.show', $class->id) }}">
+                                                            <i class="fa fa-eye text-primary me-2"></i> View
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a class="dropdown-item" href="{{ route('video.edit', $class->id) }}">
+                                                            <i class="fa fa-edit text-success me-2"></i> Edit
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <form action="{{ route('video.destroy', $class->id) }}" method="POST" onsubmit="return confirm('Are you sure?')">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button type="submit" class="dropdown-item text-danger">
+                                                                <i class="fa fa-trash me-2"></i> Delete
+                                                            </button>
+                                                        </form>
+                                                    </li>
+                                                </ul>
+                                            </div>
                                         </td>
                                     </tr>
                                     @endforeach
@@ -151,6 +192,7 @@ Manage Video
                             <p class="text-center text-muted mt-3">No live classes found.</p>
                         @endif
                     </div>
+
                 </div>
             </div>
 

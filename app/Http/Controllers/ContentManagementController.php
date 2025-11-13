@@ -1101,21 +1101,61 @@ class ContentManagementController extends Controller
                     return $row->based_on ?? '--';
                 })
                 ->addColumn('action', function ($row) {
+                    $viewUrl = route('courses.course.show', $row->id);
                     $editUrl = route('courses.course.edit', $row->id);
-                    $actionBtn = ' <a href="' . $editUrl . '" class="btn btn-sm btn-primary" title="Edit"><i class="fa fa-file"></i></a>
-                            <form action="' . route('courses.course.delete', $row->id) . '" method="POST" style="display:inline">
-                                ' . csrf_field() . '
-                                ' . method_field("DELETE") . '
-                                <button type="submit" class="btn btn-sm btn-danger" title="Delete"><i class="fa fa-trash"></i></button>
-                            </form>';
+                    $deleteUrl = route('courses.course.delete', $row->id);
+
+                    $actionBtn = '
+    <div class="dropdown">
+        <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" id="actionMenu' . $row->id . '" data-bs-toggle="dropdown" aria-expanded="false">
+            Action
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="actionMenu' . $row->id . '">
+            <li>
+                <a class="dropdown-item" href="' . $viewUrl . '">
+                    <i class="fa fa-file me-1"></i> Show
+                </a>
+            </li>
+            <li>
+                <a class="dropdown-item" href="' . $editUrl . '">
+                    <i class="fa fa-edit me-1"></i> Edit
+                </a>
+            </li>
+            <li>
+                <form action="' . $deleteUrl . '" method="POST" onsubmit="return confirm(\'Are you sure you want to delete this course?\')">
+                    ' . csrf_field() . '
+                    ' . method_field("DELETE") . '
+                    <button type="submit" class="dropdown-item text-danger">
+                        <i class="fa fa-trash me-1"></i> Delete
+                    </button>
+                </form>
+            </li>
+        </ul>
+    </div>
+    ';
+
                     return $actionBtn;
                 })
+
                 ->rawColumns(['checkbox', 'fee', 'image', 'duration', 'category', 'subcat', 'commission', 'action'])
                 ->make(true);
         }
         return view('content-management.course');
 
     }
+
+    public function courseShow($id)
+    {
+        $course = Course::with(['examinationCommission', 'category', 'subCategory'])->findOrFail($id);
+
+        // Fetch related models based on array IDs stored in the course
+        $subjects = \App\Models\Subject::whereIn('id', $course->subject_id ?? [])->get();
+        $chapters = \App\Models\Chapter::whereIn('id', $course->chapter_id ?? [])->get();
+        $topics = \App\Models\CourseTopic::whereIn('id', $course->topic_id ?? [])->get();
+
+        return view('content-management.course-show', compact('course', 'subjects', 'chapters', 'topics'));
+    }
+
 
     public function courseCreate()
     {
@@ -1639,7 +1679,7 @@ class ContentManagementController extends Controller
 
     public function studyMaterialShow($id)
     {
-        $material = StudyMaterial::with(['commission', 'category', 'subCategory', 'subject', 'chapter', 'topic'])->findOrFail($id);
+        $material = StudyMaterial::with(['commission', 'category', 'subCategory',])->findOrFail($id);
 
         return view('study-material.show', compact('material'));
     }
@@ -2011,28 +2051,62 @@ class ContentManagementController extends Controller
                     return '<input type="checkbox" class="column_checkbox career_checkbox" id="' . $row->id . '" name="career_checkbox[]" />';
                 })
                 ->addColumn('created_at', function ($row) {
-                    return $row->created_at;
+                    return $row->created_at->format('d M Y, h:i A');
                 })
                 ->addColumn('image', function ($row) {
-                    $linkUrl = asset("storage/" . $row->thumbnail);
-                    $link = '<img src="' . $linkUrl . '" alt="Image" width="50">';
-                    return $link;
+                    if ($row->thumbnail) {
+                        $linkUrl = asset("storage/" . $row->thumbnail);
+                        return '<img src="' . $linkUrl . '" alt="Image" class="rounded shadow-sm" width="50" height="50" style="object-fit:cover;">';
+                    }
+                    return '--';
                 })
                 ->addColumn('action', function ($row) {
+                    $viewUrl = route('daily.boost.show', $row->id);
                     $editUrl = route('daily.boost.edit', $row->id);
-                    $actionBtn = ' <a href="' . $editUrl . '" class="btn btn-sm btn-primary" title="Edit"><i class="fa fa-file"></i></a>
-                            <form action="' . route('daily.boost.delete', $row->id) . '" method="POST" style="display:inline">
-                                ' . csrf_field() . '
-                                ' . method_field("DELETE") . '
-                                <button type="submit" class="btn btn-sm btn-danger" title="Delete"><i class="fa fa-trash"></i></button>
-                            </form>';
-                    return $actionBtn;
+                    $deleteUrl = route('daily.boost.delete', $row->id);
+
+                    return '
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Actions
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow">
+                            <li>
+                                <a class="dropdown-item text-primary" href="' . $viewUrl . '">
+                                    <i class="fa fa-eye me-2"></i>View
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item text-info" href="' . $editUrl . '">
+                                    <i class="fa fa-edit me-2"></i>Edit
+                                </a>
+                            </li>
+                            <li>
+                                <form action="' . $deleteUrl . '" method="POST" onsubmit="return confirm(\'Are you sure?\')" style="display:inline;">
+                                    ' . csrf_field() . method_field('DELETE') . '
+                                    <button type="submit" class="dropdown-item text-danger">
+                                        <i class="fa fa-trash me-2"></i>Delete
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                ';
                 })
                 ->rawColumns(['checkbox', 'created_at', 'image', 'action'])
                 ->make(true);
         }
+
         return view('daily-booster.index');
     }
+
+    public function dailyBoostShow($id)
+    {
+        $dailyBooster = DailyBooster::findOrFail($id);
+
+        return view('daily-booster.show', compact('dailyBooster'));
+    }
+
 
     public function dailyBoostCreate()
     {
@@ -2121,41 +2195,70 @@ class ContentManagementController extends Controller
 
     public function testPlannerIndex(Request $request)
     {
-
         if ($request->ajax()) {
             $data = TestPlanner::orderBy('created_at', 'DESC')->get();
             return Datatables::of($data)
                 ->addIndexColumn()
                 ->addColumn('created_at', function ($row) {
-                    return $row->created_at;
+                    return $row->created_at ? $row->created_at->format('d M Y, h:i A') : '--';
                 })
                 ->addColumn('checkbox', function ($row) {
                     return '<input type="checkbox" class="column_checkbox career_checkbox" id="' . $row->id . '" name="career_checkbox[]" />';
                 })
                 ->addColumn('status', function ($row) {
-                    if ($row->status == 1) {
-                        $status = '<span class="badge badge-success">Active</span>';
-                    } else {
-                        $status = '<span class="badge badge-secondary">Inactive</span>';
-                    }
-                    return $status;
+                    return $row->status == 1
+                        ? '<span class="badge badge-success">Active</span>'
+                        : '<span class="badge badge-secondary">Inactive</span>';
                 })
                 ->addColumn('action', function ($row) {
+                    $viewUrl = route('test.planner.show', $row->id);
                     $editUrl = route('test.planner.edit', $row->id);
-                    $actionBtn = ' <a href="' . $editUrl . '" class="btn btn-sm btn-primary" title="Edit"><i class="fa fa-file"></i></a>
-                            <form action="' . route('test.planner.delete', $row->id) . '" method="POST" style="display:inline">
-                                ' . csrf_field() . '
-                                ' . method_field("DELETE") . '
-                                <button type="submit" class="btn btn-sm btn-danger" title="Delete"><i class="fa fa-trash"></i></button>
-                            </form>';
-                    return $actionBtn;
+                    $deleteUrl = route('test.planner.delete', $row->id);
+
+                    return '
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Actions
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow">
+                            <li>
+                                <a class="dropdown-item text-primary" href="' . $viewUrl . '">
+                                    <i class="fa fa-eye me-2"></i>View
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item text-info" href="' . $editUrl . '">
+                                    <i class="fa fa-edit me-2"></i>Edit
+                                </a>
+                            </li>
+                            <li>
+                                <form action="' . $deleteUrl . '" method="POST" onsubmit="return confirm(\'Are you sure?\')" style="display:inline;">
+                                    ' . csrf_field() . method_field('DELETE') . '
+                                    <button type="submit" class="dropdown-item text-danger">
+                                        <i class="fa fa-trash me-2"></i>Delete
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                ';
                 })
                 ->rawColumns(['checkbox', 'created_at', 'status', 'action'])
                 ->make(true);
         }
+
         return view('test-planner.index');
-        //$data['test_planners'] = TestPlanner::orderBy('created_at','DESC')->get();
-        //return view('test-planner.index',$data);
+    }
+
+    public function testPlannerShow($id)
+    {
+        try {
+            $testPlanner = TestPlanner::findOrFail($id);
+
+            return view('test-planner.show', compact('testPlanner'));
+        } catch (\Exception $e) {
+            return redirect()->route('test.planner.index')->with('error', 'Test Planner not found.');
+        }
     }
 
     public function testPlannerCreate()
@@ -2508,28 +2611,49 @@ class ContentManagementController extends Controller
                     return $row->exam_commission->name;
                 })
                 ->addColumn('status', function ($row) {
-                    if ($row->status == 1) {
-                        $status = '<span class="badge badge-success">Active</span>';
-                    } else {
-                        $status = '<span class="badge badge-secondary">Inactive</span>';
-                    }
-                    return $status;
+                    return $row->status == 1
+                        ? '<span class="badge badge-success">Active</span>'
+                        : '<span class="badge badge-secondary">Inactive</span>';
                 })
                 ->addColumn('action', function ($row) {
+                    $viewUrl = route('upcoming.exam.show', $row->id);
                     $editUrl = route('upcoming.exam.edit', $row->id);
-                    $actionBtn = ' <a href="' . $editUrl . '" class="btn btn-sm btn-primary" title="Edit"><i class="fa fa-file"></i></a>
-                            <form action="' . route('upcoming.exam.delete', $row->id) . '" method="POST" style="display:inline">
+                    $deleteUrl = route('upcoming.exam.delete', $row->id);
+
+                    $dropdown = '
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-primary dropdown-toggle" type="button" id="actionMenu' . $row->id . '" data-bs-toggle="dropdown" aria-expanded="false">
+                        Actions
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="actionMenu' . $row->id . '">
+                        <li><a class="dropdown-item" href="' . $viewUrl . '">View</a></li>
+                        <li><a class="dropdown-item" href="' . $editUrl . '">Edit</a></li>
+                        <li>
+                            <form action="' . $deleteUrl . '" method="POST" onsubmit="return confirm(\'Are you sure you want to delete this?\');">
                                 ' . csrf_field() . '
                                 ' . method_field("DELETE") . '
-                                <button type="submit" class="btn btn-sm btn-danger" title="Delete"><i class="fa fa-trash"></i></button>
-                            </form>';
-                    return $actionBtn;
+                                <button type="submit" class="dropdown-item text-danger">Delete</button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+                ';
+                    return $dropdown;
                 })
                 ->rawColumns(['checkbox', 'created_at', 'commission', 'status', 'action'])
                 ->make(true);
         }
+
         return view('upcoming-exams.index');
     }
+
+    public function upcomingExamShow($id)
+    {
+        $exam = UpcomingExam::with('exam_commission')->findOrFail($id);
+
+        return view('upcoming-exams.show', compact('exam'));
+    }
+
 
     public function upcomingExamCreate()
     {
@@ -3808,6 +3932,59 @@ class ContentManagementController extends Controller
         return redirect()->route('batches-programme.index')->with('success', 'Batch and Programme created successfully!');
     }
 
+    public function batchesProgrammeEdit($id)
+    {
+        $batch = BatchProgramme::findOrFail($id);
+        return view('batches-programme.edit', compact('batch'));
+    }
+
+    public function batchesProgrammeUpdate(Request $request, $id)
+    {
+        $batch = BatchProgramme::findOrFail($id);
+
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'duration' => 'required|string|max:255',
+            'start_date' => 'required|date',
+            'mrp' => 'required|numeric',
+            'discount' => 'nullable|integer',
+            'offered_price' => 'required|numeric',
+            'batch_heading' => 'required|string|max:255',
+            'short_description' => 'required|string',
+            'batch_overview' => 'required|string',
+            'detail_content' => 'required|string',
+            'thumbnail_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
+            'banner_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
+            'youtube_url' => 'nullable|string|max:255',
+            'meta_title' => 'nullable|string|max:255',
+            'meta_keyword' => 'nullable|string|max:255',
+            'meta_description' => 'nullable|string|max:255',
+            'image_alt_tag' => 'nullable|string|max:255',
+        ]);
+
+        // Handle file uploads (only if new file is uploaded)
+        if ($request->hasFile('thumbnail_image')) {
+            $thumbnailPath = $request->file('thumbnail_image')->store('uploads/thumbnails', 'public');
+            $validatedData['thumbnail_image'] = $thumbnailPath;
+        }
+
+        if ($request->hasFile('banner_image')) {
+            $bannerPath = $request->file('banner_image')->store('uploads/banners', 'public');
+            $validatedData['banner_image'] = $bannerPath;
+        }
+
+        $batch->update($validatedData);
+
+        return redirect()->route('batches-programme.index')->with('success', 'Batch and Programme updated successfully!');
+    }
+
+    public function batchesProgrammeShow($id)
+    {
+        $batch = BatchProgramme::findOrFail($id);
+        return view('batches-programme.show', compact('batch'));
+    }
+
+
     public function batchesProgrammeDelete($id)
     {
         $batch = BatchProgramme::findOrFail($id);
@@ -4236,6 +4413,21 @@ class ContentManagementController extends Controller
         $data['subjects'] = Subject::where('sub_category_id', $data['pyqContent']->sub_category_id)->get();
         return view('pyq.pyq-content-edit', $data);
     }
+
+    public function pyqContentShow($id)
+    {
+        // Fetch the specific PYQ content or fail if not found
+        $pyqContent = PyqContent::with([
+            'examinationCommission',   // Assuming PyqContent has a relation to ExaminationCommission
+            'category',     // Assuming relation to Category
+            'subCategory',  // Assuming relation to SubCategory
+            'subject'       // Assuming relation to Subject
+        ])->findOrFail($id);
+
+        // Return the show view with the data
+        return view('pyq.pyq-content-show', compact('pyqContent'));
+    }
+
 
     public function pyqContentStore(Request $request)
     {

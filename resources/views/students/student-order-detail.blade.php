@@ -56,10 +56,10 @@ Current Affair
               <div class="row">
                   <div class="col-sm-6">
                   <div class="company-details">
-                      <div class="company-logo">
-                          <img src="{{asset('images/Neti-logo.svg#full')}}"/>
+                      <div class="company-logo" >
+                          <img src="{{asset('images/Neti-logo.svg#full')}}" style="height:100px;width:100px;"/>
                       </div>
-                      <div class="company-name">NETI IAS</div>
+                      <div class="company-name">Adhyayanam Education</div>
                       <div class="company-address">Kanhaiya Kunj Complex, 313/313, Krishna Nagar Village, Alambagh,<br> Lucknow, Uttar Pradesh 226023 </div>
                       <div class="company contact">
                           Contact Number:+91-9369793443<br>

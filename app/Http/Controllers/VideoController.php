@@ -171,14 +171,31 @@ class VideoController extends Controller
     }
 
 
-
-    /**
-     * Display the specified resource.
-     */
     public function show(string $id)
     {
-        //
+        // dd('here');
+        // try {
+            // Fetch video with relationships
+            $video = Video::with([
+                'examinationCommission:id,name',
+                'category:id,name',
+                'subCategory:id,name',
+                'course:id,name',
+                'subject:id,name',
+                'chapter:id,name',
+                'topic:id,name',
+                'teacher:id,full_name',
+            ])->findOrFail($id);
+
+            return view('video.show', compact('video'));
+
+        // } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+        //     return redirect()->route('video.index')->with('error', 'Video not found.');
+        // } catch (\Exception $e) {
+        //     return redirect()->route('video.index')->with('error', 'Something went wrong: ' . $e->getMessage());
+        // }
     }
+
 
     /**
      * Show the form for editing the specified resource.

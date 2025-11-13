@@ -63,7 +63,7 @@ Order Details
                                     <div class="company-logo">
                                         <img src="{{asset('images/Neti-logo.svg#full')}}"/>
                                     </div>
-                                    <div class="company-name">NETI IAS</div>
+                                    <div class="company-name">Adhyayanam Education</div>
                                     <div class="company-address">Viaspir, Post Basahiya, Atrouliya, Azamgarh,Uttar Pradesh, India
 Pin Code - 223223 </div>
                                     <div class="company contact">

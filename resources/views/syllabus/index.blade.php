@@ -13,6 +13,7 @@
         .card-body table th {
             font-size: 13px;
         }
+
         .dropdown-menu a {
             font-size: 14px;
         }
@@ -81,23 +82,27 @@
                                     <td class="text-center">
                                         <div class="dropdown">
                                             <button class="btn btn-sm btn-secondary dropdown-toggle" type="button"
-                                                id="actionMenu{{ $res->id }}" data-bs-toggle="dropdown"
-                                                aria-expanded="false">
+                                                id="actionMenu{{ $res->id }}" data-bs-toggle="dropdown" aria-expanded="false">
                                                 Actions
                                             </button>
                                             <ul class="dropdown-menu" aria-labelledby="actionMenu{{ $res->id }}">
                                                 <li>
-                                                    <a class="dropdown-item" href="{{ route('syllabus.edit', $res->id) }}">
-                                                        <i class="fa fa-edit text-primary"></i> Edit
+                                                    <a class="dropdown-item" href="{{ route('syllabus.show', $res->id) }}">
+                                                        <i class="fa fa-eye text-primary me-2"></i> View
                                                     </a>
                                                 </li>
                                                 <li>
-                                                    <form action="{{ route('syllabus.destroy', $res->id) }}"
-                                                        method="POST" class="delete-form" style="display:inline;">
+                                                    <a class="dropdown-item" href="{{ route('syllabus.edit', $res->id) }}">
+                                                        <i class="fa fa-edit text-primary me-2"></i> Edit
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <form action="{{ route('syllabus.destroy', $res->id) }}" method="POST"
+                                                        class="delete-form" style="display:inline;">
                                                         @csrf
                                                         @method('DELETE')
                                                         <button type="button" class="dropdown-item text-danger delete-btn">
-                                                            <i class="fa fa-trash"></i> Delete
+                                                            <i class="fa fa-trash me-2"></i> Delete
                                                         </button>
                                                     </form>
                                                 </li>

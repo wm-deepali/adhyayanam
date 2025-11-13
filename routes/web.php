@@ -280,6 +280,7 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
         Route::get('manage-courses/course', [App\Http\Controllers\ContentManagementController::class, 'courseIndex'])->name('courses.course.index');
         Route::get('manage-courses/course/create', [App\Http\Controllers\ContentManagementController::class, 'courseCreate'])->name('courses.course.create');
         Route::get('manage-courses/course/edit/{id}', [App\Http\Controllers\ContentManagementController::class, 'courseEdit'])->name('courses.course.edit');
+        Route::get('courses/course/{course}', [App\Http\Controllers\ContentManagementController::class, 'courseShow'])->name('courses.course.show');
         Route::get('enquiries-and-call/direct-enquiries', [App\Http\Controllers\ContentManagementController::class, 'directEnquiriesIndex'])->name('enquiries.direct.call');
         Route::get('enquiries-and-call/contact-us', [App\Http\Controllers\ContentManagementController::class, 'contactUsIndex'])->name('enquiries.contact.us');
         Route::get('enquiries-and-call/call-back-request', [App\Http\Controllers\ContentManagementController::class, 'callRequestIndex'])->name('enquiries.call.request');
@@ -338,6 +339,7 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
         Route::get('study-material/bulk-delete', [App\Http\Controllers\ContentManagementController::class, 'studyMaterialBulkDelete'])->name('study.material.bulk-delete');
 
         Route::get('daily-booster', [App\Http\Controllers\ContentManagementController::class, 'dailyBoostIndex'])->name('daily.boost.index');
+        Route::get('daily-booster/show/{id}', [App\Http\Controllers\ContentManagementController::class, 'dailyBoostShow'])->name('daily.boost.show');
         Route::get('daily-booster/create', [App\Http\Controllers\ContentManagementController::class, 'dailyBoostCreate'])->name('daily.boost.create');
         Route::get('daily-booster/edit/{id}', [App\Http\Controllers\ContentManagementController::class, 'dailyBoostEdit'])->name('daily.boost.edit');
         Route::post('daily-booster/store', [App\Http\Controllers\ContentManagementController::class, 'dailyBoostStore'])->name('daily.boost.store');
@@ -346,6 +348,7 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
         Route::get('booster/bulk-delete', [App\Http\Controllers\ContentManagementController::class, 'boosterBulkDelete'])->name('booster.bulk-delete');
 
         Route::get('test-planner', [App\Http\Controllers\ContentManagementController::class, 'testPlannerIndex'])->name('test.planner.index');
+        Route::get('test-planner/show/{id}', [App\Http\Controllers\ContentManagementController::class, 'testPlannerShow'])->name('test.planner.show');
         Route::get('test-planner/edit/{id}', [App\Http\Controllers\ContentManagementController::class, 'testPlannerEdit'])->name('test.planner.edit');
         Route::get('test-planner/create', [App\Http\Controllers\ContentManagementController::class, 'testPlannerCreate'])->name('test.planner.create');
         Route::post('test-planner/store', [App\Http\Controllers\ContentManagementController::class, 'testPlannerStore'])->name('test.planner.store');
@@ -377,6 +380,7 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
         Route::get('test-series/question/create', [App\Http\Controllers\ContentManagementController::class, 'testSeriesQuestionCreate'])->name('test.series.question.create');
 
         Route::get('upcoming-exams', [App\Http\Controllers\ContentManagementController::class, 'upcomingExamIndex'])->name('upcoming.exam.index');
+        Route::get('upcoming-exams/{id}', [App\Http\Controllers\ContentManagementController::class, 'upcomingExamShow'])->name('upcoming.exam.show');
         Route::get('upcoming-exams/create', [App\Http\Controllers\ContentManagementController::class, 'upcomingExamCreate'])->name('upcoming.exam.create');
         Route::get('upcoming-exams/edit/{id}', [App\Http\Controllers\ContentManagementController::class, 'upcomingExamEdit'])->name('upcoming.exam.edit');
         Route::post('upcoming-exams/store', [App\Http\Controllers\ContentManagementController::class, 'upcomingExamStore'])->name('upcoming.exam.store');
@@ -454,6 +458,7 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
         Route::get('study-material/main-topic/fetch-topic-by-category/{category}', 'MainTopicController@fetchCategory')->name('fetch-topic-by-category');
         Route::get('pyq-content', [App\Http\Controllers\ContentManagementController::class, 'pyqContentIndex'])->name('pyq.content.index');
         Route::get('pyq-content/create', [App\Http\Controllers\ContentManagementController::class, 'pyqContentCreate'])->name('pyq.content.create');
+        Route::get('pyq-content/show/{id}', [App\Http\Controllers\ContentManagementController::class, 'pyqContentShow'])->name('pyq.content.show');
         Route::get('pyq-content/edit/{id}', [App\Http\Controllers\ContentManagementController::class, 'pyqContentEdit'])->name('pyq.content.edit');
         Route::post('pyq-content/store', [App\Http\Controllers\ContentManagementController::class, 'pyqContentStore'])->name('pyq.content.store');
         Route::post('pyq-content/update/{id}', [App\Http\Controllers\ContentManagementController::class, 'pyqContentUpdate'])->name('pyq.content.update');
@@ -524,6 +529,9 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
         Route::get('batches-and-programme/create', [App\Http\Controllers\ContentManagementController::class, 'batchesProgrammeCreate'])->name('batches-programme.create');
         Route::post('batches-and-programme/store', [App\Http\Controllers\ContentManagementController::class, 'batchesProgrammeStore'])->name('batches-programme.store');
         Route::delete('batches-and-programme/delete/{id}', [App\Http\Controllers\ContentManagementController::class, 'batchesProgrammeDelete'])->name('batches-programme.delete');
+        Route::get('batches-programme/{id}', [App\Http\Controllers\ContentManagementController::class, 'batchesProgrammeShow'])->name('batches-programme.show');
+        Route::get('batches-programme/{id}/edit', [App\Http\Controllers\ContentManagementController::class, 'batchesProgrammeEdit'])->name('batches-programme.edit');
+        Route::put('batches-programme/{id}', [App\Http\Controllers\ContentManagementController::class, 'batchesProgrammeUpdate'])->name('batches-programme.update');
 
         Route::get('admin/settings/header-settings', [App\Http\Controllers\ContentManagementController::class, 'headerSettingsIndex'])->name('settings.header.index');
         Route::post('admin/settings/header-settings/store', [App\Http\Controllers\ContentManagementController::class, 'headerSettingsStore'])->name('settings.header.store');

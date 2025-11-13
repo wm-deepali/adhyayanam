@@ -48,7 +48,7 @@ class Course extends Model
         'topic_id' => 'array',
     ];
 
-    // Define relationships
+    // 🔹 Relationships
     public function examinationCommission()
     {
         return $this->belongsTo(ExaminationCommission::class, 'examination_commission_id');
@@ -62,5 +62,23 @@ class Course extends Model
     public function subCategory()
     {
         return $this->belongsTo(SubCategory::class, 'sub_category_id');
+    }
+
+    // 🔹 Relationship for Subjects (if IDs stored as array)
+    public function subjects()
+    {
+        return Subject::whereIn('id', $this->subject_id ?? [])->get();
+    }
+
+    // 🔹 Relationship for Chapters
+    public function chapters()
+    {
+        return Chapter::whereIn('id', $this->chapter_id ?? [])->get();
+    }
+
+    // 🔹 Relationship for Topics
+    public function topics()
+    {
+        return CourseTopic::whereIn('id', $this->topic_id ?? [])->get();
     }
 }

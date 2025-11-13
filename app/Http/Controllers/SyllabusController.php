@@ -25,6 +25,17 @@ class SyllabusController extends Controller
     }
 
     /**
+     * Display the specified resource.
+     */
+    public function show(string $id)
+    {
+        $syllabus = Syllabus::with(['commission', 'category', 'subCategory', 'subject'])->findOrFail($id);
+
+        return view('syllabus.show', compact('syllabus'));
+    }
+
+
+    /**
      * Show the form for creating a new resource.
      */
     public function create()

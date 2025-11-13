@@ -31,9 +31,7 @@
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
-.dropdown.active .mega-menu-container {
-    display: flex;
-}
+
 
 .mega-menu-left {
     width: 20%;
@@ -54,6 +52,8 @@
     color: #fff;
 }
 
+
+/* --- Fix Mega Menu UI (Restores old look but keeps new working script) --- */
 .mega-menu-right {
     width: 80%;
     padding: 20px;
@@ -65,13 +65,23 @@
 }
 
 .mega-menu-panel {
-    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
-    
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease;
 }
 
 .mega-menu-panel.active {
-    display: block;
+    opacity: 1;
+    visibility: visible;
+    position: relative;
+}
+
+.dropdown.active .mega-menu-container {
+    display: flex !important;
 }
 
 .mega-menu-panel h5 {
@@ -117,15 +127,19 @@
 <link rel="shortcut icon" href="{{url('images/favicon.svg')}}" type="image/x-icon">
 <link rel="icon" href="{{url('images/favicon.svg')}}" type="image/x-icon">
 
+
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
 
 <!-- Responsive -->
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
 
+
 <!-- Main Header -->
 <header class="main-header">
 <div class="page-wrapper">
+
 
     <!-- Header Top -->
     <div class="header-top">
@@ -140,6 +154,7 @@
                     <li style="padding-left: 0px !important;"><a href="#" style="padding-left: 0px !important;"><img src="{{url('images/resource/whatsapp.png')}}" /> <span class="m-80">{{$headerSettings->whatsapp_number ?? ""}}</span></a></li>
                 </ul>
             </div>
+
 
             <!-- Right Box -->
             <div class="right-box d-flex flex-wrap">
@@ -165,6 +180,7 @@
         </div>
     </div>
 
+
     <!-- Header Lower -->
     <div class="header-lower">
         <div class="auto-container container-fluid">
@@ -184,6 +200,7 @@
                                 <span class="icon-bar"></span>
                             </button>
                         </div>
+
 
                         <div class="navbar-collapse collapse clearfix" id="navbarSupportedContent">
                             <ul class="navigation clearfix">
@@ -206,22 +223,23 @@
                                         </div>
                                     </div>
                                 </li>
+
+                                <!-- Courses Dropdown -->
                                 <li class="dropdown">
                                     <a href="#">Courses</a>
                                     <div class="mega-menu-container">
                                         <div class="mega-menu-left">
-                                            @foreach($examinationCommission as $index => $commission)
-                                            <div class="mega-menu-tab {{ $loop->first ? 'active' : '' }}" data-tab="tab-{{ $commission->id }}">
+                                            @foreach($examinationCommission as $commission)
+                                            <div class="mega-menu-tab {{ $loop->first ? 'active' : '' }}" data-tab="tab-course-{{ $commission->id }}">
                                                 {{ $commission->name }}
                                             </div>
                                             @endforeach
                                         </div>
                                         <div class="mega-menu-right">
                                             @foreach($examinationCommission as $commission)
-                                            <div class="mega-menu-panel {{ $loop->first ? 'active' : '' }}" id="tab-{{ $commission->id }}" style="width: 100%;
-    display: grid; grid-template-columns: 1fr 1fr 1fr;">
+                                            <div class="mega-menu-panel {{ $loop->first ? 'active' : '' }}" id="tab-course-{{ $commission->id }}" style="width: 100%; display: grid; grid-template-columns: 1fr 1fr 1fr;">
                                                 @foreach($commission->categories as $category)
-                                                <div> <!-- Each category is a grid item -->
+                                                <div>
                                                     <h5>{{ $category->name }}</h5>
                                                     <ul>
                                                         @foreach($category->subCategories as $subCat)
@@ -235,11 +253,13 @@
                                         </div>
                                     </div>
                                 </li>
+
+                                <!-- Test Series Dropdown -->
                                 <li class="dropdown">
                                     <a href="#">Test Series</a>
                                     <div class="mega-menu-container">
                                         <div class="mega-menu-left">
-                                            @foreach($examinationCommission as $index => $commission)
+                                            @foreach($examinationCommission as $commission)
                                             <div class="mega-menu-tab {{ $loop->first ? 'active' : '' }}" data-tab="tab-test-{{ $commission->id }}">
                                                 {{ $commission->name }}
                                             </div>
@@ -247,10 +267,9 @@
                                         </div>
                                         <div class="mega-menu-right">
                                             @foreach($examinationCommission as $commission)
-                                            <div class="mega-menu-panel {{ $loop->first ? 'active' : '' }}" id="tab-test-{{ $commission->id }}" style="width: 100%;
-    display: grid; grid-template-columns: 1fr 1fr 1fr;">
+                                            <div class="mega-menu-panel {{ $loop->first ? 'active' : '' }}" id="tab-test-{{ $commission->id }}" style="width: 100%; display: grid; grid-template-columns: 1fr 1fr 1fr;">
                                                 @foreach($commission->categories as $category)
-                                                <div> <!-- Each category is a grid item -->
+                                                <div>
                                                     <h5>{{ $category->name }}</h5>
                                                     <ul>
                                                         @foreach($category->subCategories as $subCat)
@@ -264,34 +283,35 @@
                                         </div>
                                     </div>
                                 </li>
-                                 <li class="dropdown">
+
+                                <!-- Study Material Dropdown -->
+                                <li class="dropdown">
                                     <a href="#">Study Material</a>
                                     <div class="mega-menu-container">
                                         <div class="mega-menu-left">
-                                            @foreach($examinationCommission as $index => $commission)
-                                            <div class="mega-menu-tab {{ $loop->first ? 'active' : '' }}" data-tab="tab-test-{{ $commission->id }}">
+                                            @foreach($examinationCommission as $commission)
+                                            <div class="mega-menu-tab {{ $loop->first ? 'active' : '' }}" data-tab="tab-study-{{ $commission->id }}">
                                                 {{ $commission->name }}
                                             </div>
                                             @endforeach
                                         </div>
                                         <div class="mega-menu-right">
                                             @foreach($examinationCommission as $commission)
-                                            <div class="mega-menu-panel {{ $loop->first ? 'active' : '' }}" id="tab-test-{{ $commission->id }}" style="width: 100%;
-    display: grid; grid-template-columns: 1fr 1fr 1fr;">
+                                            <div class="mega-menu-panel {{ $loop->first ? 'active' : '' }}" id="tab-study-{{ $commission->id }}" style="width: 100%; display: grid; grid-template-columns: 1fr 1fr 1fr;">
                                                 @foreach($commission->categories as $category)
-                                                <div> <!-- Each category is a grid item -->
+                                                <div>
                                                     <h5>{{ $category->name }}</h5>
                                                     <ul>
                                                         @foreach($category->subCategories as $subCat)
-                                                      <li>
-  <a href="{{ route('study.material.front', [
-      'examid' => $commission->id,
-      'catid' => $category->id,
-      'subcat' => $subCat->id
-  ]) }}">
-    {{ $subCat->name }}
-  </a>
-</li>
+                                                        <li>
+                                                            <a href="{{ route('study.material.front', [
+                                                                'examid' => $commission->id,
+                                                                'catid' => $category->id,
+                                                                'subcat' => $subCat->id
+                                                            ]) }}">
+                                                                {{ $subCat->name }}
+                                                            </a>
+                                                        </li>
                                                         @endforeach
                                                     </ul>
                                                 </div>
@@ -301,6 +321,8 @@
                                         </div>
                                     </div>
                                 </li>
+
+                                <!-- Current Affairs Dropdown -->
                                 <li class="dropdown">
                                     <a href="#">Current Affairs</a>
                                     <div class="mega-menu-container">
@@ -317,11 +339,13 @@
                                         </div>
                                     </div>
                                 </li>
+
+                                <!-- PYQ Dropdown -->
                                 <li class="dropdown">
                                     <a href="#">PYQ</a>
                                     <div class="mega-menu-container">
                                         <div class="mega-menu-left">
-                                            @foreach($examinationCommission as $index => $commission)
+                                            @foreach($examinationCommission as $commission)
                                             <div class="mega-menu-tab {{ $loop->first ? 'active' : '' }}" data-tab="tab-pyq-{{ $commission->id }}">
                                                 {{ $commission->name }}
                                             </div>
@@ -329,10 +353,9 @@
                                         </div>
                                         <div class="mega-menu-right">
                                             @foreach($examinationCommission as $commission)
-                                            <div class="mega-menu-panel {{ $loop->first ? 'active' : '' }}" id="tab-pyq-{{ $commission->id }}" style="width: 100%;
-    display: grid; grid-template-columns: 1fr 1fr 1fr;">
+                                            <div class="mega-menu-panel {{ $loop->first ? 'active' : '' }}" id="tab-pyq-{{ $commission->id }}" style="width: 100%; display: grid; grid-template-columns: 1fr 1fr 1fr;">
                                                 @foreach($commission->categories as $category)
-                                                <div> <!-- Each category is a grid item -->
+                                                <div>
                                                     <h5>{{ $category->name }}</h5>
                                                     <ul>
                                                         @foreach($category->subCategories as $subCat)
@@ -346,34 +369,35 @@
                                         </div>
                                     </div>
                                 </li>
-                                   <li class="dropdown">
+
+                                <!-- Syllabus Dropdown -->
+                                <li class="dropdown">
                                     <a href="#">Syllabus</a>
                                     <div class="mega-menu-container">
                                         <div class="mega-menu-left">
-                                            @foreach($examinationCommission as $index => $commission)
-                                            <div class="mega-menu-tab {{ $loop->first ? 'active' : '' }}" data-tab="tab-test-{{ $commission->id }}">
+                                            @foreach($examinationCommission as $commission)
+                                            <div class="mega-menu-tab {{ $loop->first ? 'active' : '' }}" data-tab="tab-syllabus-{{ $commission->id }}">
                                                 {{ $commission->name }}
                                             </div>
                                             @endforeach
                                         </div>
                                         <div class="mega-menu-right">
                                             @foreach($examinationCommission as $commission)
-                                            <div class="mega-menu-panel {{ $loop->first ? 'active' : '' }}" id="tab-test-{{ $commission->id }}" style="width: 100%;
-    display: grid; grid-template-columns: 1fr 1fr 1fr;">
+                                            <div class="mega-menu-panel {{ $loop->first ? 'active' : '' }}" id="tab-syllabus-{{ $commission->id }}" style="width: 100%; display: grid; grid-template-columns: 1fr 1fr 1fr;">
                                                 @foreach($commission->categories as $category)
-                                                <div> <!-- Each category is a grid item -->
+                                                <div>
                                                     <h5>{{ $category->name }}</h5>
                                                     <ul>
                                                         @foreach($category->subCategories as $subCat)
-                                                      <li>
-  <a href="{{ route('syllabus.front', [
-      'examid' => $commission->id,
-      'catid' => $category->id,
-      'subcat' => $subCat->id
-  ]) }}">
-    {{ $subCat->name }}
-  </a>
-</li>
+                                                        <li>
+                                                            <a href="{{ route('syllabus.front', [
+                                                                'examid' => $commission->id,
+                                                                'catid' => $category->id,
+                                                                'subcat' => $subCat->id
+                                                            ]) }}">
+                                                                {{ $subCat->name }}
+                                                            </a>
+                                                        </li>
                                                         @endforeach
                                                     </ul>
                                                 </div>
@@ -383,6 +407,8 @@
                                         </div>
                                     </div>
                                 </li>
+
+                                <!-- Student Corner Dropdown -->
                                 <li class="dropdown">
                                     <a href="#">Student Corner</a>
                                     <div class="mega-menu-container">
@@ -410,6 +436,7 @@
     </div>
     <!-- End Header Lower -->
 
+
     <!-- Sticky Header -->
     <div class="sticky-header">
         <div class="container d-flex justify-content-between align-items-center flex-wrap">
@@ -420,6 +447,7 @@
             <div class="mobile-nav-toggler"><span class="icon flaticon-menu"></span></div>
         </div>
     </div><!-- End Sticky Menu -->
+
 
     <!-- Mobile Menu -->
     <div class="mobile-menu">
@@ -432,6 +460,7 @@
     </div><!-- End Mobile Menu -->
 </div>
 </header>
+
 
 <!-- Bottom header -->
 @php

@@ -148,7 +148,7 @@
         <div class="col-12 col-sm-12 col-md-4">
           <div class="r-form-ts comment-form">
             <div class="inner-form">
-              <div class="f-h">Sign up To NETI IAS and Test Your Exam Knowledge Now!</div>
+              <div class="f-h">Sign up To Adhyayanam Education and Test Your Exam Knowledge Now!</div>
             </div>
             <div class="form-test-l contact-form">
               

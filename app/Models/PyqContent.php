@@ -16,8 +16,8 @@ class PyqContent extends Model
         'subject_id',
         'heading',
         'detail_content',
-        ];
-        
+    ];
+
     public function examinationCommission()
     {
         return $this->belongsTo(ExaminationCommission::class, 'commission_id');
@@ -31,5 +31,10 @@ class PyqContent extends Model
     public function subCategory()
     {
         return $this->belongsTo(SubCategory::class, 'sub_category_id');
+    }
+
+    public function subject()
+    {
+        return $this->belongsTo(subject::class, 'subject_id');
     }
 }

@@ -41,12 +41,22 @@ class Video extends Model
         'live_link'
     ];
 
-    public function coursecategory()
+    public function examinationCommission()
+    {
+        return $this->belongsTo(ExaminationCommission::class, 'course_type');
+    }
+
+    public function category()
     {
         return $this->belongsTo(Category::class, 'course_category');
     }
 
-    public function courses()
+    public function subCategory()
+    {
+        return $this->belongsTo(SubCategory::class, 'sub_category_id');
+    }
+
+    public function course()
     {
         return $this->belongsTo(Course::class, 'course_id', 'id');
     }
@@ -54,9 +64,19 @@ class Video extends Model
     {
         return $this->belongsTo(Teacher::class, 'teacher_id', 'id');
     }
+
+    public function subject()
+    {
+        return $this->belongsTo(Subject::class, 'subject_id');
+    }
     public function chapter()
     {
         return $this->belongsTo(Chapter::class, 'chapter_id');
+    }
+
+    public function topic()
+    {
+        return $this->belongsTo(CourseTopic::class, 'topic_id');
     }
 
 }

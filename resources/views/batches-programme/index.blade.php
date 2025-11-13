@@ -36,7 +36,7 @@ ADHYAYANAM | Batches and Online Programme
                 <tbody>
                     @foreach($batches as $data)
                     <tr>
-                        <th scope="row">{{ Carbon\Carbon::parse($data->created_at)->format('d M Y'); }}</th>
+                        <th scope="row">{{ Carbon\Carbon::parse($data->created_at)->format('d M Y') }}</th>
                         <td><img style="height: auto;width: 40px;" src="{{url('storage/'.$data->thumbnail_image)}}" alt=""></td>
                         <td><img style="height: auto;width: 40px;" src="{{url('storage/'.$data->banner_image)}}" alt=""></td>
                         <td>{{$data->batch_heading}}</td>
@@ -44,13 +44,28 @@ ADHYAYANAM | Batches and Online Programme
                         <td>{{$data->mrp}}</td>
                         <td>{{$data->discount}}</td>
                         <td>{{$data->offered_price}}</td>
-                        <td>{{$data->duration??"0"}} Days</td>
+                        <td>{{$data->duration ?? "0"}} Days</td>
                         <td>
-                            <form action="{{ route('batches-programme.delete', $data->id) }}" method="POST" style="display:inline;">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-                            </form>
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" id="actionDropdown{{$data->id}}" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Action
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="actionDropdown{{$data->id}}">
+                                    <li>
+                                        <a class="dropdown-item" href="{{ route('batches-programme.show', $data->id) }}">View</a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="{{ route('batches-programme.edit', $data->id) }}">Edit</a>
+                                    </li>
+                                    <li>
+                                        <form action="{{ route('batches-programme.delete', $data->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this batch?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="dropdown-item text-danger">Delete</button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </div>
                         </td>
                     </tr>
                     @endforeach

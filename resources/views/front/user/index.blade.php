@@ -258,7 +258,7 @@
 	<section class="current-affairs-section osdb">
 		<div class="auto-container">
 			<div class="sec-title centered">
-				<!--<div class="title">Neti IAS </div>-->
+				<!--<div class="title">Adhyayanam Education </div>-->
 				<h2 class="mb-osd">Our Study Materials </h2>
 				<div class="row">
 					@foreach($studyCategories as $category)

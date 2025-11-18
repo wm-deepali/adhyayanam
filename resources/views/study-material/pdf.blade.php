@@ -63,6 +63,7 @@
 
         <div class="row"><strong>Material Type:</strong> {{ ucfirst(str_replace('_', ' ', $material->material_type)) }}
         </div>
+        <div class="row"><strong>Language:</strong> {{ ucfirst($material->language)  }}</div>
         <div class="row"><strong>Title:</strong> {{ $material->title }}</div>
         <div class="row"><strong>Short Description:</strong> {{ $material->short_description }}</div>
         <div class="row"><strong>Detail Content:</strong> {!! $material->detail_content !!}</div>

@@ -1827,6 +1827,7 @@ class ContentManagementController extends Controller
             'titles.*' => 'required|string',
             'descriptions' => 'required|array|min:1',
             'descriptions.*' => 'required|string',
+            'language' => 'required|in:hindi,english',
         ]);
 
         // Upload PDF file (optional)
@@ -1896,6 +1897,7 @@ class ContentManagementController extends Controller
         $studyMaterial->meta_keyword = $validatedData['meta_keyword'] ?? null;
         $studyMaterial->meta_description = $validatedData['meta_description'] ?? null;
         $studyMaterial->based_on = $basedOn; // Optional, for reference
+        $studyMaterial->language = $validatedData['language'];
         $studyMaterial->save();
 
         if (!empty($validatedData['titles']) && !empty($validatedData['descriptions'])) {
@@ -2004,6 +2006,9 @@ class ContentManagementController extends Controller
             'discount' => 'nullable|numeric',
             'is_pdf_downloadable' => 'required|boolean',
 
+            // LANGUAGE FIELD
+            'language' => 'required|string|in:hindi,english',
+
             'pdf' => 'nullable|file|mimes:pdf|max:2048',
             'banner' => 'nullable|file|image|max:2048',
 
@@ -2012,7 +2017,6 @@ class ContentManagementController extends Controller
             'meta_description' => 'nullable|string',
             'based_on' => 'nullable|string',
 
-            // Section validation
             'section_ids' => 'nullable|array',
             'section_ids.*' => 'nullable|integer|exists:study_material_sections,id',
             'titles' => 'nullable|array',
@@ -2029,6 +2033,7 @@ class ContentManagementController extends Controller
             'subject_id' => $validatedData['subject_id'] ?? [],
             'chapter_id' => $validatedData['chapter_id'] ?? [],
             'topic_id' => $validatedData['topic_id'] ?? [],
+
             'title' => $validatedData['title'],
             'short_description' => $validatedData['short_description'],
             'detail_content' => $validatedData['detail_content'],
@@ -2041,6 +2046,9 @@ class ContentManagementController extends Controller
             'meta_keyword' => $validatedData['meta_keyword'] ?? null,
             'meta_description' => $validatedData['meta_description'] ?? null,
             'is_pdf_downloadable' => $validatedData['is_pdf_downloadable'],
+
+            // SAVE LANGUAGE
+            'language' => $validatedData['language'],
         ]);
 
         // Determine material type
@@ -2087,7 +2095,7 @@ class ContentManagementController extends Controller
         $material->save();
 
         /**
-         * ✅ Handle Sections (Update / Create / Delete missing)
+         * Handle Sections
          */
         $sectionIds = $request->input('section_ids', []);
         $titles = $request->input('titles', []);
@@ -2096,19 +2104,18 @@ class ContentManagementController extends Controller
         $existingSectionIds = $material->sections()->pluck('id')->toArray();
         $submittedSectionIds = array_filter($sectionIds);
 
-        // 🔸 Delete sections that are no longer submitted
+        // Delete removed sections
         $toDelete = array_diff($existingSectionIds, $submittedSectionIds);
         if (!empty($toDelete)) {
             StudyMaterialSection::whereIn('id', $toDelete)->delete();
         }
 
-        // 🔸 Loop through and update or create
+        // Update or create
         foreach ($titles as $index => $title) {
             $sectionId = $sectionIds[$index] ?? null;
             $description = $descriptions[$index] ?? '';
 
             if ($sectionId && in_array($sectionId, $existingSectionIds)) {
-                // Update existing section
                 $section = StudyMaterialSection::find($sectionId);
                 if ($section) {
                     $section->update([
@@ -2117,7 +2124,6 @@ class ContentManagementController extends Controller
                     ]);
                 }
             } else {
-                // Create new section
                 if (!empty($title) || !empty($description)) {
                     StudyMaterialSection::create([
                         'study_material_id' => $material->id,
@@ -2132,6 +2138,7 @@ class ContentManagementController extends Controller
             ->route('study.material.index')
             ->with('success', 'Study Material updated successfully with sections');
     }
+
 
 
 

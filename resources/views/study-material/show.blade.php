@@ -48,6 +48,10 @@
                         <p>{{ $material->topic->name ?? 'N/A' }}</p>
                     @endif
 
+                    <div class="col-md-6 mb-3">
+                        <strong>Language:</strong>
+                        <p>{{ ucfirst($material->language) }}</p>
+                    </div>
 
                     <div class="col-md-12 mb-3">
                         <strong>Material Type:</strong>

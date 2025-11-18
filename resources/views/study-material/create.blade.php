@@ -30,6 +30,15 @@
                     </div>
 
                     <div class="mb-3">
+                        <label for="language" class="form-label">Select Language</label>
+                        <select class="form-control" name="language" id="language" required>
+                            <option value="">--Select--</option>
+                            <option value="hindi">Hindi</option>
+                            <option value="english">English</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
                         <label>Select Category</label>
                         <select class="form-control" name="category_id" id="category_id">
                             <option value="">--Select--</option>
@@ -106,8 +115,8 @@
                                             name="descriptions[]" placeholder="Description" rows="3" required></textarea>
                                     </div>
                                     <div class="col-md-1 d-flex align-items-center">
-                                         <button type="button" class="btn btn-danger btn-sm remove-group">Remove</button>
-                                       
+                                        <button type="button" class="btn btn-danger btn-sm remove-group">Remove</button>
+
                                     </div>
                                 </div>
                             </div>
@@ -428,60 +437,60 @@
                 $('#offered-price').val(offeredPrice.toFixed(2));
             });
         });
-        
-let descEditorCount = 1; // track number of CKEditor instances
 
-// Initialize CKEditor for the first description
-CKEDITOR.replace('desc-editor-1');
+        let descEditorCount = 1; // track number of CKEditor instances
 
-// Add More / Remove functionality for Title & Description
-$(document).on('click', '#add-more-group', function () {
-    descEditorCount++;
-    const newEditorId = `desc-editor-${descEditorCount}`;
+        // Initialize CKEditor for the first description
+        CKEDITOR.replace('desc-editor-1');
 
-    const newGroup = `
-        <div class="title-description-group mb-2 border rounded p-2">
-            <div class="row">
-                <div class="col-md-12 mb-2">
-                    <input type="text" class="form-control" name="titles[]" placeholder="Title" required>
-                </div>
-                <div class="col-md-12 mb-2">
-                    <textarea class="form-control description-editor" id="${newEditorId}" name="descriptions[]" placeholder="Description" rows="3" required></textarea>
-                </div>
-                <div class="col-md-1 d-flex align-items-center">
+        // Add More / Remove functionality for Title & Description
+        $(document).on('click', '#add-more-group', function () {
+            descEditorCount++;
+            const newEditorId = `desc-editor-${descEditorCount}`;
+
+            const newGroup = `
+            <div class="title-description-group mb-2 border rounded p-2">
+                <div class="row">
+                    <div class="col-md-12 mb-2">
+                        <input type="text" class="form-control" name="titles[]" placeholder="Title" required>
+                    </div>
+                    <div class="col-md-12 mb-2">
+                        <textarea class="form-control description-editor" id="${newEditorId}" name="descriptions[]" placeholder="Description" rows="3" required></textarea>
+                    </div>
                     <div class="col-md-1 d-flex align-items-center">
-                                         <button type="button" class="btn btn-danger btn-sm remove-group">Remove</button>
-                                       
-                                    </div>
+                        <div class="col-md-1 d-flex align-items-center">
+                                             <button type="button" class="btn btn-danger btn-sm remove-group">Remove</button>
+
+                                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>`;
+            </div>`;
 
-    $('#title-description-wrapper').append(newGroup);
+            $('#title-description-wrapper').append(newGroup);
 
-    // Initialize CKEditor for the new textarea
-    CKEDITOR.replace(newEditorId);
-});
+            // Initialize CKEditor for the new textarea
+            CKEDITOR.replace(newEditorId);
+        });
 
-// Remove specific group (with CKEditor cleanup)
-$(document).on('click', '.remove-group', function () {
-    const textarea = $(this).closest('.title-description-group').find('textarea');
-    const editorId = textarea.attr('id');
+        // Remove specific group (with CKEditor cleanup)
+        $(document).on('click', '.remove-group', function () {
+            const textarea = $(this).closest('.title-description-group').find('textarea');
+            const editorId = textarea.attr('id');
 
-    // Destroy CKEditor instance safely
-    if (CKEDITOR.instances[editorId]) {
-        CKEDITOR.instances[editorId].destroy(true);
-    }
+            // Destroy CKEditor instance safely
+            if (CKEDITOR.instances[editorId]) {
+                CKEDITOR.instances[editorId].destroy(true);
+            }
 
-    $(this).closest('.title-description-group').remove();
-});
+            $(this).closest('.title-description-group').remove();
+        });
 
-// ✅ Ensure CKEditor content is synced to textarea before submitting form
-$('#study-form').on('submit', function () {
-    for (let instance in CKEDITOR.instances) {
-        CKEDITOR.instances[instance].updateElement();
-    }
-});
+        // ✅ Ensure CKEditor content is synced to textarea before submitting form
+        $('#study-form').on('submit', function () {
+            for (let instance in CKEDITOR.instances) {
+                CKEDITOR.instances[instance].updateElement();
+            }
+        });
 
 
     </script>

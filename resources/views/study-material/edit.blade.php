@@ -20,10 +20,9 @@
                     @csrf
 
 
-
                     <div class="mb-3">
                         <label>Select Examination Commission</label>
-                        <select class="form-control select2" name="commission_id" id="exam_com_id" required>
+                        <select class="form-control " name="commission_id" id="exam_com_id" required>
                             <option value="">--Select--</option>
                             @foreach($commissions as $commission)
                                 <option value="{{ $commission->id }}" {{ $material->commission_id == $commission->id ? 'selected' : '' }}>
@@ -33,8 +32,16 @@
                         </select>
                     </div>
                     <div class="mb-3">
+    <label for="language" class="form-label">Select Language</label>
+    <select class="form-control" name="language" id="language" required>
+        <option value="">--Select--</option>
+        <option value="hindi" {{ $material->language == 'hindi' ? 'selected' : '' }}>Hindi</option>
+        <option value="english" {{ $material->language == 'english' ? 'selected' : '' }}>English</option>
+    </select>
+</div>
+                    <div class="mb-3">
                         <label>Select Category</label>
-                        <select class="form-control select2" name="category_id" id="category_id" required>
+                        <select class="form-control" name="category_id" id="category_id" required>
                             <option value="">--Select--</option>
                             @foreach($categories as $category)
                                 <option value="{{ $category->id }}" {{ $material->category_id == $category->id ? 'selected' : '' }}>
@@ -45,7 +52,7 @@
                     </div>
                     <div class="mb-3 sub-cat">
                         <label>Sub Category</label>
-                        <select class="form-control select2" name="sub_category_id" id="sub_category_id">
+                        <select class="form-control" name="sub_category_id" id="sub_category_id">
                             <option value="">--Select--</option>
                             @foreach($subcategories as $subcategory)
                                 <option value="{{ $subcategory->id }}" {{ $material->sub_category_id == $subcategory->id ? 'selected' : '' }}>

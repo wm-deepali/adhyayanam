@@ -34,7 +34,8 @@ class StudyMaterial extends Model
         'mrp',
         'discount',
         'price',
-        'based_on'
+        'based_on',
+        'language'
     ];
 
 

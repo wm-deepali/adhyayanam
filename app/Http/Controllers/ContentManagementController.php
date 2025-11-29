@@ -1116,13 +1116,33 @@ class ContentManagementController extends Controller
 
     public function chapterEdit($id)
     {
-        $data['commissions'] = ExaminationCommission::all();
-        $data['categories'] = Category::all();
-        $data['subcategories'] = SubCategory::all();
-        $data['subjects'] = Subject::all();
-        $data['chapter'] = Chapter::where('id', $id)->first();
-        return view('content-management.ajax.edit-chapter', $data);
+        $chapter = Chapter::findOrFail($id);
+
+        // Fetch all commissions (assuming you always need all)
+        $commissions = ExaminationCommission::all();
+
+        // Fetch related categories, subcategories, subjects conditionally
+        $categories = $chapter->exam_com_id
+            ? Category::where('exam_com_id', $chapter->exam_com_id)->get()
+            : collect();
+
+        $subcategories = $chapter->category_id
+            ? SubCategory::where('category_id', $chapter->category_id)->get()
+            : collect();
+
+        $subjects = $chapter->sub_category_id
+            ? Subject::where('sub_category_id', $chapter->sub_category_id)->get()
+            : collect();
+
+        return view('content-management.ajax.edit-chapter', [
+            'chapter' => $chapter,
+            'commissions' => $commissions,
+            'categories' => $categories,
+            'subcategories' => $subcategories,
+            'subjects' => $subjects,
+        ]);
     }
+
     public function chapterUpdate(Request $request, $id)
     {
         $request->validate([

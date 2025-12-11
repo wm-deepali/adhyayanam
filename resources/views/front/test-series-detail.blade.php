@@ -39,7 +39,7 @@
                 {{$testseries->updated_at->format('M d,Y')}} </span></div>
             <div class="test-fst">
               <div class="fe-a"><b>{{count($testseries->testseries)}} Total Tests </b></div>
-              <div class="fe-b"><span class="bg-g">@if($testseries->fee_type == 'Paid') Premium @else Free @endif Tests</span></div>
+              <div class="fe-b"><span class="bg-g">@if($testseries->fee_type == 'paid') Premium @else Free @endif Tests</span></div>
               <div class="fe-c"><span class="user"><span class="icon flaticon-user osdc"></span><span
                     class="usr-t">286.4k Users</span> </span>
               </div>
@@ -53,7 +53,7 @@
                   <li>+{{$testseries->testseries->where('type_name','Full Test')->count()}} more tests</li>
               </ul>
             </div>
-            @if($testseries->fee_type == 'Paid')
+            @if($testseries->fee_type == 'paid')
             @if(auth()->user() && auth()->user()->email !='' && auth()->user()->type =='student')
             
               @if(!$checkExist)
@@ -154,7 +154,7 @@
               
               <div class="btn-osd">
                 <a data-bs-toggle="modal" data-bs-target="#lr" class="osd-cus">
-                  <div class="cus-btn-osd">Start test</div>
+                  <div class="cus-btn-osd">Attempt Now</div>
                 </a>
               </div>
             </div>
@@ -201,7 +201,7 @@
                                 Users</span>
                             </div>
                           </div>
-                          @if($testseries->fee_type == 'Paid')
+                          @if($testseries->fee_type == 'paid')
                             @if(auth()->user() && auth()->user()->email !='' && auth()->user()->type =='student')
                               @if(!$checkExist)
                                 <div class="mockup-start-btn">
@@ -212,7 +212,7 @@
                                 </div>
                               @else
                                 <div class="mockup-start-btn">
-                                  <a href="{{route('live-test', base64_encode($testpaper->id))}}" class="osd-cus s">Start test
+                                  <a href="{{route('live-test', base64_encode($testpaper->id))}}" class="osd-cus s">Attempt Now
                                     </a>
                                   </div>
                               @endif
@@ -227,13 +227,13 @@
                           @else
                           @if(auth()->user() && auth()->user()->email !='' && auth()->user()->type =='student')
                               <div class="mockup-start-btn">
-                                  <a href="{{route('live-test', base64_encode($testpaper->id))}}" class="osd-cus s">Start test
+                                  <a href="{{route('live-test', base64_encode($testpaper->id))}}" class="osd-cus s">Attempt Now
                                     </a>
                                   </div>
                              
                             @else
                                 <div class="mockup-start-btn">
-                                <a data-bs-toggle="modal" data-bs-target="#lr"  class="osd-cus s">Start test
+                                <a data-bs-toggle="modal" data-bs-target="#lr"  class="osd-cus s">Attempt Now
                                   </a>
                                 </div>
                             @endif
@@ -276,7 +276,7 @@
                           </div>
                           @if($testpaper->test_type == "free")
                               <div class="mockup-start-btn">
-                           <a href="#" class="osd-cus s">Start test
+                           <a href="#" class="osd-cus s">Attempt Now
                             </a>
                           </div>
                           @else

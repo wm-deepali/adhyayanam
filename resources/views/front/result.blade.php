@@ -1,418 +1,441 @@
 @extends('front-users.layouts.app')
 
 @section('title')
-Dashboard
+    {{$test->name}} Result
 @endsection
 
 @section('content')
-<style>
-    .result-section {
-      width: 100%;
-      height: auto;
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 20px;
-    }
-    .result-card {
-      width: 100%;
-      height: 150px;
-      border-radius: 10px;
-      background-color: rgb(255, 255, 255);
-      box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
-      display: grid;
-      grid-template-columns: 3fr 1fr;
-      padding: 10px;
-    }
-    .result-card1 {
-      width: 100%;
-      height: 150px;
-      border-radius: 10px;
-      background-color: rgb(255, 255, 255);
-      box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      padding: 10px;
-    }
-    .result-card2 {
-      width: 100%;
-      height: 150px;
-      border-radius: 10px;
-      background-color: rgb(255, 255, 255);
-      box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
 
-      padding: 10px;
-    }
-    .result-card img {
-      width: 100%;
-    }
-    .progress-report {
-      width: 100%;
-      height: auto;
-      border-radius: 10px;
-      background-color: white;
-      box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
-      margin-top: 20px;
-      display: flex;
-      /* grid-template-columns: 1fr 3fr; */
-      flex-direction: row;
-      justify-content: space-between;
-      gap: 20px;
-      margin-bottom: 20px;
-      padding: 20px;
-    }
-    .left-side-chart{
-        width: 35%;
-        height: auto;
-        border: 1px solid rgba(128, 128, 128, 0.137);
-        border-radius: 10px;
-        display: flex;
-        flex-direction: column;
-        padding: 10px;
-    }
-    .right-side-chart{
-        width: 68%;
-        height: auto;
-        border: 1px solid rgba(128, 128, 128, 0.137);
-        border-radius: 10px;
-        display: flex;
-        flex-direction: column;
-        padding: 10px;
-    }
-    .pie-chart-section{
-        width: 100%;
-        height: auto;
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-    }
-    .pieContainer {
-      height: 150px;
-      position: relative;
-    }
-    
-    .pieBackground {
-      position: absolute;
-      width: 150px;
-      height: 150px;
-      border-radius: 100%;
-      box-shadow: 0px 0px 8px rgba(0,0,0,0.5);
-    } 
-    
-    .pie {
-      transition: all 1s;
-      position: absolute;
-      width: 150px;
-      height: 150px;
-      border-radius: 100%;
-      clip: rect(0px, 75px, 150px, 0px);
-    }
-    
-    .hold {
-      position: absolute;
-      width: 150px;
-      height: 150px;
-      border-radius: 100%;
-      clip: rect(0px, 150px, 150px, 75px);
-    }
-    
-    #pieSlice1 .pie {
-      background-color: #1b458b;
-      transform:rotate(30deg);
-    }
-    
-    #pieSlice2 {
-      transform: rotate(30deg);
-    }
-    
-    #pieSlice2 .pie {
-      background-color: #0a0;
-      transform: rotate(60deg);
-    }
-    
-    #pieSlice3 {
-      transform: rotate(90deg);
-    }
-    
-    #pieSlice3 .pie {
-      background-color: #f80;
-      transform: rotate(120deg);
-    }
-    
-    #pieSlice4 {
-      transform: rotate(210deg);
-    }
-    
-    #pieSlice4 .pie {
-      background-color: #db3;
-      transform: rotate(10deg);
-    }
-    
-    #pieSlice5 {
-      transform: rotate(220deg);
-    }
-    
-    #pieSlice5 .pie {
-      background-color: #a04;
-      transform: rotate(70deg);
-    }
-    
-    #pieSlice6 {
-      transform: rotate(290deg);
-    }
-    
-    #pieSlice6 .pie {
-      background-color: #ffd700;
-      transform: rotate(70deg);
-    }
-    
-    .innerCircle {
-      position: absolute;
-      width: 100px;
-      height: 100px;
-      background-color: #ffffff;
-      border-radius: 100%;
-      top: 25px;
-      left: 25px; 
-      box-shadow: 0px 0px 8px rgba(0,0,0,0.5) inset;
-      color: white;
-    }
-    .innerCircle .content {
-      position: absolute;
-      display: block;
-      width: 120px;
-      top: 30px;
-      left: 0;
-      text-align: center;
-      font-size: 14px;
-    }
-  </style>
-<div class="content-header">
-            <div class="d-flex align-items-center">
-              <div class="me-auto">
-                <h4 class="page-title">{{$test->name}}</h4>
-                <div class="d-inline-block align-items-center">
-                  <nav>
-                    <ol class="breadcrumb">
-                      <li class="breadcrumb-item">
-                        <a href="#"><i class="mdi mdi-home-outline"></i></a>
-                      </li>
-                      <li class="breadcrumb-item active" aria-current="page">
-                        Result
-                      </li>
-                    </ol>
-                  </nav>
-                </div>
-              </div>
+    <style>
+        .result-wrapper {
+            width: 100%;
+            padding: 15px;
+        }
+
+        .q-box {
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            box-shadow: rgba(0, 0, 0, 0.08) 0px 4px 12px;
+        }
+
+        .q-title {
+            font-size: 17px;
+            font-weight: 600;
+        }
+
+        .answer-tag {
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .correct {
+            background: #0ccb57;
+            color: white;
+        }
+
+        .wrong {
+            background: #e13838;
+            color: white;
+        }
+
+        .pending {
+            background: #ffbe3a;
+            color: black;
+        }
+
+        .child-box {
+            margin: 8px 0;
+            padding: 10px;
+            border-left: 4px solid #0059ff;
+            background: #eef4ff;
+            border-radius: 7px;
+        }
+
+        .mcq-option {
+            padding: 4px 10px;
+            border-radius: 4px;
+            display: inline-block;
+            font-weight: 500;
+        }
+
+        .score-box {
+            font-size: 26px;
+            color: #004799;
+            font-weight: bold;
+        }
+    </style>
+
+    <div class="result-wrapper">
+
+        <div style="text-align:right;margin-bottom:15px;">
+            <a href="{{ route('user.test-papers') }}" class="btn btn-sm btn-primary"
+                style="font-weight:500;padding:7px 15px;">
+                ⬅ Back To My Attempts
+            </a>
+        </div>
+
+        <h2>{{$test->name}} - Result</h2>
+
+        {{-- TEST STATUS --}}
+        @if($attempt->status === 'pending' || $attempt->status === 'under_review')
+            <div class="q-box" style="background:#fff4cd;border-left:5px solid #ffc400;">
+                <h3 style="margin:0;color:#6a4f00;">Test Status: Pending Evaluation</h3>
+                <p style="margin-top:6px;color:#6a4f00;">
+                    Some subjective answers require manual checking.
+                    Once reviewed, marks will be updated.
+                </p>
             </div>
-          </div>
-          <!-- Main content -->
-          <section class="content">
-            <div class="row">
-              <div class="col-12">
-                <div class="result-section">
-                  <div class="result-card">
-                    <div class="content-section">
-                      <h5 style="font-weight: 600; font-size: 14px">Rank</h5>
-                      <p>
-                        Congratulations! your current Rank is #49, among 1000
-                        students
-                      </p>
-                      <h4>Score: {{$studentest->score}}/{{$studentest->total_marks}}</h4>
+        @else
+            <div class="q-box" style="background:#e7ffe8;border-left:5px solid #2fa058;">
+                <h3 style="margin:0;color:#0e6c42;">Test Status: Completed</h3>
+                <p style="margin-top:6px;color:#0e6c42;">
+                    Your test has been evaluated successfully.
+                </p>
+            </div>
+        @endif
+
+
+
+        {{-- Final Score & Stats --}}
+        <div class="row g-3">
+
+            <div class="col-md-6">
+                <div class="q-box">
+                    <h4 style="font-weight:700;margin-bottom:10px;">Performance Summary</h4>
+
+                    <table class="table table-sm mb-0">
+                        <tbody>
+                            <tr>
+                                <td class="fw-bold text-secondary">Total Questions</td>
+                                <td>{{$attempt->total_questions}}</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold text-secondary">Attempted</td>
+                                <td><span class="badge bg-primary px-3">{{$attempt->attempted_count}}</span></td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold text-secondary">Not Attempted</td>
+                                <td><span class="badge bg-dark px-3">{{$attempt->not_attempted}}</span></td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold text-secondary">Correct</td>
+                                <td><span class="badge bg-success px-3">{{$attempt->correct_count}}</span></td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold text-secondary">Wrong</td>
+                                <td><span class="badge bg-danger px-3">{{$attempt->wrong_count}}</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    {{-- Progress --}}
+                    @php $progress = ($attempt->attempted_count / $attempt->total_questions) * 100; @endphp
+
+                    <div class="mt-3">
+                        <small style="font-size:13px;font-weight:600;color:#555;">Progress</small>
+                        <div class="progress" style="height:8px;">
+                            <div class="progress-bar bg-success" style="width: {{round($progress)}}%;"></div>
+                        </div>
+                        <small>{{ round($progress) }}% Completed</small>
                     </div>
-                    <img
-                      src="https://img.freepik.com/free-vector/medal-2_78370-531.jpg"
-                    />
-                  </div>
-                  <div class="result-card1">
-                    <div class="content-data" style="display: flex">
-                      <p style="font-size: 20px; margin-right: 10px">
-                        <i class="fa fa-users text-danger"></i>
-                      </p>
-                      <div
-                        class=""
-                        style="display: flex; flex-direction: column"
-                      >
-                        <p
-                          class="p-0 m-0"
-                          style="color: gray; padding-bottom: 5px"
-                        >
-                          Total Questions
-                        </p>
-                        <h4 style="font-weight: 600; font-size: 14px">{{$studentest->total_questions}}</h4>
-                      </div>
-                    </div>
-                    <div class="content-data" style="display: flex">
-                      <p style="font-size: 20px; margin-right: 10px">
-                        <i class="fa fa-users text-danger"></i>
-                      </p>
-                      <div
-                        class=""
-                        style="display: flex; flex-direction: column"
-                      >
-                        <p
-                          class="p-0 m-0"
-                          style="color: gray; padding-bottom: 5px"
-                        >
-                          Attempted
-                        </p>
-                        <h4 style="font-weight: 500; font-size: 14px">{{$studentest->attempted}}</h4>
-                      </div>
-                    </div>
-                    <div class="content-data" style="display: flex">
-                      <p style="font-size: 20px; margin-right: 10px">
-                        <i class="fa fa-users text-danger"></i>
-                      </p>
-                      <div
-                        class=""
-                        style="display: flex; flex-direction: column"
-                      >
-                        <p
-                          class="p-0 m-0"
-                          style="color: gray; padding-bottom: 5px"
-                        >
-                          Correct Answers
-                        </p>
-                        <h4 style="font-weight: 500; font-size: 14px">{{$studentest->correct_answer}}</h4>
-                      </div>
-                    </div>
-                    <div class="content-data" style="display: flex">
-                      <p style="font-size: 20px; margin-right: 10px">
-                        <i class="fa fa-users text-danger"></i>
-                      </p>
-                      <div
-                        class=""
-                        style="display: flex; flex-direction: column"
-                      >
-                        <p
-                          class="p-0 m-0"
-                          style="color: gray; padding-bottom: 5px"
-                        >
-                          Not Attempted
-                        </p>
-                        <h4 style="font-weight: 500; font-size: 14px">{{$studentest->not_attempted}}</h4>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="result-card1">
-                    <div class="content-data" style="display: flex">
-                      <p style="font-size: 20px; margin-right: 10px">
-                        <i class="fa fa-users text-danger"></i>
-                      </p>
-                      <div
-                        class=""
-                        style="display: flex; flex-direction: column"
-                      >
-                        <p
-                          class="p-0 m-0"
-                          style="color: gray; padding-bottom: 5px"
-                        >
-                          No. of Attempts
-                        </p>
-                        <h4 style="font-weight: 600; font-size: 14px">{{$count_attempt}}</h4>
-                      </div>
-                    </div>
-                    <div class="content-data" style="display: flex">
-                      <p style="font-size: 20px; margin-right: 10px">
-                        <i class="fa fa-users text-danger"></i>
-                      </p>
-                      <div
-                        class=""
-                        style="display: flex; flex-direction: column"
-                      >
-                        <p
-                          class="p-0 m-0"
-                          style="color: gray; padding-bottom: 5px"
-                        >
-                          Test Duration
-                        </p>
-                        <h4 style="font-weight: 500; font-size: 14px">{{$studentest->duration}} mins</h4>
-                      </div>
-                    </div>
-                    <div class="content-data" style="display: flex">
-                      <p style="font-size: 20px; margin-right: 10px">
-                        <i class="fa fa-users text-danger"></i>
-                      </p>
-                      <div
-                        class=""
-                        style="display: flex; flex-direction: column"
-                      >
-                        <p
-                          class="p-0 m-0"
-                          style="color: gray; padding-bottom: 5px"
-                        >
-                          Time Taken
-                        </p>
-                        <h4 style="font-weight: 500; font-size: 14px">{{$studentest->taken_time}} mins</h4>
-                      </div>
-                    </div>
-                    <div class="content-data" style="display: flex">
-                      <!-- <div class="" style="display: flex; flex-direction: column;">
-      <button class="p-0 m-0 " style="color: rgb(255, 255, 255); padding-bottom: 5px; border: none; padding: 10px 10px; background-color: green;">Download Result</button>
-      
-  </div> -->
-                    </div>
-                  </div>
-                  <!-- <div class="result-card2">
-                <canvas id="myChart" style="width:100%;"></canvas>
-                  
-            </div> -->
                 </div>
-                <div class="progress-report">
-                    <div class="left-side-chart">
-<h3 class="border-bottom pb-2" style="font-weight: 500;">Progress Report</h3>
-<div class="pie-chart-section">
-<div class="pieContainer mb-3">
-    <div class="pieBackground"></div>
-    <div id="pieSlice1" class="hold"><div class="pie"></div></div>
-    <div id="pieSlice2" class="hold"><div class="pie"></div></div>
-    <div id="pieSlice3" class="hold"><div class="pie"></div></div>
-    <div id="pieSlice4" class="hold"><div class="pie"></div></div>
-    <!--div id="pieSlice5" class="hold"><div class="pie"></div></div>
-    <div id="pieSlice6" class="hold"><div class="pie"></div></div> -->
-    <div class="innerCircle"></div>
-  </div>
-  <div class="pichart-chart-content" style="width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center;">
-    <div class="color-tag d-flex gap-2">
-        <p style="width: 20px; height: 20px; background-color: #0a0;"></p>
-        <p> Correct Questions</p>
-    </div>
-    <div class="color-tag d-flex gap-2">
-        <p style="width: 20px; height: 20px; background-color: rgb(37, 50, 168);"></p>
-        <p> Wrong Questions</p>
-    </div>
-    <div class="color-tag d-flex gap-2">
-        <p style="width: 20px; height: 20px; background-color: rgb(219, 95, 13);"></p>
-        <p> Attempted</p>
-    </div>
-    <div class="color-tag d-flex gap-2">
-        <p style="width: 20px; height: 20px; background-color: rgb(219, 59, 13);"></p>
-        <p> Not Attempted</p>
+            </div>
+
+            {{-- FINAL SCORE --}}
+            {{-- FINAL SCORE --}}
+            <div class="col-md-6">
+                <div class="q-box text-center">
+                    <h3 class="mb-0">Final Score</h3>
+
+                    @if($attempt->status === 'published')
+                        <div class="score-box mt-2">
+                            {{$attempt->final_score}} / {{$attempt->max_positive_score}}
+                        </div>
+                    @else
+                        <div class="score-box mt-2" style="color:#888;font-size:18px;">
+                            Pending Evaluation
+                        </div>
+                    @endif
+
+                    <div class="mt-2">
+                        <strong class="badge bg-dark px-3 py-2">Attempt #{{$attemptCount}}</strong>
+                    </div>
+
+                    <div class="mt-3">
+                        <small style="font-size:13px;color:#555;">Completed On:</small><br>
+                        <strong>
+                            @if($attempt->completed_at)
+                                {{ \Carbon\Carbon::parse($attempt->completed_at)->format('d M Y, h:i A') }}
+                            @else
+                                -
+                            @endif
+                        </strong>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+
+
+        {{-- Question-wise report --}}
+        @foreach($mainAnswers as $ans)
+            @php
+                $eval = $ans->evaluation_status;
+
+                $statusClass = match ($eval) {
+                    'correct' => 'correct',
+                    'wrong' => 'wrong',
+                    'pending', 'partial' => 'pending',
+                    default => 'pending'
+                };
+
+                $statusText = match ($eval) {
+                    'correct' => "Correct ({$ans->obtained_marks})",
+                    'wrong' => "Wrong ({$ans->obtained_marks})",
+                    'pending' => "Pending Check",
+                    'partial' => "Partially Correct",
+                    'not_evaluated' => 'Not Evaluated',
+                    default => 'Attempted'
+                };
+            @endphp
+
+            <div class="q-box">
+
+                {{-- Question --}}
+                <div class="q-title">
+                    Q{{ $loop->iteration }}. {!! optional($ans->question)->question ?? '-' !!}
+                </div>
+
+
+                {{-- Show MCQ options first --}}
+                @if(optional($ans->question)->question_type == 'MCQ')
+                    <div style="margin-top:10px;">
+                        <strong>Options:</strong>
+                        <ul style="list-style:none;padding-left:0;margin-top:5px;">
+                            @foreach(['option_a', 'option_b', 'option_c', 'option_d', 'option_e'] as $key)
+                                @php
+                                    $val = $ans->question->$key ?? null;
+                                    if (!$val)
+                                        continue;
+
+                                    $optionKey = strtoupper(substr($key, -1));
+
+                                    $isCorrect = trim($ans->question->answer) == $optionKey;
+                                    $isSelected = trim($ans->answer_key) == $optionKey;
+                                @endphp
+
+                                <li style="margin-bottom:4px;">
+                                    <span class="mcq-option" style="@if($isCorrect) background:#0ccb57;color:white;
+                                       @elseif($isSelected) background:#e13838;color:white;
+                                                       @endif">
+                                        {{ $optionKey }}. {{ trim(strip_tags($val)) }}
+                                    </span>
+
+                                    @if($isCorrect)
+                                        <small style="color:#0a7d34;font-weight:600;">(Correct)</small>
+                                    @endif
+                                </li>
+
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
+
+                {{-- DO NOT show main answer for Story Based --}}
+                @if(optional($ans->question)->question_type !== 'Story Based')
+
+                    {{-- Main Answer --}}
+                    <div style="margin-bottom:8px;">
+                        <strong>Your Answer:</strong>
+
+                        @if($ans->answer_text)
+                            {{ $ans->answer_text }}
+                        @elseif($ans->answer_file)
+                            <a href="{{ asset('storage/student_attempts/' . $ans->answer_file) }}" target="_blank"
+                                style="color:#007bff;text-decoration:underline;">
+                                View Uploaded File
+                            </a>
+                        @else
+                            <span style="color:#999;">Not Answered</span>
+                        @endif
+
+                        <span class="answer-tag {{ $statusClass }}" style="margin-left:8px;">
+                            {{ $statusText }}
+                        </span>
+                        {{-- ============= SHOW SOLUTION (IF EXISTS) ============= --}}
+                        @if(optional($ans->question)->has_solution == 'yes' && $ans->question->solution)
+                            <div class="mt-2">
+                                <strong>Solution:</strong>
+                                <div class="p-2 border" style="background:#eef7ff;">
+                                    {!! $ans->question->solution !!}
+                                </div>
+                            </div>
+                        @endif
+
+                        {{-- ============= ADMIN REMARKS (SHOW FIRST) ============= --}}
+                        @if($ans->admin_remarks)
+                            <div class="mt-2">
+                                <strong style="color:#0a4d8c;">Admin Remarks:</strong>
+                                <div class="p-2 border bg-light">{{ $ans->admin_remarks }}</div>
+                            </div>
+
+                            @if($ans->admin_file)
+                                <a href="{{ asset('storage/evaluation_files/' . $ans->admin_file) }}" target="_blank"
+                                    class="btn btn-sm btn-info mt-2">View Admin File</a>
+                            @endif
+                        @elseif($ans->teacher_remarks)
+                            {{-- ============= TEACHER REMARKS (ONLY IF ADMIN EMPTY) ============= --}}
+                            <div class="mt-2">
+                                <strong style="color:#8c5700;">Teacher Remarks:</strong>
+                                <div class="p-2 border bg-light">{{ $ans->teacher_remarks }}</div>
+                            </div>
+
+                            @if($ans->teacher_file)
+                                <a href="{{ asset('storage/evaluation_files/' . $ans->teacher_file) }}" target="_blank"
+                                    class="btn btn-sm btn-secondary mt-2">View Teacher File</a>
+                            @endif
+                        @endif
+                    </div>
+                @endif
+
+
+                {{-- CHILD QUESTIONS --}}
+                @if(isset($childGrouped[$ans->question_id]))
+
+                    <div style="margin-top:10px;font-weight:600;">Sub Questions:</div>
+
+                    @foreach($childGrouped[$ans->question_id] as $child)
+
+                        @php
+                            $childEval = $child->evaluation_status;
+
+                            $childClass = match ($childEval) {
+                                'correct' => 'correct',
+                                'wrong' => 'wrong',
+                                'pending', 'partial' => 'pending',
+                                default => 'pending'
+                            };
+
+                            $childText = match ($childEval) {
+                                'correct' => "Correct ({$child->obtained_marks})",
+                                'wrong' => "Wrong ({$child->obtained_marks})",
+                                'pending' => "Pending Check",
+                                'not_evaluated' => "Not Evaluated",
+                                default => 'Attempted'
+                            };
+
+                            $childQue = optional($child->childQuestion);
+                        @endphp
+
+                        <div class="child-box">
+
+                            <div><strong>Child Question:</strong> {!! $childQue->question ?? '-' !!}</div>
+
+                            {{-- CHILD OPTIONS --}}
+                            @php
+                                $isChildMcq = !empty($childQue->answer) &&
+                                    (!empty($childQue->option_a) || !empty($childQue->option_b));
+                            @endphp
+
+                            @if($isChildMcq)
+                                <div style="margin-top:8px;">
+                                    <strong>Options:</strong>
+                                    <ul style="list-style:none;padding-left:0;margin-top:5px;">
+                                        @foreach(['option_a', 'option_b', 'option_c', 'option_d', 'option_e'] as $key)
+                                            @php
+                                                $val = $childQue->$key ?? null;
+                                                if (!$val)
+                                                    continue;
+
+                                                $optionKey = strtoupper(substr($key, -1));
+
+                                                $isCorrect = trim($childQue->answer) == $optionKey;
+                                                $isSelected = trim($child->answer_key) == $optionKey;
+                                            @endphp
+
+                                            <li style="margin-bottom:3px;">
+                                                <span class="mcq-option" style="@if($isCorrect) background:#0ccb57;color:white;
+                                                   @elseif($isSelected) background:#e13838;color:white;
+                                                                           @endif">
+                                                    {{ $optionKey }}. {{ trim(strip_tags($val)) }}
+                                                </span>
+
+                                                @if($isCorrect)
+                                                    <small style="color:#0a7d34;font-weight:600;">(Correct)</small>
+                                                @endif
+                                            </li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            @endif
+
+                            {{-- CHILD Answer --}}
+                            <div style="margin-top:8px;">
+                                <strong>Your Answer:</strong>
+
+                                @if($child->answer_text)
+                                    {{ $child->answer_text }}
+                                @elseif($child->answer_file)
+                                    <a href="{{ asset('storage/student_attempts/' . $child->answer_file) }}" target="_blank"
+                                        style="color:#007bff;text-decoration:underline;">
+                                        View Uploaded File
+                                    </a>
+                                @else
+                                    <span style="color:#777;">Not Answered</span>
+                                @endif
+
+                                <span class="answer-tag {{ $childClass }}" style="margin-left:8px;">
+                                    {{ $childText }}
+                                </span>
+                                {{-- ============= CHILD SOLUTION (IF EXISTS) ============= --}}
+                                @if(optional($childQue)->has_solution == 'yes' && $childQue->solution)
+                                    <div class="mt-2">
+                                        <strong>Solution:</strong>
+                                        <div class="p-2 border" style="background:#eef7ff;">
+                                            {!! $childQue->solution !!}
+                                        </div>
+                                    </div>
+                                @endif
+
+                                {{-- ============= ADMIN REMARKS ============= --}}
+                                @if($child->admin_remarks)
+                                    <div class="mt-2">
+                                        <strong style="color:#0a4d8c;">Admin Remarks:</strong>
+                                        <div class="p-2 border bg-light">{{ $child->admin_remarks }}</div>
+                                    </div>
+
+                                    @if($child->admin_file)
+                                        <a href="{{ asset('storage/evaluation_files/' . $child->admin_file) }}" target="_blank"
+                                            class="btn btn-sm btn-info mt-2">View Admin File</a>
+                                    @endif
+
+                                @elseif($child->teacher_remarks)
+                                    {{-- ============= TEACHER REMARKS ============= --}}
+                                    <div class="mt-2">
+                                        <strong style="color:#8c5700;">Teacher Remarks:</strong>
+                                        <div class="p-2 border bg-light">{{ $child->teacher_remarks }}</div>
+                                    </div>
+
+                                    @if($child->teacher_file)
+                                        <a href="{{ asset('storage/evaluation_files/' . $child->teacher_file) }}" target="_blank"
+                                            class="btn btn-sm btn-secondary mt-2">View Teacher File</a>
+                                    @endif
+                                @endif
+                            </div>
+                        </div>
+                    @endforeach
+                @endif
+
+            </div>
+        @endforeach
+
     </div>
 
-  </div>
-</div>
-<div class="progress-score-card" style="width: 100%; height: auto; padding: 10px; background-color: rgba(0, 136, 255, 0.082); border-radius: 5px;">
-<h4 style="font-weight: 500; font-size: 16px;">Overall Progress</h4>
-<div class="progress">
-    <div class="progress-bar" role="progressbar" style="width: 25%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">25%</div>
-  </div>
-</div>
-<div class="progress-score-card mt-3" style="width: 100%; height: auto; padding: 10px; background-color: rgba(0, 136, 255, 0.082); border-radius: 5px;">
-    <h4 style="font-weight: 500; font-size: 16px;">Overall Progress</h4>
-    <div class="progress">
-        <div class="progress-bar" role="progressbar" style="width: 25%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">25%</div>
-      </div>
-    </div>
-                    </div>
-                    <div class="right-side-chart">
-                        <h3 class="border-bottom pb-2" style="font-weight: 500;">Progress Report</h3>
-                        <h4 style="font-weight: 500;">Overall Progress</h4>
-                        <div class="progress">
-                            <div class="progress-bar" role="progressbar" style="width: 25%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">25%</div>
-                          </div>
-                                            </div>
-                </div>
-              </div>
-            </div>
-          </section>
-          <!-- /.content -->
-         @endsection
+@endsection

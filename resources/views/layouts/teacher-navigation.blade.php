@@ -31,6 +31,36 @@
             </li>
         </ul>
     </li>
+
+    <li class="nav-group" aria-expanded="false">
+        <a class="nav-link nav-group-toggle" href="#">
+            <svg class="nav-icon">
+                <use xlink:href="{{ asset('icons/coreui.svg#cil-task') }}"></use>
+            </svg>
+            Test Evaluation
+        </a>
+
+        <ul class="nav-group-items" style="height: 0px;">
+            <li class="nav-item">
+                <a class="nav-link" href="{{ route('teacher.results.assigned') }}">
+                    <svg class="nav-icon">
+                        <use xlink:href="{{ asset('icons/coreui.svg#cil-list') }}"></use>
+                    </svg>
+                    Assigned Tests
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" href="{{ route('teacher.results.completed') }}">
+                    <svg class="nav-icon">
+                        <use xlink:href="{{ asset('icons/coreui.svg#cil-check-circle') }}"></use>
+                    </svg>
+                    Completed Evaluations
+                </a>
+            </li>
+        </ul>
+    </li>
+
     <li class="nav-group" aria-expanded="false">
         <a class="nav-link nav-group-toggle" href="#">
             <svg class="nav-icon">

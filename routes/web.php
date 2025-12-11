@@ -2,13 +2,11 @@
 
 use App\Models\Blog;
 use App\Models\Course;
-use App\Models\CurrentAffair;
 use App\Models\DailyBooster;
 use App\Models\FeedTestimonial;
 use App\Models\ProgrammeFeature;
 use App\Models\PopUp;
 use App\Models\Team;
-use App\Models\User;
 use App\Models\Banner;
 use App\Models\StudyMaterialCategory;
 use App\Models\TestSeries;
@@ -22,7 +20,9 @@ use App\Http\Controllers\Teacher\TeacherController;
 use App\Http\Controllers\Teacher\QuestionBankController;
 use App\Http\Controllers\Admin\TeacherWalletController;
 use App\Http\Controllers\ContentManagementController;
-
+use App\Http\Controllers\FrontUserController;
+use App\Http\Controllers\LiveTestController;
+use App\Http\Controllers\Teacher\TeacherResultController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -78,9 +78,14 @@ Route::get('pyq-papers/{examid}/{catid}/{subcat}', [App\Http\Controllers\FrontCo
 Route::get('test-series/{examid}/{catid}/{subcat}', [App\Http\Controllers\FrontController::class, 'testseries'])->name('test-series');
 Route::post('test-series/filter', [App\Http\Controllers\FrontController::class, 'testseriesFilter'])->name('test-series.filter');
 Route::post('test-series/search', [App\Http\Controllers\FrontController::class, 'testseriesSearch'])->name('test-series.search');
-Route::get('live-test/{id}', [App\Http\Controllers\FrontController::class, 'livetest'])->name('live-test');
-Route::get('result/{id}', [App\Http\Controllers\FrontController::class, 'result'])->name('result');
-Route::post('submit-test', [App\Http\Controllers\FrontController::class, 'submittest'])->name('submit-test');
+
+Route::get('live-test/{id}', [LiveTestController::class, 'livetest'])->name('live-test');
+Route::post('/fetch-question', [LiveTestController::class, 'fetchQuestion']);
+Route::post('/save-answer', [LiveTestController::class, 'saveAttemptAnswer']);
+Route::post('/finalize-test', [LiveTestController::class, 'finalizeStudentTest']);
+Route::get('/test-result/{id}', [LiveTestController::class, 'viewTestResult'])->name('user.test-result');
+Route::post('/clear-answer', [LiveTestController::class, 'clearAnswer']);
+
 Route::get('test-series-detail/{slug}', [App\Http\Controllers\FrontController::class, 'testseriesDetail'])->name('test-series-detail');
 Route::get('subject-pyqs/{id}', [App\Http\Controllers\FrontController::class, 'subjectPapers'])->name('subject-pyqs');
 Route::post('/sendotopstudent', [App\Http\Controllers\FrontController::class, 'sendotopstudent'])->name('sendotopstudent');
@@ -111,6 +116,8 @@ Route::get('our-team', [App\Http\Controllers\FrontController::class, 'ourTeamInd
 Route::get('current-affair', [App\Http\Controllers\FrontController::class, 'currentAffairsIndex'])->name('current.index');
 Route::get('current-affair/details/{id}', [App\Http\Controllers\FrontController::class, 'currentAffairsDetail'])->name('current.details');
 Route::get('daily-boost', [App\Http\Controllers\FrontController::class, 'dailyBoostIndex'])->name('daily.boost.front');
+Route::get('/daily-booster/detail/{id}', [App\Http\Controllers\FrontController::class, 'dailyBoostDetail'])->name('daily.booster.detail');
+
 Route::get('user/test-planner', [App\Http\Controllers\FrontController::class, 'testPlannerIndex'])->name('test.planner.front');
 Route::get('user/test-planner/details/{id}', [App\Http\Controllers\FrontController::class, 'testPlannerDetails'])->name('test.planner.details');
 Route::get('user/study-material/details/{id}', [App\Http\Controllers\FrontController::class, 'studyMaterialDetails'])->name('study.material.details');
@@ -189,6 +196,22 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
             Route::get('/wallet/withdrawals', [TeacherController::class, 'withdrawalsIndex'])
                 ->name('wallet.withdrawals.index');
 
+            Route::get('/assigned', [TeacherResultController::class, 'assigned']) ->name('results.assigned');
+
+            Route::get('/completed', [TeacherResultController::class, 'completed'])
+                ->name('results.completed');
+
+            Route::get('/evaluate/{id}', [TeacherResultController::class, 'evaluate'])
+                ->name('results.evaluate');
+
+            Route::post('/assign-marks', [TeacherResultController::class, 'assignMarks'])
+                ->name('results.assign-marks');
+
+            Route::post('/evaluate-attempt/save', [
+                App\Http\Controllers\Teacher\TeacherResultController::class,
+                'saveEvaluation'
+            ])->name('save-evaluation');
+
         });
 
     });
@@ -199,40 +222,33 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
             return view('front-users.dashboard');
         })->name('user.dashboard');
 
-        Route::get('/user/orders', [App\Http\Controllers\FrontUserController::class, 'studentAllOrder'])->name('user.orders');
-        Route::get('/user/order-details/{id}', [App\Http\Controllers\FrontUserController::class, 'orderDetails'])->name('user.order-details');
-        Route::get('/user/generate-pdf/{id}', [App\Http\Controllers\FrontUserController::class, 'generatePDF'])->name('user.generate-pdf');
-        Route::get('/user/print-invoice/{id}', [App\Http\Controllers\FrontUserController::class, 'printInvoice'])->name('user.print-invoice');
-
-
-        Route::get('/user/test-papers', function () {
-            return view('front-users.test-paper');
-        })->name('user.test-papers');
-
-        Route::get('/user/test-series', function () {
-            return view('front-users.test-series');
-        })->name('user.test-series');
-
-        Route::get('/user/course-details', function () {
-            return view('front-users.course-details');
-        })->name('user.course-details');
-
-        Route::get('/user-study-material', function () {
-            return view('front-users.study-material');
-        })->name('user-study-material');
-
         Route::get('/user-test-planner', function () {
             return view('front-users.test-planner');
         })->name('user-test-planner');
 
-        Route::delete('/user/user-activity/delete/{id}', [App\Http\Controllers\FrontUserController::class, 'activityDelete'])->name('user-activity.destroy');
+        // order routes
+        Route::get('/user/orders', [FrontUserController::class, 'studentAllOrder'])->name('user.orders');
+        Route::get('/user/order-details/{id}', [FrontUserController::class, 'orderDetails'])->name('user.order-details');
+        Route::get('/user/generate-pdf/{id}', [FrontUserController::class, 'generatePDF'])->name('user.generate-pdf');
+        Route::get('/user/print-invoice/{id}', [FrontUserController::class, 'printInvoice'])->name('user.print-invoice');
+        // my course routes
+        Route::get('/my-courses', [FrontUserController::class, 'myCourses'])->name('user.mycourses');
+        Route::get('/my-course/{id}', [FrontUserController::class, 'courseDetail'])->name('course.detail');
+        Route::post('/video/{id}/watch', [FrontUserController::class, 'watch']);
+        // my study material routes
+        Route::get('/my-study-material', [FrontUserController::class, 'StudyMaterial'])->name('user.study-material');
+        Route::delete('/user/user-activity/delete/{id}', [FrontUserController::class, 'activityDelete'])->name('user-activity.destroy');
+        // test series routes
+        Route::get('/user/test-series', [FrontUserController::class, 'myTestSeries'])->name('user.test-series');
+        Route::get('user/test-series-detail/{slug}', [FrontUserController::class, 'testSeriesDetail'])->name('user.test-series-detail');
+        Route::get('/user/test-papers', [FrontUserController::class, 'listUserTestPapers'])->name('user.test-papers');
 
-        Route::get('/user/setting', [App\Http\Controllers\FrontUserController::class, 'setting'])->name('user.setting');
-        Route::post('user/register-student', [App\Http\Controllers\FrontUserController::class, 'studentRegister'])->name('register-student');
-        Route::post('user/change-student-password', [App\Http\Controllers\FrontUserController::class, 'studentChangePassword'])->name('change-student-password');
+
+        Route::get('/user/setting', [FrontUserController::class, 'setting'])->name('user.setting');
+        Route::post('user/register-student', [FrontUserController::class, 'studentRegister'])->name('register-student');
+        Route::post('user/change-student-password', [FrontUserController::class, 'studentChangePassword'])->name('change-student-password');
         Route::get('user/process-order/{type}/{id}', [App\Http\Controllers\PaymentController::class, 'orderProcess'])->name('user.process-order');
         Route::any('order/status', [App\Http\Controllers\PaymentController::class, 'orderStatus'])->name('order.status');
-
         Route::get('student/wallet', [App\Http\Controllers\StudentWalletController::class, 'index'])->name('student.wallet');
 
     });
@@ -393,6 +409,34 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
 
         Route::get('test-series/question', [App\Http\Controllers\ContentManagementController::class, 'testSeriesQuestion'])->name('test.series.question');
         Route::get('test-series/question/create', [App\Http\Controllers\ContentManagementController::class, 'testSeriesQuestionCreate'])->name('test.series.question.create');
+
+
+        Route::prefix('admin/results')->group(function () {
+
+            Route::get('/results', [App\Http\Controllers\Admin\TestResultController::class, 'results'])
+                ->name('admin.results.all');
+
+            // Evaluate specific attempt
+            Route::get('/evaluate-attempt/{id}', [App\Http\Controllers\Admin\TestResultController::class, 'showEvaluation'])
+                ->name('admin.evaluate-attempt');
+
+            Route::post(
+                '/attempt/assign-teacher',
+                [App\Http\Controllers\Admin\TestResultController::class, 'assignTeacherSave']
+            )->name('admin.assign-teacher-save');
+
+            Route::delete(
+                '/attempt/{id}',
+                [App\Http\Controllers\Admin\TestResultController::class, 'deleteAttempt']
+            )->name('admin.delete-attempt');
+
+            // Save evaluation marks
+            Route::post('/evaluate-attempt/save', [App\Http\Controllers\Admin\TestResultController::class, 'saveEvaluation'])
+                ->name('admin.save-evaluation');
+
+            Route::post('/assign-marks', [App\Http\Controllers\Admin\TestResultController::class, 'assignMarks'])->name('admin.assign-marks');
+        });
+
 
         Route::get('upcoming-exams', [App\Http\Controllers\ContentManagementController::class, 'upcomingExamIndex'])->name('upcoming.exam.index');
         Route::get('upcoming-exams/create', [App\Http\Controllers\ContentManagementController::class, 'upcomingExamCreate'])->name('upcoming.exam.create');

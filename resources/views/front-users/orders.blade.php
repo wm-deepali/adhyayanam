@@ -20,7 +20,7 @@ Orders
                                     <th>Date &amp; Time</th>
                                     <th>Order Id</th>
                                     <th>Order Type</th>
-                                     <th>Billed Amount</th>
+                                     <th>Paid Amount</th>
                                      <th>Payment Status</th>
                                      <th>Transaction ID</th>
                                      <th>Order Status</th>
@@ -34,7 +34,7 @@ Orders
                                         <td>{{ $res->created_at }}</td>
                                         <td>{{ $res->order_code ?? '-' }}</td>
                                         <td>{{ $res->order_type ?? '-' }}</td>
-                                        <td>{{ $res->billed_amount ?? '0' }}</td>
+                                        <td>{{ $res->total ?? '0' }}</td>
                                         <td>{{ ucfirst($res->payment_status) }}</td>
                                         <td>{{ $res->transaction_id ?? '-' }}</td>
                                         <td>{{ ucfirst($res->order_status) }}</td>
@@ -52,10 +52,7 @@ Orders
 						</div>
 					</div>
 				</div>
-
-			
-
-				
+	
 			</div>
 		</section>
 		<!-- /.content -->

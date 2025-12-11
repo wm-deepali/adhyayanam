@@ -73,8 +73,8 @@
                                                 <td>{{ $topic->created_at->format('Y-m-d H:i:s') }}</td>
                                                 <td>{{ $topic->title }}</td>
                                                 <td>{{ $topic->chapter->name ?? "-" }}</td>
-                                                <td>{{ $topic->courses->name ?? "-" }}</td>
-                                                <td>{{ $topic->coursecategory->name ?? "-" }}</td>
+                                                <td>{{ $topic->course->name ?? "-" }}</td>
+                                                <td>{{ $topic->category->name ?? "-" }}</td>
                                                 <td>{{ $topic->course_type }}</td>
                                                 <td>{{ $topic->duration }}</td>
                                                 <td>
@@ -167,7 +167,7 @@
                                             <tr>
                                                 <td>{{ $class->created_at->format('Y-m-d H:i:s') }}</td>
                                                 <td>{{ $class->title }}</td>
-                                                <td>{{ $class->courses->name ?? "-" }}</td>
+                                                <td>{{ $class->course->name ?? "-" }}</td>
                                                 <td>{{ optional($class->teacher)->full_name ?? 'N/A' }}</td>
                                                 <td>{{ $class->schedule_date }}</td>
                                                 <td>{{ $class->start_time }}</td>

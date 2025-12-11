@@ -11,26 +11,22 @@
 					<li>
 						<a href="{{route('user.orders')}}"><i data-feather="home"></i><span>Order History</span></a>
 					</li>
-					<!-- <li class="header">Components</li> -->
-					<li class="treeview">
-						<a href="#">
-							<i data-feather="edit"></i>
-							<span>Courses</span>
-							<span class="pull-right-container">
-								<i class="fa fa-angle-right pull-right"></i>
-							</span>
+					<li>
+						<a href="{{ route('user.mycourses') }}">
+							<i data-feather="user"></i>
+							<span>My Courses</span>
 						</a>
-						<ul class="treeview-menu">
-							<li><a href="{{route('user.course-details')}}"><i class="icon-Commit"><span
-											class="path1"></span><span class="path2"></span></i>Courses Details</a></li>
-							<li><a href="{{route('user-study-material')}}"><i class="icon-Commit"><span
-											class="path1"></span><span class="path2"></span></i>Study Material</a></li>
-							<li><a href="{{route('user-test-planner')}}"><i class="icon-Commit"><span
-											class="path1"></span><span class="path2"></span></i>Test Planner</a></li>
-
-
-						</ul>
 					</li>
+					<li>
+						<a href="{{ route('user.study-material') }}">
+							<i data-feather="user"></i>
+							<span>My Study Material</span>
+						</a>
+					</li>
+					<!-- <li><a href="{{route('user-test-planner')}}"><i class="icon-Commit"><span class="path1"></span><span
+									class="path2"></span></i>Test Planner</a></li>
+
+					</li> -->
 					<li class="treeview">
 						<a href="#">
 							<i data-feather="pie-chart"></i>
@@ -45,8 +41,6 @@
 											class="path1"></span><span class="path2"></span></i>Test Series</a></li>
 							<li><a href="{{route('user.test-papers')}}"><i class="icon-Commit"><span
 											class="path1"></span><span class="path2"></span></i>Test Results</a></li>
-
-
 						</ul>
 					</li>
 

@@ -126,4 +126,10 @@ class User extends Authenticatable implements HasMedia, MustVerifyEmail
         return $this->hasMany(Order::class, 'student_id')->where('order_type', 'Study Material')->where('attempt_status', 'pending');
     }
 
+    public function videoProgress()
+    {
+        return $this->hasMany(VideoUserProgress::class);
+    }
+
+
 }

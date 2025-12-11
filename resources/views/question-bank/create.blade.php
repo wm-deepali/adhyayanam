@@ -302,7 +302,7 @@
                                                 <div class="col-md-12 solution-group" style="display: none;">
                                                     <label>Solution</label>
                                                     <div class="input-group">
-                                                        <textarea class="form-control ckeditor" name="passage_mcq_solution[]" id="multiple_choice_passage_solution" rows="2" cols="4" placeholder="Solution"></textarea>
+                                                        <textarea class="form-control ckeditor" name="solution[]" id="multiple_choice_passage_solution" rows="2" cols="4" placeholder="Solution"></textarea>
                                                     </div>
                                                 </div>
 
@@ -332,7 +332,7 @@
                                             <div class="col-md-12 solution-group" style="display: none;">
                                                 <label>Solution</label>
                                                 <div class="input-group">
-                                                    <textarea class="form-control ckeditor" name="reasoning_passage_solution[]" id="reasoning_subjective_passage_solution" rows="2" cols="4" placeholder="Solution"></textarea>
+                                                    <textarea class="form-control ckeditor" name="solution[]" id="reasoning_subjective_passage_solution" rows="2" cols="4" placeholder="Solution"></textarea>
                                                 </div>
                                             </div>
                                                 <div class="col-sm-3"><button type="button"
@@ -885,7 +885,7 @@
                                                                 <div class="col-md-12 solution-group" style="display: none;">
                                                                     <label>Solution</label>
                                                                     <div class="input-group">
-                                                                        <textarea class="form-control ckeditor" name="passage_mcq_solution[]" id="multiple_choice_passage_solution_${id}" rows="2" cols="4" placeholder="Solution"></textarea>
+                                                                        <textarea class="form-control ckeditor" name="solution[]" id="multiple_choice_passage_solution_${id}" rows="2" cols="4" placeholder="Solution"></textarea>
                                                                     </div>
                                                                 </div>
                                     <div class="col-sm-12">
@@ -927,7 +927,7 @@
                                     <div class="col-md-12 solution-group" style="display: none;">
                                         <label>Solution</label>
                                         <div class="input-group">
-                                            <textarea class="form-control ckeditor" name="reasoning_passage_solution[]" id="reasoning_subjective_passage_solution_${id}" rows="2" cols="4" placeholder="Solution"></textarea>
+                                            <textarea class="form-control ckeditor" name="solution[]" id="reasoning_subjective_passage_solution_${id}" rows="2" cols="4" placeholder="Solution"></textarea>
                                         </div>
                                     </div>
                                     <div class="col-sm-3">

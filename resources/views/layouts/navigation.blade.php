@@ -106,6 +106,24 @@
             </li>
         </ul>
     </li>
+    <li class="nav-group" aria-expanded="false">
+        <a class="nav-link nav-group-toggle" href="#">
+            <svg class="nav-icon">
+                <use xlink:href="{{ asset('icons/coreui.svg#cil-check-circle') }}"></use>
+            </svg>
+            Test Results
+        </a>
+
+        <ul class="nav-group-items" style="height: 0px;">
+            <li class="nav-item">
+                <a class="nav-link" href="{{ route('admin.results.all') }}">
+                    Test Attempts
+                </a>
+            </li>
+
+        </ul>
+    </li>
+
     <li class="nav-item">
         <a class="nav-link {{ request()->is('courses.course.*') ? 'active' : ''}}"
             href="{{ route('courses.course.index') }}">
@@ -183,8 +201,6 @@
             </li>
         </ul>
     </li>
-
-
 
     <li class="nav-group" aria-expanded="false">
         <a class="nav-link nav-group-toggle" href="#">
@@ -304,9 +320,6 @@
             {{ __('Daily Booster') }}
         </a>
     </li>
-
-
-
 
     <li class="nav-item">
         <a class="nav-link {{ request()->is('upcoming-exams*') ? 'active' : ''}}"
@@ -577,10 +590,6 @@
 
         </ul>
     </li>
-
-
-
-
     <li class="nav-group" aria-expanded="false">
         <a class="nav-link nav-group-toggle" href="#">
             <svg class="nav-icon">

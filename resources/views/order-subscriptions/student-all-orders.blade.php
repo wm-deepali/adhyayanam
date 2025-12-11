@@ -33,7 +33,7 @@
                                 <th>Order Type</th>
                                 <th>Student Name</th>
                                 <th>Mobile Number</th>
-                                <th>Billed Amount</th>
+                                <th>Paid Amount</th>
                                 <th>Payment Status</th>
                                 <th>Transaction ID</th>
                                 <th>Order Status</th>
@@ -49,15 +49,15 @@
                                     <td>{{ $res->order_type ?? '-' }}</td>
                                     <td>{{ $res->student->name ?? '-' }}</td>
                                     <td>{{ $res->student->mobile ?? '-' }}</td>
-                                    <td>{{ $res->billed_amount ?? '0' }}</td>
+                                    <td>{{ $res->total ?? '0' }}</td>
                                     <td>{{ ucfirst($res->payment_status) }}</td>
-                                    <td>{{ $res->transaction ?? '-' }}</td>
+                                    <td>{{ $res->transaction_id ?? '-' }}</td>
                                     <td>{{ ucfirst($res->order_status) }}</td>
                                     <td>Active</td>
                                     <td>
                                         <a href="{{route('students.student-order-detail', $res->id)}}"><i
                                                 class="fa fa-eye"></i></a>
-                                        <a href="#"><i class="fa fa-user-graduate"></i></a>
+                                        <a href="{{ route('students.student-profile-detail', $res->student->id ) }}"><i class="fa fa-user-graduate"></i></a>
                                         <a href="{{route('user.generate-pdf', $res->id)}}"><i class="fa fa-download"></i></a>
                                     </td>
                                 </tr>

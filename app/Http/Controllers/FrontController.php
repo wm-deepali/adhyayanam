@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\BatchProgramme;
 use App\Models\Blog;
 use App\Models\Chapter;
-use App\Models\Question;
 use App\Models\Syllabus;
 use App\Models\Test;
 use App\Models\CallBack;
@@ -17,20 +16,16 @@ use App\Models\Career;
 use App\Models\StudyMaterialCategory;
 use App\Models\MainTopic;
 use App\Models\ContactUs;
-use App\Models\StudentTest;
 use App\Models\Course;
 use App\Models\CurrentAffair;
 use App\Models\DailyBooster;
 use App\Models\PyqContent;
 use App\Models\DirectEnquiry;
-use App\Models\ExaminationCommission;
 use App\Models\Faq;
 use App\Models\HeaderSetting;
 use App\Models\SubCategory;
 use App\Models\FeedTestimonial;
 use App\Models\Page;
-use App\Models\PYQ;
-use App\Models\PyqSubject;
 use App\Models\SEO;
 use App\Models\StudyMaterial;
 use App\Models\Subject;
@@ -192,12 +187,65 @@ class FrontController extends Controller
     public function courseDetails($id)
     {
         $data['course'] = Course::findOrFail($id);
+        // dd($data['course']->toArray());
         return view('front.user.course-detail', $data);
     }
 
-    public function courseFilter($id)
+    public function courseFilter(Request $request, $id)
     {
-        $data['courses'] = Course::with('examinationCommission', 'category', 'subCategory')->where('sub_category_id', $id)->get();
+        $subject_id = $request->query('subject_id');
+        $chapter_id = $request->query('chapter_id');
+        $topic_id = $request->query('topic_id');
+        $search = $request->query('search');
+
+        // ===== SUBJECT FILTERS =====
+        $subjectQuery = Subject::with(['chapters']);
+        if ($id)
+            $subjectQuery->where('sub_category_id', $id);
+        $data['subjects'] = $subjectQuery->get();
+
+        // ===== CHAPTER FILTERS =====
+        $chapterQuery = Chapter::with(['subject']);
+        if ($id)
+            $chapterQuery->where('sub_category_id', $id);
+        $data['chapters'] = $chapterQuery->get();
+
+        // ===== TOPIC FILTERS =====
+        $topicQuery = CourseTopic::with(['subject', 'chapter']);
+        if ($id)
+            $topicQuery->where('sub_category_id', $id);
+        $data['topics'] = $topicQuery->get();
+
+        // ===== STUDY MATERIALS =====
+        $courseQuery = Course::with(['examinationCommission', 'category', 'subCategory']);
+
+        if ($id)
+            $courseQuery->where('sub_category_id', $id);
+
+        // ---- FILTERS BASED ON MULTIPLE IDs ----
+        if (!empty($subject_id)) {
+            $courseQuery->whereJsonContains('subject_id', (string) $subject_id);
+        }
+
+        if (!empty($chapter_id)) {
+            $courseQuery->whereJsonContains('chapter_id', (string) $chapter_id);
+        }
+
+        if (!empty($topic_id)) {
+            $courseQuery->whereJsonContains('topic_id', (string) $topic_id);
+        }
+
+        // ---- SAFE SEARCH ----
+        if ($search) {
+            $courseQuery->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orwhere('course_heading', 'like', "%{$search}%")
+                    ->orWhere('short_description', 'like', "%{$search}%");
+            });
+        }
+
+        $data['courses'] = $courseQuery->paginate(10)->withQueryString();
+        $data['subcat'] = $id;
         return view('front.user.courses', $data);
     }
 
@@ -305,6 +353,12 @@ class FrontController extends Controller
         return view('front.user.daily-booster', $data);
     }
 
+    public function dailyBoostDetail($id)
+    {
+        $dailyBoost = DailyBooster::findOrFail($id);
+        return view('front.user.daily-booster-detail', compact('dailyBoost'));
+    }
+
     public function testPlannerIndex()
     {
         $data['testPlans'] = TestPlanner::all();
@@ -404,38 +458,46 @@ class FrontController extends Controller
     public function studyMaterialDetails($id)
     {
         // Get the main study material
-        $studyMaterial = StudyMaterial::findOrFail($id);
+        $studyMaterial = StudyMaterial::with('sections')->findOrFail($id);
 
         // Directly use arrays (since they're stored as arrays, not JSON)
         $topicIds = $studyMaterial->topic_id ?? [];
         $chapterIds = $studyMaterial->chapter_id ?? [];
         $subjectIds = $studyMaterial->subject_id ?? [];
 
-        // Build related materials query
         $related = StudyMaterial::where('id', '!=', $studyMaterial->id)
             ->where(function ($query) use ($studyMaterial, $topicIds, $chapterIds, $subjectIds) {
 
+                // Match by topics
                 if (!empty($topicIds)) {
                     $query->where(function ($q) use ($topicIds) {
                         foreach ($topicIds as $topicId) {
                             $q->orWhereJsonContains('topic_id', (string) $topicId);
                         }
                     });
-                } elseif (!empty($chapterIds)) {
-                    $query->where(function ($q) use ($chapterIds) {
+                }
+
+                // Match by chapters
+                if (!empty($chapterIds)) {
+                    $query->orWhere(function ($q) use ($chapterIds) {
                         foreach ($chapterIds as $chapterId) {
                             $q->orWhereJsonContains('chapter_id', (string) $chapterId);
                         }
                     });
-                } elseif (!empty($subjectIds)) {
-                    $query->where(function ($q) use ($subjectIds) {
+                }
+
+                // Match by subjects
+                if (!empty($subjectIds)) {
+                    $query->orWhere(function ($q) use ($subjectIds) {
                         foreach ($subjectIds as $subjectId) {
                             $q->orWhereJsonContains('subject_id', (string) $subjectId);
                         }
                     });
-                } else {
-                    $query->where('category_id', $studyMaterial->category_id);
                 }
+
+                // Fallback: Same category
+                $query->orWhere('category_id', $studyMaterial->category_id);
+
             })
             ->take(5)
             ->get();
@@ -682,112 +744,6 @@ class FrontController extends Controller
 
     }
 
-
-    public function livetest($id)
-    {
-        $questions = [];
-        $questionIds = [];
-        $decodeId = base64_decode($id);
-        $testData = Test::where('id', $decodeId)->first();
-        $jsonData = json_decode($testData->question_marks_details);
-        if (isset($jsonData) && !empty($jsonData)) {
-            foreach ($jsonData as $quesData) {
-                if ($quesData->question_id != "") {
-                    $questionIds[] = $quesData->question_id;
-                }
-
-            }
-            //dd($questionIds);
-            $questions = Question::whereIn('id', $questionIds)->where('status', 'Done')->get();
-        }
-
-        $data['test'] = $testData;
-        $data['questions'] = $questions;
-        return view('front.live-test', $data);
-    }
-    public function result($id)
-    {
-        $decodeId = base64_decode($id);
-        $studentest = StudentTest::findOrFail($decodeId);
-        $testData = Test::findOrFail($studentest->test_id);
-        $data['test'] = $testData;
-        $data['studentest'] = $studentest;
-        $count_attempt = StudentTest::where('test_id', $studentest->test_id)->where('student_id', $studentest->student_id)->get();
-        $attemptCount = $count_attempt->count();
-        $data['count_attempt'] = $attemptCount;
-        return view('front.result', $data);
-    }
-    public function submittest(Request $request)
-    {
-        $newArr = array();
-        $tempArr = array();
-        $new_array = array_reverse($request->storeQuestion);
-        if (!empty($request->storeQuestion)) {
-            foreach ($new_array as $key => $type) {
-                if (!in_array($type['id'], $tempArr)) {
-                    $tempArr[] = $type['id'];
-                    $newArr[] = array('id' => $type['id'], 'answer' => $type['answer'], 'option' => $type['option']);
-                }
-            }
-            $correct = 0;
-            $wrong = 0;
-            if (!empty($newArr)) {
-                foreach ($newArr as $key => $val) {
-                    if ($val['answer'] == $val['option']) {
-                        $correct = $correct + 1;
-                    } else {
-                        $wrong = $wrong + 1;
-                    }
-                }
-            }
-            $total_question = $request->total_question;
-            $student_id = $request->student_id;
-            $test_id = $request->test_id;
-            $duration = $request->duration;
-            $left_time = $request->left_time;
-            $attempted = $request->attempted;
-            $test = Test::findOrFail($test_id);
-            $total_marks = $test->total_marks;
-            $has_negative_marks = $test->has_negative_marks;
-            $negative_marks = $has_negative_marks == 'yes' ? $test->negative_marks_per_question_mcq : 0;
-            $positive_marks = $test->positive_marks_per_question_mcq;
-
-            $p_marks = $correct * $positive_marks;
-            $n_marks = $wrong * $negative_marks;
-
-            $marks = $p_marks - $n_marks;
-
-            $studentTest = StudentTest::create([
-                'test_id' => $test_id,
-                'student_id' => $student_id,
-                'total_questions' => $total_question,
-                'attempted' => $attempted,
-                'not_attempted' => $total_question - $attempted,
-                'correct_answer' => $correct,
-                'wrong_answer' => $wrong,
-                'total_marks' => $total_marks,
-                'score' => $marks,
-                'negative_marks' => $n_marks,
-                'duration' => $duration,
-                'taken_time' => $duration - $left_time,
-                'status' => $attempted > 0 ? 'completed' : 'visited',
-            ]);
-
-        }
-        if ($studentTest->id != '') {
-            return response()->json([
-                'id' => base64_encode($studentTest->id),
-                'success' => true,
-                'message' => 'Something went wrong!',
-            ]);
-        } else {
-            return response()->json([
-                'success' => false,
-                'message' => 'Something went wrong!',
-            ]);
-        }
-
-    }
 
     public function logout()
     {

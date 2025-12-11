@@ -79,4 +79,9 @@ class Video extends Model
         return $this->belongsTo(CourseTopic::class, 'topic_id');
     }
 
+    public function userProgress()
+    {
+        return $this->hasMany(VideoUserProgress::class);
+    }
+
 }

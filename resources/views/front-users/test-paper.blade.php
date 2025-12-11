@@ -1,74 +1,151 @@
-<!-- Main content -->
 @extends('front-users.layouts.app')
 
-@section('title')
-Test Papers
-@endsection
+@section('title', 'My Test Attempts')
 
 @section('content')
-<section class="content">
-			<div class="row">
-				<div class="col-12 col-xl-12">
-					<div class="card">
-						<div class="card-header">
-							<h5 class="card-title">Test Paper</h5>
-							<p class="mb-0 card-subtitle text-muted">Using the most basic table markup, here’s how .table-based tables look in Bootstrap.</p>
-						</div>
-						<div class="card-body">
-							<table class="table">
-								<thead>
-									<tr>
-										<th>Test Paper Name</th>
-										<th>Subject</th>
-										<th>Test Series Name</th>
-										<th>Test Status</th>
-										<th>Total Marks</th>
-										<th >Duration</th>
-										<th >-ve Marking</th>
-										<th >Button</th>
-										<!--<th >View Results</th>-->
-									</tr>
-								</thead>
-								<tbody>
-									
-									<tr>
-										<td>BPSC</td>
-										
-										<td class="d-none d-md-table-cell text-fade">History</td>
-										<td class="d-none d-md-table-cell text-fade">Test</td>
-										<td class="d-none d-md-table-cell text-fade">Not Attempted</td>
-										<td class="d-none d-md-table-cell text-fade">300</td>
-										<td class="d-none d-md-table-cell text-fade">60 Min</td>
-										<td class="d-none d-md-table-cell text-fade">Yes</td>
-											<td class="d-none d-md-table-cell text-fade"><button style="border-radius:3px; background:Blue;color:white;"data-toggle="modal" data-target="#exampleModal">Attempt Now</button></td>
-										<!--<td class="table-action min-w-100 text-center">-->
-										<!--	<a href="course-details.html" class="text-fade hover-primary"><i class="align-middle" data-feather="eye"></i></a>-->
-											<!--<a href="#" class="text-fade hover-primary"><i class="align-middle" data-feather="trash"></i></a>-->
-										<!--</td>-->
-									</tr>
-									<tr>
-										<td>BPSC</td>
-										
-										<td class="d-none d-md-table-cell text-fade">History</td>
-										<td class="d-none d-md-table-cell text-fade">Test</td>
-										<td class="d-none d-md-table-cell text-fade">Completed</td>
-										<td class="d-none d-md-table-cell text-fade">300</td>
-										<td class="d-none d-md-table-cell text-fade">2 Hours</td>
-										<td class="d-none d-md-table-cell text-fade">Yes</td>
-											<td class="d-none d-md-table-cell text-fade"><button style="border-radius:3px; background:green;color:white;"> View Result </button></td>
-									
-									</tr>
-									
-								</tbody>
-							</table>
-						</div>
-					</div>
-				</div>
 
-			
+    <div class="container mt-4">
 
-				
-			</div>
-		</section>
-		<!-- /.content -->
-		@endsection
+        <div class="card shadow-sm mb-4">
+            <div class="card-body d-flex justify-content-between align-items-center">
+                <h4 class="m-0">📄 My Test Attempts</h4>
+            </div>
+        </div>
+
+        @if($attemptedTests->count() > 0)
+
+            <div class="card shadow-sm">
+                <div class="card-body p-0">
+                    <table class="table table-hover table-striped mb-0 align-middle">
+                        <thead class="table-primary">
+                            <tr>
+                                <th width="30%">Test Name</th>
+                                <th>Attempt #</th>
+                                <th>Paper Type</th>
+                                <th>Status</th>
+                                <th>Score</th>
+                                <th>Assigned Teacher</th>
+                                <th>Attempted On</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+
+
+                        <tbody>
+                            @foreach($attemptedTests as $attempt)
+
+                                @php
+                                    $test = $attempt->test;
+                                    $teacher = $attempt->assignedTeacher;
+                                @endphp
+
+                                <tr>
+
+                                    {{-- TEST NAME + TYPE --}}
+                                    <td>
+                                        <strong>{{ $test->name ?? 'Unknown Test' }}</strong><br>
+
+                                        <small class="text-muted">
+                                            Test ID: #{{ $test->id }}
+                                        </small>
+                                    </td>
+                                    <td>
+                                        @php
+                                            $paperType = $test->paper_type;
+
+                                            $typeName = match ($paperType) {
+                                                1 => 'Previous Year',
+                                                2 => 'Current Affair',
+                                                default => (
+                                                    is_null($test->topic_id) && is_null($test->subject_id) && is_null($test->chapter_id)
+                                                    ? 'Full Test'
+                                                    : (!is_null($test->subject_id) && is_null($test->chapter_id)
+                                                        ? 'Subject Wise'
+                                                        : (!is_null($test->chapter_id) && is_null($test->topic_id)
+                                                            ? 'Chapter Wise'
+                                                            : (!is_null($test->topic_id)
+                                                                ? 'Topic Wise'
+                                                                : '-'
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            };
+                                            echo $typeName;
+                                        @endphp
+                                        ({{ ucfirst($test->test_paper_type) }})
+                                    </td>
+
+                                    {{-- ATTEMPT NUMBER --}}
+                                    <td class="text-center">
+                                        <span class="badge bg-info text-dark">Attempt #{{ $loop->iteration }}</span>
+                                    </td>
+
+                                    {{-- STATUS --}}
+                                    <td>
+                                        @if($attempt->status == 'published')
+                                            <span class="badge bg-success">Completed</span>
+
+                                        @elseif($attempt->status == 'under_review')
+                                            <span class="badge bg-primary">Under Review</span>
+
+                                        @elseif($attempt->status == 'pending')
+                                            <span class="badge bg-warning text-dark">Pending</span>
+
+                                        @else
+                                            <span class="badge bg-secondary">{{ ucfirst($attempt->status) }}</span>
+                                        @endif
+                                    </td>
+
+                                    {{-- SCORE --}}
+                                    <td>
+                                        @if($attempt->status == 'published')
+                                            <strong>
+                                                {{ $attempt->final_score }}/{{ $attempt->max_positive_score }}
+                                            </strong>
+                                        @else
+                                            <span class="text-muted">Waiting Evaluation</span>
+                                        @endif
+                                    </td>
+
+                                    {{-- ASSIGNED TEACHER --}}
+                                    <td>
+                                        @if($teacher)
+                                            <span class="text-dark">
+                                                👨‍🏫 {{ $teacher->full_name }}
+                                            </span>
+                                        @else
+                                            <small class="text-muted">Not Assigned</small>
+                                        @endif
+                                    </td>
+
+                                    {{-- DATE --}}
+                                    <td>
+                                        {{ $attempt->created_at->format('d M Y | h:i A') }}
+                                    </td>
+
+                                    {{-- ACTIONS --}}
+                                    <td>
+                                        <a href="{{ route('user.test-result', base64_encode($attempt->id)) }}"
+                                            class="btn btn-sm btn-outline-primary">
+                                            View Result
+                                        </a>
+                                    </td>
+                                </tr>
+
+                            @endforeach
+                        </tbody>
+
+                    </table>
+                </div>
+            </div>
+
+        @else
+            <div class="alert alert-info text-center p-3 shadow-sm">
+                No attempted tests found yet.
+            </div>
+        @endif
+
+    </div>
+
+@endsection

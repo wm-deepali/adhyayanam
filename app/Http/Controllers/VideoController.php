@@ -24,7 +24,7 @@ class VideoController extends Controller
         $search = $request->input('search');
         // VIDEOS
         $videosQuery = Video::where('type', 'video')
-            ->with(['examinationCommission', 'category', 'subCategory', 'subject', 'chapter']);
+            ->with(['examinationCommission', 'category', 'subCategory', 'subject', 'chapter', 'course']);
 
         if ($search) {
             $videosQuery->where(function ($q) use ($search) {
@@ -40,7 +40,7 @@ class VideoController extends Controller
 
         // LIVE CLASSES
         $liveQuery = Video::where('type', 'live_class')
-            ->with(['examinationCommission', 'category', 'subCategory', 'subject', 'teacher']);
+            ->with(['examinationCommission', 'category', 'subCategory', 'subject', 'teacher', 'course']);
 
         if ($search) {
             $liveQuery->where(function ($q) use ($search) {
@@ -53,7 +53,6 @@ class VideoController extends Controller
         }
 
         $liveClasses = $liveQuery->latest()->get();
-
         return view('video.index', compact('videos', 'liveClasses'));
     }
 

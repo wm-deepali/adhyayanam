@@ -106,7 +106,7 @@
                   <div class="content">
 
                     <h4><a href="test-serie-detail.html"> {{$testseriess->title}} </a></h4>
-                    <div class="number-of-test">{{count($testseriess->testseries)}} Test <span class="green-free">| @if($testseriess->fee_type == 'Paid') Premium @else Free @endif</span></div>
+                    <div class="number-of-test">{{count($testseriess->testseries)}} Test <span class="green-free">| @if($testseriess->fee_type == 'paid') Premium @else Free @endif</span></div>
                     <div class="contents">
                       <ul class="lstyle">
                         <li>{{$testseriess->testseries->where('type_name','Chapter Test')->count()}} Chapter Test</li>

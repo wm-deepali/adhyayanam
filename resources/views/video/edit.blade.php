@@ -439,7 +439,8 @@
             $('#chapter_id').on('change', function () {
                 const courseId = $('#course').val();
                 const chapterId = $(this).val();
-                fetchChapters(courseId, nusubjectIdll, chapterId);
+                const subjectId = $('#subject_id').val();
+                fetchChapters(courseId, subjectId, chapterId, initialTopic);
             });
 
                $(document).on('change', '#courseType, #courseCategory, #sub_category_id, #subject_id', function () {

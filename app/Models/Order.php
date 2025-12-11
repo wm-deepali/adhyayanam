@@ -9,9 +9,9 @@ class Order extends Model
 {
     use HasFactory;
 
-    protected $table='orders';
+    protected $table = 'orders';
 
-    protected $fillable=[
+    protected $fillable = [
         'order_code',
         'package_name',
         'cust_id',
@@ -39,4 +39,9 @@ class Order extends Model
     {
         return $this->belongsTo(User::class, 'student_id');
     }
+
+   
+
+
 }
+

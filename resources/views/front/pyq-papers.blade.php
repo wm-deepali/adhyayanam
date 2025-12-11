@@ -87,7 +87,9 @@
                                             Question
                                         </div>
                                         <div class="text-end">
+                                            @if($paper->test_type == 'paid' )
                                             <h5 class="text-danger mb-1">₹{{ $paper->offer_price }}</h5>
+                                            @endif
                                             <a href="#" class="btn btn-danger btn-sm rounded-2 px-3">Attempt Now</a>
                                         </div>
                                     </div>

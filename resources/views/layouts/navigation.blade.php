@@ -599,6 +599,22 @@
         </a>
         <ul class="nav-group-items" style="height: 0px;">
             <li class="nav-item">
+                <a class="nav-link" href="{{route('settings.user-wallet.index')}}" target="_top">
+                    <svg class="nav-icon">
+                        <use xlink:href="{{ asset('icons/coreui.svg#cil-header') }}"></use>
+                    </svg>
+                    User Wallet
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ route('percentage.system.index') }}" target="_top">
+                    <svg class="nav-icon">
+                        <use xlink:href="{{ asset('icons/coreui.svg#cil-list') }}"></use>
+                    </svg>
+                    {{ __('Manage Percentage') }}
+                </a>
+            </li>
+            <li class="nav-item">
                 <a class="nav-link" href="{{route('users.index')}}" target="_top">
                     <svg class="nav-icon">
                         <use xlink:href="{{ asset('icons/coreui.svg#cil-user') }}"></use>
@@ -686,15 +702,6 @@
                         <use xlink:href="{{ asset('icons/coreui.svg#cil-header') }}"></use>
                     </svg>
                     Feature Settings
-                </a>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link" href="{{route('settings.user-wallet.index')}}" target="_top">
-                    <svg class="nav-icon">
-                        <use xlink:href="{{ asset('icons/coreui.svg#cil-header') }}"></use>
-                    </svg>
-                    User Wallet
                 </a>
             </li>
         </ul>

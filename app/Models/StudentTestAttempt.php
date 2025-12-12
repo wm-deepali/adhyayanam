@@ -65,4 +65,21 @@ class StudentTestAttempt extends Model
     {
         return $this->belongsTo(Teacher::class, 'assigned_teacher_id');
     }
+
+    public function getResultDivisionAttribute()
+    {
+        if (!$this->actual_marks || $this->actual_marks == 0) {
+            return null;
+        }
+
+        $percentage = ($this->final_score / $this->actual_marks) * 100;
+
+        $division = \App\Models\PercentageSystem::where('from_percentage', '<=', $percentage)
+            ->where('to_percentage', '>=', $percentage)
+            ->where('status', 'active')
+            ->first();
+
+        return $division ? $division->division : 'N/A';
+    }
+
 }

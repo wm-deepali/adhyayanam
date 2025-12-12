@@ -256,7 +256,11 @@ class VideoController extends Controller
             ->pluck('teacher_id')
             ->unique();
 
-        $teachers = Teacher::whereIn('id', $teacherIds)->select('id', 'full_name')->get();
+
+        $teachers = Teacher::whereIn('id', $teacherIds)
+            ->where('can_conduct_live_classes', 1)   // only teachers allowed for live classes
+            ->select('id', 'full_name')
+            ->get();
 
         return view('video.edit', compact(
             'video',
@@ -575,7 +579,9 @@ class VideoController extends Controller
         }
 
         $teacherIds = $query->pluck('teacher_id')->unique();
-        $teachers = Teacher::whereIn('id', $teacherIds)->get();
+        $teachers = Teacher::whereIn('id', $teacherIds)
+        ->where('can_conduct_live_classes', 1)   // only teachers allowed for live classes
+            ->get();
 
         $html = '<option value="">Select Teacher</option>';
         foreach ($teachers as $teacher) {

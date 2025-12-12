@@ -617,11 +617,17 @@ class QuestionBankController extends Controller
                             $tr5 = $tables[$i]->find('tr', 5);
                             $td5 = $tr5 ? $tr5->find('td', 1) : null;
                             $p5 = $td5 ? $td5->find('p') : null;
-                            if ($p5 === null || $p5->innerHtml === '&nbsp;') {
+
+                            $rawHtml = $p5 ? trim($p5->innerHtml) : '';
+                            $textOnly = trim(strip_tags($rawHtml)); // used ONLY for empty check
+
+                            // Check if Option E is actually empty
+                            if ($textOnly === '' || $textOnly === '&nbsp;' || $rawHtml === '&nbsp;') {
                                 $option_e = null;
                                 $has_option_e = false;
                             } else {
-                                $option_e = $p5->innerHtml;
+                                // Keep original HTML as required
+                                $option_e = $rawHtml;
                                 $has_option_e = true;
                             }
 
@@ -654,22 +660,34 @@ class QuestionBankController extends Controller
                                 $has_instruction = true;
                             }
 
-                            // Solution (optional) - try next rows after instruction
                             $solution = null;
                             $has_solution = 'no';
+
                             $tryRows = [8, 9];
+
                             foreach ($tryRows as $rowIdx) {
+
                                 $tr = $tables[$i]->find('tr', $rowIdx);
                                 $td = $tr ? $tr->find('td', 1) : null;
-                                if ($td) {
-                                    $content = $td->innerHtml;
-                                    if ($content !== null && trim($content) !== '' && $content !== '&nbsp;') {
-                                        $solution = $content;
-                                        $has_solution = 'yes';
-                                        break;
-                                    }
+                                $p = $td ? $td->find('p') : null;
+
+                                // Raw HTML
+                                $rawHtml = $p ? trim($p->innerHtml) : '';
+
+                                // Text-only content (after removing tags)
+                                $textOnly = trim(strip_tags($rawHtml));
+
+                                // Check if empty
+                                if ($textOnly === '' || $rawHtml === '&nbsp;' || $textOnly === '&nbsp;') {
+                                    continue; // move to next row
                                 }
+
+                                // Valid solution found → KEEP full HTML
+                                $solution = $rawHtml;
+                                $has_solution = 'yes';
+                                break;
                             }
+
 
                             // Finally, set status once
                             if ($rejectQuestion) {
@@ -796,13 +814,28 @@ class QuestionBankController extends Controller
                             } else {
                                 $answer_format = $tables[$i]->find('tr', 2)->find('td', 1)->find('p')->innerHtml;
                             }
-                            if ($tables[$i]->find('tr', 3)->find('td', 1)->find('p')->innerHtml == '&nbsp;') {
-                                $solution = NULL;
+
+                           // Get the <p> inside row 3
+                            $tr = $tables[$i]->find('tr', 3);
+                            $td = $tr ? $tr->find('td', 1) : null;
+                            $p = $td ? $td->find('p') : null;
+
+                            // Safely extract HTML
+                            $rawHtml = $p ? trim($p->innerHtml) : '';
+
+                            // Strip HTML to detect real text
+                            $textOnly = trim(strip_tags($rawHtml));
+
+                            // Check if solution is actually empty
+                            if ($rawHtml === '' || $rawHtml === '&nbsp;' || $textOnly === '') {
+                                $solution = null;
                                 $has_solution = 'no';
                             } else {
-                                $solution = $tables[$i]->find('tr', 3)->find('td', 1)->innerHtml;
+                                // Keep full HTML
+                                $solution = $rawHtml;
                                 $has_solution = 'yes';
                             }
+                            
                             if ($tables[$i]->find('tr', 4)->find('td', 1)->find('p')->innerHtml == '&nbsp;') {
                                 $instruction = NULL;
                                 $has_instruction = false;
@@ -983,13 +1016,26 @@ class QuestionBankController extends Controller
                                     $option_b = $tables[$i]->find('tr', 2)->find('td', 1)->find('p')->innerHtml;
                                     $option_c = $tables[$i]->find('tr', 3)->find('td', 1)->find('p')->innerHtml;
                                     $option_d = $tables[$i]->find('tr', 4)->find('td', 1)->find('p')->innerHtml;
-                                    if ($tables[$i]->find('tr', 5)->find('td', 1)->find('p')->innerHtml == '&nbsp;') {
-                                        $option_e = NULL;
+
+
+                                    $tr5 = $tables[$i]->find('tr', 5);
+                                    $td5 = $tr5 ? $tr5->find('td', 1) : null;
+                                    $p5 = $td5 ? $td5->find('p') : null;
+
+                                    $rawHtml = $p5 ? trim($p5->innerHtml) : '';
+                                    $textOnly = trim(strip_tags($rawHtml)); // used only to detect empty value
+
+                                    // If Option E is actually empty
+                                    if ($textOnly === '' || $rawHtml === '&nbsp;' || $textOnly === '&nbsp;') {
+                                        $option_e = null;
                                         $has_option_e = false;
                                     } else {
-                                        $option_e = $tables[$i]->find('tr', 5)->find('td', 1)->find('p')->innerHtml;
+                                        // KEEP original HTML (as required)
+                                        $option_e = $rawHtml;
                                         $has_option_e = true;
                                     }
+
+
                                     $passage_answer = $tables[$i]->find('tr', 6)->find('td', 1)->find('p')->innerHtml;
                                     // Try to read per-subquestion solution at row 7 or 8
                                     $detail_solution = NULL;

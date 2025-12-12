@@ -53,7 +53,7 @@
                             </div>
                             <div class="mb-3"><label>Date of Birth</label>
                                 <input type="date" name="dob" class="form-control">
-                                 <small class="form-text text-muted">Format: YYYY-MM-DD</small>
+                                <small class="form-text text-muted">Format: YYYY-MM-DD</small>
                             </div>
                             <div class="mb-3"><label>Highest Qualification</label>
                                 <input type="text" name="highest_qualification" class="form-control">
@@ -103,8 +103,26 @@
                                     <label class="form-check-label" for="lang_english">English</label>
                                 </div>
                             </div>
+
                         </div>
                     </div>
+
+                    {{-- Live Class Permissions --}}
+                    <h4 class="mt-4 mb-2">Live Class Permissions</h4>
+
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="can_live_class"
+                                name="can_conduct_live_classes" value="1">
+                            <label class="form-check-label" for="can_live_class">
+                                Allow this teacher to conduct Live Classes
+                            </label>
+                        </div>
+                        <small class="form-text text-muted">
+                            If enabled, this teacher will appear in Live Class Scheduling Teacher List.
+                        </small>
+                    </div>
+
 
                     {{-- Account Setup --}}
                     <h4 class="mt-4 mb-3">Account Setup</h4>

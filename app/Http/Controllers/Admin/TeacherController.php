@@ -49,7 +49,7 @@ class TeacherController extends Controller
                 ->addColumn('total_paid', function ($teacher) {
                     return number_format($teacher->total_paid_amount, 2);
                 })
-                
+
                 ->addColumn('status', function ($teacher) {
                     return $teacher->status ? 'Active' : 'Inactive';
                 })
@@ -145,6 +145,7 @@ class TeacherController extends Controller
         $teacher->state = $request->state;
         $teacher->city = $request->city;
         $teacher->pin_code = $request->pin_code;
+        $teacher->can_conduct_live_classes = $request->has('can_conduct_live_classes') ? 1 : 0;
 
         $teacher->allow_languages = $request->language ?? [];
 
@@ -306,7 +307,7 @@ class TeacherController extends Controller
         $teacher->city = $request->city;
         $teacher->pin_code = $request->pin_code;
         $teacher->allow_languages = $request->language ?? [];
-
+        $teacher->can_conduct_live_classes = $request->has('can_conduct_live_classes') ? 1 : 0;
 
 
         // Update Question Permissions and Payment

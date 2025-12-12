@@ -154,7 +154,7 @@
 
                     @if($attempt->status === 'published')
                         <div class="score-box mt-2">
-                            {{$attempt->final_score}} / {{$attempt->max_positive_score}}
+                            {{$attempt->final_score}} / {{$attempt->actual_marks}}
                         </div>
                     @else
                         <div class="score-box mt-2" style="color:#888;font-size:18px;">

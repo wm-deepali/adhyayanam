@@ -73,7 +73,7 @@
 
                             <td><strong>{{ $attempt->final_score }}</strong></td>
 
-                            <td>{{ $attempt->max_positive_score }}</td>
+                            <td>{{ $attempt->actual_marks }}</td>
 
                             <td>
                                 <span class="badge bg-success">Submitted</span>

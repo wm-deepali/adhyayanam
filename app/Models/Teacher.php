@@ -70,6 +70,7 @@ class Teacher extends Authenticatable implements CanResetPasswordContract
 
         // Status
         'status',
+        'can_conduct_live_classes',
     ];
 
     /**
@@ -88,6 +89,7 @@ class Teacher extends Authenticatable implements CanResetPasswordContract
         'total_paid' => 'decimal:2',
         'pending' => 'decimal:2',
         'dob' => 'datetime',
+        'can_conduct_live_classes' => 'boolean',
     ];
 
     protected $hidden = [

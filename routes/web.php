@@ -196,7 +196,7 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
             Route::get('/wallet/withdrawals', [TeacherController::class, 'withdrawalsIndex'])
                 ->name('wallet.withdrawals.index');
 
-            Route::get('/assigned', [TeacherResultController::class, 'assigned']) ->name('results.assigned');
+            Route::get('/assigned', [TeacherResultController::class, 'assigned'])->name('results.assigned');
 
             Route::get('/completed', [TeacherResultController::class, 'completed'])
                 ->name('results.completed');
@@ -411,8 +411,14 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
         Route::get('test-series/question/create', [App\Http\Controllers\ContentManagementController::class, 'testSeriesQuestionCreate'])->name('test.series.question.create');
 
 
-        Route::prefix('admin/results')->group(function () {
+        Route::get('/percentage-system', [\App\Http\Controllers\Admin\PercentageSystemController::class, 'index'])->name('percentage.system.index');
+        Route::get('/percentage-system/create', [\App\Http\Controllers\Admin\PercentageSystemController::class, 'create'])->name('percentage.system.create');
+        Route::post('/percentage-system/store', [\App\Http\Controllers\Admin\PercentageSystemController::class, 'store'])->name('percentage.system.store');
+        Route::get('/percentage-system/edit/{id}', [\App\Http\Controllers\Admin\PercentageSystemController::class, 'edit'])->name('percentage.system.edit');
+        Route::post('/percentage-system/update/{id}', [\App\Http\Controllers\Admin\PercentageSystemController::class, 'update'])->name('percentage.system.update');
+        Route::delete('/percentage-system/delete/{id}', [\App\Http\Controllers\Admin\PercentageSystemController::class, 'destroy'])->name('percentage.system.delete');
 
+    
             Route::get('/results', [App\Http\Controllers\Admin\TestResultController::class, 'results'])
                 ->name('admin.results.all');
 
@@ -435,7 +441,7 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
                 ->name('admin.save-evaluation');
 
             Route::post('/assign-marks', [App\Http\Controllers\Admin\TestResultController::class, 'assignMarks'])->name('admin.assign-marks');
-        });
+    
 
 
         Route::get('upcoming-exams', [App\Http\Controllers\ContentManagementController::class, 'upcomingExamIndex'])->name('upcoming.exam.index');

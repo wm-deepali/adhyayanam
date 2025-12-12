@@ -189,10 +189,12 @@ class FrontUserController extends Controller
         $course = Course::findOrFail($id);
 
         if (strtolower($course->course_mode) == 'online') {
-            $liveClasses = Video::where('course_id', $course->id)
+            $liveClasses = Video::with('teacher:id,full_name')
+                ->where('course_id', $course->id)
                 ->where('type', 'live_class')
                 ->orderBy('schedule_date', 'asc')
                 ->get();
+
 
             // Attach user progress
             $liveClasses->transform(function ($video) use ($userId) {

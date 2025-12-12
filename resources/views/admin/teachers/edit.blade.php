@@ -112,6 +112,28 @@
                             </div>
                         </div>
                     </div>
+                    
+{{-- Live Class Permissions --}}
+<h4 class="mt-4 mb-2">Live Class Permissions</h4>
+
+<div class="mb-3">
+    <div class="form-check">
+        <input type="checkbox"
+               class="form-check-input"
+               id="can_live_class"
+               name="can_conduct_live_classes"
+               value="1"
+               {{ isset($teacher) && $teacher->can_conduct_live_classes ? 'checked' : '' }}>
+        
+        <label class="form-check-label" for="can_live_class">
+            Allow this teacher to conduct Live Classes
+        </label>
+    </div>
+
+    <small class="form-text text-muted">
+        If enabled, this teacher will appear in Live Class Scheduling Teacher List.
+    </small>
+</div>
 
 
                     {{-- Account Setup --}}

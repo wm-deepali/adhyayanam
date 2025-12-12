@@ -100,13 +100,45 @@
                                     {{-- SCORE --}}
                                     <td>
                                         @if($attempt->status == 'published')
-                                            <strong>
-                                                {{ $attempt->final_score }}/{{ $attempt->max_positive_score }}
-                                            </strong>
+
+                                            @php
+                                                $score = $attempt->final_score;
+                                                $total = $attempt->actual_marks;
+
+                                                // Percentage calculation
+                                                $percentage = $total > 0 ? round(($score / $total) * 100, 2) : 0;
+
+                                                // Get division from model accessor
+                                                $division = $attempt->result_division;
+                                                
+
+                                                // Badge colors
+                                                $badgeClass =
+                                                    ($division == 'Fail') ? 'bg-danger' :
+                                                    (($division == 'Poor') ? 'bg-warning text-dark' :
+                                                        (($division == 'Average') ? 'bg-info text-dark' :
+                                                            (($division == 'Good') ? 'bg-primary' :
+                                                                (($division == 'Excellent') ? 'bg-success' : 'bg-secondary'))));
+                                            @endphp
+
+                                            {{-- SCORE --}}
+                                            <div><strong>{{ $score }}/{{ $total }}</strong></div>
+
+                                            {{-- PERCENTAGE --}}
+                                            <small class="text-muted">{{ $percentage }}%</small>
+
+                                            {{-- DIVISION --}}
+                                            <div>
+                                                <span class="badge {{ $badgeClass }}">
+                                                    {{ $division ?? 'N/A' }}
+                                                </span>
+                                            </div>
+
                                         @else
                                             <span class="text-muted">Waiting Evaluation</span>
                                         @endif
                                     </td>
+
 
                                     {{-- ASSIGNED TEACHER --}}
                                     <td>

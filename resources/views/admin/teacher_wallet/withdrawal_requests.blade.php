@@ -51,7 +51,7 @@
                                 @endif
                             </td>
                             <td>
-                                @if($req->status == 'pending')
+                                @if($req->status == 'pending' && \App\Helpers\Helper::canAccess('manage_withdrawal_requests_status'))
                                     <button class="btn btn-success btn-sm approve-btn" data-id="{{ $req->id }}">Approve</button>
                                     <button class="btn btn-danger btn-sm reject-btn" data-id="{{ $req->id }}">Reject</button>
                                 @else

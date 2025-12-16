@@ -43,12 +43,26 @@ Failed Payments
                 <td>{{ $res->payment_method ?? '-' }}</td>
                 <td>{{ ucfirst($res->payment_status) }}</td>
                 <td>Active</td>
-                <td>
-                <a href="#"><i class="fa fa-eye"></i></a>
-                    <a href="#"><i class="fa fa-download"></i></a>
-                    <a href="#"><i class="fa fa-user-graduate"></i></a>
-                    <a href="#"><i class="fa fa-eye"></i></a>
-                </td>
+                 <td>
+                                        @if(\App\Helpers\Helper::canAccess('manage_students'))
+                                            <a href="{{ route('students.student-order-detail', $res->order->id ?? 0) }}" title="View Order">
+                                                <i class="fa fa-eye"></i>
+                                            </a>
+                                        @endif
+
+                                        @if(\App\Helpers\Helper::canAccess('manage_students'))
+                                            <a href="{{ route('students.student-profile-detail', $res->student->id ?? 0) }}"
+                                                title="View Student Profile">
+                                                <i class="fa fa-user-graduate"></i>
+                                            </a>
+                                        @endif
+
+                                        @if(\App\Helpers\Helper::canAccess('manage_students'))
+                                            <a href="{{ route('user.generate-pdf', $res->order->id ?? 0) }}" title="Download Invoice">
+                                                <i class="fa fa-download"></i>
+                                            </a>
+                                        @endif
+                                    </td>
             </tr>
             @endforeach
                     </tbody>

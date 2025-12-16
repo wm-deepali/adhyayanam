@@ -137,21 +137,28 @@
 
                             <td>
 
-                                {{-- VIEW RESULT BUTTON ALWAYS VISIBLE --}}
-                                <a href="{{ route('admin.evaluate-attempt', base64_encode($attempt->id)) }}"
-                                    class="btn btn-sm btn-primary mb-1">
-                                    View Result
-                                </a>
+                                {{-- VIEW RESULT --}}
+                                @if(\App\Helpers\Helper::canAccess('manage_test_attempts_edit'))
+                                    <a href="{{ route('admin.evaluate-attempt', base64_encode($attempt->id)) }}"
+                                        class="btn btn-sm btn-primary mb-1">
+                                        View Result
+                                    </a>
+                                @endif
 
-                                {{-- SHOW Assign Teacher ONLY WHEN: pending AND NOT MCQ --}}
-                                @if($attempt->status == 'pending' && strtolower($attempt->test->test_paper_type) != 'mcq')
+                                {{-- ASSIGN TEACHER (pending + not MCQ + permission) --}}
+                                @if(
+                                        $attempt->status == 'pending' &&
+                                        strtolower($attempt->test->test_paper_type) != 'mcq' &&
+                                        \App\Helpers\Helper::canAccess('manage_test_attempts_edit')
+                                    )
                                     <button class="btn btn-sm btn-warning mb-1"
                                         onclick="openAssignTeacherModal('{{ $attempt->id }}')">
                                         Assign Teacher
                                     </button>
+                                @endif
 
-
-                                    {{-- DELETE BUTTON --}}
+                                {{-- DELETE ATTEMPT --}}
+                                @if(\App\Helpers\Helper::canAccess('manage_test_attempts_delete'))
                                     <form action="{{ route('admin.delete-attempt', $attempt->id) }}" method="POST"
                                         style="display:inline-block;">
                                         @csrf

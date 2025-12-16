@@ -22,7 +22,6 @@ Show User
                 </div>
 
                 <div class="mt-4">
-                    <a href="{{ route('users.edit', $user->id) }}" class="btn btn-info">Edit</a>
                     <a href="{{ route('users.index') }}" class="btn btn-default">Back</a>
                 </div>
             </div>

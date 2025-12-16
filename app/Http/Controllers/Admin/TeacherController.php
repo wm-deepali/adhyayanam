@@ -54,28 +54,107 @@ class TeacherController extends Controller
                     return $teacher->status ? 'Active' : 'Inactive';
                 })
                 ->addColumn('action', function ($teacher) {
+
+                    $items = '';
+
+                    // VIEW PROFILE
+                    if (\App\Helpers\Helper::canAccess('manage_teachers')) {
+                        $items .= '
+        <li>
+            <a class="dropdown-item text-primary"
+               href="' . route("manage-teachers.show", $teacher->id) . '">
+                <i class="fas fa-user me-2"></i> View Profile
+            </a>
+        </li>';
+                    }
+
+                    // VIEW WALLET
+                    if (\App\Helpers\Helper::canAccess('manage_teacher_wallet')) {
+                        $items .= '
+        <li>
+            <a class="dropdown-item text-success"
+               href="' . route("teacher.wallet.index", ['teacher_id' => $teacher->id]) . '">
+                <i class="fas fa-wallet me-2"></i> View Wallet
+            </a>
+        </li>';
+                    }
+
+                    // VIEW QUESTIONS
+                    if (\App\Helpers\Helper::canAccess('manage_question_bank')) {
+                        $items .= '
+        <li>
+            <a class="dropdown-item text-info"
+               href="' . route("question.bank.index", ['teacher_id' => $teacher->id]) . '">
+                <i class="fas fa-question-circle me-2"></i> View All Questions
+            </a>
+        </li>';
+                    }
+
+                    // VIEW PAYOUTS
+                    if (\App\Helpers\Helper::canAccess('manage_withdrawal_requests')) {
+                        $items .= '
+        <li>
+            <a class="dropdown-item text-warning"
+               href="' . route("withdrawal.requests.index", ['teacher_id' => $teacher->id]) . '">
+                <i class="fas fa-money-check me-2"></i> View Payouts
+            </a>
+        </li>';
+                    }
+
+                    // EDIT
+                    if (\App\Helpers\Helper::canAccess('manage_teachers_edit')) {
+                        $items .= '
+        <li>
+            <a class="dropdown-item text-secondary"
+               href="' . route("manage-teachers.edit", $teacher->id) . '">
+                <i class="fas fa-edit me-2"></i> Edit
+            </a>
+        </li>
+
+        <li>
+            <button class="dropdown-item text-dark btn-change-password"
+                    data-id="' . $teacher->id . '"
+                    data-name="' . e($teacher->full_name) . '">
+                <i class="fas fa-key me-2"></i> Change Password
+            </button>
+        </li>';
+                    }
+
+                    // DELETE
+                    if (\App\Helpers\Helper::canAccess('manage_teachers_delete')) {
+                        $items .= '
+        <li>
+            <form action="' . route('manage-teachers.delete', $teacher->id) . '"
+                  method="POST"
+                  onsubmit="return confirm(\'Are you sure?\')">
+                ' . csrf_field() . '
+                ' . method_field("DELETE") . '
+                <button type="submit" class="dropdown-item text-danger">
+                    <i class="fas fa-trash me-2" style="color:red!important;"></i> Delete
+                </button>
+            </form>
+        </li>';
+                    }
+
+                    // NO PERMISSION → NO DROPDOWN
+                    if ($items === '') {
+                        return '-';
+                    }
+
                     return '
     <div class="dropdown">
-  <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" id="actionMenu' . $teacher->id . '" data-bs-toggle="dropdown" aria-expanded="false">
-    <span>Actions</span>
-  </button>
-  <ul class="dropdown-menu" aria-labelledby="actionMenu' . $teacher->id . '">
-    <li><a class="dropdown-item text-primary" href="' . route("manage-teachers.show", $teacher->id) . '"><i class="fas fa-user me-2"></i> View Profile</a></li>
-        <li><a class="dropdown-item text-success" href="' . route("teacher.wallet.index", ['teacher_id' => $teacher->id]) . '"><i class="fas fa-wallet me-2"></i> View Wallet</a></li>
-    <li><a class="dropdown-item text-info" href="' . route("question.bank.index", ['teacher_id' => $teacher->id]) . '"><i class="fas fa-question-circle me-2"></i> View All Questions</a></li>
-    <li><a class="dropdown-item text-warning" href="' . route("withdrawal.requests.index", ['teacher_id' => $teacher->id]) . '"><i class="fas fa-money-check me-2"></i> View Payouts</a></li>
-    <li><a class="dropdown-item text-secondary" href="' . route("manage-teachers.edit", $teacher->id) . '"><i class="fas fa-edit me-2"></i> Edit</a></li>
-    <li><button class="dropdown-item text-dark btn-change-password" data-id="' . $teacher->id . '" data-name="' . e($teacher->full_name) . '"><i class="fas fa-key me-2"></i> Change Password</button></li>
-    <li>
-      <form action="' . route('manage-teachers.delete', $teacher->id) . '" method="POST" style="display:inline" onsubmit="return confirm(\'Are you sure?\')">
-        ' . csrf_field() . '
-        ' . method_field("DELETE") . '
-        <button type="submit" class="dropdown-item text-danger"><i class="fas fa-trash me-2" style="color: red!important;"></i> Delete</button>
-      </form>
-    </li>
-  </ul>
-</div>';
+        <button class="btn btn-sm btn-secondary dropdown-toggle"
+                type="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false">
+            Actions
+        </button>
+        <ul class="dropdown-menu">
+            ' . $items . '
+        </ul>
+    </div>';
                 })
+
 
                 ->rawColumns(['checkbox', 'profile_picture', 'status', 'action'])
                 ->make(true);

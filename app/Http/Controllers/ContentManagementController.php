@@ -192,13 +192,24 @@ class ContentManagementController extends Controller
                     return $link;
                 })
                 ->addColumn('action', function ($row) {
-                    $actionBtn = '<form action="' . route('cm.career.delete', $row->id) . '" method="POST" style="display:inline">
-                                ' . csrf_field() . '
-                                ' . method_field("DELETE") . '
-                                <button type="submit" class="btn btn-sm btn-danger"><i class="fa fa-trash"></i></button>
-                            </form>';
-                    return $actionBtn;
+
+                    if (!\App\Helpers\Helper::canAccess('manage_career_delete')) {
+                        return '<span class="text-muted">No Action</span>';
+                    }
+
+                    return '
+        <form action="' . route('cm.career.delete', $row->id) . '" method="POST"
+              style="display:inline"
+              onsubmit="return confirm(\'Are you sure you want to delete this?\');">
+            ' . csrf_field() . '
+            ' . method_field('DELETE') . '
+            <button type="submit" class="btn btn-sm btn-danger">
+                <i class="fa fa-trash"></i>
+            </button>
+        </form>
+    ';
                 })
+
                 ->rawColumns(['checkbox', 'created_at', 'cv', 'action'])
                 ->make(true);
         }
@@ -524,15 +535,36 @@ class ContentManagementController extends Controller
                     return $status;
                 })
                 ->addColumn('action', function ($row) {
-                    $editUrl = route('cm.exam.edit', $row->id);
-                    $actionBtn = ' <a href="' . $editUrl . '" class="btn btn-sm btn-primary" title="Edit"><i class="fa fa-file"></i></a>
-                            <form action="' . route('cm.exam.destroy', $row->id) . '" method="POST" style="display:inline">
-                                ' . csrf_field() . '
-                                ' . method_field("DELETE") . '
-                                <button type="submit" class="btn btn-sm btn-danger" title="Delete"><i class="fa fa-trash"></i></button>
-                            </form>';
-                    return $actionBtn;
+
+                    $actionBtn = '';
+
+                    // ✅ EDIT permission
+                    if (\App\Helpers\Helper::canAccess('manage_exam_edit')) {
+                        $editUrl = route('cm.exam.edit', $row->id);
+                        $actionBtn .= '
+            <a href="' . $editUrl . '" class="btn btn-sm btn-primary" title="Edit">
+                <i class="fa fa-file"></i>
+            </a>
+        ';
+                    }
+
+                    // ✅ DELETE permission
+                    if (\App\Helpers\Helper::canAccess('manage_exam_delete')) {
+                        $actionBtn .= '
+            <form action="' . route('cm.exam.destroy', $row->id) . '" method="POST" style="display:inline">
+                ' . csrf_field() . '
+                ' . method_field("DELETE") . '
+                <button type="submit" class="btn btn-sm btn-danger" title="Delete"
+                    onclick="return confirm(\'Are you sure?\')">
+                    <i class="fa fa-trash"></i>
+                </button>
+            </form>
+        ';
+                    }
+
+                    return $actionBtn ?: '-';
                 })
+
                 ->rawColumns(['checkbox', 'image', 'status', 'meta_title', 'meta_description', 'meta_keyword', 'canonical_url', 'alt_tag', 'action'])
                 ->make(true);
         }
@@ -677,15 +709,37 @@ class ContentManagementController extends Controller
                     return $status;
                 })
                 ->addColumn('action', function ($row) {
-                    $editUrl = route('cm.category.edit', $row->id);
-                    $actionBtn = ' <a href="' . $editUrl . '" class="btn btn-sm btn-primary" title="Edit"><i class="fa fa-file"></i></a>
-                        <form action="' . route('cm.category.delete', $row->id) . '" method="POST" style="display:inline">
-                            ' . csrf_field() . '
-                            ' . method_field("DELETE") . '
-                            <button type="submit" class="btn btn-sm btn-danger" title="Delete"><i class="fa fa-trash"></i></button>
-                        </form>';
-                    return $actionBtn;
+
+                    $buttons = '';
+
+                    // EDIT permission
+                    if (\App\Helpers\Helper::canAccess('manage_category_edit')) {
+                        $editUrl = route('cm.category.edit', $row->id);
+                        $buttons .= '
+            <a href="' . $editUrl . '" class="btn btn-sm btn-primary" title="Edit">
+                <i class="fa fa-file"></i>
+            </a>
+        ';
+                    }
+
+                    // DELETE permission
+                    if (\App\Helpers\Helper::canAccess('manage_category_delete')) {
+                        $buttons .= '
+            <form action="' . route('cm.category.delete', $row->id) . '" method="POST" style="display:inline">
+                ' . csrf_field() . '
+                ' . method_field("DELETE") . '
+                <button type="submit" class="btn btn-sm btn-danger"
+                        title="Delete"
+                        onclick="return confirm(\'Are you sure?\')">
+                    <i class="fa fa-trash"></i>
+                </button>
+            </form>
+        ';
+                    }
+
+                    return $buttons ?: '-';
                 })
+
                 ->rawColumns(['checkbox', 'commission', 'status', 'meta_title', 'meta_description', 'meta_keyword', 'canonical_url', 'alt_tag', 'image', 'action'])
                 ->make(true);
         }
@@ -834,16 +888,39 @@ class ContentManagementController extends Controller
                     return $status;
                 })
                 ->addColumn('action', function ($row) {
-                    $editUrl = route('cm.sub.category.edit', $row->id);
-                    $actionBtn = ' <a href="' . $editUrl . '" class="btn btn-sm btn-primary" title="Edit"><i class="fa fa-file"></i></a>
-                        <form action="' . route('cm.sub-category.delete', $row->id) . '" method="POST" style="display:inline">
-                            ' . csrf_field() . '
-                            ' . method_field("DELETE") . '
-                            <button type="submit" class="btn btn-sm btn-danger" title="Delete"><i class="fa fa-trash"></i></button>
-                        </form>';
-                    return $actionBtn;
+
+                    $buttons = '';
+
+                    // EDIT permission
+                    if (\App\Helpers\Helper::canAccess('manage_subcategory_edit')) {
+                        $editUrl = route('cm.sub.category.edit', $row->id);
+                        $buttons .= '
+            <a href="' . $editUrl . '" class="btn btn-sm btn-primary" title="Edit">
+                <i class="fa fa-file"></i>
+            </a>
+        ';
+                    }
+
+                    // DELETE permission
+                    if (\App\Helpers\Helper::canAccess('manage_subcategory_delete')) {
+                        $buttons .= '
+            <form action="' . route('cm.sub-category.delete', $row->id) . '" method="POST" style="display:inline">
+                ' . csrf_field() . '
+                ' . method_field("DELETE") . '
+                <button type="submit"
+                        class="btn btn-sm btn-danger"
+                        title="Delete"
+                        onclick="return confirm(\'Are you sure?\')">
+                    <i class="fa fa-trash"></i>
+                </button>
+            </form>
+        ';
+                    }
+
+                    return $buttons ?: '-';
                 })
-                ->rawColumns(['checkbox', 'commission', 'status', 'meta_title', 'meta_description', 'meta_keyword', 'canonical_url', 'alt_tag', 'action'])
+
+                ->rawColumns(['checkbox', 'commission', 'status', 'meta_title', 'meta_description', 'meta_keyword', 'canonical_url', 'alt_tag', 'action', 'image'])
                 ->make(true);
         }
         return view('content-management.sub-category');
@@ -959,15 +1036,38 @@ class ContentManagementController extends Controller
                     return $status;
                 })
                 ->addColumn('action', function ($row) {
-                    $editUrl = route('cm.subject.edit', $row->id);
-                    $actionBtn = ' <a href="' . $editUrl . '" class="btn btn-sm btn-primary" title="Edit"><i class="fa fa-file"></i></a>
-                            <form action="' . route('cm.subject.delete', $row->id) . '" method="POST" style="display:inline">
-                                ' . csrf_field() . '
-                                ' . method_field("DELETE") . '
-                                <button type="submit" class="btn btn-sm btn-danger" title="Delete"><i class="fa fa-trash"></i></button>
-                            </form>';
-                    return $actionBtn;
+
+                    $buttons = '';
+
+                    // EDIT permission
+                    if (\App\Helpers\Helper::canAccess('manage_subject_edit')) {
+                        $editUrl = route('cm.subject.edit', $row->id);
+                        $buttons .= '
+            <a href="' . $editUrl . '" class="btn btn-sm btn-primary" title="Edit">
+                <i class="fa fa-file"></i>
+            </a>
+        ';
+                    }
+
+                    // DELETE permission
+                    if (\App\Helpers\Helper::canAccess('manage_subject_delete')) {
+                        $buttons .= '
+            <form action="' . route('cm.subject.delete', $row->id) . '" method="POST" style="display:inline">
+                ' . csrf_field() . '
+                ' . method_field("DELETE") . '
+                <button type="submit"
+                        class="btn btn-sm btn-danger"
+                        title="Delete"
+                        onclick="return confirm(\'Are you sure?\')">
+                    <i class="fa fa-trash"></i>
+                </button>
+            </form>
+        ';
+                    }
+
+                    return $buttons ?: '-';
                 })
+
                 ->rawColumns(['checkbox', 'subcat', 'category', 'commission', 'status', 'action'])
                 ->make(true);
         }
@@ -1065,15 +1165,38 @@ class ContentManagementController extends Controller
                     return $status;
                 })
                 ->addColumn('action', function ($row) {
-                    $editUrl = route('cm.chapter.edit', $row->id);
-                    $actionBtn = ' <a href="' . $editUrl . '" class="btn btn-sm btn-primary" title="Edit"><i class="fa fa-file"></i></a>
-                            <form action="' . route('cm.chapter.delete', $row->id) . '" method="POST" style="display:inline">
-                                ' . csrf_field() . '
-                                ' . method_field("DELETE") . '
-                                <button type="submit" class="btn btn-sm btn-danger" title="Delete"><i class="fa fa-trash"></i></button>
-                            </form>';
-                    return $actionBtn;
+
+                    $buttons = '';
+
+                    // EDIT permission
+                    if (\App\Helpers\Helper::canAccess('manage_chapter_edit')) {
+                        $editUrl = route('cm.chapter.edit', $row->id);
+                        $buttons .= '
+            <a href="' . $editUrl . '" class="btn btn-sm btn-primary" title="Edit">
+                <i class="fa fa-file"></i>
+            </a>
+        ';
+                    }
+
+                    // DELETE permission
+                    if (\App\Helpers\Helper::canAccess('manage_chapter_delete')) {
+                        $buttons .= '
+            <form action="' . route('cm.chapter.delete', $row->id) . '" method="POST" style="display:inline">
+                ' . csrf_field() . '
+                ' . method_field("DELETE") . '
+                <button type="submit"
+                        class="btn btn-sm btn-danger"
+                        title="Delete"
+                        onclick="return confirm(\'Are you sure?\')">
+                    <i class="fa fa-trash"></i>
+                </button>
+            </form>
+        ';
+                    }
+
+                    return $buttons ?: '-';
                 })
+
                 ->rawColumns(['checkbox', 'subject', 'status', 'action'])
                 ->make(true);
         }
@@ -1209,41 +1332,62 @@ class ContentManagementController extends Controller
                     return $row->based_on ?? '--';
                 })
                 ->addColumn('action', function ($row) {
-                    $viewUrl = route('courses.course.show', $row->id);
-                    $editUrl = route('courses.course.edit', $row->id);
-                    $deleteUrl = route('courses.course.delete', $row->id);
 
-                    $actionBtn = '
-    <div class="dropdown">
-        <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" id="actionMenu' . $row->id . '" data-bs-toggle="dropdown" aria-expanded="false">
-            Action
-        </button>
-        <ul class="dropdown-menu" aria-labelledby="actionMenu' . $row->id . '">
+                    $buttons = '';
+
+                    // SHOW (manage)
+                    if (\App\Helpers\Helper::canAccess('manage_courses')) {
+                        $buttons .= '
             <li>
-                <a class="dropdown-item" href="' . $viewUrl . '">
+                <a class="dropdown-item" href="' . route('courses.course.show', $row->id) . '">
                     <i class="fa fa-file me-1"></i> Show
                 </a>
-            </li>
+            </li>';
+                    }
+
+                    // EDIT
+                    if (\App\Helpers\Helper::canAccess('manage_courses_edit')) {
+                        $buttons .= '
             <li>
-                <a class="dropdown-item" href="' . $editUrl . '">
+                <a class="dropdown-item" href="' . route('courses.course.edit', $row->id) . '">
                     <i class="fa fa-edit me-1"></i> Edit
                 </a>
-            </li>
+            </li>';
+                    }
+
+                    // DELETE
+                    if (\App\Helpers\Helper::canAccess('manage_courses_delete')) {
+                        $buttons .= '
             <li>
-                <form action="' . $deleteUrl . '" method="POST" onsubmit="return confirm(\'Are you sure you want to delete this course?\')">
+                <form action="' . route('courses.course.delete', $row->id) . '" method="POST"
+                      onsubmit="return confirm(\'Are you sure you want to delete this course?\')">
                     ' . csrf_field() . '
                     ' . method_field("DELETE") . '
                     <button type="submit" class="dropdown-item text-danger">
-                        <i class="fa fa-trash me-1"></i> Delete
+                        <i class="fa fa-trash me-1" style="color:#dc3545!important"></i> Delete
                     </button>
                 </form>
-            </li>
-        </ul>
-    </div>
-    ';
+            </li>';
+                    }
 
-                    return $actionBtn;
+                    // If user has no permissions → no dropdown
+                    if (empty($buttons)) {
+                        return '-';
+                    }
+
+                    return '
+        <div class="dropdown">
+            <button class="btn btn-sm btn-secondary dropdown-toggle" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false">
+                Action
+            </button>
+            <ul class="dropdown-menu">
+                ' . $buttons . '
+            </ul>
+        </div>
+    ';
                 })
+
 
                 ->rawColumns(['checkbox', 'fee', 'image', 'duration', 'category', 'subcat', 'commission', 'action'])
                 ->make(true);
@@ -1475,15 +1619,31 @@ class ContentManagementController extends Controller
                 ->addColumn('created_at', function ($row) {
                     return $row->created_at;
                 })
-
-
                 ->addColumn('action', function ($row) {
-                    $actionBtn = ' <form action="' . route('enquiries.contact.delete', $row->id) . '" method="POST" style="display:inline">
-                            ' . csrf_field() . '
-                            ' . method_field("DELETE") . '
-                            <button type="submit" class="btn btn-sm btn-danger" title="Delete"><i class="fa fa-trash"></i></button>
-                        </form>';
-                    return $actionBtn;
+
+                    if (!\App\Helpers\Helper::canAccess('manage_contact_inquiries_delete')) {
+                        return '-';
+                    }
+
+                    return '
+        <div class="dropdown">
+            <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                Actions
+            </button>
+            <ul class="dropdown-menu">
+                <li>
+                    <form action="' . route('enquiries.contact.delete', $row->id) . '" 
+                          method="POST"
+                          onsubmit="return confirm(\'Are you sure?\')">
+                        ' . csrf_field() . method_field("DELETE") . '
+                        <button type="submit" class="dropdown-item text-danger">
+                            <i class="fa fa-trash me-2" style="color:#dc3545!important"></i> Delete
+                        </button>
+                    </form>
+                </li>
+            </ul>
+        </div>
+    ';
                 })
                 ->rawColumns(['checkbox', 'created_at', 'action'])
                 ->make(true);
@@ -1759,27 +1919,71 @@ class ContentManagementController extends Controller
                 })
 
                 ->addColumn('action', function ($row) {
+
+                    $items = '';
+
+                    // VIEW
+                    if (\App\Helpers\Helper::canAccess('manage_study_material')) {
+                        $items .= '
+            <li>
+                <a class="dropdown-item text-primary" href="' . route('study.material.show', $row->id) . '">
+                    <i class="fa fa-eye"></i> View Details
+                </a>
+            </li>';
+                    }
+
+                    // EDIT
+                    if (\App\Helpers\Helper::canAccess('manage_study_material_edit')) {
+                        $items .= '
+            <li>
+                <a class="dropdown-item text-secondary" href="' . route('study.material.edit', $row->id) . '">
+                    <i class="fas fa-edit me-2"></i> Edit
+                </a>
+            </li>';
+                    }
+
+                    // DOWNLOAD
+                    if (\App\Helpers\Helper::canAccess('manage_study_material')) {
+                        $items .= '
+            <li>
+                <a class="dropdown-item text-info" href="' . route('study.material.download', $row->id) . '">
+                    <i class="fa fa-download"></i> Download PDF
+                </a>
+            </li>';
+                    }
+
+                    // DELETE
+                    if (\App\Helpers\Helper::canAccess('manage_study_material_delete')) {
+                        $items .= '
+            <li>
+                <form action="' . route('study.material.delete', $row->id) . '" method="POST"
+                      onsubmit="return confirm(\'Are you sure?\')">
+                    ' . csrf_field() . '
+                    ' . method_field("DELETE") . '
+                    <button type="submit" class="dropdown-item text-danger">
+                        <i class="fas fa-trash me-2" style="color:red!important;"></i> Delete
+                    </button>
+                </form>
+            </li>';
+                    }
+
+                    // No permission → no actions
+                    if ($items === '') {
+                        return '-';
+                    }
+
                     return '
-    <div class="dropdown">
-  <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" id="actionMenu' . $row->id . '" data-bs-toggle="dropdown" aria-expanded="false">
-    <span>Actions</span>
-  </button>
-  <ul class="dropdown-menu" aria-labelledby="actionMenu' . $row->id . '">
-    <li><a class="dropdown-item text-primary" href="' . route('study.material.show', $row->id) . '"><i class="fa fa-eye"></i> View Details</a></li>
-    <li><a class="dropdown-item text-secondary" href="' . route('study.material.edit', $row->id) . '"><i class="fas fa-edit me-2"></i> Edit</a></li>
-    <li><a class="dropdown-item text-info" href="' . route('study.material.download', $row->id) . '"><i class="fa fa-download"></i> Download PDF</a></li>
-    <li>
-      <form action="' . route('study.material.delete', $row->id) . '" method="POST" style="display:inline" onsubmit="return confirm(\'Are you sure?\')">
-        ' . csrf_field() . '
-        ' . method_field("DELETE") . '
-        <button type="submit" class="dropdown-item text-danger"><i class="fas fa-trash me-2" style="color: red!important;"></i> Delete</button>
-      </form>
-    </li>
-  </ul>
-</div>';
-
-
+        <div class="dropdown">
+            <button class="btn btn-sm btn-secondary dropdown-toggle" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false">
+                Actions
+            </button>
+            <ul class="dropdown-menu">
+                ' . $items . '
+            </ul>
+        </div>';
                 })
+
 
                 ->rawColumns([
                     'checkbox',
@@ -2189,38 +2393,60 @@ class ContentManagementController extends Controller
                     return '--';
                 })
                 ->addColumn('action', function ($row) {
-                    $viewUrl = route('daily.boost.show', $row->id);
-                    $editUrl = route('daily.boost.edit', $row->id);
-                    $deleteUrl = route('daily.boost.delete', $row->id);
+
+                    $buttons = '';
+
+                    // VIEW
+                    if (\App\Helpers\Helper::canAccess('manage_daily_booster')) {
+                        $buttons .= '
+            <li>
+                <a class="dropdown-item text-primary" href="' . route('daily.boost.show', $row->id) . '">
+                    <i class="fa fa-eye me-2"></i> View
+                </a>
+            </li>';
+                    }
+
+                    // EDIT
+                    if (\App\Helpers\Helper::canAccess('manage_daily_booster_edit')) {
+                        $buttons .= '
+            <li>
+                <a class="dropdown-item text-info" href="' . route('daily.boost.edit', $row->id) . '">
+                    <i class="fa fa-edit me-2"></i> Edit
+                </a>
+            </li>';
+                    }
+
+                    // DELETE
+                    if (\App\Helpers\Helper::canAccess('manage_daily_booster_delete')) {
+                        $buttons .= '
+            <li>
+                <form action="' . route('daily.boost.delete', $row->id) . '" method="POST"
+                      onsubmit="return confirm(\'Are you sure?\')" style="display:inline;">
+                    ' . csrf_field() . method_field('DELETE') . '
+                    <button type="submit" class="dropdown-item text-danger">
+                        <i class="fa fa-trash me-2" style="color:#dc3545!important"></i> Delete
+                    </button>
+                </form>
+            </li>';
+                    }
+
+                    // If user has no permissions at all
+                    if ($buttons === '') {
+                        return '<span class="text-muted">No Actions</span>';
+                    }
 
                     return '
-                    <div class="dropdown">
-                        <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            Actions
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end shadow">
-                            <li>
-                                <a class="dropdown-item text-primary" href="' . $viewUrl . '">
-                                    <i class="fa fa-eye me-2"></i>View
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item text-info" href="' . $editUrl . '">
-                                    <i class="fa fa-edit me-2"></i>Edit
-                                </a>
-                            </li>
-                            <li>
-                                <form action="' . $deleteUrl . '" method="POST" onsubmit="return confirm(\'Are you sure?\')" style="display:inline;">
-                                    ' . csrf_field() . method_field('DELETE') . '
-                                    <button type="submit" class="dropdown-item text-danger">
-                                        <i class="fa fa-trash me-2"></i>Delete
-                                    </button>
-                                </form>
-                            </li>
-                        </ul>
-                    </div>
-                ';
+        <div class="dropdown">
+            <button class="btn btn-sm btn-secondary dropdown-toggle" type="button"
+                    data-bs-toggle="dropdown" aria-expanded="false">
+                Actions
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end shadow">
+                ' . $buttons . '
+            </ul>
+        </div>';
                 })
+
                 ->rawColumns(['checkbox', 'created_at', 'image', 'action'])
                 ->make(true);
         }
@@ -2339,37 +2565,63 @@ class ContentManagementController extends Controller
                         : '<span class="badge badge-secondary">Inactive</span>';
                 })
                 ->addColumn('action', function ($row) {
-                    $viewUrl = route('test.planner.show', $row->id);
-                    $editUrl = route('test.planner.edit', $row->id);
-                    $deleteUrl = route('test.planner.delete', $row->id);
+
+                    $buttons = '';
+
+                    // VIEW
+                    if (\App\Helpers\Helper::canAccess('manage_test_planner')) {
+                        $buttons .= '
+            <li>
+                <a class="dropdown-item text-primary" href="' . route('test.planner.show', $row->id) . '">
+                    <i class="fa fa-eye me-2"></i> View
+                </a>
+            </li>';
+                    }
+
+                    // EDIT
+                    if (\App\Helpers\Helper::canAccess('manage_test_planner_edit')) {
+                        $buttons .= '
+            <li>
+                <a class="dropdown-item text-info" href="' . route('test.planner.edit', $row->id) . '">
+                    <i class="fa fa-edit me-2"></i> Edit
+                </a>
+            </li>';
+                    }
+
+                    // DELETE
+                    if (\App\Helpers\Helper::canAccess('manage_test_planner_delete')) {
+                        $buttons .= '
+            <li>
+                <form action="' . route('test.planner.delete', $row->id) . '" 
+                      method="POST" 
+                      onsubmit="return confirm(\'Are you sure?\')" 
+                      style="display:inline;">
+                    ' . csrf_field() . '
+                    ' . method_field('DELETE') . '
+                    <button type="submit" class="dropdown-item text-danger">
+                        <i class="fa fa-trash me-2" style="color:#dc3545!important"></i> Delete
+                    </button>
+                </form>
+            </li>';
+                    }
+
+                    // If no permission → no dropdown
+                    if ($buttons === '') {
+                        return '';
+                    }
 
                     return '
-                    <div class="dropdown">
-                        <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            Actions
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end shadow">
-                            <li>
-                                <a class="dropdown-item text-primary" href="' . $viewUrl . '">
-                                    <i class="fa fa-eye me-2"></i>View
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item text-info" href="' . $editUrl . '">
-                                    <i class="fa fa-edit me-2"></i>Edit
-                                </a>
-                            </li>
-                            <li>
-                                <form action="' . $deleteUrl . '" method="POST" onsubmit="return confirm(\'Are you sure?\')" style="display:inline;">
-                                    ' . csrf_field() . method_field('DELETE') . '
-                                    <button type="submit" class="dropdown-item text-danger">
-                                        <i class="fa fa-trash me-2"></i>Delete
-                                    </button>
-                                </form>
-                            </li>
-                        </ul>
-                    </div>
-                ';
+        <div class="dropdown">
+            <button class="btn btn-sm btn-secondary dropdown-toggle" 
+                    type="button" 
+                    data-bs-toggle="dropdown" 
+                    aria-expanded="false">
+                Actions
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end shadow">
+                ' . $buttons . '
+            </ul>
+        </div>';
                 })
                 ->rawColumns(['checkbox', 'created_at', 'status', 'action'])
                 ->make(true);
@@ -2789,30 +3041,61 @@ class ContentManagementController extends Controller
                         : '<span class="badge badge-secondary">Inactive</span>';
                 })
                 ->addColumn('action', function ($row) {
-                    $viewUrl = route('upcoming.exam.show', $row->id);
-                    $editUrl = route('upcoming.exam.edit', $row->id);
-                    $deleteUrl = route('upcoming.exam.delete', $row->id);
 
-                    $dropdown = '
-                <div class="dropdown">
-                    <button class="btn btn-sm btn-primary dropdown-toggle" type="button" id="actionMenu' . $row->id . '" data-bs-toggle="dropdown" aria-expanded="false">
-                        Actions
+                    $actions = '';
+
+                    // VIEW
+                    if (\App\Helpers\Helper::canAccess('manage_upcoming_exams')) {
+                        $actions .= '
+            <li>
+                <a class="dropdown-item" href="' . route('upcoming.exam.show', $row->id) . '">
+                    <i class="fa fa-eye me-2"></i> View
+                </a>
+            </li>';
+                    }
+
+                    // EDIT
+                    if (\App\Helpers\Helper::canAccess('manage_upcoming_exams_edit')) {
+                        $actions .= '
+            <li>
+                <a class="dropdown-item" href="' . route('upcoming.exam.edit', $row->id) . '">
+                    <i class="fa fa-edit me-2"></i> Edit
+                </a>
+            </li>';
+                    }
+
+                    // DELETE
+                    if (\App\Helpers\Helper::canAccess('manage_upcoming_exams_delete')) {
+                        $actions .= '
+            <li>
+                <form action="' . route('upcoming.exam.delete', $row->id) . '" method="POST"
+                      onsubmit="return confirm(\'Are you sure you want to delete this?\');">
+                    ' . csrf_field() . '
+                    ' . method_field('DELETE') . '
+                    <button type="submit" class="dropdown-item text-danger">
+                        <i class="fa fa-trash me-2" style="color:#dc3545!important"></i> Delete
                     </button>
-                    <ul class="dropdown-menu" aria-labelledby="actionMenu' . $row->id . '">
-                        <li><a class="dropdown-item" href="' . $viewUrl . '">View</a></li>
-                        <li><a class="dropdown-item" href="' . $editUrl . '">Edit</a></li>
-                        <li>
-                            <form action="' . $deleteUrl . '" method="POST" onsubmit="return confirm(\'Are you sure you want to delete this?\');">
-                                ' . csrf_field() . '
-                                ' . method_field("DELETE") . '
-                                <button type="submit" class="dropdown-item text-danger">Delete</button>
-                            </form>
-                        </li>
-                    </ul>
-                </div>
-                ';
-                    return $dropdown;
+                </form>
+            </li>';
+                    }
+
+                    // No permission at all
+                    if ($actions === '') {
+                        return '<span class="text-muted">No Actions</span>';
+                    }
+
+                    return '
+        <div class="dropdown">
+            <button class="btn btn-sm btn-primary dropdown-toggle" type="button"
+                    id="actionMenu' . $row->id . '" data-bs-toggle="dropdown" aria-expanded="false">
+                Actions
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="actionMenu' . $row->id . '">
+                ' . $actions . '
+            </ul>
+        </div>';
                 })
+
                 ->rawColumns(['checkbox', 'created_at', 'commission', 'status', 'action'])
                 ->make(true);
         }

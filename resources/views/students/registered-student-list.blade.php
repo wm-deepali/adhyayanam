@@ -64,16 +64,39 @@
                     <input data-id="{{$res->id}}" class="toggle-class" type="checkbox" data-onstyle="success"
                       data-offstyle="danger" data-toggle="toggle" data-on="Active" data-off="InActive" {{ $res->status == 'Active' ? 'checked' : '' }}>
                   </td>
+            
                   <td>
-                    <a href="{{route('students.student-profile-detail', $res->id)}}" title="View Student Detail"><i
-                        class="fa fa-eye"></i></a>
-                    <a href="{{route('students.change-password', $res->id)}}" title="Change Password"><i
-                        class="fa fa-user-lock"></i></a>
-                    <a href="{{route('students.view-all-orders', $res->id)}}" title="View All Orders"><i
-                        class="fa fa-eye"></i></a>
-                    <a href="#" title="View All Test"><i class="fa fa-award"></i></a>
-                    <a href="#" title="View All Video's"><i class="fa fa-video"></i></a>
+                    @if(\App\Helpers\Helper::canAccess('manage_students'))
+                      <a href="{{ route('students.student-profile-detail', $res->id) }}" title="View Student Detail">
+                        <i class="fa fa-eye"></i>
+                      </a>
+                    @endif
+
+                    @if(\App\Helpers\Helper::canAccess('manage_students_edit'))
+                      <a href="{{ route('students.change-password', $res->id) }}" title="Change Password">
+                        <i class="fa fa-user-lock"></i>
+                      </a>
+                    @endif
+
+                    @if(\App\Helpers\Helper::canAccess('manage_students'))
+                      <a href="{{ route('students.view-all-orders', $res->id) }}" title="View All Orders">
+                        <i class="fa fa-eye"></i>
+                      </a>
+                    @endif
+
+                    @if(\App\Helpers\Helper::canAccess('manage_student_tests'))
+                      <a href="{{ route('students.student-test-result-detail') }}" title="View All Tests">
+                        <i class="fa fa-award"></i>
+                      </a>
+                    @endif
+
+                    @if(\App\Helpers\Helper::canAccess('manage_student_videos'))
+                      <a href="{{ route('students.student-videos-list') }}" title="View All Videos">
+                        <i class="fa fa-video"></i>
+                      </a>
+                    @endif
                   </td>
+
                 </tr>
               @endforeach
             </tbody>

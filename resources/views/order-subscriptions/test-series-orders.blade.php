@@ -43,11 +43,26 @@ Test Series Orders
                 <!--<td>{{ $res->transaction ?? '-' }}</td>-->
                 <!--<td>{{ ucfirst($res->order_status) }}</td>-->
                 <!--<td>Active</td>-->
-                <td>
-                   <a href="{{route('students.student-order-detail',$res->id)}}"><i class="fa fa-eye"></i></a>
-                    <a href="#"><i class="fa fa-user-graduate"></i></a>
-                    <a href="{{route('user.generate-pdf', $res->id)}}"><i class="fa fa-download"></i></a>
-                </td>
+                 <td>
+                                        @if(\App\Helpers\Helper::canAccess('manage_students'))
+                                            <a href="{{ route('students.student-order-detail', $res->id) }}" title="View Order">
+                                                <i class="fa fa-eye"></i>
+                                            </a>
+                                        @endif
+
+                                        @if(\App\Helpers\Helper::canAccess('manage_students'))
+                                            <a href="{{ route('students.student-profile-detail', $res->student->id) }}"
+                                                title="View Student Profile">
+                                                <i class="fa fa-user-graduate"></i>
+                                            </a>
+                                        @endif
+
+                                        @if(\App\Helpers\Helper::canAccess('manage_students'))
+                                            <a href="{{ route('user.generate-pdf', $res->id) }}" title="Download Invoice">
+                                                <i class="fa fa-download"></i>
+                                            </a>
+                                        @endif
+                                    </td>
             </tr>
             @endforeach
                     </tbody>

@@ -160,7 +160,7 @@
                         @php $status = strtolower($attempt->status) @endphp
 
                         <span class="fw-bold 
-                                                                                    {{ $status == 'evaluated' ? 'text-success' :
+                                                                                            {{ $status == 'evaluated' ? 'text-success' :
         ($status == 'pending' ? 'text-warning' : 'text-primary') }}">
                             {{ ucfirst($status) }}
                         </span>
@@ -368,12 +368,13 @@
                                             <hr>
 
                                             {{-- Assign Marks ONLY for subjective child --}}
-                                            @if($isSubjective)
+                                            @if($isSubjective && \App\Helpers\Helper::canAccess('manage_test_attempts_edit'))
                                                 <button type="button" class="btn btn-dark w-100"
                                                     onclick="openMarksModal('{{ $child->id }}','{{ $child->positive_mark }}','{{ $child->obtained_marks }}')">
                                                     Assign Marks
                                                 </button>
                                             @endif
+
 
                                             {{-- For MCQ show correct answer --}}
                                             @if($isMCQ)
@@ -499,7 +500,10 @@
 
                                 <hr>
 
-                                @if($ans->question->question_type == "Subjective")
+                                @if(
+                                        $ans->question->question_type == "Subjective" &&
+                                        \App\Helpers\Helper::canAccess('manage_test_attempts_edit')
+                                    )
                                     <button type="button" class="btn btn-dark w-100"
                                         onclick="openMarksModal('{{ $ans->id }}', '{{ $ans->positive_mark }}', '{{ $ans->obtained_marks }}')">
                                         Assign Marks
@@ -524,50 +528,53 @@
         </div>
 
 
-        <div class="block-card mt-4">
-            <div class="box-heading">Final Evaluation Status</div>
+        @if(\App\Helpers\Helper::canAccess('manage_test_attempts_edit'))
+            <div class="block-card mt-4">
+                <div class="box-heading">Final Evaluation Status</div>
 
-            <div class="row mt-3">
+                <div class="row mt-3">
 
-                {{-- STATUS DROPDOWN --}}
-                <div class="col-md-4">
-                    <label class="fw-bold">Status</label>
-                    <select name="final_status" class="form-control">
-                        <option value="pending" {{ $attempt->status == 'pending' ? 'selected' : '' }}>
-                            Pending
-                        </option>
-                        <option value="under_review" {{ $attempt->status == 'under_review' ? 'selected' : '' }}>
-                            Under Review
-                        </option>
-                        <option value="published" {{ $attempt->status == 'published' ? 'selected' : '' }}>
-                            Published
-                        </option>
-                    </select>
-                </div>
-
-                {{-- UPLOAD FINAL FILE --}}
-                <div class="col-md-4">
-                    <label class="fw-bold">Upload Final Evaluated File</label>
-                    <input type="file" name="final_file" class="form-control">
-                </div>
-
-                {{-- SHOW EXISTING FILE --}}
-                @if($attempt->final_file)
-                    <div class="col-md-4 mt-4">
-                        <a href="{{ asset('storage/evaluations/' . $attempt->final_file) }}" class="btn btn-primary"
-                            target="_blank">
-                            View Uploaded File
-                        </a>
+                    {{-- STATUS DROPDOWN --}}
+                    <div class="col-md-4">
+                        <label class="fw-bold">Status</label>
+                        <select name="final_status" class="form-control">
+                            <option value="pending" {{ $attempt->status == 'pending' ? 'selected' : '' }}>
+                                Pending
+                            </option>
+                            <option value="under_review" {{ $attempt->status == 'under_review' ? 'selected' : '' }}>
+                                Under Review
+                            </option>
+                            <option value="published" {{ $attempt->status == 'published' ? 'selected' : '' }}>
+                                Published
+                            </option>
+                        </select>
                     </div>
-                @endif
-            </div>
 
-            <div class="text-end mt-4">
-                <button type="button" class="btn btn-success btn-lg" onclick="submitAdminEvaluation()">
-                    ✅ Save Evaluation
-                </button>
+                    {{-- UPLOAD FINAL FILE --}}
+                    <div class="col-md-4">
+                        <label class="fw-bold">Upload Final Evaluated File</label>
+                        <input type="file" name="final_file" class="form-control">
+                    </div>
+
+                    {{-- SHOW EXISTING FILE --}}
+                    @if($attempt->final_file)
+                        <div class="col-md-4 mt-4">
+                            <a href="{{ asset('storage/evaluations/' . $attempt->final_file) }}" class="btn btn-primary"
+                                target="_blank">
+                                View Uploaded File
+                            </a>
+                        </div>
+                    @endif
+                </div>
+
+                <div class="text-end mt-4">
+                    <button type="button" class="btn btn-success btn-lg" onclick="submitAdminEvaluation()">
+                        ✅ Save Evaluation
+                    </button>
+                </div>
             </div>
-        </div>
+        @endif
+
     </form>
 
     {{-- ================= VIEW SOLUTION MODAL ================= --}}

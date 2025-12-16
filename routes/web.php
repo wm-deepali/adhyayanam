@@ -2,27 +2,39 @@
 
 use App\Models\Blog;
 use App\Models\Course;
-use App\Models\DailyBooster;
-use App\Models\FeedTestimonial;
-use App\Models\ProgrammeFeature;
 use App\Models\PopUp;
 use App\Models\Team;
 use App\Models\Banner;
-use App\Models\StudyMaterialCategory;
-use App\Models\TestSeries;
 use App\Models\Topic;
-use App\Models\UpcomingExam;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Auth;
 use App\Models\Feature;
-use App\Http\Controllers\Auth\TeacherLoginController;
-use App\Http\Controllers\Teacher\TeacherController;
-use App\Http\Controllers\Teacher\QuestionBankController;
-use App\Http\Controllers\Admin\TeacherWalletController;
-use App\Http\Controllers\ContentManagementController;
+use App\Models\TestSeries;
+use App\Models\UpcomingExam;
+use App\Models\DailyBooster;
+use App\Models\FeedTestimonial;
+use App\Models\ProgrammeFeature;
+use App\Models\StudyMaterialCategory;
+use App\Http\Controllers\TestController;
+use App\Http\Controllers\VideoController;
+use App\Http\Controllers\PYQController;
+use App\Http\Controllers\OrderController;
+use App\Http\Controllers\StudentController;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\FrontUserController;
 use App\Http\Controllers\LiveTestController;
+use App\Http\Controllers\FrontController;
+use App\Http\Controllers\CourseTopicController;
+use App\Http\Controllers\ContentManagementController;
+use App\Http\Controllers\Auth\TeacherLoginController;
+use App\Http\Controllers\Admin\RoleGroupController;
+use App\Http\Controllers\Admin\SubAdminController;
+use App\Http\Controllers\Admin\TestResultController;
+use App\Http\Controllers\Admin\TeacherWalletController;
+use App\Http\Controllers\Teacher\TeacherController;
+use App\Http\Controllers\Teacher\QuestionBankController;
 use App\Http\Controllers\Teacher\TeacherResultController;
+use App\Http\Controllers\Admin\PercentageSystemController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -71,13 +83,10 @@ Route::get('/about', function () {
     return view('about');
 });
 
-
-
-
-Route::get('pyq-papers/{examid}/{catid}/{subcat}', [App\Http\Controllers\FrontController::class, 'pyqPapers'])->name('pyq-papers');
-Route::get('test-series/{examid}/{catid}/{subcat}', [App\Http\Controllers\FrontController::class, 'testseries'])->name('test-series');
-Route::post('test-series/filter', [App\Http\Controllers\FrontController::class, 'testseriesFilter'])->name('test-series.filter');
-Route::post('test-series/search', [App\Http\Controllers\FrontController::class, 'testseriesSearch'])->name('test-series.search');
+Route::get('pyq-papers/{examid}/{catid}/{subcat}', [FrontController::class, 'pyqPapers'])->name('pyq-papers');
+Route::get('test-series/{examid}/{catid}/{subcat}', [FrontController::class, 'testseries'])->name('test-series');
+Route::post('test-series/filter', [FrontController::class, 'testseriesFilter'])->name('test-series.filter');
+Route::post('test-series/search', [FrontController::class, 'testseriesSearch'])->name('test-series.search');
 
 Route::get('live-test/{id}', [LiveTestController::class, 'livetest'])->name('live-test');
 Route::post('/fetch-question', [LiveTestController::class, 'fetchQuestion']);
@@ -86,51 +95,51 @@ Route::post('/finalize-test', [LiveTestController::class, 'finalizeStudentTest']
 Route::get('/test-result/{id}', [LiveTestController::class, 'viewTestResult'])->name('user.test-result');
 Route::post('/clear-answer', [LiveTestController::class, 'clearAnswer']);
 
-Route::get('test-series-detail/{slug}', [App\Http\Controllers\FrontController::class, 'testseriesDetail'])->name('test-series-detail');
-Route::get('subject-pyqs/{id}', [App\Http\Controllers\FrontController::class, 'subjectPapers'])->name('subject-pyqs');
-Route::post('/sendotopstudent', [App\Http\Controllers\FrontController::class, 'sendotopstudent'])->name('sendotopstudent');
-Route::post('/verifymobilenumberstudent', [App\Http\Controllers\FrontController::class, 'verifymobilenumberstudent'])->name('verifymobilenumberstudent');
-Route::get('/logout', [App\Http\Controllers\FrontController::class, 'logout'])->name('logouts');
-Route::get('about-us', [App\Http\Controllers\FrontController::class, 'aboutIndex'])->name('about');
-Route::get('term-and-conditions', [App\Http\Controllers\FrontController::class, 'termIndex'])->name('term.conditions');
-Route::get('privacy-policy', [App\Http\Controllers\FrontController::class, 'privacyIndex'])->name('privacy.policy');
-Route::get('refund-policy', [App\Http\Controllers\FrontController::class, 'refundCancellationIndex'])->name('refund.policy');
-Route::get('cookies-policy', [App\Http\Controllers\FrontController::class, 'cookiesIndex'])->name('cookies.policy');
-Route::get('faq', [App\Http\Controllers\FrontController::class, 'faqIndex'])->name('faq');
-Route::get('vision-mission', [App\Http\Controllers\FrontController::class, 'visionIndex'])->name('vision.mission');
+Route::get('test-series-detail/{slug}', [FrontController::class, 'testseriesDetail'])->name('test-series-detail');
+Route::get('subject-pyqs/{id}', [FrontController::class, 'subjectPapers'])->name('subject-pyqs');
+Route::post('/sendotopstudent', [FrontController::class, 'sendotopstudent'])->name('sendotopstudent');
+Route::post('/verifymobilenumberstudent', [FrontController::class, 'verifymobilenumberstudent'])->name('verifymobilenumberstudent');
+Route::get('/logout', [FrontController::class, 'logout'])->name('logouts');
+Route::get('about-us', [FrontController::class, 'aboutIndex'])->name('about');
+Route::get('term-and-conditions', [FrontController::class, 'termIndex'])->name('term.conditions');
+Route::get('privacy-policy', [FrontController::class, 'privacyIndex'])->name('privacy.policy');
+Route::get('refund-policy', [FrontController::class, 'refundCancellationIndex'])->name('refund.policy');
+Route::get('cookies-policy', [FrontController::class, 'cookiesIndex'])->name('cookies.policy');
+Route::get('faq', [FrontController::class, 'faqIndex'])->name('faq');
+Route::get('vision-mission', [FrontController::class, 'visionIndex'])->name('vision.mission');
 
-Route::get('blog-articles', [App\Http\Controllers\FrontController::class, 'blogIndex'])->name('blog.articles');
-Route::get('blog-details/{id}', [App\Http\Controllers\FrontController::class, 'blogDetailsIndex'])->name('blog.details');
-Route::get('career', [App\Http\Controllers\FrontController::class, 'careerIndex'])->name('career');
-Route::post('career/store', [App\Http\Controllers\FrontController::class, 'careerStore'])->name('career.store');
-Route::get('courses', [App\Http\Controllers\FrontController::class, 'courseIndex'])->name('courses');
-Route::get('courses/category/{id}', [App\Http\Controllers\FrontController::class, 'courseFilter'])->name('courses.filter');
-Route::get('courses/details/{id}', [App\Http\Controllers\FrontController::class, 'courseDetails'])->name('courses.detail');
-Route::get('direct-enquiry', [App\Http\Controllers\FrontController::class, 'enquiryIndex'])->name('enquiry.direct');
-Route::post('direct-enquiry/store', [App\Http\Controllers\FrontController::class, 'enquiryStore'])->name('enquiry.store');
-Route::get('contact-us-inquiry', [App\Http\Controllers\FrontController::class, 'contactUsIndex'])->name('contact.inquiry');
-Route::post('contact-us-inquiry/store', [App\Http\Controllers\FrontController::class, 'contactUsStore'])->name('contact.inquiry.store');
-Route::get('callback-inquiry', [App\Http\Controllers\FrontController::class, 'callbackIndex'])->name('callback.inquiry');
-Route::post('callback-inquiry/store', [App\Http\Controllers\FrontController::class, 'callbackStore'])->name('callback.inquiry.store');
-Route::get('our-team', [App\Http\Controllers\FrontController::class, 'ourTeamIndex'])->name('our.team.index');
-Route::get('current-affair', [App\Http\Controllers\FrontController::class, 'currentAffairsIndex'])->name('current.index');
-Route::get('current-affair/details/{id}', [App\Http\Controllers\FrontController::class, 'currentAffairsDetail'])->name('current.details');
-Route::get('daily-boost', [App\Http\Controllers\FrontController::class, 'dailyBoostIndex'])->name('daily.boost.front');
-Route::get('/daily-booster/detail/{id}', [App\Http\Controllers\FrontController::class, 'dailyBoostDetail'])->name('daily.booster.detail');
+Route::get('blog-articles', [FrontController::class, 'blogIndex'])->name('blog.articles');
+Route::get('blog-details/{id}', [FrontController::class, 'blogDetailsIndex'])->name('blog.details');
+Route::get('career', [FrontController::class, 'careerIndex'])->name('career');
+Route::post('career/store', [FrontController::class, 'careerStore'])->name('career.store');
+Route::get('courses', [FrontController::class, 'courseIndex'])->name('courses');
+Route::get('courses/category/{id}', [FrontController::class, 'courseFilter'])->name('courses.filter');
+Route::get('courses/details/{id}', [FrontController::class, 'courseDetails'])->name('courses.detail');
+Route::get('direct-enquiry', [FrontController::class, 'enquiryIndex'])->name('enquiry.direct');
+Route::post('direct-enquiry/store', [FrontController::class, 'enquiryStore'])->name('enquiry.store');
+Route::get('contact-us-inquiry', [FrontController::class, 'contactUsIndex'])->name('contact.inquiry');
+Route::post('contact-us-inquiry/store', [FrontController::class, 'contactUsStore'])->name('contact.inquiry.store');
+Route::get('callback-inquiry', [FrontController::class, 'callbackIndex'])->name('callback.inquiry');
+Route::post('callback-inquiry/store', [FrontController::class, 'callbackStore'])->name('callback.inquiry.store');
+Route::get('our-team', [FrontController::class, 'ourTeamIndex'])->name('our.team.index');
+Route::get('current-affair', [FrontController::class, 'currentAffairsIndex'])->name('current.index');
+Route::get('current-affair/details/{id}', [FrontController::class, 'currentAffairsDetail'])->name('current.details');
+Route::get('daily-boost', [FrontController::class, 'dailyBoostIndex'])->name('daily.boost.front');
+Route::get('/daily-booster/detail/{id}', [FrontController::class, 'dailyBoostDetail'])->name('daily.booster.detail');
 
-Route::get('user/test-planner', [App\Http\Controllers\FrontController::class, 'testPlannerIndex'])->name('test.planner.front');
-Route::get('user/test-planner/details/{id}', [App\Http\Controllers\FrontController::class, 'testPlannerDetails'])->name('test.planner.details');
-Route::get('user/study-material/details/{id}', [App\Http\Controllers\FrontController::class, 'studyMaterialDetails'])->name('study.material.details');
-Route::get('user/study-material/{examid?}/{catid?}/{subcat?}', [App\Http\Controllers\FrontController::class, 'studyMaterialIndex'])->name('study.material.front');
-Route::post('user/study-material/filter', [App\Http\Controllers\FrontController::class, 'studyMaterialFilter'])->name('study.material.filter');
-Route::post('user/study-material/search', [App\Http\Controllers\FrontController::class, 'studyMaterialSearch'])->name('study.material.search');
-Route::get('user/study-material/all-topics/{id}', [App\Http\Controllers\FrontController::class, 'studyMaterialAllTopics'])->name('study.material.topics');
-Route::get('user/upcoming-exams', [App\Http\Controllers\FrontController::class, 'upcomingExamsIndex'])->name('upcoming.exam.front');
-Route::get('user/adhyayanam-corner', [App\Http\Controllers\FrontController::class, 'netiCornerIndex'])->name('neti.corner.index');
-Route::get('user/feed-back-testimonial', [App\Http\Controllers\FrontController::class, 'feedBackIndex'])->name('feed.back.index');
-Route::post('user/feed-back-testimonial/store', [App\Http\Controllers\FrontController::class, 'feedBackStore'])->name('feed.back.store');
-Route::get('user/batches-and-programme', [App\Http\Controllers\FrontController::class, 'batchesIndex'])->name('batches.index');
-Route::get('user/syllabus/{examid?}/{catid?}/{subcat?}', [App\Http\Controllers\FrontController::class, 'syllabusIndex'])->name('syllabus.front');
+Route::get('user/test-planner', [FrontController::class, 'testPlannerIndex'])->name('test.planner.front');
+Route::get('user/test-planner/details/{id}', [FrontController::class, 'testPlannerDetails'])->name('test.planner.details');
+Route::get('user/study-material/details/{id}', [FrontController::class, 'studyMaterialDetails'])->name('study.material.details');
+Route::get('user/study-material/{examid?}/{catid?}/{subcat?}', [FrontController::class, 'studyMaterialIndex'])->name('study.material.front');
+Route::post('user/study-material/filter', [FrontController::class, 'studyMaterialFilter'])->name('study.material.filter');
+Route::post('user/study-material/search', [FrontController::class, 'studyMaterialSearch'])->name('study.material.search');
+Route::get('user/study-material/all-topics/{id}', [FrontController::class, 'studyMaterialAllTopics'])->name('study.material.topics');
+Route::get('user/upcoming-exams', [FrontController::class, 'upcomingExamsIndex'])->name('upcoming.exam.front');
+Route::get('user/adhyayanam-corner', [FrontController::class, 'netiCornerIndex'])->name('neti.corner.index');
+Route::get('user/feed-back-testimonial', [FrontController::class, 'feedBackIndex'])->name('feed.back.index');
+Route::post('user/feed-back-testimonial/store', [FrontController::class, 'feedBackStore'])->name('feed.back.store');
+Route::get('user/batches-and-programme', [FrontController::class, 'batchesIndex'])->name('batches.index');
+Route::get('user/syllabus/{examid?}/{catid?}/{subcat?}', [FrontController::class, 'syllabusIndex'])->name('syllabus.front');
 /**
  * Auth Routes
  */
@@ -139,19 +148,16 @@ Auth::routes(['verify' => false]);
 
 Route::group(['namespace' => 'App\Http\Controllers'], function () {
 
-
+    // teacher panel routes
     Route::prefix('teacher')->name('teacher.')->group(function () {
         Route::get('/login', [TeacherLoginController::class, 'showLoginForm'])->name('login');
         Route::post('/login', [TeacherLoginController::class, 'login']);
         Route::post('/logout', [TeacherLoginController::class, 'logout'])->name('logout');
         Route::get('password/reset', [TeacherLoginController::class, 'showLinkRequestForm'])->name('password.request');
         Route::post('password/email', [TeacherLoginController::class, 'sendResetLinkEmail'])->name('password.email');
-
         Route::get('password/reset/{token}', [TeacherLoginController::class, 'showResetForm'])->name('password.reset');
         Route::post('password/reset', [TeacherLoginController::class, 'reset'])->name('password.update');
         // Other teacher-authenticated routes using 'auth:teacher' middleware
-
-
         Route::middleware(['auth:teacher'])->group(function () {
             // teacher home route
             Route::get('/dashboard', function () {
@@ -213,9 +219,9 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
             ])->name('save-evaluation');
 
         });
-
     });
 
+    // student panel routes
     Route::middleware('auth')->group(function () {
 
         Route::get('/user/dashboard', function () {
@@ -243,7 +249,6 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
         Route::get('user/test-series-detail/{slug}', [FrontUserController::class, 'testSeriesDetail'])->name('user.test-series-detail');
         Route::get('/user/test-papers', [FrontUserController::class, 'listUserTestPapers'])->name('user.test-papers');
 
-
         Route::get('/user/setting', [FrontUserController::class, 'setting'])->name('user.setting');
         Route::post('user/register-student', [FrontUserController::class, 'studentRegister'])->name('register-student');
         Route::post('user/change-student-password', [FrontUserController::class, 'studentChangePassword'])->name('change-student-password');
@@ -253,291 +258,363 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
 
     });
 
-    Route::middleware('auth', 'isAdmin')->group(function () {
-        /**
-         * Home Routes
-         */
-        //content management
-
+    // admin panel routes
+    Route::middleware(['auth', 'isAdmin'])->group(function () {
         Route::get('admin-login', [App\Http\Controllers\HomeController::class, 'index'])->name('dashboard');
-        Route::get('content-management/about', [App\Http\Controllers\ContentManagementController::class, 'aboutUs'])->name('cm.about');
-        Route::get('content-management/term-and-condition', [App\Http\Controllers\ContentManagementController::class, 'termAndCondition'])->name('cm.term.condition');
-        Route::get('content-management/privacy-policies', [App\Http\Controllers\ContentManagementController::class, 'privacyPolicies'])->name('cm.privacy.policy');
-        Route::get('content-management/refund-and-cancellation', [App\Http\Controllers\ContentManagementController::class, 'refundCancellation'])->name('cm.refund.cancellation');
-        Route::get('content-management/cookies-policies', [App\Http\Controllers\ContentManagementController::class, 'cookiesPolicies'])->name('cm.cookies.policies');
-        Route::get('content-management/career', [App\Http\Controllers\ContentManagementController::class, 'career'])->name('cm.career');
-        Route::get('ajaxdata/bulk-delete', [App\Http\Controllers\ContentManagementController::class, 'careerBulkDelete'])->name('ajaxdata.bulk-delete');
-        Route::delete('content-management/career/delete/{id}', [App\Http\Controllers\ContentManagementController::class, 'careerDelete'])->name('cm.career.delete');
-        Route::get('content-management/our-team', [App\Http\Controllers\ContentManagementController::class, 'ourTeam'])->name('cm.our.team');
-        Route::delete('content-management/our-team/delete/{id}', [App\Http\Controllers\ContentManagementController::class, 'ourTeamDelete'])->name('cm.our.team.delete');
-        Route::get('content-management/our-team/edit/{id}', [App\Http\Controllers\ContentManagementController::class, 'ourTeamEdit'])->name('cm.our.team.edit');
-        Route::post('content-management/our-team/store', [App\Http\Controllers\ContentManagementController::class, 'ourTeamStore'])->name('cm.our.team.store');
-        Route::post('content-management/our-team/update', [App\Http\Controllers\ContentManagementController::class, 'ourTeamUpdate'])->name('cm.our.team.update');
-        Route::get('content-management/vision-and-mission', [App\Http\Controllers\ContentManagementController::class, 'visionMission'])->name('cm.vision.mission');
 
+        //Content Management
         Route::prefix('content-management')->group(function () {
+            //About Us
+            Route::get('/about', [ContentManagementController::class, 'aboutUs'])->name('cm.about')->middleware('custom.permission:manage_about');
+            Route::post('/about/store', [ContentManagementController::class, 'aboutStore'])->name('about.store')->middleware('custom.permission:manage_about_edit');
 
-            // Blogs & Articles
-            Route::get('blog-and-articles', [ContentManagementController::class, 'blogArticles'])->name('cm.blog.articles');
-            Route::post('blog-and-articles/store', [ContentManagementController::class, 'blogStore'])->name('blog.store');
-            Route::get('blog-and-articles/edit/{id}', [ContentManagementController::class, 'blogEdit'])->name('blog.edit');
-            Route::put('blog-and-articles/update/{id}', [ContentManagementController::class, 'blogUpdate'])->name('blog.update');
-            Route::delete('blog-and-articles/delete/{id}', [ContentManagementController::class, 'blogDelete'])->name('blog.destroy');
+            // Privacy Policies
+            Route::get('/privacy-policies', [ContentManagementController::class, 'privacyPolicies'])->name('cm.privacy.policy')->middleware('custom.permission:manage_privacy');
+            Route::post('/privacy-policies/store', [ContentManagementController::class, 'privacyStore'])->name('privacy.policies.store')->middleware('custom.permission:manage_privacy_edit');
 
-            Route::get('faq', [ContentManagementController::class, 'faq'])->name('cm.faq'); // list page
-            Route::post('faq/store', [ContentManagementController::class, 'storeFaq'])->name('faq.store'); // save
-            Route::get('faq/edit/{id}', [ContentManagementController::class, 'editFaq'])->name('faq.edit'); // edit form
-            Route::put('faq/update/{id}', [ContentManagementController::class, 'updateFaq'])->name('faq.update'); // update
-            Route::delete('faq/destroy/{id}', [ContentManagementController::class, 'destroyFaq'])->name('faq.destroy'); // delete
+            // ---------------- OUR TEAM ----------------
+            Route::get('/our-team', [ContentManagementController::class, 'ourTeam'])->name('cm.our.team')->middleware('custom.permission:manage_team');
+            Route::post('/our-team/store', [ContentManagementController::class, 'ourTeamStore'])->name('cm.our.team.store')->middleware('custom.permission:manage_team_add');
+            Route::get('/our-team/edit/{id}', [ContentManagementController::class, 'ourTeamEdit'])->name('cm.our.team.edit')->middleware('custom.permission:manage_team_edit');
+            Route::post('/our-team/update', [ContentManagementController::class, 'ourTeamUpdate'])->name('cm.our.team.update')->middleware('custom.permission:manage_team_edit');
+            Route::delete('/our-team/delete/{id}', [ContentManagementController::class, 'ourTeamDelete'])->name('cm.our.team.delete')->middleware('custom.permission:manage_team_delete');
+
+            // Terms & Conditions
+            Route::get('/term-and-condition', [ContentManagementController::class, 'termAndCondition'])->name('cm.term.condition')->middleware('custom.permission:manage_terms');
+            Route::post('/term-and-conditions/store', [ContentManagementController::class, 'termStore'])->name('term.conditions.store')->middleware('custom.permission:manage_terms_edit');
+
+            // Refund & Cancellation
+            Route::get('/refund-and-cancellation', [ContentManagementController::class, 'refundCancellation'])->name('cm.refund.cancellation')->middleware('custom.permission:manage_refund');
+            Route::post('/refund-and-cancellation/store', [ContentManagementController::class, 'refundCancellationStore'])->name('refund.cancellation.store')->middleware('custom.permission:manage_refund_edit');
+
+            // Cookies Policies
+            Route::get('/cookies-policies', [ContentManagementController::class, 'cookiesPolicies'])->name('cm.cookies.policies')->middleware('custom.permission:manage_cookies');
+            Route::post('/cookies-policies/store', [ContentManagementController::class, 'cookiesPolicyStore'])->name('cookies.policy.store')->middleware('custom.permission:manage_cookies_edit');
+
+            // Vision & Mission
+            Route::get('/vision-and-mission', [ContentManagementController::class, 'visionMission'])->name('cm.vision.mission')->middleware('custom.permission:manage_vision');
+            Route::post('/vision-and-mission/store', [ContentManagementController::class, 'visionStore'])->name('vision.store')->middleware('custom.permission:manage_vision_edit');
+
+            // ---------------- CAREER ----------------
+            Route::get('/career', [ContentManagementController::class, 'career'])->name('cm.career')->middleware('custom.permission:manage_career');
+            Route::delete('/career/delete/{id}', [ContentManagementController::class, 'careerDelete'])->name('cm.career.delete')->middleware('custom.permission:manage_career_delete');
+            Route::get('/career/bulk-delete', [ContentManagementController::class, 'careerBulkDelete'])->name('ajaxdata.bulk-delete')->middleware('custom.permission:manage_career_delete');
+
+            // ---------------- BLOGS & ARTICLES ----------------
+            Route::get('blog-and-articles', [ContentManagementController::class, 'blogArticles'])->name('cm.blog.articles')->middleware('custom.permission:manage_blog');
+            Route::post('blog-and-articles/store', [ContentManagementController::class, 'blogStore'])->name('blog.store')->middleware('custom.permission:manage_blog_add');
+            Route::get('blog-and-articles/edit/{id}', [ContentManagementController::class, 'blogEdit'])->name('blog.edit')->middleware('custom.permission:manage_blog_edit');
+            Route::put('blog-and-articles/update/{id}', [ContentManagementController::class, 'blogUpdate'])->name('blog.update')->middleware('custom.permission:manage_blog_edit');
+            Route::delete('blog-and-articles/delete/{id}', [ContentManagementController::class, 'blogDelete'])->name('blog.destroy')->middleware('custom.permission:manage_blog_delete');
+
+            // ---------------- FAQ ----------------
+            Route::get('faq', [ContentManagementController::class, 'faq'])->name('cm.faq')->middleware('custom.permission:manage_faq');
+            Route::post('faq/store', [ContentManagementController::class, 'storeFaq'])->name('faq.store')->middleware('custom.permission:manage_faq_add');
+            Route::get('faq/edit/{id}', [ContentManagementController::class, 'editFaq'])->name('faq.edit')->middleware('custom.permission:manage_faq_edit');
+            Route::put('faq/update/{id}', [ContentManagementController::class, 'updateFaq'])->name('faq.update')->middleware('custom.permission:manage_faq_edit');
+            Route::delete('faq/destroy/{id}', [ContentManagementController::class, 'destroyFaq'])->name('faq.destroy')->middleware('custom.permission:manage_faq_delete');
         });
 
-        Route::get('manage-courses/examination-commission', [App\Http\Controllers\ContentManagementController::class, 'examinationIndex'])->name('cm.exam');
-        Route::get('manage-courses/examination-commission/create', [App\Http\Controllers\ContentManagementController::class, 'examinationCreate'])->name('cm.exam.create');
-        Route::get('manage-courses/examination-commission/edit/{id}', [App\Http\Controllers\ContentManagementController::class, 'examinationEdit'])->name('cm.exam.edit');
-        Route::post('manage-courses/examination-commission/update', [App\Http\Controllers\ContentManagementController::class, 'examinationUpdate'])->name('cm.exam.update');
-        Route::get('manage-courses/category', [App\Http\Controllers\ContentManagementController::class, 'categoryIndex'])->name('cm.category');
-        Route::get('manage-courses/category/create', [App\Http\Controllers\ContentManagementController::class, 'categoryCreate'])->name('cm.category.create');
-        Route::get('manage-courses/category/edit/{id}', [App\Http\Controllers\ContentManagementController::class, 'categoryEdit'])->name('cm.category.edit');
-        Route::post('manage-courses/category/update', [App\Http\Controllers\ContentManagementController::class, 'categoryUpdate'])->name('cm.category.update');
-        Route::get('manage-courses/sub-category', [App\Http\Controllers\ContentManagementController::class, 'subCategoryIndex'])->name('cm.sub.category');
-        Route::get('manage-courses/sub-category/edit/{id}', [App\Http\Controllers\ContentManagementController::class, 'subCategoryEdit'])->name('cm.sub.category.edit');
-        Route::post('manage-courses/sub-category/update/{id}', [App\Http\Controllers\ContentManagementController::class, 'subCategoryUpdate'])->name('cm.sub-category.update');
-        Route::get('manage-courses/sub-category/create', [App\Http\Controllers\ContentManagementController::class, 'subCategoryCreate'])->name('cm.sub-category.create');
-        Route::get('manage-courses/subject', [App\Http\Controllers\ContentManagementController::class, 'subjectIndex'])->name('cm.subject');
-        Route::get('manage-courses/subject/create', [App\Http\Controllers\ContentManagementController::class, 'subjectCreate'])->name('cm.subject.create');
-        Route::get('manage-courses/subject/edit/{id}', [App\Http\Controllers\ContentManagementController::class, 'subjectEdit'])->name('cm.subject.edit');
-        Route::get('manage-courses/chapter', [App\Http\Controllers\ContentManagementController::class, 'chapterIndex'])->name('cm.chapter');
-        Route::get('manage-courses/chapter/create', [App\Http\Controllers\ContentManagementController::class, 'chapterCreate'])->name('cm.chapter.create');
-        Route::get('manage-courses/chapter/edit/{id}', [App\Http\Controllers\ContentManagementController::class, 'chapterEdit'])->name('cm.chapter.edit');
-        Route::post('manage-courses/chapter/update/{id}', [App\Http\Controllers\ContentManagementController::class, 'chapterUpdate'])->name('cm.chapter.update');
-        Route::get('manage-courses/course', [App\Http\Controllers\ContentManagementController::class, 'courseIndex'])->name('courses.course.index');
-        Route::get('manage-courses/course/create', [App\Http\Controllers\ContentManagementController::class, 'courseCreate'])->name('courses.course.create');
-        Route::get('manage-courses/course/edit/{id}', [App\Http\Controllers\ContentManagementController::class, 'courseEdit'])->name('courses.course.edit');
-        Route::get('courses/course/{course}', [App\Http\Controllers\ContentManagementController::class, 'courseShow'])->name('courses.course.show');
-        Route::get('enquiries-and-call/direct-enquiries', [App\Http\Controllers\ContentManagementController::class, 'directEnquiriesIndex'])->name('enquiries.direct.call');
-        Route::get('enquiries-and-call/contact-us', [App\Http\Controllers\ContentManagementController::class, 'contactUsIndex'])->name('enquiries.contact.us');
-        Route::get('enquiries-and-call/call-back-request', [App\Http\Controllers\ContentManagementController::class, 'callRequestIndex'])->name('enquiries.call.request');
+        // examination commission route
+        Route::prefix('manage-courses/examination-commission')->group(function () {
+            Route::get('/', [ContentManagementController::class, 'examinationIndex'])->name('cm.exam')->middleware('custom.permission:manage_exam');
+            Route::get('/create', [ContentManagementController::class, 'examinationCreate'])->name('cm.exam.create')->middleware('custom.permission:manage_exam_add');
+            Route::get('/edit/{id}', [ContentManagementController::class, 'examinationEdit'])->name('cm.exam.edit')->middleware('custom.permission:manage_exam_edit');
+            Route::post('/update', [ContentManagementController::class, 'examinationUpdate'])->name('cm.exam.update')->middleware('custom.permission:manage_exam_edit');
+            Route::post('/create/store', [ContentManagementController::class, 'examinationStore'])->name('cm.exam.store')->middleware('custom.permission:manage_exam_add');
+            Route::delete('/delete/{id}', [ContentManagementController::class, 'examinationDelete'])->name('cm.exam.destroy')->middleware('custom.permission:manage_exam_delete');
+            Route::get('/bulk-delete', [ContentManagementController::class, 'examinationBulkDelete'])->name('cm.exam.bulk-delete')->middleware('custom.permission:manage_exam_delete');
+        });
+
+        // CATEGORY ROUTES
+        Route::prefix('manage-courses/category')->group(function () {
+            Route::get('/', [ContentManagementController::class, 'categoryIndex'])->name('cm.category')->middleware('custom.permission:manage_category');
+            Route::get('/create', [ContentManagementController::class, 'categoryCreate'])->name('cm.category.create')->middleware('custom.permission:manage_category_add');
+            Route::get('/edit/{id}', [ContentManagementController::class, 'categoryEdit'])->name('cm.category.edit')->middleware('custom.permission:manage_category_edit');
+            Route::post('/update', [ContentManagementController::class, 'categoryUpdate'])->name('cm.category.update')->middleware('custom.permission:manage_category_edit');
+            Route::post('/create/store', [ContentManagementController::class, 'categoryStore'])->name('cm.category.store')->middleware('custom.permission:manage_category_add');
+            Route::delete('/delete/{id}', [ContentManagementController::class, 'categoryDelete'])->name('cm.category.delete')->middleware('custom.permission:manage_category_delete');
+            Route::get('/bulk-delete', [ContentManagementController::class, 'categoryBulkDelete'])->name('cm.category.bulk-delete')->middleware('custom.permission:manage_category_delete');
+        });
+
+        // SUB CATEGORY ROUTES
+        Route::prefix('manage-courses/sub-category')->group(function () {
+            Route::get('/', [ContentManagementController::class, 'subCategoryIndex'])->name('cm.sub.category')->middleware('custom.permission:manage_subcategory');
+            Route::get('/create', [ContentManagementController::class, 'subCategoryCreate'])->name('cm.sub-category.create')->middleware('custom.permission:manage_subcategory_add');
+            Route::post('/create/store', [ContentManagementController::class, 'subCategoryStore'])->name('cm.sub-category.store')->middleware('custom.permission:manage_subcategory_add');
+            Route::get('/edit/{id}', [ContentManagementController::class, 'subCategoryEdit'])->name('cm.sub.category.edit')->middleware('custom.permission:manage_subcategory_edit');
+            Route::post('/update/{id}', [ContentManagementController::class, 'subCategoryUpdate'])->name('cm.sub-category.update')->middleware('custom.permission:manage_subcategory_edit');
+            Route::delete('/delete/{id}', [ContentManagementController::class, 'subCategoryDelete'])->name('cm.sub-category.delete')->middleware('custom.permission:manage_subcategory_delete');
+            Route::get('/bulk-delete', [ContentManagementController::class, 'subCatBulkDelete'])->name('cm.sub-category.bulk-delete')->middleware('custom.permission:manage_subcategory_delete');
+        });
+
+        // SUBJECT ROUTES
+        Route::prefix('manage-courses/subject')->group(function () {
+            Route::get('/', [ContentManagementController::class, 'subjectIndex'])->name('cm.subject')->middleware('custom.permission:manage_subject');
+            Route::get('/create', [ContentManagementController::class, 'subjectCreate'])->name('cm.subject.create')->middleware('custom.permission:manage_subject_add');
+            Route::post('/store', [ContentManagementController::class, 'subjectStore'])->name('cm.subject.store')->middleware('custom.permission:manage_subject_add');
+            Route::get('/edit/{id}', [ContentManagementController::class, 'subjectEdit'])->name('cm.subject.edit')->middleware('custom.permission:manage_subject_edit');
+            Route::post('/update/{id}', [ContentManagementController::class, 'subjectUpdate'])->name('cm.subject.update')->middleware('custom.permission:manage_subject_edit');
+            Route::delete('/delete/{id}', [ContentManagementController::class, 'subjectDelete'])->name('cm.subject.delete')->middleware('custom.permission:manage_subject_delete');
+            Route::get('/bulk-delete', [ContentManagementController::class, 'subjectBulkDelete'])->name('cm.subject.bulk-delete')->middleware('custom.permission:manage_subject_delete');
+        });
+
+        // CHAPTER ROUTES
+        Route::prefix('manage-courses/chapter')->group(function () {
+            Route::get('/', [ContentManagementController::class, 'chapterIndex'])->name('cm.chapter')->middleware('custom.permission:manage_chapter');
+            Route::get('/create', [ContentManagementController::class, 'chapterCreate'])->name('cm.chapter.create')->middleware('custom.permission:manage_chapter_add');
+            Route::post('/store', [ContentManagementController::class, 'chapterStore'])->name('cm.chapter.store')->middleware('custom.permission:manage_chapter_add');
+            Route::get('/edit/{id}', [ContentManagementController::class, 'chapterEdit'])->name('cm.chapter.edit')->middleware('custom.permission:manage_chapter_edit');
+            Route::post('/update/{id}', [ContentManagementController::class, 'chapterUpdate'])->name('cm.chapter.update')->middleware('custom.permission:manage_chapter_edit');
+            Route::delete('/delete/{id}', [ContentManagementController::class, 'chapterDelete'])->name('cm.chapter.delete')->middleware('custom.permission:manage_chapter_delete');
+            Route::get('/bulk-delete', [ContentManagementController::class, 'chapterBulkDelete'])->name('cm.chapter.bulk-delete')->middleware('custom.permission:manage_chapter_delete');
+        });
+
+        // TOPIC ROUTES
+        Route::prefix('manage-courses/topic')->group(function () {
+            Route::get('/', [CourseTopicController::class, 'index'])->name('topic.index')->middleware('custom.permission:manage_topic');
+            Route::get('/create', [CourseTopicController::class, 'create'])->name('topic.create')->middleware('custom.permission:manage_topic_add');
+            Route::post('/', [CourseTopicController::class, 'store'])->name('topic.store')->middleware('custom.permission:manage_topic_add');
+            Route::get('/{id}/edit', [CourseTopicController::class, 'edit'])->name('topic.edit')->middleware('custom.permission:manage_topic_edit');
+            Route::put('/{id}', [CourseTopicController::class, 'update'])->name('topic.update')->middleware('custom.permission:manage_topic_edit');
+            Route::delete('/{id}', [CourseTopicController::class, 'destroy'])->name('topic.destroy')->middleware('custom.permission:manage_topic_delete');
+        });
+
+        // ---------------- COURSES ----------------
+        Route::prefix('manage-courses/course')->group(function () {
+            Route::get('/', [ContentManagementController::class, 'courseIndex'])->name('courses.course.index')->middleware('custom.permission:manage_courses');
+            Route::get('/create', [ContentManagementController::class, 'courseCreate'])->name('courses.course.create')->middleware('custom.permission:manage_courses_add');
+            Route::post('/store', [ContentManagementController::class, 'courseStore'])->name('courses.course.store')->middleware('custom.permission:manage_courses_add');
+            Route::get('/edit/{id}', [ContentManagementController::class, 'courseEdit'])->name('courses.course.edit')->middleware('custom.permission:manage_courses_edit');
+            Route::post('/update/{id}', [ContentManagementController::class, 'courseUpdate'])->name('courses.course.update')->middleware('custom.permission:manage_courses_edit');
+            Route::delete('/delete/{id}', [ContentManagementController::class, 'courseDelete'])->name('courses.course.delete')->middleware('custom.permission:manage_courses_delete');
+            Route::get('/bulk-delete', [ContentManagementController::class, 'courseBulkDelete'])->name('courses.course.bulk-delete')->middleware('custom.permission:manage_courses_delete');
+            Route::get('/{course}', [ContentManagementController::class, 'courseShow'])->name('courses.course.show')->middleware('custom.permission:manage_courses');
+        });
+
+        // ---------------- ENQUIRIES & CALL ----------------
+
+        // Direct Enquiries
+        Route::get('enquiries-and-call/direct-enquiries', [ContentManagementController::class, 'directEnquiriesIndex'])->name('enquiries.direct.call')->middleware('custom.permission:manage_direct_enquiries');
+        Route::delete('enquiries-and-call/direct-enquiries/delete/{id}', [ContentManagementController::class, 'directEnquiriesDelete'])->name('enquiries.direct.delete')->middleware('custom.permission:manage_direct_enquiries_delete');
+        // Contact Us Enquiries
+        Route::get('enquiries-and-call/contact-us', [ContentManagementController::class, 'contactUsIndex'])->name('enquiries.contact.us')->middleware('custom.permission:manage_contact_inquiries');
+        Route::delete('enquiries-and-call/contact-us/delete/{id}', [ContentManagementController::class, 'contactUsDelete'])->name('enquiries.contact.delete')->middleware('custom.permission:manage_contact_inquiries_delete');
+        Route::get('enquiries-and-call/contact-us/bulk-delete', [ContentManagementController::class, 'contactUsBulkDelete'])->name('enquiries.contact.bulk-delete')->middleware('custom.permission:manage_contact_inquiries_delete');
+        // Call Back Request
+        Route::get('enquiries-and-call/call-back-request', [ContentManagementController::class, 'callRequestIndex'])->name('enquiries.call.request')->middleware('custom.permission:manage_call_requests');
+        Route::delete('enquiries-and-call/call-back-request/delete/{id}', [ContentManagementController::class, 'callRequestDelete'])->name('enquiries.call.delete')->middleware('custom.permission:manage_call_requests_delete');
+        // Feedback
+        Route::get('feedback', [ContentManagementController::class, 'feedIndex'])->name('feed.index')->middleware('custom.permission:manage_feedback');
+        Route::delete('feedback-testimonial/delete/{id}', [ContentManagementController::class, 'feedDelete'])->name('feed.delete')->middleware('custom.permission:manage_feedback_delete');
+        // Testimonials
+        Route::get('testimonials', [ContentManagementController::class, 'testimonialsIndex'])->name('testimonials.index')->middleware('custom.permission:manage_testimonials');
+        Route::get('testimonial/view/{id}', [ContentManagementController::class, 'testimonialView'])->name('testimonial.view')->middleware('custom.permission:manage_testimonials');
+        Route::patch('testimonial/{id}/approveStatus', [ContentManagementController::class, 'updateapproveStatus'])->name('testimonial.approveStatus')->middleware('custom.permission:manage_testimonials_status');
+        Route::patch('/feed/{id}/updateStatus', [ContentManagementController::class, 'updateFeedStatus'])->name('feed.updateStatus')->middleware('custom.permission:manage_testimonials_status');
 
 
-        Route::get('feedback', [App\Http\Controllers\ContentManagementController::class, 'feedIndex'])->name('feed.index');
-        Route::get('testimonials', [App\Http\Controllers\ContentManagementController::class, 'testimonialsIndex'])->name('testimonials.index');
-        Route::get('testimonial/view/{id}', [App\Http\Controllers\ContentManagementController::class, 'testimonialView'])->name('testimonial.view');
-        Route::patch('/testimonial/{id}/approveStatus', [App\Http\Controllers\ContentManagementController::class, 'updateapproveStatus'])->name('testimonial.approveStatus');
-        Route::delete('feedback-testimonial/delete/{id}', [App\Http\Controllers\ContentManagementController::class, 'feedDelete'])->name('feed.delete');
+        // ---------------- STUDY MATERIAL ----------------
+        Route::prefix('study-material')->group(function () {
+            Route::get('/', [ContentManagementController::class, 'studyMaterialIndex'])->name('study.material.index')->middleware('custom.permission:manage_study_material');
+            Route::get('/create', [ContentManagementController::class, 'studyMaterialCreate'])->name('study.material.create')->middleware('custom.permission:manage_study_material_add');
+            Route::post('/store', [ContentManagementController::class, 'studyMaterialStore'])->name('study.material.store')->middleware('custom.permission:manage_study_material_add');
+            Route::get('/edit/{id}', [ContentManagementController::class, 'studyMaterialEdit'])->name('study.material.edit')->middleware('custom.permission:manage_study_material_edit');
+            Route::post('/update/{id}', [ContentManagementController::class, 'studyMaterialUpdate'])->name('study.material.update')->middleware('custom.permission:manage_study_material_edit');
+            Route::delete('/delete/{id}', [ContentManagementController::class, 'studyMaterialDelete'])->name('study.material.delete')->middleware('custom.permission:manage_study_material_delete');
+            Route::get('/bulk-delete', [ContentManagementController::class, 'studyMaterialBulkDelete'])->name('study.material.bulk-delete')->middleware('custom.permission:manage_study_material_delete');
+            Route::get('/show/{id}', [ContentManagementController::class, 'studyMaterialShow'])->name('study.material.show');
+            Route::get('/{id}/download', [ContentManagementController::class, 'downloadPdf'])->name('study.material.download');
+        });
 
-        Route::post('content-management/our-team/store', [App\Http\Controllers\ContentManagementController::class, 'ourTeamStore'])->name('cm.team.store');
-        Route::post('content-management/about/store', [App\Http\Controllers\ContentManagementController::class, 'aboutStore'])->name('about.store');
-        Route::post('content-management/term-and-conditions/store', [App\Http\Controllers\ContentManagementController::class, 'termStore'])->name('term.conditions.store');
-        Route::post('content-management/privacy-policies/store', [App\Http\Controllers\ContentManagementController::class, 'privacyStore'])->name('privacy.policies.store');
-        Route::post('content-management/refund-and-cancellation/store', [App\Http\Controllers\ContentManagementController::class, 'refundCancellationStore'])->name('refund.cancellation.store');
-        Route::post('content-management/cookies-policies/store', [App\Http\Controllers\ContentManagementController::class, 'cookiesPolicyStore'])->name('cookies.policy.store');
-        Route::post('content-management/vision-and-mission/store', [App\Http\Controllers\ContentManagementController::class, 'visionStore'])->name('vision.store');
-        Route::post('manage-courses/examination-commission/create/store', [App\Http\Controllers\ContentManagementController::class, 'examinationStore'])->name('cm.exam.store');
-        Route::delete('manage-courses/examination-commission/delete/{id}', [App\Http\Controllers\ContentManagementController::class, 'examinationDelete'])->name('cm.exam.destroy');
-        Route::get('manage-courses/examination-commission/bulk-delete', [App\Http\Controllers\ContentManagementController::class, 'examinationBulkDelete'])->name('cm.exam.bulk-delete');
-        Route::post('manage-courses/category/create/store', [App\Http\Controllers\ContentManagementController::class, 'categoryStore'])->name('cm.category.store');
-        Route::delete('manage-courses/category/delete/{id}', [App\Http\Controllers\ContentManagementController::class, 'categoryDelete'])->name('cm.category.delete');
-        Route::get('manage-courses/category/bulk-delete', [App\Http\Controllers\ContentManagementController::class, 'categoryBulkDelete'])->name('cm.category.bulk-delete');
-        Route::post('manage-courses/sub-category/create/store', [App\Http\Controllers\ContentManagementController::class, 'subCategoryStore'])->name('cm.sub-category.store');
-        Route::delete('manage-courses/sub-category/delete/{id}', [App\Http\Controllers\ContentManagementController::class, 'subCategoryDelete'])->name('cm.sub-category.delete');
-        Route::get('manage-courses/sub-category/bulk-delete', [App\Http\Controllers\ContentManagementController::class, 'subCatBulkDelete'])->name('cm.sub-category.bulk-delete');
-        Route::post('manage-courses/subject/store', [App\Http\Controllers\ContentManagementController::class, 'subjectStore'])->name('cm.subject.store');
-        Route::post('manage-courses/subject/update/{id}', [App\Http\Controllers\ContentManagementController::class, 'subjectUpdate'])->name('cm.subject.update');
-        Route::delete('manage-courses/subject/delete/{id}', [App\Http\Controllers\ContentManagementController::class, 'subjectDelete'])->name('cm.subject.delete');
-        Route::get('manage-courses/subject/bulk-delete', [App\Http\Controllers\ContentManagementController::class, 'subjectBulkDelete'])->name('cm.subject.bulk-delete');
-        Route::post('manage-courses/chapter/store', [App\Http\Controllers\ContentManagementController::class, 'chapterStore'])->name('cm.chapter.store');
-        Route::delete('manage-courses/chapter/delete/{id}', [App\Http\Controllers\ContentManagementController::class, 'chapterDelete'])->name('cm.chapter.delete');
-        Route::get('manage-courses/chapter/bulk-delete', [App\Http\Controllers\ContentManagementController::class, 'chapterBulkDelete'])->name('cm.chapter.bulk-delete');
-        Route::post('manage-courses/course/store', [App\Http\Controllers\ContentManagementController::class, 'courseStore'])->name('courses.course.store');
-        Route::post('manage-courses/course/update/{id}', [App\Http\Controllers\ContentManagementController::class, 'courseUpdate'])->name('courses.course.update');
-        Route::delete('manage-courses/course/delete/{id}', [App\Http\Controllers\ContentManagementController::class, 'courseDelete'])->name('courses.course.delete');
-        Route::get('manage-courses/course/bulk-delete', [App\Http\Controllers\ContentManagementController::class, 'courseBulkDelete'])->name('courses.course.bulk-delete');
+        // Daily Booster
+        Route::prefix('daily-booster')->name('daily.boost.')->group(function () {
+            Route::get('/', [ContentManagementController::class, 'dailyBoostIndex'])->name('index')->middleware('custom.permission:manage_daily_booster');
+            Route::get('/show/{id}', [ContentManagementController::class, 'dailyBoostShow'])->name('show')->middleware('custom.permission:manage_daily_booster');
+            Route::get('/create', [ContentManagementController::class, 'dailyBoostCreate'])->name('create')->middleware('custom.permission:manage_daily_booster_add');
+            Route::post('/store', [ContentManagementController::class, 'dailyBoostStore'])->name('store')->middleware('custom.permission:manage_daily_booster_add');
+            Route::get('/edit/{id}', [ContentManagementController::class, 'dailyBoostEdit'])->name('edit')->middleware('custom.permission:manage_daily_booster_edit');
+            Route::post('/update/{id}', [ContentManagementController::class, 'dailyBoostUpdate'])->name('update')->middleware('custom.permission:manage_daily_booster_edit');
+            Route::delete('/delete/{id}', [ContentManagementController::class, 'dailyBoostDelete'])->name('delete')->middleware('custom.permission:manage_daily_booster_delete');
+        });
+        // Bulk delete
+        Route::get('booster/bulk-delete', [ContentManagementController::class, 'boosterBulkDelete'])->name('booster.bulk-delete')->middleware('custom.permission:manage_daily_booster_delete');
 
-        Route::delete('enquiries-and-call/direct-enquiries/delete/{id}', [App\Http\Controllers\ContentManagementController::class, 'directEnquiriesDelete'])->name('enquiries.direct.delete');
-        Route::delete('enquiries-and-call/contact-us/delete/{id}', [App\Http\Controllers\ContentManagementController::class, 'contactUsDelete'])->name('enquiries.contact.delete');
-        Route::get('enquiries-and-call/contact-us/bulk-delete', [App\Http\Controllers\ContentManagementController::class, 'contactUsBulkDelete'])->name('enquiries.contact.bulk-delete');
-        Route::delete('enquiries-and-call/call-back-request/delete/{id}', [App\Http\Controllers\ContentManagementController::class, 'callRequestDelete'])->name('enquiries.call.delete');
+        // Test Planner
+        Route::prefix('test-planner')->name('test.planner.')->group(function () {
+            Route::get('/', [ContentManagementController::class, 'testPlannerIndex'])->name('index')->middleware('custom.permission:manage_test_planner');
+            Route::get('/show/{id}', [ContentManagementController::class, 'testPlannerShow'])->name('show')->middleware('custom.permission:manage_test_planner');
+            Route::get('/create', [ContentManagementController::class, 'testPlannerCreate'])->name('create')->middleware('custom.permission:manage_test_planner_add');
+            Route::post('/store', [ContentManagementController::class, 'testPlannerStore'])->name('store')->middleware('custom.permission:manage_test_planner_add');
+            Route::get('/edit/{id}', [ContentManagementController::class, 'testPlannerEdit'])->name('edit')->middleware('custom.permission:manage_test_planner_edit');
+            Route::post('/update/{id}', [ContentManagementController::class, 'testPlannerUpdate'])->name('update')->middleware('custom.permission:manage_test_planner_edit');
+            Route::delete('/delete/{id}', [ContentManagementController::class, 'testPlannerDelete'])->name('delete')->middleware('custom.permission:manage_test_planner_delete');
+            Route::get('/bulk-delete', [ContentManagementController::class, 'testPlannerBulkDelete'])->name('bulk-delete')->middleware('custom.permission:manage_test_planner_delete');
+        });
 
-        Route::get('study-material', [App\Http\Controllers\ContentManagementController::class, 'studyMaterialIndex'])->name('study.material.index');
-        Route::get('study-material/create', [App\Http\Controllers\ContentManagementController::class, 'studyMaterialCreate'])->name('study.material.create');
-        Route::get('study-material/edit/{id}', [App\Http\Controllers\ContentManagementController::class, 'studyMaterialEdit'])->name('study.material.edit');
-        Route::get('study-material/show/{id}', [App\Http\Controllers\ContentManagementController::class, 'studyMaterialShow'])->name('study.material.show');
-        Route::get('study-material/{id}/download', [App\Http\Controllers\ContentManagementController::class, 'downloadPdf'])->name('study.material.download');
-        Route::post('study-material/store', [App\Http\Controllers\ContentManagementController::class, 'studyMaterialStore'])->name('study.material.store');
-        Route::post('study-material/update/{id}', [App\Http\Controllers\ContentManagementController::class, 'studyMaterialUpdate'])->name('study.material.update');
-        Route::delete('study-material/delete/{id}', [App\Http\Controllers\ContentManagementController::class, 'studyMaterialDelete'])->name('study.material.delete');
-        Route::get('study-material/bulk-delete', [App\Http\Controllers\ContentManagementController::class, 'studyMaterialBulkDelete'])->name('study.material.bulk-delete');
+        // CURRENT AFFAIRS - TOPIC
+        Route::prefix('current-affairs/topic')->name('current.affairs.topic.')->group(function () {
+            Route::get('/', [ContentManagementController::class, 'topicIndex'])->name('index')->middleware('custom.permission:manage_ca_categories');
+            Route::post('/store', [ContentManagementController::class, 'topicStore'])->name('store')->middleware('custom.permission:manage_ca_categories_add');
+            Route::put('/update/{id}', [ContentManagementController::class, 'topicUpdate'])->name('update')->middleware('custom.permission:manage_ca_categories_edit');
+            Route::delete('/delete/{id}', [ContentManagementController::class, 'topicDelete'])->name('delete')->middleware('custom.permission:manage_ca_categories_delete');
+        });
 
-        Route::get('daily-booster', [App\Http\Controllers\ContentManagementController::class, 'dailyBoostIndex'])->name('daily.boost.index');
-        Route::get('daily-booster/show/{id}', [App\Http\Controllers\ContentManagementController::class, 'dailyBoostShow'])->name('daily.boost.show');
-        Route::get('daily-booster/create', [App\Http\Controllers\ContentManagementController::class, 'dailyBoostCreate'])->name('daily.boost.create');
-        Route::get('daily-booster/edit/{id}', [App\Http\Controllers\ContentManagementController::class, 'dailyBoostEdit'])->name('daily.boost.edit');
-        Route::post('daily-booster/store', [App\Http\Controllers\ContentManagementController::class, 'dailyBoostStore'])->name('daily.boost.store');
-        Route::post('daily-booster/update/{id}', [App\Http\Controllers\ContentManagementController::class, 'dailyBoostUpdate'])->name('daily.boost.update');
-        Route::delete('daily-booster/delete/{id}', [App\Http\Controllers\ContentManagementController::class, 'dailyBoostDelete'])->name('daily.boost.delete');
-        Route::get('booster/bulk-delete', [App\Http\Controllers\ContentManagementController::class, 'boosterBulkDelete'])->name('booster.bulk-delete');
+        // CURRENT AFFAIRS
+        Route::prefix('current-affairs')->name('current.affairs.')->group(function () {
+            Route::get('/', [ContentManagementController::class, 'currentAffairIndex'])->name('index')->middleware('custom.permission:manage_ca');
+            Route::get('/create', [ContentManagementController::class, 'currentAffairCreate'])->name('create')->middleware('custom.permission:manage_ca_add');
+            Route::post('/store', [ContentManagementController::class, 'currentAffairStore'])->name('store')->middleware('custom.permission:manage_ca_add');
+            Route::get('/edit/{id}', [ContentManagementController::class, 'currentAffairEdit'])->name('edit')->middleware('custom.permission:manage_ca_edit');
+            Route::put('/update/{id}', [ContentManagementController::class, 'currentAffairUpdate'])->name('update')->middleware('custom.permission:manage_ca_edit');
+            Route::get('/show/{id}', [ContentManagementController::class, 'currentAffairShow'])->name('show')->middleware('custom.permission:manage_ca');
+            Route::delete('/delete/{id}', [ContentManagementController::class, 'currentAffairDelete'])->name('delete')->middleware('custom.permission:manage_ca_delete');
+        });
 
-        Route::get('test-planner', [App\Http\Controllers\ContentManagementController::class, 'testPlannerIndex'])->name('test.planner.index');
-        Route::get('test-planner/show/{id}', [App\Http\Controllers\ContentManagementController::class, 'testPlannerShow'])->name('test.planner.show');
-        Route::get('test-planner/edit/{id}', [App\Http\Controllers\ContentManagementController::class, 'testPlannerEdit'])->name('test.planner.edit');
-        Route::get('test-planner/create', [App\Http\Controllers\ContentManagementController::class, 'testPlannerCreate'])->name('test.planner.create');
-        Route::post('test-planner/store', [App\Http\Controllers\ContentManagementController::class, 'testPlannerStore'])->name('test.planner.store');
-        Route::post('test-planner/update/{id}', [App\Http\Controllers\ContentManagementController::class, 'testPlannerUpdate'])->name('test.planner.update');
-        Route::delete('test-planner/delete/{id}', [App\Http\Controllers\ContentManagementController::class, 'testPlannerDelete'])->name('test.planner.delete');
-        Route::get('test-planner/bulk-delete', [App\Http\Controllers\ContentManagementController::class, 'testPlannerBulkDelete'])->name('test.planner.bulk-delete');
+        // TEST SERIES PACKAGE ROUTES
+        Route::prefix('test-series')->group(function () {
+            Route::get('/', [ContentManagementController::class, 'testSeriesIndex'])->name('test.series.index')->middleware('custom.permission:manage_test_series_package');
+            Route::get('/filter', [ContentManagementController::class, 'testSeriesFilter'])->name('test.series.filter')->middleware('custom.permission:manage_test_series_package');
+            Route::get('/create', [ContentManagementController::class, 'testSeriesCreate'])->name('test.series.create')->middleware('custom.permission:manage_test_series_package_add');
+            Route::post('/store', [ContentManagementController::class, 'testSeriesStore'])->name('test.series.store')->middleware('custom.permission:manage_test_series_package_add');
+            Route::get('/edit/{id}', [ContentManagementController::class, 'testSeriesEdit'])->name('test.series.edit')->middleware('custom.permission:manage_test_series_package_edit');
+            Route::post('/update/{id}', [ContentManagementController::class, 'testSeriesUpdate'])->name('test.series.update')->middleware('custom.permission:manage_test_series_package_edit');
+            Route::delete('/delete/{id}', [ContentManagementController::class, 'testSeriesDelete'])->name('test.series.delete')->middleware('custom.permission:manage_test_series_package_delete');
+            Route::get('/view/{id}', [ContentManagementController::class, 'testSeriesView'])->name('test.series.view')->middleware('custom.permission:manage_test_series_package');
+            // ---------------- QUESTION ROUTES ----------------
+            Route::get('/question', [ContentManagementController::class, 'testSeriesQuestion'])->name('test.series.question');
+            Route::get('/question/create', [ContentManagementController::class, 'testSeriesQuestionCreate'])->name('test.series.question.create');
+        });
 
-        Route::get('current-affairs/topic', [App\Http\Controllers\ContentManagementController::class, 'topicIndex'])->name('current.affairs.topic');
-        Route::get('current-affairs', [App\Http\Controllers\ContentManagementController::class, 'currentAffairIndex'])->name('current.affairs.index');
-        Route::get('current-affairs/create', [App\Http\Controllers\ContentManagementController::class, 'currentAffairCreate'])->name('current.affairs.create');
-        Route::get('current-affairs/edit/{id}', [App\Http\Controllers\ContentManagementController::class, 'currentAffairEdit'])->name('current.affairs.edit');
-        Route::get('current-affairs/show/{id}', [App\Http\Controllers\ContentManagementController::class, 'currentAffairShow'])->name('current.affairs.show');
-        Route::put('current-affairs/update/{id}', [App\Http\Controllers\ContentManagementController::class, 'currentAffairUpdate'])->name('current.affairs.update');
-        Route::post('current-affairs/topic/store', [App\Http\Controllers\ContentManagementController::class, 'topicStore'])->name('current.affairs.topic.store');
-        Route::put('current-affairs/topic/update/{id}', [App\Http\Controllers\ContentManagementController::class, 'topicUpdate'])->name('current.affairs.topic.update');
-        Route::delete('current-affairs/topic/delete/{id}', [App\Http\Controllers\ContentManagementController::class, 'topicDelete'])->name('current.affairs.topic.delete');
-        Route::post('current-affairs/store', [App\Http\Controllers\ContentManagementController::class, 'currentAffairStore'])->name('current.affairs.store');
-        Route::delete('current-affairs/delete/{id}', [App\Http\Controllers\ContentManagementController::class, 'currentAffairDelete'])->name('current.affairs.delete');
+        // ---------------- TEST RESULTS ----------------
+        Route::prefix('results')->group(function () {
+            Route::get('/', [TestResultController::class, 'results'])->name('admin.results.all')->middleware('custom.permission:manage_test_attempts');
+            Route::get('/evaluate-attempt/{id}', [TestResultController::class, 'showEvaluation'])->name('admin.evaluate-attempt')->middleware('custom.permission:manage_test_attempts_edit');
+            Route::post('/evaluate-attempt/save', [TestResultController::class, 'saveEvaluation'])->name('admin.save-evaluation')->middleware('custom.permission:manage_test_attempts_edit');
+            Route::post('/attempt/assign-teacher', [TestResultController::class, 'assignTeacherSave'])->name('admin.assign-teacher-save')->middleware('custom.permission:manage_test_attempts_edit');
+            Route::post('/assign-marks', [TestResultController::class, 'assignMarks'])->name('admin.assign-marks')->middleware('custom.permission:manage_test_attempts_edit');
+            Route::delete('/attempt/{id}', [TestResultController::class, 'deleteAttempt'])->name('admin.delete-attempt')->middleware('custom.permission:manage_test_attempts_delete');
+        });
 
-        Route::get('test-series', [App\Http\Controllers\ContentManagementController::class, 'testSeriesIndex'])->name('test.series.index');
-        Route::get('test-series/filter', [App\Http\Controllers\ContentManagementController::class, 'testSeriesFilter'])->name('test.series.filter');
-        Route::get('test-series/create', [App\Http\Controllers\ContentManagementController::class, 'testSeriesCreate'])->name('test.series.create');
-        Route::post('test-series/store', [App\Http\Controllers\ContentManagementController::class, 'testSeriesStore'])->name('test.series.store');
-        Route::get('test-series/edit/{id}', [App\Http\Controllers\ContentManagementController::class, 'testSeriesEdit'])->name('test.series.edit');
-        Route::post('test-series/update/{id}', [App\Http\Controllers\ContentManagementController::class, 'testSeriesUpdate'])->name('test.series.update');
-        Route::delete('test-series/delete/{id}', [App\Http\Controllers\ContentManagementController::class, 'testSeriesDelete'])->name('test.series.delete');
-        Route::get('test-series/view/{id}', [App\Http\Controllers\ContentManagementController::class, 'testSeriesView'])->name('test.series.view');
+        // Upcoming Exams
+        Route::prefix('upcoming-exams')->name('upcoming.exam.')->group(function () {
+            Route::get('/', [ContentManagementController::class, 'upcomingExamIndex'])->name('index')->middleware('custom.permission:manage_upcoming_exams');
+            Route::get('/create', [ContentManagementController::class, 'upcomingExamCreate'])->name('create')->middleware('custom.permission:manage_upcoming_exams_add');
+            Route::get('/show/{id}', [ContentManagementController::class, 'upcomingExamShow'])->name('show')->middleware('custom.permission:manage_upcoming_exams');
+            Route::get('/edit/{id}', [ContentManagementController::class, 'upcomingExamEdit'])->name('edit')->middleware('custom.permission:manage_upcoming_exams_edit');
+            Route::post('/store', [ContentManagementController::class, 'upcomingExamStore'])->name('store')->middleware('custom.permission:manage_upcoming_exams_add');
+            Route::post('/update/{id}', [ContentManagementController::class, 'upcomingExamUpdate'])->name('update')->middleware('custom.permission:manage_upcoming_exams_edit');
+            Route::delete('/delete/{id}', [ContentManagementController::class, 'upcomingExamDelete'])->name('delete')->middleware('custom.permission:manage_upcoming_exams_delete');
+            Route::delete('/bulk-delete', [ContentManagementController::class, 'upcomingExamBulkDelete'])->name('bulk-delete')->middleware('custom.permission:manage_upcoming_exams_delete');
+        });
 
-        Route::get('test-series/question', [App\Http\Controllers\ContentManagementController::class, 'testSeriesQuestion'])->name('test.series.question');
-        Route::get('test-series/question/create', [App\Http\Controllers\ContentManagementController::class, 'testSeriesQuestionCreate'])->name('test.series.question.create');
+        // QUESTION BANK ROUTES
+        Route::prefix('question-bank')->group(function () {
+            Route::get('/', [ContentManagementController::class, 'questionBankIndex'])->name('question.bank.index')->middleware('custom.permission:manage_question_bank');
+            Route::get('/rejected', [ContentManagementController::class, 'rejectQuestionBankIndex'])->name('question.bank.rejected')->middleware('custom.permission:manage_question_bank');
+            Route::get('/pending', [ContentManagementController::class, 'pendingQuestionBankIndex'])->name('question.bank.pending')->middleware('custom.permission:manage_question_bank');
+            Route::get('/create', [ContentManagementController::class, 'questionBankCreate'])->name('question.bank.create')->middleware('custom.permission:manage_question_bank_add');
+            Route::post('/store', [ContentManagementController::class, 'questionBankStore'])->name('question.bank.store')->middleware('custom.permission:manage_question_bank_add');
+            Route::get('/bulk-upload', [ContentManagementController::class, 'questionBankBulkUpload'])->name('question.bank.bulk-upload')->middleware('custom.permission:manage_question_bank_add');
+            Route::post('/import-questions', [ContentManagementController::class, 'ImportQuestions'])->name('question.bank.import-questions')->middleware('custom.permission:manage_question_bank_add');
+            Route::get('/edit/{id}', [ContentManagementController::class, 'questionBankEdit'])->name('question.bank.edit')->middleware('custom.permission:manage_question_bank_edit');
+            Route::post('/update/{id}', [ContentManagementController::class, 'questionBankUpdate'])->name('question.bank.update')->middleware('custom.permission:manage_question_bank_edit');
+            Route::get('/view/{id}', [ContentManagementController::class, 'questionBankView'])->name('question.bank.view')->middleware('custom.permission:manage_question_bank');
+            Route::post('/update-status/{id}', [ContentManagementController::class, 'updateStatus'])->name('question.bank.update-status')->middleware('custom.permission:manage_question_bank_status');
+            Route::delete('/delete/{id}', [ContentManagementController::class, 'questionBankDelete'])->name('question.bank.delete')->middleware('custom.permission:manage_question_bank_delete');
+        });
 
-
-        Route::get('/percentage-system', [\App\Http\Controllers\Admin\PercentageSystemController::class, 'index'])->name('percentage.system.index');
-        Route::get('/percentage-system/create', [\App\Http\Controllers\Admin\PercentageSystemController::class, 'create'])->name('percentage.system.create');
-        Route::post('/percentage-system/store', [\App\Http\Controllers\Admin\PercentageSystemController::class, 'store'])->name('percentage.system.store');
-        Route::get('/percentage-system/edit/{id}', [\App\Http\Controllers\Admin\PercentageSystemController::class, 'edit'])->name('percentage.system.edit');
-        Route::post('/percentage-system/update/{id}', [\App\Http\Controllers\Admin\PercentageSystemController::class, 'update'])->name('percentage.system.update');
-        Route::delete('/percentage-system/delete/{id}', [\App\Http\Controllers\Admin\PercentageSystemController::class, 'destroy'])->name('percentage.system.delete');
-
-    
-            Route::get('/results', [App\Http\Controllers\Admin\TestResultController::class, 'results'])
-                ->name('admin.results.all');
-
-            // Evaluate specific attempt
-            Route::get('/evaluate-attempt/{id}', [App\Http\Controllers\Admin\TestResultController::class, 'showEvaluation'])
-                ->name('admin.evaluate-attempt');
-
-            Route::post(
-                '/attempt/assign-teacher',
-                [App\Http\Controllers\Admin\TestResultController::class, 'assignTeacherSave']
-            )->name('admin.assign-teacher-save');
-
-            Route::delete(
-                '/attempt/{id}',
-                [App\Http\Controllers\Admin\TestResultController::class, 'deleteAttempt']
-            )->name('admin.delete-attempt');
-
-            // Save evaluation marks
-            Route::post('/evaluate-attempt/save', [App\Http\Controllers\Admin\TestResultController::class, 'saveEvaluation'])
-                ->name('admin.save-evaluation');
-
-            Route::post('/assign-marks', [App\Http\Controllers\Admin\TestResultController::class, 'assignMarks'])->name('admin.assign-marks');
-    
-
-
-        Route::get('upcoming-exams', [App\Http\Controllers\ContentManagementController::class, 'upcomingExamIndex'])->name('upcoming.exam.index');
-        Route::get('upcoming-exams/create', [App\Http\Controllers\ContentManagementController::class, 'upcomingExamCreate'])->name('upcoming.exam.create');
-        Route::get('upcoming-exams/show/{id}', [App\Http\Controllers\ContentManagementController::class, 'upcomingExamShow'])->name('upcoming.exam.show');
-        Route::get('upcoming-exams/edit/{id}', [App\Http\Controllers\ContentManagementController::class, 'upcomingExamEdit'])->name('upcoming.exam.edit');
-        Route::post('upcoming-exams/store', [App\Http\Controllers\ContentManagementController::class, 'upcomingExamStore'])->name('upcoming.exam.store');
-        Route::post('upcoming-exams/update/{id}', [App\Http\Controllers\ContentManagementController::class, 'upcomingExamUpdate'])->name('upcoming.exam.update');
-        Route::delete('upcoming-exams/delete/{id}', [App\Http\Controllers\ContentManagementController::class, 'upcomingExamDelete'])->name('upcoming.exam.delete');
-        Route::delete('upcoming-exams/bulk-delete', [App\Http\Controllers\ContentManagementController::class, 'upcomingExamBulkDelete'])->name('upcoming.exam.bulk-delete');
-
-        Route::get('question-bank', [App\Http\Controllers\ContentManagementController::class, 'questionBankIndex'])->name('question.bank.index');
-        Route::get('rejected-question-bank', [App\Http\Controllers\ContentManagementController::class, 'rejectQuestionBankIndex'])->name('question.bank.rejected');
-        Route::get('question-bank/pending', [App\Http\Controllers\ContentManagementController::class, 'pendingQuestionBankIndex'])->name('question.bank.pending');
-
-        Route::post('question-bank/store', [App\Http\Controllers\ContentManagementController::class, 'questionBankStore'])->name('question.bank.store');
-        Route::post('question-bank/import-questions', [App\Http\Controllers\ContentManagementController::class, 'ImportQuestions'])->name('question.bank.import-questions');
-        Route::get('question-bank/create', [App\Http\Controllers\ContentManagementController::class, 'questionBankCreate'])->name('question.bank.create');
-        Route::get('question-bank/bulk-upload', [App\Http\Controllers\ContentManagementController::class, 'questionBankBulkUpload'])->name('question.bank.bulk-upload');
-        Route::delete('question-bank/delete/{id}', [App\Http\Controllers\ContentManagementController::class, 'questionBankDelete'])->name('question.bank.delete');
-        Route::get('question-bank/edit/{id}', [App\Http\Controllers\ContentManagementController::class, 'questionBankEdit'])->name('question.bank.edit');
-        Route::post('question-bank/update/{id}', [App\Http\Controllers\ContentManagementController::class, 'questionBankUpdate'])->name('question.bank.update');
-        Route::get('question-bank/view/{id}', [App\Http\Controllers\ContentManagementController::class, 'questionBankView'])->name('question.bank.view');
-        Route::post('question-bank/update-status/{id}', [App\Http\Controllers\ContentManagementController::class, 'updateStatus'])->name('question.bank.update-status');
-
-        // Teacher Management Routes
+        // ---------------- TEACHER MANAGEMENT ----------------
         Route::prefix('manage-teachers')->name('manage-teachers.')->group(function () {
-            Route::get('/', [App\Http\Controllers\Admin\TeacherController::class, 'index'])->name('index'); // Listing Page
-            Route::get('/create', [App\Http\Controllers\Admin\TeacherController::class, 'create'])->name('create'); // Registration Form
-            Route::post('/store', [App\Http\Controllers\Admin\TeacherController::class, 'store'])->name('store'); // Store Teacher
-            Route::get('/{teacher}', [App\Http\Controllers\Admin\TeacherController::class, 'show'])->name('show');
-            Route::post('/{teacher}/change-password', [App\Http\Controllers\Admin\TeacherController::class, 'changePassword'])
-                ->name('change-password');
-            Route::get('/{teacher}/edit', [App\Http\Controllers\Admin\TeacherController::class, 'edit'])->name('edit'); // Edit Teacher
-            Route::put('/{teacher}', [App\Http\Controllers\Admin\TeacherController::class, 'update'])->name('update'); // Update Teacher
-            Route::delete('/delete/{teacher}', [App\Http\Controllers\Admin\TeacherController::class, 'destroy'])->name('delete');
-            Route::post('/bulk-delete', [App\Http\Controllers\Admin\TeacherController::class, 'bulkDelete'])
-                ->name('bulk-delete');
-
+            Route::get('/', [App\Http\Controllers\Admin\TeacherController::class, 'index'])->name('index')->middleware('custom.permission:manage_teachers');
+            Route::get('/create', [App\Http\Controllers\Admin\TeacherController::class, 'create'])->name('create')->middleware('custom.permission:manage_teachers_add');
+            Route::post('/store', [App\Http\Controllers\Admin\TeacherController::class, 'store'])->name('store')->middleware('custom.permission:manage_teachers_add');
+            Route::get('/{teacher}', [App\Http\Controllers\Admin\TeacherController::class, 'show'])->name('show')->middleware('custom.permission:manage_teachers');
+            Route::post('/{teacher}/change-password', [App\Http\Controllers\Admin\TeacherController::class, 'changePassword'])->name('change-password')->middleware('custom.permission:manage_teachers_edit');
+            Route::get('/{teacher}/edit', [App\Http\Controllers\Admin\TeacherController::class, 'edit'])->name('edit')->middleware('custom.permission:manage_teachers_edit');
+            Route::put('/{teacher}', [App\Http\Controllers\Admin\TeacherController::class, 'update'])->name('update')->middleware('custom.permission:manage_teachers_edit');
+            Route::delete('/delete/{teacher}', [App\Http\Controllers\Admin\TeacherController::class, 'destroy'])->name('delete')->middleware('custom.permission:manage_teachers_delete');
+            Route::post('/bulk-delete', [App\Http\Controllers\Admin\TeacherController::class, 'bulkDelete'])->name('bulk-delete')->middleware('custom.permission:manage_teachers_delete');
         });
 
-        Route::get('teacher-wallet', [TeacherWalletController::class, 'index'])->name('teacher.wallet.index');
-        Route::get('teacher-transactions', [TeacherWalletController::class, 'transactions'])
-            ->name('teacher.transactions.index');
-        Route::get('withdrawal-requests', [TeacherWalletController::class, 'withdrawalRequests'])->name('withdrawal.requests.index');
-        Route::post('teacher-withdrawal/{withdrawal}/update', [TeacherWalletController::class, 'updateWithdrawalStatus'])
-            ->name('teacher.withdrawal.update');
+        // ---------------- TEACHER WALLET ----------------
+        Route::get('teacher-wallet', [TeacherWalletController::class, 'index'])->name('teacher.wallet.index')->middleware('custom.permission:manage_teacher_wallet');
+        // ---------------- TEACHER TRANSACTIONS ----------------
+        Route::get('teacher-transactions', [TeacherWalletController::class, 'transactions'])->name('teacher.transactions.index')->middleware('custom.permission:manage_teacher_transactions');
+        // ---------------- WITHDRAWAL REQUESTS ----------------
+        Route::get('withdrawal-requests', [TeacherWalletController::class, 'withdrawalRequests'])->name('withdrawal.requests.index')->middleware('custom.permission:manage_withdrawal_requests');
+        // UPDATE STATUS (Approve/Reject withdrawal)
+        Route::post('teacher-withdrawal/{withdrawal}/update', [TeacherWalletController::class, 'updateWithdrawalStatus'])->name('teacher.withdrawal.update')->middleware('custom.permission:manage_withdrawal_requests_status');
 
+        // TEST PAPER ROUTES
+        Route::prefix('test-paper')->group(function () {
+            Route::get('/', [TestController::class, 'TestBankIndex'])->name('test.bank.index')->middleware('custom.permission:manage_test_bank');
+            Route::get('/filter', [TestController::class, 'filter'])->name('test.paper.filter');
+            Route::get('/create', [TestController::class, 'testPaperCreate'])->name('test.paper.create')->middleware('custom.permission:manage_test_bank_add');
+            Route::post('/store', [TestController::class, 'store'])->name('manage-test')->middleware('custom.permission:manage_test_bank_add');
+            Route::get('/view/{id}', [TestController::class, 'view'])->name('test.paper.view')->middleware('custom.permission:manage_test_bank');
+            Route::get('/edit/{id}', [TestController::class, 'edit'])->name('test.paper.edit')->middleware('custom.permission:manage_test_bank_edit');
+            Route::post('/update/{id}', [TestController::class, 'update'])->name('test.paper.update')->middleware('custom.permission:manage_test_bank_edit');
+            Route::delete('/delete/{id}', [TestController::class, 'destroy'])->name('test.paper.delete')->middleware('custom.permission:manage_test_bank_delete');
+            Route::get('/{id}/download', [TestController::class, 'download'])->name('test-papers.download')->middleware('custom.permission:manage_test_bank');
+        });
 
-        Route::get('test-paper', [App\Http\Controllers\TestController::class, 'TestBankIndex'])->name('test.bank.index');
-        Route::get('/test-paper/filter', [App\Http\Controllers\TestController::class, 'filter'])->name('test.paper.filter');
-
-        Route::get('test-paper/create', [App\Http\Controllers\TestController::class, 'testPaperCreate'])->name('test.paper.create');
-        Route::delete('test-paper/delete/{id}', [App\Http\Controllers\TestController::class, 'destroy'])->name('test.paper.delete');
-        Route::get('test-paper/view/{id}', [App\Http\Controllers\TestController::class, 'view'])->name('test.paper.view');
-        Route::get('test-paper/edit/{id}', [App\Http\Controllers\TestController::class, 'edit'])->name('test.paper.edit');
-        Route::post('test-paper/update/{id}', [App\Http\Controllers\TestController::class, 'update'])->name('test.paper.update');
+        Route::post('/generate-test-paper-by-selections', 'TestController@generatetestpaperbyselections')->name('generate-test-paper-by-selections');
+        Route::post('/generate-test-questions-by-selections', 'TestController@generatetestquestionsbyselections')->name('generate-test-questions-by-selections');
+        Route::get('test-papers/{id}/download', [TestController::class, 'download'])->name('test-papers.download');
         Route::get('fetch-exam-category-by-commission/{commission}', 'TestController@fetchExamCategoryByCommission')->name('fetch-exam-category-by-commission');
         Route::get('fetch-sub-category-by-exam-category/{exam_category}', 'TestController@fetchSubCategoryByExamCategory')->name('fetch-sub-category-by-exam-category');
         Route::get('fetch-subject-by-subcategory/{sub_category}', 'TestController@fetchSubjectBySubCategory')->name('fetch-subject-by-subcategory');
-        Route::post('generate-test-questions-by-selections', 'TestController@generatetestquestionsbyselections')->name('generate-test-questions-by-selections');
-        Route::post('generate-test-paper-by-selections', 'TestController@generatetestpaperbyselections')->name('generate-test-paper-by-selections');
-        Route::get('test-papers/{id}/download', [App\Http\Controllers\TestController::class, 'download'])->name('test-papers.download');
-
-
         Route::post('preview-test', 'TestController@previewTest')->name('preview-test');
         Route::get('fetch-subject/{commission}/{category?}/{sub_category?}', 'TestController@fetchSubject')->name('fetch-subject');
         Route::get('fetch-chapter-by-subject/{subject}', 'TestController@fetchchapterbySubject')->name('fetch-chapter-by-subject');
         Route::get('fetch-topic-by-chapter/{subject}', 'TestController@fetchtopicbychapter')->name('fetch-topic-by-chapter');
-        Route::post('manage-test', 'TestController@store')->name('manage-test');
         Route::post('get-all-subjects', 'TestController@allSubject')->name('get-all-subjects');
         Route::post('get-all-subjects-multi', 'TestController@allSubjectMulti')->name('get-all-subjects-multi');
 
-        Route::resource('syllabus', 'SyllabusController');
+        // SYLLABUS MANAGEMENT
+        Route::prefix('syllabus')->name('syllabus.')->group(function () {
+            Route::get('/', 'SyllabusController@index')->name('index')->middleware('custom.permission:manage_syllabus');
+            Route::get('/create', 'SyllabusController@create')->name('create')->middleware('custom.permission:manage_syllabus_add');
+            Route::post('/', 'SyllabusController@store')->name('store')->middleware('custom.permission:manage_syllabus_add');
+            Route::get('/{syllabus}/edit', 'SyllabusController@edit')->name('edit')->middleware('custom.permission:manage_syllabus_edit');
+            Route::put('/{syllabus}', 'SyllabusController@update')->name('update')->middleware('custom.permission:manage_syllabus_edit');
+            Route::get('/{syllabus}', 'SyllabusController@show')->name('show')->middleware('custom.permission:manage_syllabus');
+            Route::delete('/{syllabus}', 'SyllabusController@destroy')->name('destroy')->middleware('custom.permission:manage_syllabus_delete');
+        });
 
-        Route::get('pyq/filter', 'PYQController@filter')->name('pyq.filter');
-        Route::resource('pyq', 'PYQController');
+        // PYQ MANAGEMENT
+        Route::prefix('pyq')->name('pyq.')->group(function () {
+            Route::get('/filter', [PYQController::class, 'filter'])->name('filter')->middleware('custom.permission:manage_pyq');
+            Route::get('/', [PYQController::class, 'index'])->name('index')->middleware('custom.permission:manage_pyq');
+        });
+
+        // PYQ CONTENT MANAGEMENT
+        Route::prefix('pyq-content')->name('pyq.content.')->group(function () {
+            Route::get('/', [ContentManagementController::class, 'pyqContentIndex'])->name('index')->middleware('custom.permission:manage_pyq_content');
+            Route::get('/create', [ContentManagementController::class, 'pyqContentCreate'])->name('create')->middleware('custom.permission:manage_pyq_content_add');
+            Route::post('/store', [ContentManagementController::class, 'pyqContentStore'])->name('store')->middleware('custom.permission:manage_pyq_content_add');
+            Route::get('/show/{id}', [ContentManagementController::class, 'pyqContentShow'])->name('show')->middleware('custom.permission:manage_pyq_content');
+            Route::get('/edit/{id}', [ContentManagementController::class, 'pyqContentEdit'])->name('edit')->middleware('custom.permission:manage_pyq_content_edit');
+            Route::post('/update/{id}', [ContentManagementController::class, 'pyqContentUpdate'])->name('update')->middleware('custom.permission:manage_pyq_content_edit');
+            Route::delete('/delete/{id}', [ContentManagementController::class, 'pyqContentDelete'])->name('delete')->middleware('custom.permission:manage_pyq_content_delete');
+        });
+
         Route::resource('study-material/category', 'StudyMaterialCategoryController');
         Route::resource('study-material/main-topic', 'MainTopicController');
         Route::get('study-material/main-topic/fetch-topic-by-category/{category}', 'MainTopicController@fetchCategory')->name('fetch-topic-by-category');
-        Route::get('pyq-content', [App\Http\Controllers\ContentManagementController::class, 'pyqContentIndex'])->name('pyq.content.index');
-        Route::get('pyq-content/create', [App\Http\Controllers\ContentManagementController::class, 'pyqContentCreate'])->name('pyq.content.create');
-        Route::get('pyq-content/show/{id}', [App\Http\Controllers\ContentManagementController::class, 'pyqContentShow'])->name('pyq.content.show');
-        Route::get('pyq-content/edit/{id}', [App\Http\Controllers\ContentManagementController::class, 'pyqContentEdit'])->name('pyq.content.edit');
-        Route::post('pyq-content/store', [App\Http\Controllers\ContentManagementController::class, 'pyqContentStore'])->name('pyq.content.store');
-        Route::post('pyq-content/update/{id}', [App\Http\Controllers\ContentManagementController::class, 'pyqContentUpdate'])->name('pyq.content.update');
-        Route::delete('pyq-content/delete/{id}', [App\Http\Controllers\ContentManagementController::class, 'pyqContentDelete'])->name('pyq.content.delete');
 
-        Route::patch('/feed/{id}/updateStatus', [App\Http\Controllers\ContentManagementController::class, 'updateFeedStatus'])->name('feed.updateStatus');
+        // VIDEO / LIVE CLASS MANAGEMENT
+        Route::prefix('video')->name('video.')->group(function () {
+            Route::get('/', [VideoController::class, 'index'])->name('index')->middleware('custom.permission:manage_videos');
+            Route::get('/create', [VideoController::class, 'create'])->name('create')->middleware('custom.permission:manage_videos_add');
+            Route::post('/store', [VideoController::class, 'store'])->name('store')->middleware('custom.permission:manage_videos_add');
+            Route::get('/{video}/edit', [VideoController::class, 'edit'])->name('edit')->middleware('custom.permission:manage_videos_edit');
+            Route::post('/{video}/update', [VideoController::class, 'update'])->name('update')->middleware('custom.permission:manage_videos_edit');
+            Route::delete('/{video}/delete', [VideoController::class, 'destroy'])->name('destroy')->middleware('custom.permission:manage_videos_delete');
+            Route::get('/{video}', [VideoController::class, 'show'])->name('show')->middleware('custom.permission:manage_videos');
+        });
 
-        Route::resource('manage-courses/topic', App\Http\Controllers\CourseTopicController::class);
-        //seo
-        Route::get('seo/index', [App\Http\Controllers\ContentManagementController::class, 'seoIndex'])->name('seo.index');
-        Route::get('seo/create', [App\Http\Controllers\ContentManagementController::class, 'seoCreate'])->name('seo.create');
-        Route::post('seo/store', [App\Http\Controllers\ContentManagementController::class, 'seoStore'])->name('seo.store');
-        Route::resource('video', 'VideoController');
         Route::get('chapter-video/{id}', 'VideoController@chapter_topic')->name('chapter-video');
         Route::get('course-video/{id}', 'VideoController@course_topic')->name('course-video');
         Route::get('chapter-course/{id}', 'VideoController@chapter_course')->name('chapter-course');
@@ -547,111 +624,172 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
         Route::get('fetch-chapter/{id}', 'VideoController@fetchchapter')->name('fetch-chapter');
         Route::get('fetch-teachers-by-filters', 'VideoController@fetchTeachersByFilters');
 
-        /************************Page Url for design***************/
-        Route::get('order/student-all-orders', [App\Http\Controllers\OrderController::class, 'allOrder'])->name('order.student-all-orders');
-        Route::get('order/test-series-orders', [App\Http\Controllers\OrderController::class, 'allTestSeriesOrder'])->name('order.test-series-orders');
-        Route::get('order/course-orders', [App\Http\Controllers\OrderController::class, 'allCourseOrder'])->name('order.course-orders');
+        // ORDER MANAGEMENT
+        Route::prefix('order')->name('order.')->group(function () {
+            Route::get('/student-all-orders', [App\Http\Controllers\OrderController::class, 'allOrder'])->name('student-all-orders')->middleware('custom.permission:manage_all_orders');
+            Route::get('/test-series-orders', [App\Http\Controllers\OrderController::class, 'allTestSeriesOrder'])->name('test-series-orders')->middleware('custom.permission:manage_test_series_orders');
+            Route::get('/course-orders', [App\Http\Controllers\OrderController::class, 'allCourseOrder'])->name('course-orders')->middleware('custom.permission:manage_course_orders');
+            Route::get('/study-material-orders', [App\Http\Controllers\OrderController::class, 'allStudyMaterialOrder'])->name('study-material-orders')->middleware('custom.permission:manage_study_material_orders');
+            Route::get('/student-transactions-list', [App\Http\Controllers\OrderController::class, 'allTransactions'])->name('student-transactions-list')->middleware('custom.permission:manage_transactions');
+            Route::get('/student-failed-transactions', [App\Http\Controllers\OrderController::class, 'allFailedTransactions'])->name('student-failed-transactions')->middleware('custom.permission:manage_failed_payments');
+        });
 
-        Route::get('order/study-material-orders', [App\Http\Controllers\OrderController::class, 'allStudyMaterialOrder'])->name('order.study-material-orders');
-        Route::get('order/student-transactions-list', [App\Http\Controllers\OrderController::class, 'allTransactions'])->name('order.student-transactions-list');
-        Route::get('order/student-failed-transactions', [App\Http\Controllers\OrderController::class, 'allFailedTransactions'])->name('order.student-failed-transactions');
 
+        // STUDENTS ROUTES
+        Route::get('students/registered-student-list', [StudentController::class, 'RegisterStudentList'])->name('students.registered-student-list')->middleware('custom.permission:manage_students');
+        Route::get('students/view-all-orders/{id}', [StudentController::class, 'ViewAllOrder'])->name('students.view-all-orders')->middleware('custom.permission:manage_students');
+        Route::get('students/student-order-detail/{id}', [OrderController::class, 'studentOrderDetails'])->name('students.student-order-detail')->middleware('custom.permission:manage_students');
+        Route::get('students/change-status', [StudentController::class, 'changeStatus'])->name('students.change-status')->middleware('custom.permission:manage_students_status');
+        Route::get('students/change-password/{id}', [StudentController::class, 'studentChangePassword'])->name('students.change-password')->middleware('custom.permission:students.view-all-orders');
+        Route::post('students/update-password/{id}', [StudentController::class, 'studentUpdatePassword'])->name('students.update-password')->middleware('custom.permission:manage_students_edit');
 
-        Route::get('students/registered-student-list', [App\Http\Controllers\StudentController::class, 'RegisterStudentList'])->name('students.registered-student-list');
-        Route::get('students/view-all-orders/{id}', [App\Http\Controllers\StudentController::class, 'ViewAllOrder'])->name('students.view-all-orders');
-
-        Route::get('students/change-status', [App\Http\Controllers\StudentController::class, 'changeStatus'])->name('students.change-status');
-
-        Route::get('students/student-test-series-summary', [App\Http\Controllers\StudentController::class, 'studentTestSummery'])->name('students.student-test-series-summary');
-        Route::get('students/student-course-summary', [App\Http\Controllers\StudentController::class, 'studentCourseSummery'])->name('students.student-course-summary');
-
-        Route::get('students/student-all-test-list', function () {
-            return view('students.student-all-test-list');
-        })->name('students.student-all-test-list');
-
+        // STUDENT PROFILE DETAIL
+        Route::get('students/student-profile-detail/{id}', [StudentController::class, 'studentProfile'])->name('students.student-profile-detail')->middleware('custom.permission:manage_students');
+        // TEST SERIES SUMMARY
+        Route::get('students/student-test-series-summary', [StudentController::class, 'studentTestSummery'])->name('students.student-test-series-summary')->middleware('custom.permission:manage_student_test_summary');
+        // COURSE SUMMARY
+        Route::get('students/student-course-summary', [StudentController::class, 'studentCourseSummery'])->name('students.student-course-summary')->middleware('custom.permission:manage_student_course_summary');
+        // ALL VIDEOS LIST (STATIC VIEW)
         Route::get('students/student-videos-list', function () {
             return view('students.student-videos-list');
-        })->name('students.student-videos-list');
-
-
-        Route::get('students/student-profile-detail/{id}', [App\Http\Controllers\StudentController::class, 'studentProfile'])->name('students.student-profile-detail');
-        Route::get('students/change-password/{id}', [App\Http\Controllers\StudentController::class, 'studentChangePassword'])->name('students.change-password');
-        Route::post('students/update-password/{id}', [App\Http\Controllers\StudentController::class, 'studentUpdatePassword'])->name('students.update-password');
-
-
+        })->name('students.student-videos-list')
+            ->middleware('custom.permission:manage_student_videos');
+        // TEST RESULT DETAIL (STATIC VIEW)
         Route::get('students/student-test-result-detail', function () {
             return view('students.student-test-result-detail');
-        })->name('students.student-test-result-detail');
-
+        })->name('students.student-test-result-detail')
+            ->middleware('custom.permission:manage_student_tests');
+        // WATCHED VIDEO LIST (STATIC VIEW)
         Route::get('students/student-watched-video-list', function () {
             return view('students.student-watched-video-list');
-        })->name('students.student-watched-video-list');
+        })->name('students.student-watched-video-list')
+            ->middleware('custom.permission:manage_student_videos');
 
-        Route::get('students/student-order-detail/{id}', [App\Http\Controllers\OrderController::class, 'studentOrderDetails'])->name('students.student-order-detail');
+
+
+        // Batches & Programme
+        Route::prefix('batches-and-programme')->name('batches-programme.')->group(function () {
+            Route::get('/', [ContentManagementController::class, 'batchesProgrammeIndex'])->name('index')->middleware('custom.permission:manage_batches');
+            Route::get('/create', [ContentManagementController::class, 'batchesProgrammeCreate'])->name('create')->middleware('custom.permission:manage_batches_add');
+            Route::post('/store', [ContentManagementController::class, 'batchesProgrammeStore'])->name('store')->middleware('custom.permission:manage_batches_add');
+            Route::get('/show/{id}', [ContentManagementController::class, 'batchesProgrammeShow'])->name('show')->middleware('custom.permission:manage_batches');
+            Route::get('/{id}/edit', [ContentManagementController::class, 'batchesProgrammeEdit'])->name('edit')->middleware('custom.permission:manage_batches_edit');
+            Route::put('/{id}', [ContentManagementController::class, 'batchesProgrammeUpdate'])->name('update')->middleware('custom.permission:manage_batches_edit');
+            Route::delete('/delete/{id}', [ContentManagementController::class, 'batchesProgrammeDelete'])->name('delete')->middleware('custom.permission:manage_batches_delete');
+        });
+
+        /** ------------------------
+         *  ROLE GROUP MANAGEMENT
+         * ------------------------*/
+        Route::prefix('role-groups')->group(function () {
+            Route::get('/', [RoleGroupController::class, 'index'])->name('role-groups.index')->middleware('custom.permission:manage_role_groups');
+            Route::get('/create', [RoleGroupController::class, 'create'])->name('role-groups.create')->middleware('custom.permission:manage_role_groups_add');
+            Route::post('/store', [RoleGroupController::class, 'store'])->name('role-groups.store')->middleware('custom.permission:manage_role_groups_add');
+            Route::get('/{id}/edit', [RoleGroupController::class, 'edit'])->name('role-groups.edit')->middleware('custom.permission:manage_role_groups_edit');
+            Route::post('/{id}/update', [RoleGroupController::class, 'update'])->name('role-groups.update')->middleware('custom.permission:manage_role_groups_edit');
+            Route::delete('/{id}', [RoleGroupController::class, 'destroy'])->name('role-groups.destroy')->middleware('custom.permission:manage_role_groups_delete');
+        });
+
+        /** ------------------------
+         *  SUB ADMIN MANAGEMENT
+         * ------------------------*/
+        Route::prefix('sub-admins')->group(function () {
+            Route::get('/', [SubAdminController::class, 'index'])->name('sub-admins.index')->middleware('custom.permission:manage_sub_admins');
+            Route::get('/create', [SubAdminController::class, 'create'])->name('sub-admins.create')->middleware('custom.permission:manage_sub_admins_add');
+            Route::post('/store', [SubAdminController::class, 'store'])->name('sub-admins.store')->middleware('custom.permission:manage_sub_admins_add');
+            Route::get('/{id}/edit', [SubAdminController::class, 'edit'])->name('sub-admins.edit')->middleware('custom.permission:manage_sub_admins_edit');
+            Route::post('/{id}/update', [SubAdminController::class, 'update'])->name('sub-admins.update')->middleware('custom.permission:manage_sub_admins_edit');
+            Route::delete('/{id}', [SubAdminController::class, 'destroy'])->name('sub-admins.destroy')->middleware('custom.permission:manage_sub_admins_delete');
+            Route::get('/{id}/password', [SubAdminController::class, 'editPassword'])
+                ->name('sub-admins.password.edit')->middleware('custom.permission:manage_sub_admins_edit');
+            Route::post('/{id}/password', [SubAdminController::class, 'updatePassword'])
+                ->name('sub-admins.password.update')->middleware('custom.permission:manage_sub_admins_edit');
+
+        });
+
+        // student wallet route
+        Route::prefix('admin/settings/user-wallet')->group(function () {
+            Route::get('/', [ContentManagementController::class, 'userWalletIndex'])->name('settings.user-wallet.index')->middleware('custom.permission:manage_user_wallet');
+            Route::post('/store', [ContentManagementController::class, 'userWalletStore'])->name('settings.user-wallet.store')->middleware('custom.permission:manage_user_wallet_add');
+        });
+
+        // percentage system route
+        Route::prefix('percentage-system')->group(function () {
+            Route::get('/', [PercentageSystemController::class, 'index'])->name('percentage.system.index')->middleware('custom.permission:manage_percentage');
+            Route::get('/create', [PercentageSystemController::class, 'create'])->name('percentage.system.create')->middleware('custom.permission:manage_percentage_add');
+            Route::post('/store', [PercentageSystemController::class, 'store'])->name('percentage.system.store')->middleware('custom.permission:manage_percentage_add');
+            Route::get('/edit/{id}', [PercentageSystemController::class, 'edit'])->name('percentage.system.edit')->middleware('custom.permission:manage_percentage_edit');
+            Route::post('/update/{id}', [PercentageSystemController::class, 'update'])->name('percentage.system.update')->middleware('custom.permission:manage_percentage_edit');
+            Route::delete('/delete/{id}', [PercentageSystemController::class, 'destroy'])->name('percentage.system.delete')->middleware('custom.permission:manage_percentage_delete');
+        });
+
+        //User Routes
+        Route::group(['prefix' => 'users'], function () {
+            Route::get('/', [App\Http\Controllers\UsersController::class, 'index'])->name('users.index')->middleware('custom.permission:manage_users');
+            Route::get('/create', 'UsersController@create')->name('users.create')->middleware('custom.permission:manage_users_add');
+            Route::post('/store', 'UsersController@store')->name('users.store')->middleware('custom.permission:manage_users_add');
+            Route::get('/{user}/show', 'UsersController@show')->name('users.show')->middleware('custom.permission:manage_users');
+            Route::get('/{user}/edit', 'UsersController@edit')->name('users.edit')->middleware('custom.permission:manage_users_edit');
+            Route::patch('/{user}/update', 'UsersController@update')->name('users.update')->middleware('custom.permission:manage_users_edit');
+            Route::delete('/{user}/delete', 'UsersController@destroy')->name('users.destroy')->middleware('custom.permission:manage_users_delete');
+        });
+
+
+        // SEO Routes
+        Route::group(['prefix' => 'seo'], function () {
+            Route::get('/index', [ContentManagementController::class, 'seoIndex'])->name('seo.index')->middleware('custom.permission:manage_seo');
+            Route::get('/create', [ContentManagementController::class, 'seoCreate'])->name('seo.create')->middleware('custom.permission:manage_seo_add');
+            Route::post('/store', [ContentManagementController::class, 'seoStore'])->name('seo.store')->middleware('custom.permission:manage_seo_add');
+        });
 
         /************************Page Url for design End***************/
 
-        Route::get('batches-and-programme', [App\Http\Controllers\ContentManagementController::class, 'batchesProgrammeIndex'])->name('batches-programme.index');
-        Route::get('batches-and-programme/create', [App\Http\Controllers\ContentManagementController::class, 'batchesProgrammeCreate'])->name('batches-programme.create');
-        Route::post('batches-and-programme/store', [App\Http\Controllers\ContentManagementController::class, 'batchesProgrammeStore'])->name('batches-programme.store');
-        Route::delete('batches-and-programme/delete/{id}', [App\Http\Controllers\ContentManagementController::class, 'batchesProgrammeDelete'])->name('batches-programme.delete');
-        Route::get('batches-programme/show/{id}', [App\Http\Controllers\ContentManagementController::class, 'batchesProgrammeShow'])->name('batches-programme.show');
-        Route::get('batches-programme/{id}/edit', [App\Http\Controllers\ContentManagementController::class, 'batchesProgrammeEdit'])->name('batches-programme.edit');
-        Route::put('batches-programme/{id}', [App\Http\Controllers\ContentManagementController::class, 'batchesProgrammeUpdate'])->name('batches-programme.update');
+        Route::prefix('admin/settings')->group(function () {
 
-        Route::get('admin/settings/header-settings', [App\Http\Controllers\ContentManagementController::class, 'headerSettingsIndex'])->name('settings.header.index');
-        Route::post('admin/settings/header-settings/store', [App\Http\Controllers\ContentManagementController::class, 'headerSettingsStore'])->name('settings.header.store');
-        Route::get('admin/settings/social-media', [App\Http\Controllers\ContentManagementController::class, 'socialMediaIndex'])->name('settings.social.index');
-        Route::post('admin/settings/social-media/store', [App\Http\Controllers\ContentManagementController::class, 'socialMediaStore'])->name('settings.social.store');
+            /* ---------------- HEADER SETTINGS ---------------- */
+            Route::get('/header-settings', [ContentManagementController::class, 'headerSettingsIndex'])->name('settings.header.index')->middleware('custom.permission:manage_header');
+            Route::post('/header-settings/store', [ContentManagementController::class, 'headerSettingsStore'])->name('settings.header.store')->middleware('custom.permission:manage_header_add');
 
-        Route::get('admin/settings/banner-settings', [App\Http\Controllers\ContentManagementController::class, 'bannerSettingsIndex'])->name('settings.banner.index');
-        Route::get('admin/settings/banner-settings/edit/{id}', [App\Http\Controllers\ContentManagementController::class, 'bannerSettingsEdit'])->name('settings.banner.edit');
-        Route::post('admin/settings/banner-settings/store', [App\Http\Controllers\ContentManagementController::class, 'bannerSettingsStore'])->name('settings.banner.store');
-        Route::post('admin/settings/banner-settings/update', [App\Http\Controllers\ContentManagementController::class, 'bannerSettingsUpdate'])->name('settings.banner.update');
-        Route::delete('admin/settings/banner-settings/delete/{id}', [App\Http\Controllers\ContentManagementController::class, 'bannerSettingsDelete'])->name('settings.banner.delete');
+            /* ---------------- SOCIAL MEDIA ---------------- */
+            Route::get('/social-media', [ContentManagementController::class, 'socialMediaIndex'])->name('settings.social.index')->middleware('custom.permission:manage_social');
+            Route::post('/social-media/store', [ContentManagementController::class, 'socialMediaStore'])->name('settings.social.store')->middleware('custom.permission:manage_social_add');
 
-        Route::get('admin/settings/programme-feature-settings', [App\Http\Controllers\ContentManagementController::class, 'programmeSettingsIndex'])->name('settings.programme_feature.index');
-        Route::post('admin/settings/programme-feature-settings/store', [App\Http\Controllers\ContentManagementController::class, 'programmeSettingsStore'])->name('settings.programme_feature.store');
+            /* ---------------- BANNER SETTINGS ---------------- */
+            Route::get('/banner-settings', [ContentManagementController::class, 'bannerSettingsIndex'])->name('settings.banner.index')->middleware('custom.permission:manage_banner');
+            Route::get('/banner-settings/edit/{id}', [ContentManagementController::class, 'bannerSettingsEdit'])->name('settings.banner.edit')->middleware('custom.permission:manage_banner_edit');
+            Route::post('/banner-settings/store', [ContentManagementController::class, 'bannerSettingsStore'])->name('settings.banner.store')->middleware('custom.permission:manage_banner_add');
+            Route::post('/banner-settings/update', [ContentManagementController::class, 'bannerSettingsUpdate'])->name('settings.banner.update')->middleware('custom.permission:manage_banner_edit');
+            Route::delete('/banner-settings/delete/{id}', [ContentManagementController::class, 'bannerSettingsDelete'])->name('settings.banner.delete')->middleware('custom.permission:manage_banner_delete');
 
-        Route::get('admin/settings/marquee-settings', [App\Http\Controllers\ContentManagementController::class, 'marqueeSettingsIndex'])->name('settings.marquee.index');
-        Route::get('admin/settings/marquee-settings/edit/{id}', [App\Http\Controllers\ContentManagementController::class, 'marqueeSettingsEdit'])->name('settings.marquee.edit');
-        Route::post('admin/settings/marquee-settings/store', [App\Http\Controllers\ContentManagementController::class, 'marqueeSettingsStore'])->name('settings.marquee.store');
-        Route::post('admin/settings/marquee-settings/update', [App\Http\Controllers\ContentManagementController::class, 'marqueeSettingsUpdate'])->name('settings.marquee.update');
-        Route::delete('admin/settings/marquee-settings/delete/{id}', [App\Http\Controllers\ContentManagementController::class, 'marqueeSettingsDelete'])->name('settings.marquee.delete');
+            /* ---------------- PROGRAMME FEATURE ---------------- */
+            Route::get('/programme-feature-settings', [ContentManagementController::class, 'programmeSettingsIndex'])->name('settings.programme_feature.index')->middleware('custom.permission:manage_programme_feature');
+            Route::post('/programme-feature-settings/store', [ContentManagementController::class, 'programmeSettingsStore'])->name('settings.programme_feature.store')->middleware('custom.permission:manage_programme_feature_add');
 
-        Route::get('admin/settings/pop-up-settings', [App\Http\Controllers\ContentManagementController::class, 'popSettingsIndex'])->name('settings.popup.index');
-        Route::post('admin/settings/pop-up-settings/store', [App\Http\Controllers\ContentManagementController::class, 'popSettingsStore'])->name('settings.popup.store');
+            /* ---------------- MARQUEE SETTINGS ---------------- */
+            Route::get('/marquee-settings', [ContentManagementController::class, 'marqueeSettingsIndex'])->name('settings.marquee.index')->middleware('custom.permission:manage_marquee');
+            Route::get('/marquee-settings/edit/{id}', [ContentManagementController::class, 'marqueeSettingsEdit'])->name('settings.marquee.edit')->middleware('custom.permission:manage_marquee_edit');
+            Route::post('/marquee-settings/store', [ContentManagementController::class, 'marqueeSettingsStore'])->name('settings.marquee.store')->middleware('custom.permission:manage_marquee_add');
+            Route::post('/marquee-settings/update', [ContentManagementController::class, 'marqueeSettingsUpdate'])->name('settings.marquee.update')->middleware('custom.permission:manage_marquee_edit');
+            Route::delete('/marquee-settings/delete/{id}', [ContentManagementController::class, 'marqueeSettingsDelete'])->name('settings.marquee.delete')->middleware('custom.permission:manage_marquee_delete');
 
-        Route::get('admin/settings/feature-settings', [App\Http\Controllers\ContentManagementController::class, 'featureSettingsIndex'])->name('settings.feature.index');
-        Route::post('admin/settings/feature-settings/store', [App\Http\Controllers\ContentManagementController::class, 'featureSettingsStore'])->name('settings.feature.store');
+            /* ---------------- POPUP SETTINGS ---------------- */
+            Route::get('/pop-up-settings', [ContentManagementController::class, 'popSettingsIndex'])->name('settings.popup.index')->middleware('custom.permission:manage_popup');
+            Route::post('/pop-up-settings/store', [ContentManagementController::class, 'popSettingsStore'])->name('settings.popup.store')->middleware('custom.permission:manage_popup_add');
 
-        Route::get('admin/settings/user-wallet', [App\Http\Controllers\ContentManagementController::class, 'userWalletIndex'])->name('settings.user-wallet.index');
-        Route::post('admin/settings/user-wallet/store', [App\Http\Controllers\ContentManagementController::class, 'userWalletStore'])->name('settings.user-wallet.store');
+            /* ---------------- FEATURE SETTINGS ---------------- */
+            Route::get('/feature-settings', [ContentManagementController::class, 'featureSettingsIndex'])->name('settings.feature.index')->middleware('custom.permission:manage_feature');
+            Route::post('/feature-settings/store', [ContentManagementController::class, 'featureSettingsStore'])->name('settings.feature.store')->middleware('custom.permission:manage_feature_add');
 
-
-        Route::get('admin/get-categories/{id}', [App\Http\Controllers\ContentManagementController::class, 'getCategories'])->name('settings.categories');
-
-        Route::get('admin/get-subcategories/{id}', [App\Http\Controllers\ContentManagementController::class, 'getSubCategories'])->name('settings.subcategories');
-
-        /**
-         * Role Routes
-         */
-        Route::resource('roles', App\Http\Controllers\RolesController::class);
-        /**
-         * Permission Routes
-         */
-        Route::resource('permissions', App\Http\Controllers\PermissionsController::class);
-        /**
-         * User Routes
-         */
-        Route::group(['prefix' => 'users'], function () {
-            Route::get('/', [App\Http\Controllers\UsersController::class, 'index'])->name('users.index');
-            Route::get('/create', 'UsersController@create')->name('users.create');
-            Route::post('/create', 'UsersController@store')->name('users.store');
-            Route::get('/{user}/show', 'UsersController@show')->name('users.show');
-            Route::get('/{user}/edit', 'UsersController@edit')->name('users.edit');
-            Route::patch('/{user}/update', 'UsersController@update')->name('users.update');
-            Route::delete('/{user}/delete', 'UsersController@destroy')->name('users.destroy');
         });
+
+
+        Route::get('admin/get-categories/{id}', [ContentManagementController::class, 'getCategories'])->name('settings.categories');
+        Route::get('admin/get-subcategories/{id}', [ContentManagementController::class, 'getSubCategories'])->name('settings.subcategories');
+
+        // Role Routes
+        Route::resource('roles', App\Http\Controllers\RolesController::class);
+        //Permission Routes
+        Route::resource('permissions', App\Http\Controllers\PermissionsController::class);
+
     });
 });

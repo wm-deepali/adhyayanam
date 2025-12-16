@@ -20,13 +20,17 @@
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <!-- Search Box -->
                         <form method="GET" action="{{ route('current.affairs.index') }}" class="d-flex">
-                            <input type="text" name="search" class="form-control me-2"
-                                placeholder="Search"
+                            <input type="text" name="search" class="form-control me-2" placeholder="Search"
                                 value="{{ request('search') }}">
                             <button type="submit" class="btn btn-success">Search</button>
                         </form>
 
-                        <a href="{{ route('current.affairs.create') }}" class="btn btn-primary">Add New</a>
+                        @if(\App\Helpers\Helper::canAccess('manage_ca_add'))
+                            <a href="{{ route('current.affairs.create') }}" class="btn btn-primary">
+                                Add New
+                            </a>
+                        @endif
+
                     </div>
 
                     <table class="table table-striped mt-5">
@@ -61,37 +65,56 @@
                                     </td>
                                     <td>{{ $affair->image_alt_tag }}</td>
                                     <td>
-                                        <div class="dropdown">
-                                            <button class="btn btn-secondary dropdown-toggle btn-sm" type="button"
-                                                data-bs-toggle="dropdown" aria-expanded="false">
-                                                Actions
-                                            </button>
-                                            <ul class="dropdown-menu">
-                                                <li>
-                                                    <a class="dropdown-item"
-                                                        href="{{ route('current.affairs.show', $affair->id) }}">
-                                                        <i class="fas fa-eye"></i> View
-                                                    </a>
-                                                </li>
-                                                <li>
-                                                    <a class="dropdown-item"
-                                                        href="{{ route('current.affairs.edit', $affair->id) }}">
-                                                        <i class="fas fa-edit"></i> Edit
-                                                    </a>
-                                                </li>
-                                                <li>
-                                                    <form action="{{ route('current.affairs.delete', $affair->id) }}"
-                                                        method="POST" style="display:inline;">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="submit" class="dropdown-item text-danger">
-                                                            <i class="fas fa-trash" style="color: #dc3545!important"></i> Delete
-                                                        </button>
-                                                    </form>
-                                                </li>
-                                            </ul>
-                                        </div>
+                                        @if(
+                                                \App\Helpers\Helper::canAccess('manage_ca_edit') ||
+                                                \App\Helpers\Helper::canAccess('manage_ca_delete')
+                                            )
+                                            <div class="dropdown">
+                                                <button class="btn btn-secondary dropdown-toggle btn-sm" type="button"
+                                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                                    Actions
+                                                </button>
+
+                                                <ul class="dropdown-menu">
+
+                                                    {{-- VIEW (usually allowed with manage) --}}
+                                                    <li>
+                                                        <a class="dropdown-item"
+                                                            href="{{ route('current.affairs.show', $affair->id) }}">
+                                                            <i class="fas fa-eye"></i> View
+                                                        </a>
+                                                    </li>
+
+                                                    {{-- EDIT --}}
+                                                    @if(\App\Helpers\Helper::canAccess('manage_ca_edit'))
+                                                        <li>
+                                                            <a class="dropdown-item"
+                                                                href="{{ route('current.affairs.edit', $affair->id) }}">
+                                                                <i class="fas fa-edit"></i> Edit
+                                                            </a>
+                                                        </li>
+                                                    @endif
+
+                                                    {{-- DELETE --}}
+                                                    @if(\App\Helpers\Helper::canAccess('manage_ca_delete'))
+                                                        <li>
+                                                            <form action="{{ route('current.affairs.delete', $affair->id) }}"
+                                                                method="POST"
+                                                                onsubmit="return confirm('Are you sure you want to delete this current affair?');">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                                <button type="submit" class="dropdown-item text-danger">
+                                                                    <i class="fas fa-trash" style="color:#dc3545!important"></i> Delete
+                                                                </button>
+                                                            </form>
+                                                        </li>
+                                                    @endif
+
+                                                </ul>
+                                            </div>
+                                        @endif
                                     </td>
+
                                 </tr>
                             @endforeach
                         </tbody>

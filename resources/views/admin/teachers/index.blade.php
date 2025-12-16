@@ -13,9 +13,11 @@
                         <h5 class="card-title">Teachers</h5>
                         <h6 class="card-subtitle mb-2 text-muted">Manage your teachers here.</h6>
                     </div>
-                    <div class="justify-content-end">
-                        <a href='{{ route("manage-teachers.create") }}' class="btn btn-primary">&#43; Add Teacher</a>
-                    </div>
+                    @if(\App\Helpers\Helper::canAccess('manage_teachers_add'))
+                        <div class="justify-content-end">
+                            <a href='{{ route("manage-teachers.create") }}' class="btn btn-primary">&#43; Add Teacher</a>
+                        </div>
+                    @endif
                 </div>
                 <div class="mt-2">
                     @include('layouts.includes.messages')
@@ -101,13 +103,15 @@
                 lengthMenu: [10, 25, 50, 100],
                 dom: '<"row mb-2"<"col-sm-12"<"pull-left"l><"pull-right"fr><"pull-right ml-2"B>>>tip',
                 buttons: [
-                    {
-                        className: 'btn btn-danger btn-flat delete_btn pull-left',
-                        text: 'Bulk Delete',
-                        action: function (e, dt, node, config) {
-                            multi_delete();
-                        }
-                    },
+                    @if(\App\Helpers\Helper::canAccess('manage_teachers_delete'))
+                            {
+                            className: 'btn btn-danger btn-flat delete_btn pull-left',
+                            text: 'Bulk Delete',
+                            action: function (e, dt, node, config) {
+                                multi_delete();
+                            }
+                        },
+                    @endif
                     { extend: 'excel', className: 'btn btn-info btn-flat', exportOptions: { columns: ':visible:not(:first-child,:last-child)' } },
                     { extend: 'pdf', className: 'btn btn-info btn-flat', exportOptions: { columns: ':visible:not(:first-child,:last-child)' } },
                     { extend: 'csv', className: 'btn btn-info btn-flat', exportOptions: { columns: ':visible:not(:first-child,:last-child)' } },

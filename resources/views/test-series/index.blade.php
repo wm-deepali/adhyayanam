@@ -19,9 +19,11 @@
                         <h5 class="card-title">Test Series</h5>
                         <h6 class="card-subtitle mb-2 text-muted">Manage your Test Series section here.</h6>
                     </div>
-                    <div class="justify-content-end">
-                        <a href='{{ route('test.series.create') }}' class="btn btn-primary">&#43; Add</a>
-                    </div>
+                    @if(\App\Helpers\Helper::canAccess('manage_test_series_package_add'))
+                        <div class="justify-content-end">
+                            <a href='{{ route('test.series.create') }}' class="btn btn-primary">&#43; Add</a>
+                        </div>
+                    @endif
                 </div>
                 <div class="mt-2">
                     @include('layouts.includes.messages')
@@ -66,13 +68,13 @@
 
                         {{-- subject --}}
                         <!-- <div class="col-md-3">
-                            <div class="form-group">
-                                <label>Subject</label>
-                                <select class="form-control" id="subject_id" name="subject_id">
-                                    <option value="">--Select--</option>
-                                </select>
-                            </div>
-                        </div> -->
+                                <div class="form-group">
+                                    <label>Subject</label>
+                                    <select class="form-control" id="subject_id" name="subject_id">
+                                        <option value="">--Select--</option>
+                                    </select>
+                                </div>
+                            </div> -->
 
                         {{-- Search --}}
                         <div class="col-md-3">

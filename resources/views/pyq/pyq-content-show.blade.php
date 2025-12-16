@@ -51,10 +51,6 @@
                     </tr>
                 </tbody>
             </table>
-
-            <div class="mt-3">
-                <a href="{{ route('pyq.content.edit', $pyqContent->id) }}" class="btn btn-primary">Edit</a>
-            </div>
         </div>
     </div>
 </div>

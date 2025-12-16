@@ -1,0 +1,24 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up()
+    {
+        Schema::create('role_groups', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');              // Role group name (Support Team, Content Team)
+            $table->string('type')->nullable();  // Optional: Academic, Universities, Competitive, etc.
+            $table->json('permissions')->nullable();  // Store all permissions as JSON
+            $table->timestamps();
+        });
+    }
+
+    public function down()
+    {
+        Schema::dropIfExists('role_groups');
+    }
+};

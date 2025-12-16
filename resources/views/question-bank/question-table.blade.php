@@ -31,30 +31,49 @@
 
                 <td>{{$data->show_on_pyq}}</td>
                 <td>Active</td>
-                <td>{{ $data->addedBy->full_name ?? ($data->addedBy->name ?? '-' )}}<br>{{ $data->addedBy->email ?? '-' }}</td>
+                <td>{{ $data->addedBy->full_name ?? ($data->addedBy->name ?? '-')}}<br>{{ $data->addedBy->email ?? '-' }}
+                </td>
                 <td>
-
                     <div class="dropdown">
                         <button class="btn btn-secondary dropdown-toggle btn-sm" type="button" data-bs-toggle="dropdown"
                             aria-expanded="false">
                             Actions
                         </button>
+
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="{{route('question.bank.view', $data->id)}}"><i
-                                        class="fas fa-eye"></i> View</a></li>
-                            <li><a class="dropdown-item" href="{{route('question.bank.edit', $data->id)}}"><i
-                                        class="fas fa-edit"></i> Edit</a></li>
-                            <li>
-                                <form action="{{ route('question.bank.delete', $data->id) }}" method="POST"
-                                    style="display:inline;">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="dropdown-item text-danger"><i class="fas fa-trash"
-                                            style="color: #dc3545!important"></i> Delete</button>
-                                </form>
+
+                            @if(\App\Helpers\Helper::canAccess('manage_question_bank'))
+                                <li>
+                                    <a class="dropdown-item" href="{{ route('question.bank.view', $data->id) }}">
+                                        <i class="fas fa-eye"></i> View
+                                    </a>
+                                </li>
+                            @endif
+
+                            @if(\App\Helpers\Helper::canAccess('manage_question_bank_edit'))
+                                <li>
+                                    <a class="dropdown-item" href="{{ route('question.bank.edit', $data->id) }}">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </a>
+                                </li>
+                            @endif
+
+                            @if(\App\Helpers\Helper::canAccess('manage_question_bank_delete'))
+                                <li>
+                                    <form action="{{ route('question.bank.delete', $data->id) }}" method="POST"
+                                        style="display:inline;">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="dropdown-item text-danger">
+                                            <i class="fas fa-trash" style="color:#dc3545!important"></i> Delete
+                                        </button>
+                                    </form>
+                                </li>
+                            @endif
 
                         </ul>
                     </div>
+
                 </td>
             </tr>
         @endforeach

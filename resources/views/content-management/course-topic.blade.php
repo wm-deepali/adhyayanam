@@ -13,9 +13,11 @@
                         <h5 class="card-title">Topic</h5>
                         <h6 class="card-subtitle mb-2 text-muted"> Manage Topic section here.</h6>
                     </div>
+                    @if(\App\Helpers\Helper::canAccess('manage_topic_add'))
                     <div class="justify-content-end">
                         <a href='{{route('topic.create')}}' class="btn btn-primary">&#43; Add</a>
                     </div>
+                    @endif
                 </div>
                 <div class="mt-2">
                     @include('layouts.includes.messages')

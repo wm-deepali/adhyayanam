@@ -12,7 +12,12 @@
                         <h6 class="card-subtitle mb-2 text-muted"> Manage Batches and Online Programme section here.</h6>
                     </div>
                     <div class="justify-content-end">
-                        <a href='{{route('batches-programme.create')}}' class="btn btn-primary">&#43; Add</a>
+                        @if(\App\Helpers\Helper::canAccess('manage_batches_add'))
+                            <a href="{{ route('batches-programme.create') }}" class="btn btn-primary">
+                                &#43; Add
+                            </a>
+                        @endif
+
                     </div>
                 </div>
                 <div class="d-flex justify-content-between align-items-center">
@@ -47,7 +52,8 @@
                                 <th scope="row">{{ Carbon\Carbon::parse($data->created_at)->format('d M Y') }}</th>
                                 <td><img style="height: auto;width: 40px;" src="{{url('storage/' . $data->thumbnail_image)}}"
                                         alt=""></td>
-                                <td><img style="height: auto;width: 40px;" src="{{url('storage/' . $data->banner_image)}}" alt="">
+                                <td><img style="height: auto;width: 40px;" src="{{url('storage/' . $data->banner_image)}}"
+                                        alt="">
                                 </td>
                                 <td>{{$data->batch_heading}}</td>
                                 <td>{{$data->start_date}}</td>
@@ -56,31 +62,56 @@
                                 <td>{{$data->offered_price}}</td>
                                 <td>{{$data->duration ?? "0"}} Days</td>
                                 <td>
-                                    <div class="dropdown">
-                                        <button class="btn btn-sm btn-secondary dropdown-toggle" type="button"
-                                            id="actionDropdown{{$data->id}}" data-bs-toggle="dropdown" aria-expanded="false">
-                                            Action
-                                        </button>
-                                        <ul class="dropdown-menu" aria-labelledby="actionDropdown{{$data->id}}">
-                                            <li>
-                                                <a class="dropdown-item"
-                                                    href="{{ route('batches-programme.show', $data->id) }}">View</a>
-                                            </li>
-                                            <li>
-                                                <a class="dropdown-item"
-                                                    href="{{ route('batches-programme.edit', $data->id) }}">Edit</a>
-                                            </li>
-                                            <li>
-                                                <form action="{{ route('batches-programme.delete', $data->id) }}" method="POST"
-                                                    onsubmit="return confirm('Are you sure you want to delete this batch?');">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="dropdown-item text-danger">Delete</button>
-                                                </form>
-                                            </li>
-                                        </ul>
-                                    </div>
+                                    @if(
+                                            \App\Helpers\Helper::canAccess('manage_batches') ||
+                                            \App\Helpers\Helper::canAccess('manage_batches_edit') ||
+                                            \App\Helpers\Helper::canAccess('manage_batches_delete')
+                                        )
+                                        <div class="dropdown">
+                                            <button class="btn btn-sm btn-secondary dropdown-toggle" type="button"
+                                                id="actionDropdown{{ $data->id }}" data-bs-toggle="dropdown" aria-expanded="false">
+                                                Action
+                                            </button>
+
+                                            <ul class="dropdown-menu" aria-labelledby="actionDropdown{{ $data->id }}">
+
+                                                {{-- VIEW --}}
+                                                <li>
+                                                    <a class="dropdown-item"
+                                                        href="{{ route('batches-programme.show', $data->id) }}">
+                                                        View
+                                                    </a>
+                                                </li>
+
+                                                {{-- EDIT --}}
+                                                @if(\App\Helpers\Helper::canAccess('manage_batches_edit'))
+                                                    <li>
+                                                        <a class="dropdown-item"
+                                                            href="{{ route('batches-programme.edit', $data->id) }}">
+                                                            Edit
+                                                        </a>
+                                                    </li>
+                                                @endif
+
+                                                {{-- DELETE --}}
+                                                @if(\App\Helpers\Helper::canAccess('manage_batches_delete'))
+                                                    <li>
+                                                        <form action="{{ route('batches-programme.delete', $data->id) }}" method="POST"
+                                                            onsubmit="return confirm('Are you sure you want to delete this batch?');">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button type="submit" class="dropdown-item text-danger">
+                                                                Delete
+                                                            </button>
+                                                        </form>
+                                                    </li>
+                                                @endif
+
+                                            </ul>
+                                        </div>
+                                    @endif
                                 </td>
+
                             </tr>
                         @endforeach
                     </tbody>

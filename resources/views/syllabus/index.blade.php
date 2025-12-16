@@ -36,9 +36,12 @@
                     </form>
 
                     <!-- Create Button -->
-                    <a href="{{ route('syllabus.create') }}" class="btn btn-primary">
-                        &#43; Create Syllabus
-                    </a>
+                    @if(\App\Helpers\Helper::canAccess('manage_syllabus_add'))
+                        <a href="{{ route('syllabus.create') }}" class="btn btn-primary">
+                            &#43; Create Syllabus
+                        </a>
+                    @endif
+
                 </div>
 
                 <div class="mt-2">@include('layouts.includes.messages')</div>
@@ -94,27 +97,40 @@
                                                 Actions
                                             </button>
                                             <ul class="dropdown-menu" aria-labelledby="actionMenu{{ $res->id }}">
-                                                <li>
-                                                    <a class="dropdown-item" href="{{ route('syllabus.show', $res->id) }}">
-                                                        <i class="fa fa-eye text-primary me-2"></i> View
-                                                    </a>
-                                                </li>
-                                                <li>
-                                                    <a class="dropdown-item" href="{{ route('syllabus.edit', $res->id) }}">
-                                                        <i class="fa fa-edit text-primary me-2"></i> Edit
-                                                    </a>
-                                                </li>
-                                                <li>
-                                                    <form action="{{ route('syllabus.destroy', $res->id) }}" method="POST"
-                                                        class="delete-form" style="display:inline;">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="button" class="dropdown-item text-danger delete-btn">
-                                                            <i class="fa fa-trash me-2"></i> Delete
-                                                        </button>
-                                                    </form>
-                                                </li>
-                                            </ul>
+
+    {{-- VIEW --}}
+    @if(\App\Helpers\Helper::canAccess('manage_syllabus'))
+        <li>
+            <a class="dropdown-item" href="{{ route('syllabus.show', $res->id) }}">
+                <i class="fa fa-eye text-primary me-2"></i> View
+            </a>
+        </li>
+    @endif
+
+    {{-- EDIT --}}
+    @if(\App\Helpers\Helper::canAccess('manage_syllabus_edit'))
+        <li>
+            <a class="dropdown-item" href="{{ route('syllabus.edit', $res->id) }}">
+                <i class="fa fa-edit text-primary me-2"></i> Edit
+            </a>
+        </li>
+    @endif
+
+    {{-- DELETE --}}
+    @if(\App\Helpers\Helper::canAccess('manage_syllabus_delete'))
+        <li>
+            <form action="{{ route('syllabus.destroy', $res->id) }}" method="POST"
+                  class="delete-form" style="display:inline;">
+                @csrf
+                @method('DELETE')
+                <button type="button" class="dropdown-item text-danger delete-btn">
+                    <i class="fa fa-trash me-2" style="color:#dc3545!important"></i> Delete
+                </button>
+            </form>
+        </li>
+    @endif
+
+</ul>
                                         </div>
                                     </td>
                                 </tr>

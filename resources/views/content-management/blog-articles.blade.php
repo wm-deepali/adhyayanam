@@ -14,59 +14,63 @@
                     @include('layouts.includes.messages')
                 </div>
                 <div class="container mt-4">
-                    <form method="POST" action="{{ route('blog.store') }}" id="blog-form" enctype="multipart/form-data">
-                        @csrf
-                        <div class="mb-3">
-                            <label for="heading" class="form-label">Heading</label>
-                            <input type="text" class="form-control" name="heading" placeholder="Heading" required>
-                            @if ($errors->has('heading'))
-                                <span class="text-danger text-left">{{ $errors->first('heading') }}</span>
-                            @endif
-                        </div>
+                    @if(\App\Helpers\Helper::canAccess('manage_blog_add'))
+                        <form method="POST" action="{{ route('blog.store') }}" id="blog-form" enctype="multipart/form-data">
+                            @csrf
+                            <div class="mb-3">
+                                <label for="heading" class="form-label">Heading</label>
+                                <input type="text" class="form-control" name="heading" placeholder="Heading" required>
+                                @if ($errors->has('heading'))
+                                    <span class="text-danger text-left">{{ $errors->first('heading') }}</span>
+                                @endif
+                            </div>
 
-                        <div class="mb-3">
-                            <label for="short_description" class="form-label">Short Description</label>
-                            <input type="text" class="form-control" name="short_description"
-                                placeholder="Short Description">
-                            @if ($errors->has('short_description'))
-                                <span class="text-danger text-left">{{ $errors->first('short_description') }}</span>
-                            @endif
-                        </div>
+                            <div class="mb-3">
+                                <label for="short_description" class="form-label">Short Description</label>
+                                <input type="text" class="form-control" name="short_description"
+                                    placeholder="Short Description">
+                                @if ($errors->has('short_description'))
+                                    <span class="text-danger text-left">{{ $errors->first('short_description') }}</span>
+                                @endif
+                            </div>
 
-                        <div class="mb-3">
-                            <label for="description" class="form-label">Description</label>
-                            <textarea id="editor" name="description" style="height: 200px;"></textarea>
-                            @if ($errors->has('description'))
-                                <span class="text-danger text-left">{{ $errors->first('description') }}</span>
-                            @endif
-                        </div>
+                            <div class="mb-3">
+                                <label for="description" class="form-label">Description</label>
+                                <textarea id="editor" name="description" style="height: 200px;"></textarea>
+                                @if ($errors->has('description'))
+                                    <span class="text-danger text-left">{{ $errors->first('description') }}</span>
+                                @endif
+                            </div>
 
-                        <div class="mb-3">
-                            <label for="type" class="form-label">Type</label>
-                            <input type="text" class="form-control" name="type" placeholder="Type">
-                            @if ($errors->has('type'))
-                                <span class="text-danger text-left">{{ $errors->first('type') }}</span>
-                            @endif
-                        </div>
+                            <div class="mb-3">
+                                <label for="type" class="form-label">Type</label>
+                                <input type="text" class="form-control" name="type" placeholder="Type">
+                                @if ($errors->has('type'))
+                                    <span class="text-danger text-left">{{ $errors->first('type') }}</span>
+                                @endif
+                            </div>
 
-                        <div class="mb-3">
-                            <label for="image" class="form-label">Image</label>
-                            <input type="file" class="form-control" name="image" accept="image/*" required>
-                            @if ($errors->has('image'))
-                                <span class="text-danger text-left">{{ $errors->first('image') }}</span>
-                            @endif
-                        </div>
+                            <div class="mb-3">
+                                <label for="image" class="form-label">Image</label>
+                                <input type="file" class="form-control" name="image" accept="image/*" required>
+                                @if ($errors->has('image'))
+                                    <span class="text-danger text-left">{{ $errors->first('image') }}</span>
+                                @endif
+                            </div>
 
-                        <div class="mb-3">
-                            <label for="thumbnail" class="form-label">Thumbnail</label>
-                            <input type="file" class="form-control" name="thumbnail" accept="image/*">
-                            @if ($errors->has('thumbnail'))
-                                <span class="text-danger text-left">{{ $errors->first('thumbnail') }}</span>
-                            @endif
-                        </div>
+                            <div class="mb-3">
+                                <label for="thumbnail" class="form-label">Thumbnail</label>
+                                <input type="file" class="form-control" name="thumbnail" accept="image/*">
+                                @if ($errors->has('thumbnail'))
+                                    <span class="text-danger text-left">{{ $errors->first('thumbnail') }}</span>
+                                @endif
+                            </div>
 
-                        <button type="submit" class="btn btn-primary">Save Blog</button>
+                            <button type="submit" class="btn btn-primary">Save Blog</button>
                     </form>
+                    @else
+                        <div class="alert alert-warning">You don’t have permission to add blogs.</div>
+                    @endif
 
                     <table class="table table-striped mt-5">
                         <thead>
@@ -92,27 +96,49 @@
                                     <td><img src="{{ asset('storage/' . $blog->image) }}" alt="Image" width="50"></td>
                                     <td><img src="{{ asset('storage/' . $blog->thumbnail) }}" alt="Thumbnail" width="50"></td>
                                     <td>
-                                        <div class="dropdown">
-                                            <button class="btn btn-sm btn-secondary dropdown-toggle" type="button"
-                                                id="actionDropdown{{ $blog->id }}" data-bs-toggle="dropdown"
-                                                aria-expanded="false">
-                                                Actions
-                                            </button>
-                                            <ul class="dropdown-menu" aria-labelledby="actionDropdown{{ $blog->id }}">
-                                                <li>
-                                                    <a class="dropdown-item" href="{{ route('blog.edit', $blog->id) }}">Edit</a>
-                                                </li>
-                                                <li>
-                                                    <form action="{{ route('blog.destroy', $blog->id) }}" method="POST"
-                                                        onsubmit="return confirm('Are you sure you want to delete this blog?');">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="submit" class="dropdown-item text-danger">Delete</button>
-                                                    </form>
-                                                </li>
-                                            </ul>
-                                        </div>
+                                        @if(
+                                                \App\Helpers\Helper::canAccess('manage_blog_edit') ||
+                                                \App\Helpers\Helper::canAccess('manage_blog_delete')
+                                            )
+                                            <div class="dropdown">
+                                                <button class="btn btn-sm btn-secondary dropdown-toggle" type="button"
+                                                    id="actionDropdown{{ $blog->id }}" data-bs-toggle="dropdown"
+                                                    aria-expanded="false">
+                                                    Actions
+                                                </button>
+
+                                                <ul class="dropdown-menu" aria-labelledby="actionDropdown{{ $blog->id }}">
+
+                                                    {{-- EDIT --}}
+                                                    @if(\App\Helpers\Helper::canAccess('manage_blog_edit'))
+                                                        <li>
+                                                            <a class="dropdown-item" href="{{ route('blog.edit', $blog->id) }}">
+                                                                <i class="fa fa-edit me-1"></i> Edit
+                                                            </a>
+                                                        </li>
+                                                    @endif
+
+                                                    {{-- DELETE --}}
+                                                    @if(\App\Helpers\Helper::canAccess('manage_blog_delete'))
+                                                        <li>
+                                                            <form action="{{ route('blog.destroy', $blog->id) }}" method="POST"
+                                                                onsubmit="return confirm('Are you sure you want to delete this blog?');">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                                <button type="submit" class="dropdown-item text-danger">
+                                                                    <i class="fa fa-trash me-1" style="color:#dc3545!important"></i> Delete
+                                                                </button>
+                                                            </form>
+                                                        </li>
+                                                    @endif
+
+                                                </ul>
+                                            </div>
+                                        @else
+                                            <span class="text-muted">No Action</span>
+                                        @endif
                                     </td>
+
 
                                 </tr>
                             @endforeach

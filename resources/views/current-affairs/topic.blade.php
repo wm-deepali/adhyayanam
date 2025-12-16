@@ -16,10 +16,12 @@ Adhyayanam | Current Affairs Categories
             </div>
 
             <div class="container mt-4">
-                <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal"
-                    data-bs-target="#addTopicModal">
-                    Add Categories
-                </button>
+               @if(\App\Helpers\Helper::canAccess('manage_ca_categories_add'))
+                    <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal"
+                        data-bs-target="#addTopicModal">
+                        Add Categories
+                    </button>
+                @endif
 
                 <table class="table table-striped mt-5">
                     <thead>
@@ -39,31 +41,47 @@ Adhyayanam | Current Affairs Categories
                             <td>{{ $topic->description ?? '' }}</td>
                             <td>{{ $topic->created_at->format('d M Y, h:i A') }}</td>
                             <td>
-                                <div class="dropdown">
-                                    <button class="btn btn-secondary dropdown-toggle btn-sm" type="button"
-                                        data-bs-toggle="dropdown" aria-expanded="false">
-                                        Actions
-                                    </button>
-                                    <ul class="dropdown-menu">
-                                        <li>
-                                            <a class="dropdown-item" href="#" data-bs-toggle="modal"
-                                                data-bs-target="#editTopicModal{{ $topic->id }}">
-                                                <i class="fas fa-edit"></i> Edit
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <form action="{{ route('current.affairs.topic.delete', $topic->id) }}"
-                                                method="POST" style="display:inline;">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="dropdown-item text-danger">
-                                                    <i class="fas fa-trash" style="color: #dc3545!important"></i> Delete
-                                                </button>
-                                            </form>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </td>
+    @if(
+        \App\Helpers\Helper::canAccess('manage_ca_categories_edit') ||
+        \App\Helpers\Helper::canAccess('manage_ca_categories_delete')
+    )
+        <div class="dropdown">
+            <button class="btn btn-secondary dropdown-toggle btn-sm" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false">
+                Actions
+            </button>
+
+            <ul class="dropdown-menu">
+
+                {{-- EDIT --}}
+                @if(\App\Helpers\Helper::canAccess('manage_ca_categories_edit'))
+                    <li>
+                        <a class="dropdown-item" href="#" data-bs-toggle="modal"
+                            data-bs-target="#editTopicModal{{ $topic->id }}">
+                            <i class="fas fa-edit"></i> Edit
+                        </a>
+                    </li>
+                @endif
+
+                {{-- DELETE --}}
+                @if(\App\Helpers\Helper::canAccess('manage_ca_categories_delete'))
+                    <li>
+                        <form action="{{ route('current.affairs.topic.delete', $topic->id) }}"
+                            method="POST" style="display:inline;"
+                            onsubmit="return confirm('Are you sure you want to delete this category?');">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="dropdown-item text-danger">
+                                <i class="fas fa-trash" style="color:#dc3545!important"></i> Delete
+                            </button>
+                        </form>
+                    </li>
+                @endif
+
+            </ul>
+        </div>
+    @endif
+</td>
                         </tr>
 
                         <!-- Edit Modal for this category -->

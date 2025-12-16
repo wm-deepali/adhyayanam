@@ -37,7 +37,9 @@ Cookies Policy Management
                             <span class="text-danger text-left">{{ $errors->first('description1') }}</span>
                         @endif
                     </div>
-                    <button type="submit" class="btn btn-primary">Save Page</button>
+                   @if(\App\Helpers\Helper::canAccess('manage_cookies_edit'))
+                            <button type="submit" class="btn btn-primary">Save Page</button>
+                        @endif
                 </form>
             </div>
         </div>

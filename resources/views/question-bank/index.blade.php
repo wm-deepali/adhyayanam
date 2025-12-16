@@ -14,8 +14,10 @@
                         <h6 class="card-subtitle mb-2 text-muted"> Manage your Question Bank section here.</h6>
                     </div>
                     <div class="justify-content-end">
-                        <a href='{{route('question.bank.create')}}' class="btn btn-primary">&#43; Add</a>
-                        <a href='{{route('question.bank.bulk-upload')}}' class="btn btn-primary">&#43; Bulk Upload</a>
+                        @if(\App\Helpers\Helper::canAccess('manage_question_bank_add'))
+                            <a href='{{route('question.bank.create')}}' class="btn btn-primary">&#43; Add</a>
+                            <a href='{{route('question.bank.bulk-upload')}}' class="btn btn-primary">&#43; Bulk Upload</a>
+                        @endif
                         <a href='{{route('question.bank.rejected')}}' class="btn btn-primary">Rejected Questions</a>
                         <a href='{{route('question.bank.pending')}}' class="btn btn-primary">Pending Questions</a>
                     </div>

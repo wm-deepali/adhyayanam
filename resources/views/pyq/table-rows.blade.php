@@ -28,26 +28,33 @@
                     Actions
                 </button>
                 <ul class="dropdown-menu">
-                    <li>
-                        <a class="dropdown-item" href="{{ route('test.paper.view', $res->id) }}">
-                            <i class="fas fa-eye"></i> View
-                        </a>
-                    </li>
-                    <li>
-                        <a class="dropdown-item" href="{{ route('test.paper.edit', $res->id) }}">
-                            <i class="fas fa-edit"></i> Edit
-                        </a>
-                    </li>
-                    <li>
-                        <form action="{{ route('test.paper.delete', $res->id) }}" method="POST" class="delete-form"
-                            style="display:inline;">
-                            @csrf
-                            @method('DELETE')
-                            <button type="button" class="dropdown-item text-danger delete-btn">
-                                <i class="fas fa-trash" style="color: #dc3545!important"></i> Delete
-                            </button>
-                        </form>
-                    </li>
+                    @if(\App\Helpers\Helper::canAccess('manage_test_bank'))
+                        <li>
+                            <a class="dropdown-item" href="{{ route('test.paper.view', $bank->id) }}">
+                                <i class="fas fa-eye"></i> View
+                            </a>
+                        </li>
+                    @endif
+                    @if(\App\Helpers\Helper::canAccess('manage_test_bank_edit'))
+                        <li>
+                            <a class="dropdown-item" href="{{ route('test.paper.edit', $bank->id) }}">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                        </li>
+                    @endif
+
+                    @if(\App\Helpers\Helper::canAccess('manage_test_bank_delete'))
+                        <li>
+                            <form action="{{ route('test.paper.delete', $res->id) }}" method="POST" class="delete-form"
+                                style="display:inline;">
+                                @csrf
+                                @method('DELETE')
+                                <button type="button" class="dropdown-item text-danger delete-btn">
+                                    <i class="fas fa-trash" style="color: #dc3545!important"></i> Delete
+                                </button>
+                            </form>
+                        </li>
+                    @endif
                 </ul>
             </div>
         </td>

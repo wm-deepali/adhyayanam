@@ -37,29 +37,46 @@
                             Actions
                         </button>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="{{ route('question.bank.view', $data->id) }}"><i
-                                        class="fas fa-eye"></i> View</a></li>
-                            <li><a class="dropdown-item" href="{{ route('question.bank.edit', $data->id) }}"><i
-                                        class="fas fa-edit"></i> Edit</a></li>
-                            <li>
-                                <button type="button" class="dropdown-item text-danger deleteBtn" data-id="{{ $data->id }}"
-                                    data-url="{{ route('question.bank.delete', $data->id) }}">
-                                    <i class="fas fa-trash"></i> Delete</button>
-                            </li>
-                            <li>
-                                <form action="{{ route('question.bank.update-status', $data->id) }}" method="POST"
-                                    style="display:inline;">
-                                    @csrf
-                                    <input type="hidden" name="status" value="Done">
-                                    <button type="submit" class="dropdown-item text-success"><i class="fas fa-check"></i>
-                                        Approve</button>
-                                </form>
-                            </li>
-                            <li>
-                                <button class="dropdown-item text-warning" data-bs-toggle="modal"
-                                    data-bs-target="#rejectModal{{ $data->id }}"><i class="fas fa-times"></i>
-                                    Reject</button>
-                            </li>
+                            @if(\App\Helpers\Helper::canAccess('manage_question_bank'))
+                                <li>
+                                    <a class="dropdown-item" href="{{ route('question.bank.view', $data->id) }}">
+                                        <i class="fas fa-eye"></i> View
+                                    </a>
+                                </li>
+                            @endif
+
+                            @if(\App\Helpers\Helper::canAccess('manage_question_bank_edit'))
+                                <li>
+                                    <a class="dropdown-item" href="{{ route('question.bank.edit', $data->id) }}">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </a>
+                                </li>
+                            @endif
+                            @if(\App\Helpers\Helper::canAccess('manage_question_bank_delete'))
+                                <li>
+                                    <button type="button" class="dropdown-item text-danger deleteBtn" data-id="{{ $data->id }}"
+                                        data-url="{{ route('question.bank.delete', $data->id) }}">
+                                        <i class="fas fa-trash" style="color:#dc3545!important"></i> Delete</button>
+                                </li>
+                            @endif
+                            @if(\App\Helpers\Helper::canAccess('manage_question_bank_status'))
+                                <li>
+                                    <form action="{{ route('question.bank.update-status', $data->id) }}" method="POST"
+                                        style="display:inline;">
+                                        @csrf
+                                        <input type="hidden" name="status" value="Done">
+                                        <button type="submit" class="dropdown-item text-success"><i class="fas fa-check"></i>
+                                            Approve</button>
+                                    </form>
+                                </li>
+                            @endif
+                            @if(\App\Helpers\Helper::canAccess('manage_question_bank_status'))
+                                <li>
+                                    <button class="dropdown-item text-warning" data-bs-toggle="modal"
+                                        data-bs-target="#rejectModal{{ $data->id }}"><i class="fas fa-times"></i>
+                                        Reject</button>
+                                </li>
+                            @endif
                         </ul>
 
                     </div>

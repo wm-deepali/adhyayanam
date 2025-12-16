@@ -27,9 +27,11 @@
                         <h5 class="card-title">Test Paper</h5>
                         <!--<h6 class="card-subtitle mb-2 text-muted"> Manage your Question Bank section here.</h6>-->
                     </div>
-                    <div class="justify-content-end">
-                        <a href='{{route('test.paper.create')}}' class="btn btn-primary">&#43; Create New Paper</a>
-                    </div>
+                    @if(\App\Helpers\Helper::canAccess('manage_test_bank_add'))
+                        <div class="justify-content-end">
+                            <a href='{{route('test.paper.create')}}' class="btn btn-primary">&#43; Create New Paper</a>
+                        </div>
+                    @endif
                 </div>
                 <div class="mt-2">
                     @include('layouts.includes.messages')

@@ -25,7 +25,9 @@
                         </form>
 
                         <!-- Add New Button -->
-                        <a href="{{ route('video.create') }}" class="btn btn-primary">Add New</a>
+                        @if(\App\Helpers\Helper::canAccess('manage_videos_add'))
+                            <a href="{{ route('video.create') }}" class="btn btn-primary">Add New</a>
+                        @endif
                     </div>
 
                     <!-- Tabs -->
@@ -105,36 +107,60 @@
                                                 </td>
                                                 <td>{{ $topic->status ? 'Active' : 'Inactive' }}</td>
                                                 <td>
-                                                    <div class="dropdown">
-                                                        <button class="btn btn-sm btn-secondary dropdown-toggle" type="button"
-                                                            data-bs-toggle="dropdown">
-                                                            Actions
-                                                        </button>
-                                                        <ul class="dropdown-menu">
-                                                            <li>
-                                                                <a class="dropdown-item"
-                                                                    href="{{ route('video.show', $topic->id) }}">
-                                                                    <i class="fa fa-eye text-primary me-2"></i> View
-                                                                </a>
-                                                            </li>
-                                                            <li>
-                                                                <a class="dropdown-item"
-                                                                    href="{{ route('video.edit', $topic->id) }}">
-                                                                    <i class="fa fa-edit text-success me-2"></i> Edit
-                                                                </a>
-                                                            </li>
-                                                            <li>
-                                                                <form action="{{ route('video.destroy', $topic->id) }}"
-                                                                    method="POST" onsubmit="return confirm('Are you sure?')">
-                                                                    @csrf
-                                                                    @method('DELETE')
-                                                                    <button type="submit" class="dropdown-item text-danger">
-                                                                        <i class="fa fa-trash me-2"></i> Delete
-                                                                    </button>
-                                                                </form>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
+                                                    @php
+                                                        $canView = \App\Helpers\Helper::canAccess('manage_video');
+                                                        $canEdit = \App\Helpers\Helper::canAccess('manage_videos_edit');
+                                                        $canDelete = \App\Helpers\Helper::canAccess('manage_videos_delete');
+                                                    @endphp
+
+                                                    @if($canView || $canEdit || $canDelete)
+                                                        <div class="dropdown">
+                                                            <button class="btn btn-sm btn-secondary dropdown-toggle" type="button"
+                                                                data-bs-toggle="dropdown">
+                                                                Actions
+                                                            </button>
+
+                                                            <ul class="dropdown-menu">
+
+                                                                {{-- VIEW --}}
+                                                                @if($canView)
+                                                                    <li>
+                                                                        <a class="dropdown-item"
+                                                                            href="{{ route('video.show', $topic->id) }}">
+                                                                            <i class="fa fa-eye text-primary me-2"></i> View
+                                                                        </a>
+                                                                    </li>
+                                                                @endif
+
+                                                                {{-- EDIT --}}
+                                                                @if($canEdit)
+                                                                    <li>
+                                                                        <a class="dropdown-item"
+                                                                            href="{{ route('video.edit', $topic->id) }}">
+                                                                            <i class="fa fa-edit text-success me-2"></i> Edit
+                                                                        </a>
+                                                                    </li>
+                                                                @endif
+
+                                                                {{-- DELETE --}}
+                                                                @if($canDelete)
+                                                                    <li>
+                                                                        <form action="{{ route('video.destroy', $topic->id) }}"
+                                                                            method="POST" onsubmit="return confirm('Are you sure?')">
+                                                                            @csrf
+                                                                            @method('DELETE')
+                                                                            <button type="submit" class="dropdown-item text-danger">
+                                                                                <i class="fa fa-trash me-2"></i> Delete
+                                                                            </button>
+                                                                        </form>
+                                                                    </li>
+                                                                @endif
+
+                                                            </ul>
+                                                        </div>
+                                                    @else
+                                                        -
+                                                    @endif
                                                 </td>
                                             </tr>
                                         @endforeach
@@ -174,37 +200,59 @@
                                                 <td>{{ $class->end_time }}</td>
                                                 <td>{{ $class->status ? 'Active' : 'Inactive' }}</td>
                                                 <td>
-                                                    <div class="dropdown">
-                                                        <button class="btn btn-sm btn-secondary dropdown-toggle" type="button"
-                                                            data-bs-toggle="dropdown">
-                                                            Actions
-                                                        </button>
-                                                        <ul class="dropdown-menu">
-                                                            <li>
-                                                                <a class="dropdown-item"
-                                                                    href="{{ route('video.show', $class->id) }}">
-                                                                    <i class="fa fa-eye text-primary me-2"></i> View
-                                                                </a>
-                                                            </li>
-                                                            <li>
-                                                                <a class="dropdown-item"
-                                                                    href="{{ route('video.edit', $class->id) }}">
-                                                                    <i class="fa fa-edit text-success me-2"></i> Edit
-                                                                </a>
-                                                            </li>
-                                                            <li>
-                                                                <form action="{{ route('video.destroy', $class->id) }}"
-                                                                    method="POST" onsubmit="return confirm('Are you sure?')">
-                                                                    @csrf
-                                                                    @method('DELETE')
-                                                                    <button type="submit" class="dropdown-item text-danger">
-                                                                        <i class="fa fa-trash me-2"></i> Delete
-                                                                    </button>
-                                                                </form>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                </td>
+    @php
+        $canView   = \App\Helpers\Helper::canAccess('manage_videos');
+        $canEdit   = \App\Helpers\Helper::canAccess('manage_videos_edit');
+        $canDelete = \App\Helpers\Helper::canAccess('manage_videos_delete');
+    @endphp
+
+    @if($canView || $canEdit || $canDelete)
+        <div class="dropdown">
+            <button class="btn btn-sm btn-secondary dropdown-toggle" type="button"
+                data-bs-toggle="dropdown">
+                Actions
+            </button>
+
+            <ul class="dropdown-menu">
+
+                @if($canView)
+                    <li>
+                        <a class="dropdown-item"
+                           href="{{ route('video.show', $class->id) }}">
+                            <i class="fa fa-eye text-primary me-2"></i> View
+                        </a>
+                    </li>
+                @endif
+
+                @if($canEdit)
+                    <li>
+                        <a class="dropdown-item"
+                           href="{{ route('video.edit', $class->id) }}">
+                            <i class="fa fa-edit text-success me-2"></i> Edit
+                        </a>
+                    </li>
+                @endif
+
+                @if($canDelete)
+                    <li>
+                        <form action="{{ route('video.destroy', $class->id) }}"
+                              method="POST"
+                              onsubmit="return confirm('Are you sure?')">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="dropdown-item text-danger">
+                                <i class="fa fa-trash me-2"></i> Delete
+                            </button>
+                        </form>
+                    </li>
+                @endif
+
+            </ul>
+        </div>
+    @else
+        -
+    @endif
+</td>
                                             </tr>
                                         @endforeach
                                     </tbody>

@@ -44,6 +44,10 @@ class User extends Authenticatable implements HasMedia, MustVerifyEmail
         'password',
         'type',
         'is_save_activity',
+        'role_group_id',
+        'date_of_birth',
+        'gender',
+        'username'
     ];
 
     /**
@@ -131,5 +135,10 @@ class User extends Authenticatable implements HasMedia, MustVerifyEmail
         return $this->hasMany(VideoUserProgress::class);
     }
 
+
+    public function roleGroup()
+    {
+        return $this->belongsTo(RoleGroup::class, 'role_group_id');
+    }
 
 }

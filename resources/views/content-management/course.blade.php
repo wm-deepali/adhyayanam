@@ -13,9 +13,11 @@
                         <h5 class="card-title">Course</h5>
                         <h6 class="card-subtitle mb-2 text-muted"> Manage Course section here.</h6>
                     </div>
+                    @if(\App\Helpers\Helper::canAccess('manage_courses_add'))
                     <div class="justify-content-end">
                         <a href='{{route('courses.course.create')}}' class="btn btn-primary">&#43; Add</a>
                     </div>
+                    @endif
                 </div>
                 <div class="mt-2">
                     @include('layouts.includes.messages')
@@ -60,6 +62,7 @@
                 dom: '<"row margin-bottom-12"<"col-sm-12"<"pull-left"l><"pull-right"fr><"pull-right margin-left-10 "B>>>tip',
                 buttons: {
                     buttons: [
+                        @if(\App\Helpers\Helper::canAccess('manage_courses_delete'))
                         {
                             className: 'btn bg-red color-palette btn-flat hidden delete_btn pull-left',
                             text: 'Bulk Delete',
@@ -67,6 +70,7 @@
                                 multi_delete();
                             }
                         },
+                        @endif
                         { extend: 'copy', className: 'btn bg-teal color-palette btn-flat', footer: true, exportOptions: { columns: [1, 2, 3, 4, 5, 6, 7, 8, 9] } },
                         { extend: 'excel', className: 'btn bg-teal color-palette btn-flat', footer: true, exportOptions: { columns: [1, 2, 3, 4, 5, 6, 7, 8, 9] } },
                         { extend: 'pdf', className: 'btn bg-teal color-palette btn-flat', footer: true, exportOptions: { columns: [1, 2, 3, 4, 5, 6, 7, 8, 9] } },

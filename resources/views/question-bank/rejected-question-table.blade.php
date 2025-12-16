@@ -24,7 +24,7 @@
                 <td>{{ $data->subject->name ?? "-" }}</td>
                 <td>{{ $data->instruction }}</td>
                 <td><span class="badge bg-danger">{{ ucfirst($data->status) }}</span></td>
-                 <td>{{ $data->addedBy->full_name ?? '-' }}<br>{{ $data->addedBy->email ?? '-' }}</td>
+                <td>{{ $data->addedBy->full_name ?? '-' }}<br>{{ $data->addedBy->email ?? '-' }}</td>
                 <td>
                     {{ $data->rejectedBy->name ?? '-' }}
                 </td>
@@ -36,16 +36,30 @@
                             Actions
                         </button>
                         <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton{{ $data->id }}">
-                            <li><a class="dropdown-item text-primary"
-                                    href="{{route('question.bank.view', $data->id)}}">View</a></li>
-                            <li><a class="dropdown-item text-secondary"
-                                    href="{{ route('question.bank.edit', $data->id) }}">Edit</a></li>
-                            <li>
-                                <button type="button" class="dropdown-item text-danger deleteBtn" data-id="{{ $data->id }}"
-                                    data-url="{{ route('question.bank.delete', $data->id) }}">
-                                    Delete
-                                </button>
-                            </li>
+
+                            @if(\App\Helpers\Helper::canAccess('manage_question_bank'))
+                                <li>
+                                    <a class="dropdown-item" href="{{ route('question.bank.view', $data->id) }}">
+                                        <i class="fas fa-eye"></i> View
+                                    </a>
+                                </li>
+                            @endif
+
+                            @if(\App\Helpers\Helper::canAccess('manage_question_bank_edit'))
+                                <li>
+                                    <a class="dropdown-item" href="{{ route('question.bank.edit', $data->id) }}">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </a>
+                                </li>
+                            @endif
+                            @if(\App\Helpers\Helper::canAccess('manage_question_bank_delete'))
+                                <li>
+                                    <button type="button" class="dropdown-item text-danger deleteBtn" data-id="{{ $data->id }}"
+                                        data-url="{{ route('question.bank.delete', $data->id) }}">
+                                        Delete
+                                    </button>
+                                </li>
+                            @endif
                         </ul>
                     </div>
                 </td>

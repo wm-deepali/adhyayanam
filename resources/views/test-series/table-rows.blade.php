@@ -58,22 +58,45 @@ if (isset($test->testseries) && count($test->testseries) > 0) {
                             <td>{{ $test->price }}</td>
                            
                             <td>
-                                <div class="dropdown">
-              <button class="btn btn-secondary dropdown-toggle btn-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                Actions
-              </button>
-              <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="{{ route('test.series.view', $test->id) }}"><i class="fas fa-eye"></i> View</a></li>
-                <li><a class="dropdown-item" href="{{ route('test.series.edit', $test->id) }}"><i class="fas fa-edit"></i> Edit</a></li>
-                <li>
-                    <form action="{{ route('test.series.delete', $test->id) }}" method="POST" style="display:inline;">
-                                    @csrf
-                                    @method('DELETE')
-                    <button type="submit" class="dropdown-item text-danger"><i class="fas fa-trash" style="color: #dc3545!important"></i> Delete</button>
+                               <div class="dropdown">
+    <button class="btn btn-secondary dropdown-toggle btn-sm" type="button"
+        data-bs-toggle="dropdown" aria-expanded="false">
+        Actions
+    </button>
+
+    <ul class="dropdown-menu">
+
+        @if(\App\Helpers\Helper::canAccess('manage_test_series_package'))
+            <li>
+                <a class="dropdown-item" href="{{ route('test.series.view', $test->id) }}">
+                    <i class="fas fa-eye"></i> View
+                </a>
+            </li>
+        @endif
+
+        @if(\App\Helpers\Helper::canAccess('manage_test_series_package_edit'))
+            <li>
+                <a class="dropdown-item" href="{{ route('test.series.edit', $test->id) }}">
+                    <i class="fas fa-edit"></i> Edit
+                </a>
+            </li>
+        @endif
+
+        @if(\App\Helpers\Helper::canAccess('manage_test_series_package_delete'))
+            <li>
+                <form action="{{ route('test.series.delete', $test->id) }}" method="POST" style="display:inline;">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="dropdown-item text-danger">
+                        <i class="fas fa-trash" style="color:#dc3545!important"></i> Delete
+                    </button>
                 </form>
-                    
-              </ul>
-            </div>
+            </li>
+        @endif
+
+    </ul>
+</div>
+
                                 
                                 
                                 

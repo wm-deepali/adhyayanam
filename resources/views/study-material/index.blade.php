@@ -13,9 +13,11 @@
                         <h5 class="card-title">Study Material</h5>
                         <h6 class="card-subtitle mb-2 text-muted">Manage your Study Material section here.</h6>
                     </div>
-                    <div class="justify-content-end">
-                        <a href='{{route('study.material.create')}}' class="btn btn-primary">&#43; Add</a>
-                    </div>
+                    @if(\App\Helpers\Helper::canAccess('manage_study_material_add'))
+                        <div class="justify-content-end">
+                            <a href='{{route('study.material.create')}}' class="btn btn-primary">&#43; Add</a>
+                        </div>
+                    @endif
                 </div>
                 <div class="mt-2">
                     @include('layouts.includes.messages')
@@ -98,13 +100,15 @@
                 dom: '<"row margin-bottom-12"<"col-sm-12"<"pull-left"l><"pull-right"fr><"pull-right margin-left-10 "B>>>tip',
                 buttons: {
                     buttons: [
-                        {
-                            className: 'btn bg-red color-palette btn-flat hidden delete_btn pull-left',
-                            text: 'Bulk Delete',
-                            action: function (e, dt, node, config) {
-                                multi_delete();
-                            }
-                        },
+                        @if(\App\Helpers\Helper::canAccess('manage_study_material_delete'))
+                                {
+                                className: 'btn bg-red color-palette btn-flat hidden delete_btn pull-left',
+                                text: 'Bulk Delete',
+                                action: function (e, dt, node, config) {
+                                    multi_delete();
+                                }
+                            },
+                        @endif
                         { extend: 'copy', className: 'btn bg-teal color-palette btn-flat', footer: true, exportOptions: { columns: [1, 2, 3, 4, 5, 6] } },
                         { extend: 'excel', className: 'btn bg-teal color-palette btn-flat', footer: true, exportOptions: { columns: [1, 2, 3, 4, 5, 6] } },
                         { extend: 'pdf', className: 'btn bg-teal color-palette btn-flat', footer: true, exportOptions: { columns: [1, 2, 3, 4, 5, 6] } },

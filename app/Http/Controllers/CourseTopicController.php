@@ -43,15 +43,32 @@ class CourseTopicController extends Controller
                     return $status;
                 })
                 ->addColumn('action', function ($row) {
-                    $editUrl = route('cm.chapter.edit', $row->id);
-                    $actionBtn = ' <a href="' . $editUrl . '" class="btn btn-sm btn-primary" title="Edit"><i class="fa fa-file"></i></a>
-                            <form action="' . route('cm.chapter.delete', $row->id) . '" method="POST" style="display:inline">
-                                ' . csrf_field() . '
-                                ' . method_field("DELETE") . '
-                                <button type="submit" class="btn btn-sm btn-danger" title="Delete"><i class="fa fa-trash"></i></button>
-                            </form>';
+                    $actionBtn = '';
+
+                    if (\App\Helpers\Helper::canAccess('manage_chapter_edit')) {
+                        $editUrl = route('cm.chapter.edit', $row->id);
+                        $actionBtn .= ' 
+            <a href="' . $editUrl . '" class="btn btn-sm btn-primary" title="Edit">
+                <i class="fa fa-file"></i>
+            </a>
+        ';
+                    }
+
+                    if (\App\Helpers\Helper::canAccess('manage_chapter_delete')) {
+                        $actionBtn .= '
+            <form action="' . route('cm.chapter.delete', $row->id) . '" method="POST" style="display:inline">
+                ' . csrf_field() . '
+                ' . method_field("DELETE") . '
+                <button type="submit" class="btn btn-sm btn-danger" title="Delete">
+                    <i class="fa fa-trash"></i>
+                </button>
+            </form>
+        ';
+                    }
+
                     return $actionBtn;
                 })
+
                 ->rawColumns(['checkbox', 'subject', 'status', 'action'])
                 ->make(true);
         }

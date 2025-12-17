@@ -13,32 +13,32 @@ class Video extends Model
     protected $fillable = [
         'course_type',
         'course_category',
-        'access_till',
-        'duration',
-        'rating',
-        'cover_image',
         'course_id',
         'chapter_id',
+        'sub_category_id',
+        'subject_id',
+        'topic_id',
         'type',
         'title',
         'image',
+        'cover_image',
         'content',
-        'assignment',
+        'solution_file',
+        'assignment_file',
+        'live_link',
         'slug',
         'video_url',
         'video_type',
+        'duration',
         'schedule_date',
         'start_time',
         'end_time',
         'teacher_id',
+        'rating',
+        'access_till',
         'status',
         'support',
         'no_of_times_can_view',
-        'asignment',
-        'sub_category_id',
-        'subject_id',
-        'topic_id',
-        'live_link'
     ];
 
 
@@ -88,6 +88,11 @@ class Video extends Model
     public function userProgress()
     {
         return $this->hasMany(VideoUserProgress::class);
+    }
+
+    public function homeworkSubmissions()
+    {
+        return $this->hasMany(StudentHomeworkSubmission::class);
     }
 
 }

@@ -154,10 +154,10 @@
                                         {{-- Thumb Image --}}
                                         <div class="col-md-6 mb-2">
                                             <label>Thumb Image:</label>
-                                            <img id="live_thumb_preview"
+                                            <img id="video_thumb_preview"
                                                 src="{{ isset($video) && $video->image ? asset('storage/' . $video->image) : '#' }}"
                                                 style="max-width:200px; margin-bottom:10px; {{ !isset($video->image) ? 'display:none;' : '' }}">
-                                            <input type="file" class="form-control-file" id="image" name="image"
+                                            <input type="file" class="form-control-file" id="video_image" name="image"
                                                 accept="image/*">
                                             <div class="text-danger validation-err" id="image-err"></div>
                                         </div>
@@ -165,23 +165,47 @@
                                         {{-- Cover Image --}}
                                         <div class="col-md-6 mb-2">
                                             <label>Cover Image:</label>
-                                            <img id="live_cover_preview"
+                                            <img id="video_cover_preview"
                                                 src="{{ isset($video) && $video->cover_image ? asset('storage/' . $video->cover_image) : '#' }}"
                                                 style="max-width:200px; margin-bottom:10px; {{ !isset($video->cover_image) ? 'display:none;' : '' }}">
-                                            <input type="file" class="form-control-file" id="cover_image" name="cover_image"
+                                            <input type="file" class="form-control-file" id="video_cover_image" name="cover_image"
                                                 accept="image/*">
                                             <div class="text-danger validation-err" id="cover_image-err"></div>
                                         </div>
 
-                                        {{-- Assignment --}}
-                                        <div class="col-md-6 mb-2">
-                                            <label>Assignment Image (optional):</label>
-                                            <img id="live_assignment_preview"
-                                                src="{{ isset($video) && $video->assignment ? asset('storage/' . $video->assignment) : '#' }}"
-                                                style="max-width:200px; margin-bottom:10px; {{ !isset($video->assignment) ? 'display:none;' : '' }}">
-                                            <input type="file" class="form-control-file" id="assignment" name="assignment">
-                                            <div class="text-danger validation-err" id="assignment-err"></div>
-                                        </div>
+     {{-- Assignment File --}}
+<div class="col-md-6 mb-2">
+    <label>Upload Assignment File</label>
+    <input type="file"
+           class="form-control"
+           name="video_assignment_file"
+           accept=".pdf,.doc,.docx">
+    @if(!empty($video->assignment_file))
+        <small class="d-block mt-1">
+            <a href="{{ asset('storage/'.$video->assignment_file) }}" target="_blank">
+                View existing assignment
+            </a>
+        </small>
+    @endif
+</div>
+
+{{-- Solution File --}}
+<div class="col-md-6 mb-2">
+    <label>Upload Solution File</label>
+    <input type="file"
+           class="form-control"
+           name="video_solution_file"
+           accept=".pdf,.doc,.docx">
+    @if(!empty($video->solution_file))
+        <small class="d-block mt-1">
+            <a href="{{ asset('storage/'.$video->solution_file) }}" target="_blank">
+                View existing solution
+            </a>
+        </small>
+    @endif
+</div>
+
+
 
 
                                         {{-- Video Type --}}
@@ -243,16 +267,62 @@
                             <h5>Live Class Details</h5>
                             <div class="row">
 
+                            {{-- Thumb Image --}}
+                                        <div class="col-md-6 mb-2">
+                                            <label>Thumb Image:</label>
+                                            <img id="live_thumb_preview"
+                                                src="{{ isset($video) && $video->image ? asset('storage/' . $video->image) : '#' }}"
+                                                style="max-width:200px; margin-bottom:10px; {{ !isset($video->image) ? 'display:none;' : '' }}">
+                                            <input type="file" class="form-control-file" id="live_image" name="image"
+                                                accept="image/*">
+                                            <div class="text-danger validation-err" id="image-err"></div>
+                                        </div>
 
-                                {{-- Assignment --}}
-                                <div class="col-md-6 mb-2">
-                                    <label>Assignment Image (optional):</label>
-                                    <img id="live_assignment_preview"
-                                        src="{{ isset($video) && $video->assignment ? asset('storage/' . $video->assignment) : '#' }}"
-                                        style="max-width:200px; margin-bottom:10px; {{ !isset($video->assignment) ? 'display:none;' : '' }}">
-                                    <input type="file" class="form-control-file" id="assignment" name="assignment">
-                                    <div class="text-danger validation-err" id="assignment-err"></div>
-                                </div>
+                                        {{-- Cover Image --}}
+                                        <div class="col-md-6 mb-2">
+                                            <label>Cover Image:</label>
+                                            <img id="live_cover_preview"
+                                                src="{{ isset($video) && $video->cover_image ? asset('storage/' . $video->cover_image) : '#' }}"
+                                                style="max-width:200px; margin-bottom:10px; {{ !isset($video->cover_image) ? 'display:none;' : '' }}">
+                                            <input type="file" class="form-control-file" id="live_cover_image" name="cover_image"
+                                                accept="image/*">
+                                            <div class="text-danger validation-err" id="cover_image-err"></div>
+                                        </div>
+
+
+      {{-- Assignment File --}}
+<div class="col-md-6 mb-2">
+    <label>Upload Assignment File</label>
+    <input type="file"
+           class="form-control"
+           name="live_assignment_file"
+           accept=".pdf,.doc,.docx">
+    @if(!empty($video->assignment_file))
+        <small class="d-block mt-1">
+            <a href="{{ asset('storage/'.$video->assignment_file) }}" target="_blank">
+                View existing assignment
+            </a>
+        </small>
+    @endif
+</div>
+
+{{-- Solution File --}}
+<div class="col-md-6 mb-2">
+    <label>Upload Solution File</label>
+    <input type="file"
+           class="form-control"
+           name="live_solution_file"
+           accept=".pdf,.doc,.docx">
+    @if(!empty($video->solution_file))
+        <small class="d-block mt-1">
+            <a href="{{ asset('storage/'.$video->solution_file) }}" target="_blank">
+                View existing solution
+            </a>
+        </small>
+    @endif
+</div>
+
+
 
                                 {{-- Schedule, Start, End --}}
                                 <div class="col-md-6 mb-2">
@@ -338,7 +408,14 @@
                 filterTeachers();
             }
 
-            CKEDITOR.replace('content');
+ if ($('#video_content').length && !CKEDITOR.instances.video_content) {
+    CKEDITOR.replace('video_content');
+}
+if ($('#live_content').length && !CKEDITOR.instances.live_content) {
+    CKEDITOR.replace('live_content');
+}
+
+
             setInterval(() => $(".cke_notifications_area").remove(), 100);
 
             function fetchCourses(subCategoryId, type, selectedCourse = null) {
@@ -546,9 +623,9 @@
                 }
             }
 
-            $('#image').on('change', () => previewImage($('#image')[0], '#live_thumb_preview'));
-            $('#cover_image').on('change', () => previewImage($('#cover_image')[0], '#live_cover_preview'));
-            $('#assignment').on('change', () => previewImage($('#assignment')[0], '#live_assignment_preview'));
+            $('#video_image').on('change', () => previewImage($('#video_image')[0], '#video_thumb_preview'));
+$('#live_image').on('change', () => previewImage($('#live_image')[0], '#live_thumb_preview'));
+
 
             // Submit form via AJAX
             $('#categoryForm').submit(function (e) {

@@ -95,6 +95,10 @@ return [
         'manage_videos' => [
             'label' => 'Manage Videos / Live Class',
             'actions' => ['manage', 'add', 'edit', 'delete']
+        ],
+         'manage_homework_submissions' => [
+            'label' => 'Manage Submitted Assignments',
+            'actions' => ['manage', 'edit']
         ]
     ],
 

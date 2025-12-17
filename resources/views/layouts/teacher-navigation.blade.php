@@ -61,6 +61,16 @@
         </ul>
     </li>
 
+    <li class="nav-item">
+        <a class="nav-link {{ request()->is('teacher/homework*') ? 'active' : '' }}"
+            href="{{ route('teacher.homework.index') }}">
+            <svg class="nav-icon">
+                <use xlink:href="{{ asset('icons/coreui.svg#cil-task') }}"></use>
+            </svg>
+            Submitted Assignments
+        </a>
+    </li>
+
     <li class="nav-group" aria-expanded="false">
         <a class="nav-link nav-group-toggle" href="#">
             <svg class="nav-icon">

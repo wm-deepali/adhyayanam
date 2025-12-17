@@ -22,14 +22,13 @@
                                     <li><strong>Classes:</strong> {{ $course->num_classes }}</li>
                                     <li><strong>Topics:</strong> {{ $course->num_topics }}</li>
                                     <li><strong>Language:</strong>
-                                        @if($course->language_of_teaching == 'E')
-                                            English
-                                        @elseif($course->language_of_teaching == 'H')
-                                            Hindi
-                                        @else
-                                            {{$course->language_of_teaching}}
-                                        @endif
+                                        {{$course->language_of_teaching}}
                                     </li>
+                                    <li>
+                                        <strong>Course Mode:</strong>
+                                        {{ ucfirst($course->course_mode) }}
+                                    </li>
+
                                     <li><strong>Fee Paid:</strong> Rs. {{ $order->total }}</li>
                                 </ul>
                                 <a href="{{ route('course.detail', $course->id) }}" class="btn btn-primary btn-block">

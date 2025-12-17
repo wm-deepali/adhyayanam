@@ -1398,8 +1398,6 @@ class ContentManagementController extends Controller
         </div>
     ';
                 })
-
-
                 ->rawColumns(['checkbox', 'fee', 'image', 'duration', 'category', 'subcat', 'commission', 'action'])
                 ->make(true);
         }
@@ -1411,10 +1409,11 @@ class ContentManagementController extends Controller
     {
         $course = Course::with(['examinationCommission', 'category', 'subCategory'])->findOrFail($id);
 
+        // dd($course->ToArray());
         // Fetch related models based on array IDs stored in the course
-        $subjects = \App\Models\Subject::whereIn('id', $course->subject_id ?? [])->get();
-        $chapters = \App\Models\Chapter::whereIn('id', $course->chapter_id ?? [])->get();
-        $topics = \App\Models\CourseTopic::whereIn('id', $course->topic_id ?? [])->get();
+        $subjects = Subject::whereIn('id', $course->subject_id ?? [])->get();
+        $chapters = Chapter::whereIn('id', $course->chapter_id ?? [])->get();
+        $topics = CourseTopic::whereIn('id', $course->topic_id ?? [])->get();
 
         return view('content-management.course-show', compact('course', 'subjects', 'chapters', 'topics'));
     }
@@ -2015,8 +2014,7 @@ class ContentManagementController extends Controller
 
     public function studyMaterialShow($id)
     {
-        $material = StudyMaterial::with(['commission', 'category', 'subCategory',])->findOrFail($id);
-
+        $material = StudyMaterial::with(['commission', 'category', 'subCategory','sections'])->findOrFail($id);
         return view('study-material.show', compact('material'));
     }
 
@@ -2150,7 +2148,6 @@ class ContentManagementController extends Controller
             ->with('success', 'Study material has been created successfully.');
     }
 
-
     public function downloadPdf($id)
     {
         $material = StudyMaterial::with([
@@ -2213,7 +2210,6 @@ class ContentManagementController extends Controller
 
         return view('study-material.edit', $data);
     }
-
 
     public function studyMaterialUpdate($id, Request $request)
     {
@@ -2373,9 +2369,6 @@ class ContentManagementController extends Controller
             ->route('study.material.index')
             ->with('success', 'Study Material updated successfully with sections');
     }
-
-
-
 
     public function studyMaterialDelete($id)
     {

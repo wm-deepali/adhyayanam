@@ -127,10 +127,18 @@
                             <input type="file" class="form-control-file" name="video_cover_image[]">
                         </div>
 
-                        <!-- Assignment Image -->
+                        <!-- Assignment File -->
                         <div class="col-md-6 mb-2">
-                            <label>Assignment Image (optional):</label>
-                            <input type="file" class="form-control-file" name="video_assignment[]">
+                            <label>Upload Assignment (PDF/Image):</label>
+                            <input type="file" class="form-control-file" name="video_assignment_file[]"
+                                accept=".pdf,.doc,.docx,image/*">
+                        </div>
+
+                        <!-- Solution File -->
+                        <div class="col-md-6 mb-2">
+                            <label>Upload Solution (PDF/Image):</label>
+                            <input type="file" class="form-control-file" name="video_solution_file[]"
+                                accept=".pdf,.doc,.docx,image/*">
                         </div>
 
                         <!-- Video Type -->
@@ -175,7 +183,7 @@
                         <!-- Content -->
                         <div class="col-md-12 mb-2">
                             <label>Content</label>
-                            <textarea class="form-control" name="video_content[]" rows="3"></textarea>
+                            <textarea class="form-control editor" name="video_content[]" rows="3"></textarea>
                         </div>
 
                         <div class="col-md-12">
@@ -198,16 +206,36 @@
                     <div class="row">
 
                         <!-- Title -->
-                        <div class="col-md-6 mb-2">
+                        <div class="col-md-12 mb-2">
                             <label for="live_title">Title:</label>
                             <input type="text" class="form-control" name="live_title[]"
                                 placeholder="Enter Live Class Title">
                         </div>
 
-                        <!-- Assignment Image -->
+                        <!-- Thumb Image -->
                         <div class="col-md-6 mb-2">
-                            <label for="assignment">Assignment Image (optional):</label>
-                            <input type="file" class="form-control-file" name="live_assignment[]">
+                            <label>Thumb Image:</label>
+                            <input type="file" class="form-control-file" name="live_image[]">
+                        </div>
+
+                        <!-- Cover Image -->
+                        <div class="col-md-6 mb-2">
+                            <label>Cover Image:</label>
+                            <input type="file" class="form-control-file" name="live_cover_image[]">
+                        </div>
+
+                        <!-- Assignment File -->
+                        <div class="col-md-6 mb-2">
+                            <label>Upload Assignment (PDF/Image):</label>
+                            <input type="file" class="form-control-file" name="live_assignment_file[]"
+                                accept=".pdf,.doc,.docx,image/*">
+                        </div>
+
+                        <!-- Solution File -->
+                        <div class="col-md-6 mb-2">
+                            <label>Upload Solution (PDF/Image):</label>
+                            <input type="file" class="form-control-file" name="live_solution_file[]"
+                                accept=".pdf,.doc,.docx,image/*">
                         </div>
 
                         <!-- Schedule Date -->
@@ -234,7 +262,7 @@
                             <select class="form-control" name="teacher_id[]">
                                 <option value="">Select Teacher</option>
                                 @foreach(\App\Models\Teacher::all() as $teacher)
-                                    <option value="{{ $teacher->id }}">{{ $teacher->name }}</option>
+                                    <option value="{{ $teacher->id }}">{{ $teacher->full_name }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -259,7 +287,7 @@
                         <!-- Content -->
                         <div class="col-md-12 mb-2">
                             <label for="content">Content</label>
-                            <textarea class="form-control" name="live_content[]" rows="3"></textarea>
+                            <textarea class="form-control editor" name="live_content[]" rows="3"></textarea>
                         </div>
 
                         <div class="col-md-12">
@@ -281,75 +309,89 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="//cdn.ckeditor.com/4.14.1/standard/ckeditor.js"></script>
 <script>
-    CKEDITOR.replace('content');
 
-    // Auto-generate slug per video title
-    $(document).on("input", ".video_title", function () {
-        var title = $(this).val().toLowerCase().replace(/\s+/g, '-');
-        $(this).closest('.video-block').find('.video_slug').val(title);
+
+    /* ================= CKEDITOR SAFE HANDLING ================= */
+
+    function initEditors() {
+        $('.editor').each(function () {
+            if (!this.id) {
+                this.id = 'editor_' + Math.random().toString(36).substr(2, 9);
+            }
+            if (!CKEDITOR.instances[this.id]) {
+                CKEDITOR.replace(this.id);
+            }
+        });
+    }
+
+    $(document).ready(function () {
+        initEditors();
     });
 
+    /* ================= CLONE CLEAN BLOCK ================= */
 
-    setInterval(function () {
-        $(document).find(".cke_notifications_area").remove();
-    }, 100);
+    function cloneClean(selector) {
+        return $($(selector).prop('outerHTML'));
+    }
 
-    // When type changes
-    // When type changes
-    $("#type").on("change", function () {
-        var data = this.value;
-
-        if (data == "video") {
-            $(".video-container").show();
-            $(".live-container").hide();
-            $(".wa, .video_div").show(); // Show Access Till & No. of times
-        } else if (data == "live_class") {
-            $(".live-container").show();
-            $(".video-container").hide();
-            $(".wa, .video_div").hide(); // Hide Access Till & No. of times
-            filterTeachers(); // Trigger teacher filtering
-        } else {
-            $(".video-container, .live-container").hide();
-            $(".wa, .video_div").show();
-        }
-
-        fetchCoursesBySubCategory(); // refresh courses when type changes
-    });
-
-    // Add new video block
     $('#addVideo').on('click', function () {
-        var newBlock = $('.video-block:first').clone(); // clone first block
-        newBlock.find('input, textarea').val(''); // clear values
-        newBlock.find('select').prop('selectedIndex', 0); // reset dropdowns
-        newBlock.find('.video_file_div, .video_url_div, .video_duration_div').hide(); // hide conditional divs
-        $('#videoWrapper').append(newBlock);
+        const block = cloneClean('.video-block:first');
+        block.find('input, textarea').val('');
+        block.find('textarea').removeAttr('id');
+        $('#videoWrapper').append(block);
+        initEditors();
     });
 
-    // Remove video block
+    $('#addLive').on('click', function () {
+        const block = cloneClean('.live-block:first');
+        block.find('input, textarea').val('');
+        block.find('textarea').removeAttr('id');
+        $('#liveWrapper').append(block);
+        initEditors();
+    });
+
+    /* ================= REMOVE ================= */
     $(document).on('click', '.remove-video', function () {
-        if ($('.video-block').length > 1) { // keep at least one block
+        if ($('.video-block').length > 1) {
+            $(this).closest('.video-block').find('.editor').each(function () {
+                if (this.id && CKEDITOR.instances[this.id]) {
+                    CKEDITOR.instances[this.id].destroy(true);
+                }
+            });
             $(this).closest('.video-block').remove();
-        } else {
-            alert("At least one video is required.");
         }
     });
 
-
-    // Add new Live Class block
-    $('#addLive').on('click', function () {
-        var newBlock = $('.live-block:first').clone(); // clone first block
-        newBlock.find('input, textarea').val(''); // clear text fields
-        newBlock.find('select').prop('selectedIndex', 0); // reset dropdowns
-        $('#liveWrapper').append(newBlock);
-    });
-
-    // Remove Live Class block
     $(document).on('click', '.remove-live', function () {
         if ($('.live-block').length > 1) {
+            $(this).closest('.live-block').find('.editor').each(function () {
+                if (this.id && CKEDITOR.instances[this.id]) {
+                    CKEDITOR.instances[this.id].destroy(true);
+                }
+            });
             $(this).closest('.live-block').remove();
-        } else {
-            alert("At least one live class is required.");
         }
+    });
+
+
+
+    /* ================= TYPE TOGGLE ================= */
+
+    $('#type').on('change', function () {
+        const type = $(this).val();
+
+        $('.video-container').toggle(type === 'video');
+        $('.live-container').toggle(type === 'live_class');
+
+        $('.wa, .video_div').toggle(type === 'video');
+    });
+
+
+    /* ================= SLUG ================= */
+
+    $(document).on('input', '.video_title', function () {
+        const slug = $(this).val().toLowerCase().replace(/[^\w ]+/g, '').replace(/\s+/g, '-');
+        $(this).closest('.video-block').find('.video_slug').val(slug);
     });
 
 

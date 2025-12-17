@@ -154,4 +154,11 @@ class Teacher extends Authenticatable implements CanResetPasswordContract
             ->where('added_by_type', 'teacher');
     }
 
+    // Teacher side
+    public function reviewedHomeworks()
+    {
+        return $this->hasMany(StudentHomeworkSubmission::class, 'teacher_id');
+    }
+
+
 }

@@ -32,7 +32,7 @@
                         <div class="col-md-6">
     <div class="mb-3">
         <label for="course_mode" class="form-label">Course Mode</label>
-        <select class="form-select" name="course_mode" id="course_mode" required>
+        <select class="form-control" name="course_mode" id="course_mode" required>
             <option value="" disabled {{ empty($course->course_mode) ? 'selected' : '' }}>None</option>
             <option value="Online" {{ $course->course_mode == 'Online' ? 'selected' : '' }}>Online</option>
             <option value="Video Learning" {{ $course->course_mode == 'Video Learning' ? 'selected' : '' }}>Video Learning</option>
@@ -48,7 +48,7 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="examination_commission_id" class="form-label">Course Type</label>
-                                <select class="form-select" name="examination_commission_id" id="examination_commission_id"
+                                <select class="form-control" name="examination_commission_id" id="examination_commission_id"
                                     required>
                                     <option value="" disabled>None</option>
                                     @foreach($examinationCommissions as $commission)
@@ -65,7 +65,7 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="category_id" class="form-label">Category</label>
-                                <select class="form-select" name="category_id" id="category_id" required>
+                                <select class="form-control" name="category_id" id="category_id" required>
                                     <option value="{{$course->category->id}}" selected>{{$course->category->name}}</option>
                                     <!-- Options will be dynamically loaded -->
                                 </select>
@@ -80,7 +80,7 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="sub_category_id" class="form-label">Sub Category</label>
-                                <select class="form-select" name="sub_category_id" id="sub_category_id">
+                                <select class="form-control" name="sub_category_id" id="sub_category_id">
                                     <option value="{{$course->subCategory->id}}" selected>{{$course->subCategory->name}}
                                     </option>
                                     <!-- Options will be dynamically loaded -->
@@ -237,19 +237,23 @@
                         </div>
                     </div>
 
+                    
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="language_of_teaching" class="form-label">Languages</label>
-                                <select class="form-control select2" name="language_of_teaching[]" multiple="multiple">
-                                    <option value="{{$course->language_of_teaching[0]}}" selected>
-                                        {{$course->language_of_teaching}}
-                                    </option>
-                                </select>
-                                @error('language_of_teaching')
-                                    <span class="text-danger">{{ $message }}</span>
-                                @enderror
-                            </div>
+    <label for="language_of_teaching" class="form-label">Languages</label>
+    @php
+        $selectedLanguages = (array) $course->language_of_teaching;
+    @endphp
+    <select class="form-control select2" name="language_of_teaching[]" multiple>
+        <option value="English" {{ in_array('English', $selectedLanguages) ? 'selected' : '' }}>English</option>
+        <option value="Hindi" {{ in_array('Hindi', $selectedLanguages) ? 'selected' : '' }}>Hindi</option>
+    </select>
+    @error('language_of_teaching')
+        <span class="text-danger">{{ $message }}</span>
+    @enderror
+</div>
+
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
@@ -386,9 +390,6 @@
     <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
 
     <script src="https://cdn.ckeditor.com/4.16.2/standard/ckeditor.js"></script>
-
-    {{-- In your Blade file or master layout --}}
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
 
 $(document).ready(function () {
@@ -418,23 +419,30 @@ $(document).ready(function () {
 });
 
 
-    function updateDisableSelects() {
+ let isEditLoad = true;
+
+function updateDisableSelects() {
     let subjects = $('#subject_id').val() || [];
     let chapters = $('#chapter_id').val() || [];
 
-    // Enable all by default
-    $('#chapter_id').prop('disabled', false).trigger('change.select2');
-    $('#topic_id').prop('disabled', false).trigger('change.select2');
+    $('#chapter_id').prop('disabled', false);
+    $('#topic_id').prop('disabled', false);
 
     if (subjects.length > 1) {
-        $('#chapter_id').val(null).trigger('change');
-        $('#chapter_id').prop('disabled', true).trigger('change.select2');
-        $('#topic_id').val(null).trigger('change');
-        $('#topic_id').prop('disabled', true).trigger('change.select2');
+        if (!isEditLoad) {
+            $('#chapter_id').val(null).trigger('change');
+            $('#topic_id').val(null).trigger('change');
+        }
+        $('#chapter_id').prop('disabled', true);
+        $('#topic_id').prop('disabled', true);
     } else if (chapters.length > 1) {
-        $('#topic_id').val(null).trigger('change');
-        $('#topic_id').prop('disabled', true).trigger('change.select2');
+        if (!isEditLoad) {
+            $('#topic_id').val(null).trigger('change');
+        }
+        $('#topic_id').prop('disabled', true);
     }
+
+    isEditLoad = false;
 }
 
 
@@ -456,19 +464,7 @@ $(document).ready(function () {
                 console.error("❌ Select2 not loaded!");
             }
 
-            // ✅ Initialize Language of Teaching dropdown
-            const languages = ["English", "Hindi"];
-
-            $('select[name="language_of_teaching[]"]').select2({
-                width: '100%',
-                placeholder: 'Select Languages',
-                data: languages.map(lang => ({ id: lang, text: lang })), // preload options
-                tags: true, // allow adding new custom entries
-                tokenSeparators: [',', ' '],
-                maximumSelectionLength: 5,
-                allowClear: true
-            });
-
+          
             const examinationCommissionSelect = document.getElementById('examination_commission_id');
             const categorySelect = document.getElementById('category_id');
             const subCategorySelect = document.getElementById('sub_category_id');
@@ -499,8 +495,6 @@ $(document).ready(function () {
             // On Subject change -> fetch Chapters
             $('#subject_id').on('change', function () {
                 let subjects = $(this).val();
-                console.log('here', subjects);
-
                 if (subjects && subjects.length > 0) {
                     $.ajax({
                         url: '/fetch-chapter-by-subject/' + subjects.join(','),
@@ -508,7 +502,17 @@ $(document).ready(function () {
                         dataType: 'json',
                         success: function (result) {
                             if (result.success) {
-                                $('#chapter_id').html(result.html).trigger('change');
+                                let previousChapters = $('#chapter_id').val() || [];
+
+$('#chapter_id').html(result.html);
+
+$('#chapter_id option').each(function () {
+    if (previousChapters.includes($(this).val())) {
+        $(this).prop('selected', true);
+    }
+});
+
+$('#chapter_id').trigger('change');
                             } else {
                                 $('#chapter_id').html('<option value="">--Select--</option>').trigger('change');
                             }
@@ -617,9 +621,15 @@ if (basedOn) {
                     dataType: 'json',
                     success: function (response) {
                         categorySelect.innerHTML = '<option value="" selected disabled>None</option>';
-                        response.categories.forEach(category => {
-                            categorySelect.innerHTML += `<option value="${category.id}">${category.name}</option>`;
-                        });
+                        let selectedCategory = "{{ $course->category_id }}";
+
+response.categories.forEach(category => {
+    categorySelect.innerHTML +=
+        `<option value="${category.id}" ${category.id == selectedCategory ? 'selected' : ''}>
+            ${category.name}
+        </option>`;
+});
+
                     },
                     error: function (error) {
                         console.error('Error fetching categories:', error);

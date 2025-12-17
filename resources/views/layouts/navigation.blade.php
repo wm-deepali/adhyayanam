@@ -272,6 +272,17 @@
                         {{__('Manage Videos/Live Class')}}
                     </a>
                 </li>
+                @if(Helper::canAccess('manage_homework_submissions'))
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->is('homework*') ? 'active' : '' }}"
+                            href="{{ route('homework.index') }}">
+                            <svg class="nav-icon">
+                                <use xlink:href="{{ asset('icons/coreui.svg#cil-task') }}"></use>
+                            </svg>
+                            Submitted Assignments
+                        </a>
+                    </li>
+                @endif
             </ul>
         </li>
     @endif

@@ -141,4 +141,10 @@ class User extends Authenticatable implements HasMedia, MustVerifyEmail
         return $this->belongsTo(RoleGroup::class, 'role_group_id');
     }
 
+    // Student side
+    public function homeworkSubmissions()
+    {
+        return $this->hasMany(StudentHomeworkSubmission::class, 'student_id');
+    }
+
 }

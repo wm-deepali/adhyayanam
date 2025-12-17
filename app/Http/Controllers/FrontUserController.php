@@ -1,25 +1,27 @@
 <?php
-
 namespace App\Http\Controllers;
-use App\Models\Course;
-use App\Models\StudentTestAttempt;
-use App\Models\StudyMaterial;
-use App\Models\TestSeries;
-use App\Models\Video;
-use App\Models\VideoUserProgress;
+
 use PDF;
+use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Order;
+use App\Models\Video;
+use App\Models\Course;
+use App\Models\TestSeries;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\DB;
 use App\Helpers\LogActivity;
+use App\Models\StudyMaterial;
 use App\Models\StudentWallet;
-use App\Models\StudentWalletTransaction;
 use App\Models\WalletSetting;
+use App\Models\VideoUserProgress;
+use App\Models\StudentTestAttempt;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
+use App\Models\StudentWalletTransaction;
+use Illuminate\Support\Facades\Validator;
 use App\Models\LogActivity as LogActivityModel;
+use App\Models\StudentHomeworkSubmission;
 
 class FrontUserController extends Controller
 {
@@ -96,12 +98,12 @@ class FrontUserController extends Controller
             ]);
         }
     }
+
     public function setting()
     {
         $logs = LogActivity::userLogActivityLists();
         return view('front-users.setting', compact('logs'));
     }
-
 
     public function activityDelete($id)
     {
@@ -139,6 +141,7 @@ class FrontUserController extends Controller
 
 
     }
+
     public function studentAllOrder()
     {
         $data['orders'] = Order::with('student', 'transaction')
@@ -153,6 +156,7 @@ class FrontUserController extends Controller
         $data['order'] = Order::with('student', 'transaction')->where('id', $id)->first();
         return view('front-users.order-details', $data);
     }
+
     public function printInvoice($id)
     {
         $data['order'] = Order::with('student', 'transaction')->where('id', $id)->first();
@@ -183,68 +187,116 @@ class FrontUserController extends Controller
         return view('front-users.courses', compact('orders'));
     }
 
+
     public function courseDetail($id)
     {
-        $userId = auth()->id(); // current user
+        $studentId = auth()->id();
         $course = Course::findOrFail($id);
 
-        if (strtolower($course->course_mode) == 'online') {
-            $liveClasses = Video::with('teacher:id,full_name')
+        // ===============================
+        // LIVE CLASSES (ONLINE MODE)
+        // ===============================
+        if (strtolower($course->course_mode) === 'online') {
+
+            $liveClasses = Video::with([
+                'teacher:id,full_name,profile_picture',
+                'homeworkSubmissions' => function ($q) use ($studentId) {
+                    $q->where('student_id', $studentId);
+                }
+            ])
                 ->where('course_id', $course->id)
                 ->where('type', 'live_class')
                 ->orderBy('schedule_date', 'asc')
+                ->orderBy('start_time', 'asc')
                 ->get();
 
+            // ===============================
+            // HEADER DATA
+            // ===============================
+            $totalSessions = $liveClasses->count();
+            $firstLiveDate = $liveClasses->min('schedule_date');
+            $lastLiveDate = $liveClasses->max('schedule_date');
 
-            // Attach user progress
-            $liveClasses->transform(function ($video) use ($userId) {
-                $progress = $video->userProgress()->firstOrCreate(
-                    ['user_id' => $userId],
-                    [
-                        'watched_count' => 0,
-                        'access_till' => $video->access_till
-                    ]
-                );
+            $teachers = $liveClasses
+                ->pluck('teacher')
+                ->filter()
+                ->unique('id')
+                ->values();
 
-                $video->watched_count = $progress->watched_count;
-                $video->user_access_till = $progress->access_till;
+            // ===============================
+            // SPLIT CLASSES
+            // ===============================
+            $now = Carbon::now();
 
-                $video->is_valid =
-                    (!$video->user_access_till || $video->user_access_till >= now()->toDateString()) &&
-                    (!$video->no_of_times_can_view || $video->watched_count < $video->no_of_times_can_view);
-
-                return $video;
+            $scheduledClasses = $liveClasses->filter(function ($class) use ($now) {
+                return Carbon::parse($class->schedule_date . ' ' . $class->start_time)->gte($now);
             });
 
-            return view('front-users.course-detail-live', compact('course', 'liveClasses'));
+            $finishedClasses = $liveClasses->filter(function ($class) use ($now) {
+                return Carbon::parse($class->schedule_date . ' ' . $class->end_time)->lt($now);
+            });
+
+            // dd($scheduledClasses->toArray());
+            return view('front-users.course-detail-live', compact(
+                'course',
+                'scheduledClasses',
+                'finishedClasses',
+                'totalSessions',
+                'firstLiveDate',
+                'lastLiveDate',
+                'teachers'
+            ));
         }
 
-        // Video Learning (LMS)
+        // ===============================
+        // VIDEO LMS MODE
+        // ===============================
         $videoLessons = Video::where('course_id', $course->id)
             ->where('type', 'video')
             ->orderBy('created_at', 'asc')
             ->get();
 
-        // Attach user progress
-        $videoLessons->transform(function ($video) use ($userId) {
-            $progress = $video->userProgress()->firstOrCreate(
-                ['user_id' => $userId],
-                [
-                    'watched_count' => 0,
-                    'access_till' => $video->access_till
-                ]
-            );
-            $video->watched_count = $progress->watched_count;
-            $video->user_access_till = $progress->access_till;
-
-            $video->is_valid =
-                (!$video->user_access_till || $video->user_access_till >= now()->toDateString()) &&
-                (!$video->no_of_times_can_view || $video->watched_count < $video->no_of_times_can_view);
-
-            return $video;
-        });
-
+            // dd($videoLessons->toArray());
         return view('front-users.course-detail-lms', compact('course', 'videoLessons'));
+    }
+
+    public function uploadAssignment(Request $request)
+    {
+        $request->validate([
+            'video_id' => 'required|exists:videos,id',
+           'assignment_file' => 'required|file|mimes:pdf,jpg,jpeg,png|max:5120',
+
+        ]);
+
+        $studentId = auth()->id();
+
+        // Fetch live class
+        $video = Video::with('teacher')->findOrFail($request->video_id);
+
+        // Prevent duplicate submission
+        $alreadySubmitted = StudentHomeworkSubmission::where('student_id', $studentId)
+            ->where('video_id', $video->id)
+            ->first();
+
+        if ($alreadySubmitted) {
+            return back()->with('error', 'Homework already submitted for this class.');
+        }
+
+        // Store file
+        $path = $request->file('assignment_file')
+            ->store('homework/student', 'public');
+
+        // Save submission
+        StudentHomeworkSubmission::create([
+            'student_id' => $studentId,
+            'teacher_id' => $video->teacher_id, // assigned teacher
+            'video_id' => $video->id,
+            'assignment_file' => $path,
+            'submitted_at' => now(),
+            'status' => 'submitted',
+        ]);
+
+        return back()->with('success', 'Homework submitted successfully.');
     }
 
     public function watch($id)

@@ -22,6 +22,7 @@
                     @csrf
                     <div class="row">
                         <div class="col-md-6">
+                            
                             <div class="mb-3">
                                 <label for="feature" class="form-label">Feature</label>
                                 <input class="form-control" id="feature" name="feature" type="checkbox" data-toggle="toggle"
@@ -31,7 +32,7 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="course_mode" class="form-label">Course Mode</label>
-                                <select class="form-select" name="course_mode" id="course_mode" required>
+                                <select class="form-control" name="course_mode" id="course_mode" required>
                                     <option value="" selected disabled>None</option>
                                     <option value="Online">Online</option>
                                     <option value="Video Learning">Video Learning</option>
@@ -47,7 +48,7 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="examination_commission_id" class="form-label">Course Type</label>
-                                <select class="form-select" name="examination_commission_id" id="examination_commission_id"
+                                <select class="form-control" name="examination_commission_id" id="examination_commission_id"
                                     required>
                                     <option value="" selected disabled>None</option>
                                     @foreach($examinationCommissions as $commission)
@@ -62,7 +63,7 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="category_id" class="form-label">Category</label>
-                                <select class="form-select" name="category_id" id="category_id" required>
+                                <select class="form-control" name="category_id" id="category_id" required>
                                     <option value="" selected disabled>None</option>
                                     <!-- Options will be dynamically loaded -->
                                 </select>
@@ -77,7 +78,7 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="sub_category_id" class="form-label">Sub Category</label>
-                                <select class="form-select" name="sub_category_id" id="sub_category_id">
+                                <select class="form-control" name="sub_category_id" id="sub_category_id">
                                     <option value="" selected disabled>None</option>
                                     <!-- Options will be dynamically loaded -->
                                 </select>
@@ -217,8 +218,10 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="language_of_teaching" class="form-label">Languages</label>
-                                <select class="form-control select2" name="language_of_teaching[]"
-                                    multiple="multiple"></select>
+                                <select class="form-control select2" name="language_of_teaching[]" multiple>
+                                    <option value="English">English</option>
+                                    <option value="Hindi">Hindi</option>
+                                </select>
                                 @error('language_of_teaching')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
@@ -353,9 +356,6 @@
     <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
 
     <script src="https://cdn.ckeditor.com/4.16.2/standard/ckeditor.js"></script>
-
-    {{-- In your Blade file or master layout --}}
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
 
         $(document).ready(function () {
@@ -372,7 +372,7 @@
                     $('#discount').val(courseFee);
                 }
                 $('#offered_price').val(offeredPrice);
-                
+
             }
 
             // Recalculate on input
@@ -397,18 +397,7 @@
                 console.error("❌ Select2 not loaded!");
             }
 
-            // ✅ Initialize Language of Teaching dropdown
-            const languages = ["English", "Hindi"];
 
-            $('select[name="language_of_teaching[]"]').select2({
-                width: '100%',
-                placeholder: 'Select Languages',
-                data: languages.map(lang => ({ id: lang, text: lang })), // preload options
-                tags: true, // allow adding new custom entries
-                tokenSeparators: [',', ' '],
-                maximumSelectionLength: 5,
-                allowClear: true
-            });
 
             const examinationCommissionSelect = document.getElementById('examination_commission_id');
             const categorySelect = document.getElementById('category_id');
@@ -441,8 +430,6 @@
             // On Subject change -> fetch Chapters
             $('#subject_id').on('change', function () {
                 let subjects = $(this).val();
-                console.log('here', subjects);
-
                 if (subjects && subjects.length > 0) {
                     $.ajax({
                         url: '/fetch-chapter-by-subject/' + subjects.join(','),
@@ -608,5 +595,5 @@
                 });
             }
         });
-            </script>
+    </script>
 @endsection

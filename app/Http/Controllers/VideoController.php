@@ -77,7 +77,7 @@ class VideoController extends Controller
     {
         $requestData = $request->all();
 
-        // ✅ Basic validation (common fields)
+        // ✅ Base validation
         $rules = [
             'type' => 'required|in:video,live_class',
             'course_type' => 'required',
@@ -87,25 +87,35 @@ class VideoController extends Controller
             'topic_id' => 'nullable',
         ];
 
-        // ✅ Conditional validation
+        // ✅ VIDEO rules
         if ($request->type === 'video') {
             $rules['access_till'] = 'nullable|date';
             $rules['no_of_times_can_view'] = 'nullable|numeric|min:1';
+            $rules['video_title'] = 'required|array|min:1';
+            $rules['video_title.*'] = 'required|string';
         }
 
+        // ✅ LIVE CLASS rules
         if ($request->type === 'live_class') {
+            $rules['live_title'] = 'required|array|min:1';
+            $rules['live_title.*'] = 'required|string';
+
             $rules['schedule_date'] = 'required|array';
             $rules['schedule_date.*'] = 'required|date|after_or_equal:today';
+
             $rules['start_time'] = 'required|array';
             $rules['start_time.*'] = 'required';
+
             $rules['end_time'] = 'required|array';
-            $rules['end_time.*'] = 'required';
+            $rules['end_time.*'] = 'required|after:start_time.*';
+
             $rules['teacher_id'] = 'required|array';
             $rules['teacher_id.*'] = 'required';
         }
 
-        // ✅ Validate base fields
+
         $validator = Validator::make($requestData, $rules);
+
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
@@ -114,20 +124,26 @@ class VideoController extends Controller
             ]);
         }
 
-        // ✅ For VIDEO type
+        /*
+        |--------------------------------------------------------------------------
+        | VIDEO
+        |--------------------------------------------------------------------------
+        */
         if ($request->type === 'video') {
-            $videoCount = count($request->video_title ?? []);
-            for ($i = 0; $i < $videoCount; $i++) {
+
+            foreach ($request->video_title as $i => $title) {
+
                 $videoData = [
                     'type' => 'video',
                     'course_type' => $request->course_type,
                     'course_category' => $request->course_category,
                     'course_id' => $request->course,
-                    'chapter_id' => $request->chapter_id,
                     'sub_category_id' => $request->sub_category_id,
                     'subject_id' => $request->subject_id,
+                    'chapter_id' => $request->chapter_id,
                     'topic_id' => $request->topic_id,
-                    'title' => $request->video_title[$i] ?? null,
+
+                    'title' => $title,
                     'slug' => $request->video_slug[$i] ?? null,
                     'access_till' => $request->access_till,
                     'no_of_times_can_view' => $request->no_of_times_can_view,
@@ -136,53 +152,82 @@ class VideoController extends Controller
                     'video_type' => $request->video_type[$i] ?? null,
                     'video_url' => $request->video_url[$i] ?? null,
                     'duration' => $request->duration[$i] ?? null,
-
                 ];
 
-                // ✅ Handle image uploads
                 if ($request->hasFile("video_image.$i")) {
-                    $videoData['image'] = $request->file("video_image.$i")->store('topic', 'public');
+                    $videoData['image'] = $request->file("video_image.$i")->store('videos', 'public');
                 }
+
                 if ($request->hasFile("video_cover_image.$i")) {
-                    $videoData['cover_image'] = $request->file("video_cover_image.$i")->store('topic', 'public');
+                    $videoData['cover_image'] = $request->file("video_cover_image.$i")->store('videos', 'public');
                 }
-                if ($request->hasFile("video_assignment.$i")) {
-                    $videoData['assignment'] = $request->file("video_assignment.$i")->store('topic', 'public');
-                }
+
                 if ($request->hasFile("video_file.$i")) {
-                    $videoData['video_file'] = $request->file("video_file.$i")->store('videos', 'public');
+                    $videoData['video_url'] = $request->file("video_file.$i")->store('videos', 'public');
                 }
+
+                // ✅ Assignment file
+                if ($request->hasFile("video_assignment_file.$i")) {
+                    $videoData['assignment_file'] =
+                        $request->file("video_assignment_file.$i")->store('videos', 'public');
+                }
+
+                if ($request->hasFile("video_solution_file.$i")) {
+                    $videoData['solution_file'] =
+                        $request->file("video_solution_file.$i")->store('videos', 'public');
+                }
+
 
                 Video::create($videoData);
             }
         }
 
-        // ✅ For LIVE CLASS type
+        /*
+        |--------------------------------------------------------------------------
+        | LIVE CLASS
+        |--------------------------------------------------------------------------
+        */
         if ($request->type === 'live_class') {
-            $liveCount = count($request->live_title ?? []);
-            for ($i = 0; $i < $liveCount; $i++) {
+
+            foreach ($request->live_title as $i => $title) {
+
                 $liveData = [
                     'type' => 'live_class',
                     'course_type' => $request->course_type,
                     'course_category' => $request->course_category,
                     'course_id' => $request->course,
-                    'chapter_id' => $request->chapter_id,
                     'sub_category_id' => $request->sub_category_id,
                     'subject_id' => $request->subject_id,
+                    'chapter_id' => $request->chapter_id,
                     'topic_id' => $request->topic_id,
-                    'title' => $request->live_title[$i] ?? null,
+
+                    'title' => $title,
                     'schedule_date' => $request->schedule_date[$i] ?? null,
                     'start_time' => $request->start_time[$i] ?? null,
                     'end_time' => $request->end_time[$i] ?? null,
                     'teacher_id' => $request->teacher_id[$i] ?? null,
+                    'live_link' => $request->live_link[$i] ?? null,
                     'status' => $request->live_status[$i] ?? 'active',
                     'content' => $request->live_content[$i] ?? null,
-                    'live_link' => $request->live_link[$i] ?? null, // ✅ Add this line
                 ];
 
-                // ✅ Handle optional assignment image
-                if ($request->hasFile("live_assignment.$i")) {
-                    $liveData['assignment'] = $request->file("live_assignment.$i")->store('topic', 'public');
+                // ✅ Images
+                if ($request->hasFile("live_image.$i")) {
+                    $liveData['image'] = $request->file("live_image.$i")->store('live', 'public');
+                }
+
+                if ($request->hasFile("live_cover_image.$i")) {
+                    $liveData['cover_image'] = $request->file("live_cover_image.$i")->store('live', 'public');
+                }
+
+                // ✅ Assignment file
+                if ($request->hasFile("live_assignment_file.$i")) {
+                    $liveData['assignment_file'] = $request->file("live_assignment_file.$i")->store('live', 'public');
+                }
+
+                // ✅ Solution file
+                if ($request->hasFile("live_solution_file.$i")) {
+                    $liveData['solution_file'] = $request->file("live_solution_file.$i")->store('live', 'public');
                 }
 
                 Video::create($liveData);
@@ -191,9 +236,10 @@ class VideoController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Videos added successfully.',
+            'message' => 'Content added successfully.',
         ]);
     }
+
 
 
     public function show(string $id)
@@ -284,11 +330,13 @@ class VideoController extends Controller
     public function update(Request $request, Video $video)
     {
         try {
-            $requestData = $request->all();
+            // dd($request->all());
 
-            // ✅ Validation Rules
+            // -----------------------------
+            // VALIDATION RULES
+            // -----------------------------
             $rules = [
-                'type' => 'required',
+                'type' => 'required|in:video,live_class',
                 'course_type' => 'required',
                 'course_category' => 'required',
                 'sub_category_id' => 'required',
@@ -296,119 +344,151 @@ class VideoController extends Controller
                 'subject_id' => 'required',
                 'chapter_id' => 'required',
                 'topic_id' => 'nullable',
-                'title' => 'required|string',
+                'title' => 'required|string|max:255',
                 'slug' => 'nullable|string|unique:videos,slug,' . $video->id,
+
+                // Images
                 'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
                 'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-                'assignment' => 'nullable|file|mimes:jpeg,png,jpg,gif,pdf,doc,docx|max:5120',
+
+                // Assignment & Solution FILES
+                'video_assignment_file' => 'nullable|file|mimes:pdf,doc,docx|max:5120',
+                'video_solution_file' => 'nullable|file|mimes:pdf,doc,docx|max:5120',
+                'live_assignment_file' => 'nullable|file|mimes:pdf,doc,docx|max:5120',
+                'live_solution_file' => 'nullable|file|mimes:pdf,doc,docx|max:5120',
             ];
 
-            if ($request->type === "video") {
+            if ($request->type === 'video') {
                 $rules['video_type'] = 'required';
-                $rules['video_url'] = 'required|string';
+                $rules['video_url'] = 'nullable|string';
             }
 
-            if ($request->type === "live_class") {
+            if ($request->type === 'live_class') {
                 $rules['schedule_date'] = 'required|date|after_or_equal:today';
                 $rules['start_time'] = 'required';
-                $rules['end_time'] = 'required';
+                $rules['end_time'] = 'required|after:start_time';
                 $rules['teacher'] = 'required';
                 $rules['live_link'] = 'nullable|url';
             }
 
-            $validator = Validator::make($requestData, $rules);
+            $validator = Validator::make($request->all(), $rules);
 
             if ($validator->fails()) {
                 return response()->json([
                     'success' => false,
                     'errors' => $validator->errors(),
                 ], 422);
-
             }
 
-            // ✅ Time Validation for Live Classes
-            if ($request->type === "live_class") {
-                $start_time = strtotime($request->start_time);
-                $end_time = strtotime($request->end_time);
-
-                if ($request->schedule_date === date('Y-m-d') && $start_time < strtotime(date('H:i:s'))) {
-                    return response()->json([
-                        'success' => false,
-                        'errors' => [
-                            'start_time' => ['Start time must be greater than or equal to current time']
-                        ],
-                    ], 422);
-
-                }
-
-                if ($end_time <= $start_time) {
-                    return response()->json([
-                        'success' => false,
-                        'errors' => [
-                            'end_time' => ['End time must be greater than start time']
-                        ],
-                    ], 422);
-
-                }
-            }
-
-            // ✅ Handle File Uploads
-            // Image
+            // -----------------------------
+            // IMAGE UPLOADS
+            // -----------------------------
             if ($request->hasFile('image')) {
                 if ($video->image && Storage::disk('public')->exists($video->image)) {
                     Storage::disk('public')->delete($video->image);
                 }
-                $requestData['image'] = $request->file('image')->store('topic', 'public');
-            } else {
-                $requestData['image'] = $video->image;
+                $video->image = $request->file('image')->store('videos/images', 'public');
             }
 
-            // Cover Image
             if ($request->hasFile('cover_image')) {
                 if ($video->cover_image && Storage::disk('public')->exists($video->cover_image)) {
                     Storage::disk('public')->delete($video->cover_image);
                 }
-                $requestData['cover_image'] = $request->file('cover_image')->store('topic', 'public');
-            } else {
-                $requestData['cover_image'] = $video->cover_image;
+                $video->cover_image = $request->file('cover_image')->store('videos/covers', 'public');
             }
 
-            // Assignment
-            if ($request->hasFile('assignment')) {
-                if ($video->assignment && Storage::disk('public')->exists($video->assignment)) {
-                    Storage::disk('public')->delete($video->assignment);
-                }
-                $requestData['assignment'] = $request->file('assignment')->store('topic', 'public');
-            } else {
-                $requestData['assignment'] = $video->assignment;
-            }
-
-            // ✅ S3 Video Upload (if applicable)
+            // -----------------------------
+            // S3 VIDEO FILE (OPTIONAL)
+            // -----------------------------
             if ($request->hasFile('video_file')) {
                 $file = $request->file('video_file');
-                $filePath = 'uploads/' . time() . '_' . $file->getClientOriginalName();
-                Storage::disk('s3')->put($filePath, file_get_contents($file));
-                $requestData['video_url'] = Storage::disk('s3')->url($filePath);
+                $path = 'videos/' . time() . '_' . $file->getClientOriginalName();
+                Storage::disk('s3')->put($path, file_get_contents($file));
+                $video->video_url = Storage::disk('s3')->url($path);
             }
 
-            // ✅ Map field names to DB fields
-            $requestData['teacher_id'] = $request->teacher ?? $video->teacher_id;
-            $requestData['course_id'] = $request->course;
-            $requestData['chapter_id'] = $request->chapter_id;
-            $requestData['sub_category_id'] = $request->sub_category_id;
-            $requestData['subject_id'] = $request->subject_id;
-            $requestData['topic_id'] = $request->topic_id;
-             $requestData['content'] = $request->video_content ?? null;
+            // -----------------------------
+            // COMMON FIELDS
+            // -----------------------------
+            $video->update([
+                'type' => $request->type,
+                'course_type' => $request->course_type,
+                'course_category' => $request->course_category,
+                'sub_category_id' => $request->sub_category_id,
+                'course_id' => $request->course,
+                'subject_id' => $request->subject_id,
+                'chapter_id' => $request->chapter_id,
+                'topic_id' => $request->topic_id,
+                'title' => $request->title,
+                'slug' => $request->slug,
+                'video_type' => $request->video_type,
+                'duration' => $request->duration,
+                'status' => $request->status,
+                'no_of_times_can_view' => $request->no_of_times_can_view,
+                'access_till' => $request->access_till,
+                'teacher_id' => $request->teacher,
+            ]);
 
-            if ($request->type === "live_class") {
-                $requestData['content'] = $request->live_content ?? null;
-                $requestData['start_time'] = date('H:i:s', strtotime($request->start_time));
-                $requestData['end_time'] = date('H:i:s', strtotime($request->end_time));
-                $requestData['live_link'] = $request->live_link ?? $video->live_link; // ✅ Add this line
+            // -----------------------------
+            // CONTENT & LIVE CLASS DATA
+            // -----------------------------
+            if ($request->type === 'video') {
+                $video->content = $request->video_content;
+
+                 // -----------------------------
+            // ASSIGNMENT FILE
+            // -----------------------------
+            if ($request->hasFile('video_assignment_file')) {
+                if ($video->assignment_file && Storage::disk('public')->exists($video->assignment_file)) {
+                    Storage::disk('public')->delete($video->assignment_file);
+                }
+                $video->assignment_file = $request->file('video_assignment_file')
+                    ->store('videos/assignments', 'public');
             }
 
-            // ✅ Update Video
-            $video->update($requestData);
+            // -----------------------------
+            // SOLUTION FILE
+            // -----------------------------
+            if ($request->hasFile('video_solution_file')) {
+                if ($video->solution_file && Storage::disk('public')->exists($video->solution_file)) {
+                    Storage::disk('public')->delete($video->solution_file);
+                }
+                $video->solution_file = $request->file('video_solution_file')
+                    ->store('videos/solutions', 'public');
+            }
+            }
+
+            if ($request->type === 'live_class') {
+                $video->content = $request->live_content;
+                $video->schedule_date = $request->schedule_date;
+                $video->start_time = date('H:i:s', strtotime($request->start_time));
+                $video->end_time = date('H:i:s', strtotime($request->end_time));
+                $video->live_link = $request->live_link;
+
+                 // -----------------------------
+            // ASSIGNMENT FILE
+            // -----------------------------
+            if ($request->hasFile('live_assignment_file')) {
+                if ($video->assignment_file && Storage::disk('public')->exists($video->assignment_file)) {
+                    Storage::disk('public')->delete($video->assignment_file);
+                }
+                $video->assignment_file = $request->file('live_assignment_file')
+                    ->store('videos/assignments', 'public');
+            }
+
+            // -----------------------------
+            // SOLUTION FILE
+            // -----------------------------
+            if ($request->hasFile('live_solution_file')) {
+                if ($video->solution_file && Storage::disk('public')->exists($video->solution_file)) {
+                    Storage::disk('public')->delete($video->solution_file);
+                }
+                $video->solution_file = $request->file('live_solution_file')
+                    ->store('videos/solutions', 'public');
+            }
+            }
+
+            $video->save();
 
             return response()->json([
                 'success' => true,
@@ -419,9 +499,10 @@ class VideoController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => $e->getMessage(),
-            ]);
+            ], 500);
         }
     }
+
 
     /**
      * Remove the specified resource from storage.

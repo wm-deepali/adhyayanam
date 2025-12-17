@@ -34,6 +34,8 @@ use App\Http\Controllers\Teacher\TeacherController;
 use App\Http\Controllers\Teacher\QuestionBankController;
 use App\Http\Controllers\Teacher\TeacherResultController;
 use App\Http\Controllers\Admin\PercentageSystemController;
+use App\Http\Controllers\Admin\AdminHomeworkController;
+use \App\Http\Controllers\Teacher\TeacherHomeworkController;
 
 /*
 |--------------------------------------------------------------------------
@@ -218,6 +220,18 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
                 'saveEvaluation'
             ])->name('save-evaluation');
 
+            // 📋 List all submitted assignments for teacher
+            Route::get('homework', [TeacherHomeworkController::class, 'index'])
+                ->name('homework.index');
+
+            // ✏️ Edit / Evaluate a submission
+            Route::get('homework/{id}/edit', [TeacherHomeworkController::class, 'edit'])
+                ->name('homework.edit');
+
+            // ✅ Update evaluation (marks, remark, status)
+            Route::patch('homework/{id}', [TeacherHomeworkController::class, 'update'])
+                ->name('homework.update');
+
         });
     });
 
@@ -241,6 +255,8 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
         Route::get('/my-courses', [FrontUserController::class, 'myCourses'])->name('user.mycourses');
         Route::get('/my-course/{id}', [FrontUserController::class, 'courseDetail'])->name('course.detail');
         Route::post('/video/{id}/watch', [FrontUserController::class, 'watch']);
+        Route::post('/student/homework/upload', [FrontUserController::class, 'uploadAssignment'])->name('student.homework.upload');
+
         // my study material routes
         Route::get('/my-study-material', [FrontUserController::class, 'StudyMaterial'])->name('user.study-material');
         Route::delete('/user/user-activity/delete/{id}', [FrontUserController::class, 'activityDelete'])->name('user-activity.destroy');
@@ -614,6 +630,15 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
             Route::delete('/{video}/delete', [VideoController::class, 'destroy'])->name('destroy')->middleware('custom.permission:manage_videos_delete');
             Route::get('/{video}', [VideoController::class, 'show'])->name('show')->middleware('custom.permission:manage_videos');
         });
+
+        Route::get('homework', [AdminHomeworkController::class, 'index'])
+            ->name('homework.index');
+
+        Route::get('homework/{id}/edit', [AdminHomeworkController::class, 'edit'])
+            ->name('homework.edit');
+
+        Route::patch('homework/{id}', [AdminHomeworkController::class, 'update'])
+            ->name('homework.update');
 
         Route::get('chapter-video/{id}', 'VideoController@chapter_topic')->name('chapter-video');
         Route::get('course-video/{id}', 'VideoController@course_topic')->name('course-video');

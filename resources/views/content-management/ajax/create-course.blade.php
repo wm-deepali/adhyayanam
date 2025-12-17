@@ -158,7 +158,8 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="course_fee" class="form-label">Fee</label>
-                                <input type="number" class="form-control" name="course_fee" placeholder="Fee" required>
+                                <input type="number" class="form-control" id="course_fee" name="course_fee"
+                                    placeholder="Fee" required>
                                 @error('course_fee')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
@@ -170,7 +171,8 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="discount" class="form-label">Discount</label>
-                                <input type="number" class="form-control" name="discount" placeholder="Discount" required>
+                                <input type="number" class="form-control" id="discount" name="discount"
+                                    placeholder="Discount" required>
                                 @error('discount')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
@@ -179,8 +181,8 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="offered_price" class="form-label">Offered Price</label>
-                                <input type="number" class="form-control" name="offered_price" placeholder="Offered Price"
-                                    required>
+                                <input type="number" class="form-control" id="offered_price" name="offered_price"
+                                    placeholder="Offered Price" required readonly>
                                 @error('offered_price')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
@@ -357,6 +359,27 @@
     <script>
 
         $(document).ready(function () {
+
+            function calculateOfferedPrice() {
+                let courseFee = parseFloat($('#course_fee').val()) || 0;
+                let discount = parseFloat($('#discount').val()) || 0;
+
+                // Prevent negative price
+                let offeredPrice = courseFee - discount;
+                if (offeredPrice < 0) offeredPrice = 0;
+                if (discount > courseFee) {
+                    discount = courseFee;
+                    $('#discount').val(courseFee);
+                }
+                $('#offered_price').val(offeredPrice);
+                
+            }
+
+            // Recalculate on input
+            $('#course_fee, #discount').on('input', function () {
+                calculateOfferedPrice();
+            });
+
             CKEDITOR.replace('detail_content');
             CKEDITOR.replace('course_overview');
             setInterval(function () {
@@ -585,5 +608,5 @@
                 });
             }
         });
-    </script>
+            </script>
 @endsection

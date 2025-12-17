@@ -241,7 +241,7 @@
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="dropdown-item text-danger">
-                                <i class="fa fa-trash me-2"></i> Delete
+                                <i class="fa fa-trash me-2" style="color:#dc3545!important"></i> Delete
                             </button>
                         </form>
                     </li>

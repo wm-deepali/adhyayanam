@@ -30,8 +30,7 @@
 						<!-- Search Widget -->
 						<div class="sidebar-widget search-box">
 							<div class="widget-content">
-								<form method="GET"
-									action="{{ route('courses.filter', ['id' => $subcat]) }}"
+								<form method="GET" action="{{ route('courses.filter', ['id' => $subcat]) }}"
 									id="searchForm">
 									<div class="form-group">
 										<input type="search" name="search" value="{{ request('search') ?? '' }}"
@@ -50,9 +49,8 @@
 						<div class="filter-box">
 
 							<!-- Dropdown Filters Start -->
-							<form method="GET"
-								action="{{ route('courses.filter', ['id' => $subcat]) }}"
-								id="filterForm" class="mb-3">
+							<form method="GET" action="{{ route('courses.filter', ['id' => $subcat]) }}" id="filterForm"
+								class="mb-3">
 								<div class="row g-2">
 
 									<!-- Subject -->
@@ -122,15 +120,20 @@
 																class="osd tt">{{$course->duration}} Week</span></li>
 													</ul>
 													<div class="price">RS. {{$course->offered_price}}</div>
+
 												</div>
 												<h4><a href="service-detail.html">{{$course->name}}</a></h4>
 												<div class="contents">
-													<p>{{$course->course_heading}}</p>
+													<p class="mb-1">{{$course->course_heading}}</p>
+
+													<small class="text-muted d-flex align-items-center gap-1">
+														<span class="flaticon-internet"></span>
+														<span>
+															Learning Method: {{ $course->course_mode ?? 'Online' }}
+														</span>
+													</small>
 												</div>
-												<!-- <ul class="course-options">
-													<li><span class="icon flaticon-book-1"></span>10 lessons</li>
-													<li><span class="icon flaticon-user-1"></span>15 Students</li>
-												</ul> -->
+
 											</div>
 											<div class="lower-box osd m">
 												<div class="d-flex justify-content-between align-items-center">

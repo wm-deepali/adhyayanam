@@ -14,9 +14,9 @@
                         <h6 class="card-subtitle mb-2 text-muted"> Manage Course section here.</h6>
                     </div>
                     @if(\App\Helpers\Helper::canAccess('manage_courses_add'))
-                    <div class="justify-content-end">
-                        <a href='{{route('courses.course.create')}}' class="btn btn-primary">&#43; Add</a>
-                    </div>
+                        <div class="justify-content-end">
+                            <a href='{{route('courses.course.create')}}' class="btn btn-primary">&#43; Add</a>
+                        </div>
                     @endif
                 </div>
                 <div class="mt-2">
@@ -30,6 +30,7 @@
                             </th>
                             <th scope="col">Image</th>
                             <th scope="col">Course Name</th>
+                            <th scope="col">Course Mode</th>
                             <th scope="col">Course Type</th>
                             <th scope="col">Exam Category</th>
                             <th scope="col">Sub Category</th>
@@ -63,13 +64,13 @@
                 buttons: {
                     buttons: [
                         @if(\App\Helpers\Helper::canAccess('manage_courses_delete'))
-                        {
-                            className: 'btn bg-red color-palette btn-flat hidden delete_btn pull-left',
-                            text: 'Bulk Delete',
-                            action: function (e, dt, node, config) {
-                                multi_delete();
-                            }
-                        },
+                                {
+                                className: 'btn bg-red color-palette btn-flat hidden delete_btn pull-left',
+                                text: 'Bulk Delete',
+                                action: function (e, dt, node, config) {
+                                    multi_delete();
+                                }
+                            },
                         @endif
                         { extend: 'copy', className: 'btn bg-teal color-palette btn-flat', footer: true, exportOptions: { columns: [1, 2, 3, 4, 5, 6, 7, 8, 9] } },
                         { extend: 'excel', className: 'btn bg-teal color-palette btn-flat', footer: true, exportOptions: { columns: [1, 2, 3, 4, 5, 6, 7, 8, 9] } },
@@ -96,6 +97,7 @@
                     { data: 'checkbox', name: 'checkbox', orderable: false, searchable: false },
                     { data: 'image', name: 'image' },
                     { data: 'name', name: 'name' },
+                    { data: 'course_mode', name: 'course_mode' },
                     { data: 'commission', name: 'commission' },
                     { data: 'category', name: 'category' },
                     { data: 'subcat', name: 'subcat' },

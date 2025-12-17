@@ -84,7 +84,7 @@ class VideoController extends Controller
             'course_category' => 'required',
             'sub_category_id' => 'required',
             'subject_id' => 'required',
-            'topic_id' => 'required',
+            'topic_id' => 'nullable',
         ];
 
         // ✅ Conditional validation
@@ -262,6 +262,8 @@ class VideoController extends Controller
             ->select('id', 'full_name')
             ->get();
 
+        // dd($video->toArray());
+
         return view('video.edit', compact(
             'video',
             'categories',
@@ -293,10 +295,9 @@ class VideoController extends Controller
                 'course' => 'required',
                 'subject_id' => 'required',
                 'chapter_id' => 'required',
-                'topic_id' => 'required',
+                'topic_id' => 'nullable',
                 'title' => 'required|string',
                 'slug' => 'nullable|string|unique:videos,slug,' . $video->id,
-                'content' => 'required|string',
                 'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
                 'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
                 'assignment' => 'nullable|file|mimes:jpeg,png,jpg,gif,pdf,doc,docx|max:5120',
@@ -320,9 +321,9 @@ class VideoController extends Controller
             if ($validator->fails()) {
                 return response()->json([
                     'success' => false,
-                    'code' => 422,
                     'errors' => $validator->errors(),
-                ]);
+                ], 422);
+
             }
 
             // ✅ Time Validation for Live Classes
@@ -333,17 +334,21 @@ class VideoController extends Controller
                 if ($request->schedule_date === date('Y-m-d') && $start_time < strtotime(date('H:i:s'))) {
                     return response()->json([
                         'success' => false,
-                        'code' => 422,
-                        'errors' => ['start_time' => ['Start time must be greater than or equal to current time']],
-                    ]);
+                        'errors' => [
+                            'start_time' => ['Start time must be greater than or equal to current time']
+                        ],
+                    ], 422);
+
                 }
 
                 if ($end_time <= $start_time) {
                     return response()->json([
                         'success' => false,
-                        'code' => 422,
-                        'errors' => ['end_time' => ['End time must be greater than start time']],
-                    ]);
+                        'errors' => [
+                            'end_time' => ['End time must be greater than start time']
+                        ],
+                    ], 422);
+
                 }
             }
 
@@ -393,8 +398,10 @@ class VideoController extends Controller
             $requestData['sub_category_id'] = $request->sub_category_id;
             $requestData['subject_id'] = $request->subject_id;
             $requestData['topic_id'] = $request->topic_id;
+             $requestData['content'] = $request->video_content ?? null;
 
             if ($request->type === "live_class") {
+                $requestData['content'] = $request->live_content ?? null;
                 $requestData['start_time'] = date('H:i:s', strtotime($request->start_time));
                 $requestData['end_time'] = date('H:i:s', strtotime($request->end_time));
                 $requestData['live_link'] = $request->live_link ?? $video->live_link; // ✅ Add this line
@@ -580,7 +587,7 @@ class VideoController extends Controller
 
         $teacherIds = $query->pluck('teacher_id')->unique();
         $teachers = Teacher::whereIn('id', $teacherIds)
-        ->where('can_conduct_live_classes', 1)   // only teachers allowed for live classes
+            ->where('can_conduct_live_classes', 1)   // only teachers allowed for live classes
             ->get();
 
         $html = '<option value="">Select Teacher</option>';

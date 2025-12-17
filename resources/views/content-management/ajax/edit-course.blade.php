@@ -182,7 +182,7 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="course_fee" class="form-label">Fee</label>
-                                <input type="number" class="form-control" name="course_fee" placeholder="Fee"
+                                <input type="number" class="form-control" id="course_fee" name="course_fee" placeholder="Fee"
                                     value="{{ $course->course_fee }}" required>
                                 @error('course_fee')
                                     <span class="text-danger">{{ $message }}</span>
@@ -195,7 +195,7 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="discount" class="form-label">Discount</label>
-                                <input type="number" class="form-control" name="discount" placeholder="Discount"
+                                <input type="number" class="form-control" id="discount" name="discount" placeholder="Discount"
                                     value="{{ $course->discount }}" required>
                                 @error('discount')
                                     <span class="text-danger">{{ $message }}</span>
@@ -205,8 +205,8 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="offered_price" class="form-label">Offered Price</label>
-                                <input type="number" class="form-control" name="offered_price" placeholder="Offered Price"
-                                    value="{{ $course->offered_price }}" required>
+                                <input type="number" class="form-control" id="offered_price" name="offered_price" placeholder="Offered Price"
+                                    value="{{ $course->offered_price }}" required readonly>
                                 @error('offered_price')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
@@ -390,7 +390,33 @@
     {{-- In your Blade file or master layout --}}
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-  
+
+$(document).ready(function () {
+
+    function calculateOfferedPrice() {
+        let courseFee = parseFloat($('#course_fee').val()) || 0;
+        let discount  = parseFloat($('#discount').val()) || 0;
+
+        // Discount cannot be more than fee
+        if (discount > courseFee) {
+            discount = courseFee;
+            $('#discount').val(courseFee);
+        }
+
+        let offeredPrice = courseFee - discount;
+        $('#offered_price').val(offeredPrice);
+    }
+
+    // Auto calculate on change
+    $('#course_fee, #discount').on('input', function () {
+        calculateOfferedPrice();
+    });
+
+    // 🔥 IMPORTANT: calculate once on page load (edit mode)
+    calculateOfferedPrice();
+
+});
+
 
     function updateDisableSelects() {
     let subjects = $('#subject_id').val() || [];

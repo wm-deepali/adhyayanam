@@ -24,6 +24,7 @@
     </section>
     <!-- End Page Title -->
 
+
     <!-- Course Page Title -->
     <section class="course-page-title" style="background-image: url(images/background/pattern-10.png)">
       <div class="auto-container">
@@ -112,10 +113,13 @@
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                       allowfullscreen></iframe>
                   @else
-                    <img src="{{ url('storage/' . $course->banner_image) }}" alt="{{$course->image_alt_tag}}" />
+                    <img src="{{ asset('storage/' . $course->banner_image) }}"
+                      alt="{{ $course->image_alt_tag ?? $course->course_heading }}" loading="lazy" />
+
                   @endif
                 @else
-                  <img src="{{ url('storage/' . $course->banner_image) }}" alt="{{$course->image_alt_tag}}" />
+                   <img src="{{ asset('storage/' . $course->banner_image) }}"
+                      alt="{{ $course->image_alt_tag ?? $course->course_heading }}" loading="lazy" />
                 @endif
               </div>
 
@@ -158,14 +162,14 @@
                     <li data-tab="#course-overview" class="tab-btn active-btn">Overview</li>
                     <li data-tab="#course-curriculum" class="tab-btn">Course Detail</li>
                     <!-- <a href="#">
-                      <li class="tab-btn">Study Material</li>
-                    </a>
-                    <a href="#">
-                      <li class="tab-btn">Test Series</li>
-                    </a>
-                    <a href="#">
-                      <li data-tab="#course-instructor" class="tab-btn">Test Planner</li>
-                    </a> -->
+                          <li class="tab-btn">Study Material</li>
+                        </a>
+                        <a href="#">
+                          <li class="tab-btn">Test Series</li>
+                        </a>
+                        <a href="#">
+                          <li data-tab="#course-instructor" class="tab-btn">Test Planner</li>
+                        </a> -->
                     <!-- <li data-tab="#course-reviews" class="tab-btn">Reviews</li> -->
                   </ul>
 

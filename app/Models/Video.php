@@ -41,6 +41,12 @@ class Video extends Model
         'live_link'
     ];
 
+
+    // App\Models\Video.php
+    protected $casts = [
+        'course_type' => 'integer',
+    ];
+
     public function examinationCommission()
     {
         return $this->belongsTo(ExaminationCommission::class, 'course_type');

@@ -8,9 +8,16 @@
     <div class="bg-light rounded">
         <div class="card">
             <div class="card-body">
-                <h3 class="card-title mb-3">Edit Teacher</h3>
+                <div class="d-flex justify-content-between mb-3">
+    <h3 class="card-title">Edit Teacher</h3>
 
-                @include('layouts.includes.messages')
+    <a href="{{ route('manage-teachers.index') }}"
+       class="btn btn-secondary">
+        <i class="fa fa-arrow-left"></i> Back
+    </a>
+</div>
+
+              @include('layouts.includes.messages')
 
                 <form id="teacherForm" method="POST" enctype="multipart/form-data">
                     @csrf

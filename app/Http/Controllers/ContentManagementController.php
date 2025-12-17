@@ -1302,20 +1302,31 @@ class ContentManagementController extends Controller
     public function courseIndex(Request $request)
     {
         if ($request->ajax()) {
-            $data = Course::with('examinationCommission', 'category', 'subCategory')->get();
-
+            $data = Course::with('examinationCommission', 'category', 'subCategory')->latest()->get();
             return Datatables::of($data)
                 ->addIndexColumn()
                 ->addColumn('checkbox', function ($row) {
                     return '<input type="checkbox" class="column_checkbox career_checkbox" id="' . $row->id . '" name="career_checkbox[]" />';
                 })
                 ->addColumn('image', function ($row) {
-                    $image = '<img style="width: 35px" src="' . asset('storage/' . $row->image) . '" alt="">';
-                    return $image;
+
+                    $imagePath = $row->thumbnail_image ?? $row->banner_image;
+
+                    if ($imagePath) {
+                        return '<img src="' . asset('storage/' . $imagePath) . '" 
+                     style="width:40px;height:auto;border-radius:4px" 
+                     alt="Course Image">';
+                    }
+
+                    return '--';
                 })
                 ->addColumn('fee', function ($row) {
                     return $row->course_fee ?? '--';
                 })
+                ->addColumn('course_mode', function ($row) {
+                    return $row->course_mode ?? '--';
+                })
+
                 ->addColumn('duration', function ($row) {
                     return $row->duration ?? '0';
                 })
@@ -3395,8 +3406,6 @@ class ContentManagementController extends Controller
     }
 
 
-
-
     public function questionBankCreate()
     {
         $data['commissions'] = ExaminationCommission::get();
@@ -3409,6 +3418,11 @@ class ContentManagementController extends Controller
     public function questionBankEdit($id)
     {
         $question = Question::where('id', $id)->with('questionDeatils')->first();
+
+        $que = Question::where('question', 'LIKE', '%' . trim($question->question) . '%')->get();
+
+        // dd($question->toArray(), $que->toArray());
+
         //dd($question);
         $data['commissions'] = ExaminationCommission::get();
 
@@ -3446,6 +3460,7 @@ class ContentManagementController extends Controller
 
         return view('question-bank.edit', $data);
     }
+
     public function questionBankView($id)
     {
         $question = Question::where('id', $id)->with('questionDeatils')->first();
@@ -3464,282 +3479,325 @@ class ContentManagementController extends Controller
 
     public function questionBankStore(Request $request)
     {
-        // dd($request->all());
-        $validatedData = $request->validate([
+        $request->validate([
             'language' => 'required',
             'question_category' => 'required',
             'question_type' => 'required',
             'fee_type' => 'required',
-            'previous_year' => 'nullable|integer',
             'commission_id' => 'required',
             'category_id' => 'required',
-            'sub_category_id' => 'nullable',
             'subject_id' => 'required',
-            'chapter_id' => 'nullable',
-            'topic' => 'nullable',
-            'has_instruction' => 'nullable',
-            'instruction' => 'nullable',
-            'has_option_e' => 'nullable',
-            'question.*' => 'required_if:question_type,MCQ',
-            'answer.*' => 'required_if:question_type,MCQ',
-            'option_a.*' => 'required_if:question_type,MCQ',
-            'option_b.*' => 'required_if:question_type,MCQ',
-            'option_c.*' => 'required_if:question_type,MCQ',
-            'option_d.*' => 'required_if:question_type,MCQ',
-            'option_e.*' => 'nullable|string',
-            'passage_question_type' => 'required_if:question_type,Story Based',
+
+            'question.*' => 'required',
         ]);
 
-        // Create a new instance of QuestionBank model
-        // $questionBank = new QuestionBank();
+        foreach ($request->question as $qIndex => $questionText) {
 
-        // // Assign values to the model properties
-        // $questionBank->language = $request->language;
-        // $questionBank->question_category = $request->question_category;
-        // $questionBank->commission_id = $request->commission_id;
-        // $questionBank->previous_year = $request->previous_year;
-        // $questionBank->category_id = $request->category_id;
-        // $questionBank->sub_category_id = $request->sub_category_id;
-        // $questionBank->chapter_id = $request->chapter_id;
-        // $questionBank->subject_id = $request->subject_id;
-        // $questionBank->topic = $request->topic;
-        // $questionBank->has_instruction = $request->has_instruction ? true : false;
-        // $questionBank->instruction = $request->has_instruction ? $request->instruction : null;
-        // $questionBank->has_option_e = $request->has_option_e ? true : false;
+            if (empty($questionText)) {
+                continue;
+            }
 
-        // // Save the question bank to the database
-        // $questionBank->save();
+            /* ===============================
+               MAIN QUESTION
+            =============================== */
+            $question = new Question();
+            $question->language = $request->language;
+            $question->question_category = $request->question_category;
+            $question->question_type = $request->question_type;
+            $question->fee_type = $request->fee_type;
+            $question->previous_year = $request->previous_year;
+            $question->commission_id = $request->commission_id;
+            $question->category_id = $request->category_id;
+            $question->sub_category_id = $request->sub_category_id;
+            $question->subject_id = $request->subject_id;
+            $question->chapter_id = $request->chapter_id;
+            $question->topic = $request->topic;
+            $question->question = $questionText;
 
-        // Process and save each question associated with this question bank
-        foreach ($request->question as $key => $questionData) {
-            if (isset($questionData) && $questionData != "") {
+            $question->has_instruction = $request->has_instruction ? true : false;
+            $question->instruction = $request->has_instruction ? $request->instruction : null;
+            $question->has_option_e = $request->has_option_e ? true : false;
+            $question->show_on_pyq = $request->show_on_pyq ?? 'no';
 
+            /* ===============================
+               MCQ / SUBJECTIVE ANSWERS
+            =============================== */
+            $question->answer = $request->answer[$qIndex] ?? null;
+            $question->option_a = $request->option_a[$qIndex] ?? null;
+            $question->option_b = $request->option_b[$qIndex] ?? null;
+            $question->option_c = $request->option_c[$qIndex] ?? null;
+            $question->option_d = $request->option_d[$qIndex] ?? null;
+            $question->option_e = $request->has_option_e ? ($request->option_e[$qIndex] ?? null) : null;
 
-                // QuestionBank::where('id',$questionBank->id)->update(['question' => $questionData]);
-                // Create a new instance of Question model
-                $question = new Question();
+            $solution = $request->solution[$qIndex] ?? null;
+            $question->has_solution = !empty($solution) ? 'yes' : 'no';
+            $question->solution = $solution;
 
-                // Assign values to the model properties
-                $question->language = $request->language;
-                $question->question_category = $request->question_category;
-                $question->question_type = $request->question_type;
-                $question->fee_type = $request->fee_type;
-                $question->previous_year = $request->previous_year;
-                $question->commission_id = $request->commission_id;
-                $question->category_id = $request->category_id;
-                $question->sub_category_id = $request->sub_category_id;
-                $question->chapter_id = $request->chapter_id;
-                $question->subject_id = $request->subject_id;
-                $question->topic = $request->topic;
-                $question->has_instruction = $request->has_instruction ? true : false;
-                $question->instruction = $request->has_instruction ? $request->instruction : null;
-                $question->has_option_e = $request->has_option_e ? true : false;
-                $question->show_on_pyq = $request->show_on_pyq == "yes" ? "yes" : "no";
-                // $question->question_bank_id = $questionBank->id; // Assign the question bank ID
-                $question->question = $questionData;
-                $question->answer = $request->answer[$key] ?? NULL;
-                $question->option_a = $request->option_a[$key] ?? NULL;
-                $question->option_b = $request->option_b[$key] ?? NULL;
-                $question->option_c = $request->option_c[$key] ?? NULL;
-                $question->option_d = $request->option_d[$key] ?? NULL;
-                $question->option_e = $request->has_option_e ? $request->option_e[$key] ?? null : null;
+            $question->answer_format = $request->answer_format[$qIndex] ?? null;
 
-                $question->passage_question_type = $request->passage_question_type ?? NULL;
-                $question->answer_format = $request->answer_format[$key] ?? NULL;
-                // Save solution from text editor instead of file upload
-                $solutionText = $request->solution[$key] ?? null;
-                $question->has_solution = (!empty($request->has_solution) && !empty($solutionText)) ? 'yes' : 'no';
-                $question->solution = $solutionText;
-                // Save the question to the database
-                $question->added_by_id = auth()->id(); // teacher's ID
-                $question->added_by_type = 'user';
+            $question->added_by_id = auth()->id();
+            $question->added_by_type = 'user';
 
-                $question->save();
+            $question->save();
 
-                if (isset($request->question_type) && $request->question_type == 'Story Based') {
+            /* ===============================
+               STORY BASED → SUB QUESTIONS
+            =============================== */
+            if ($request->question_type === 'Story Based') {
 
-                    if ($request->passage_question_type == 'reasoning_subjective') {
-                        foreach ($request->reasoning_passage_questions as $t => $passagequestionData) {
-                            if (isset($passagequestionData) && $passagequestionData != "") {
-                                $detailData = [
-                                    'question_id' => $question->id,
-                                    'question' => $passagequestionData,
-                                ];
-                                // Optional per-subquestion solution
-                                if (isset($request->reasoning_passage_solution[$t]) && $request->reasoning_passage_solution[$t] !== null) {
-                                    $detailData['solution'] = $request->reasoning_passage_solution[$t];
-                                }
-                                QuestionDetail::create($detailData);
-                            }
+                foreach ($request->sub_question as $sIndex => $subQuestionText) {
 
-                        }
-                    }
-                    if ($request->passage_question_type == 'multiple_choice') {
-
-                        foreach ($request->passage_mcq_questions as $k => $passagemcqquestionData) {
-                            if (isset($passagemcqquestionData) && $passagemcqquestionData != "") {
-                                $detailData = [
-                                    'question_id' => $question->id,
-                                    'question' => $passagemcqquestionData,
-                                    'answer' => strtoupper($request->multiple_choice_passage_answer[$k]) ?? NULL,
-                                    'option_a' => $request->multiple_choice_passage_option_a[$k],
-                                    'option_b' => $request->multiple_choice_passage_option_b[$k],
-                                    'option_c' => $request->multiple_choice_passage_option_c[$k],
-                                    'option_d' => $request->multiple_choice_passage_option_d[$k],
-                                ];
-                                // Optional per-subquestion solution
-                                if (isset($request->passage_mcq_solution[$k]) && $request->passage_mcq_solution[$k] !== null) {
-                                    $detailData['solution'] = $request->passage_mcq_solution[$k];
-                                }
-                                QuestionDetail::create($detailData);
-                            }
-                        }
+                    if (empty(strip_tags($subQuestionText))) {
+                        continue;
                     }
 
+                    $detail = new QuestionDetail();
+                    $detail->question_id = $question->id;
+                    $detail->question = $subQuestionText;
+
+                    // ✅ SET TYPE PROPERLY
+                    $detail->type = $request->sub_question_type[$sIndex] ?? 'mcq';
+
+                    /* ---------- MCQ SUB QUESTION ---------- */
+                    if ($detail->type === 'mcq') {
+
+                        $detail->option_a = $request->option_a[$sIndex] ?? null;
+                        $detail->option_b = $request->option_b[$sIndex] ?? null;
+                        $detail->option_c = $request->option_c[$sIndex] ?? null;
+                        $detail->option_d = $request->option_d[$sIndex] ?? null;
+
+                        $detail->answer = $request->answer[$sIndex] ?? null;
+                    }
+
+                    /* ---------- REASONING / SUBJECTIVE ---------- */
+                    if ($detail->type === 'reasoning') {
+                        $detail->answer_format = $request->answer_format[$sIndex] ?? null;
+                    }
+
+                    /* ---------- SOLUTION ---------- */
+                    $detail->solution = $request->solution[$sIndex] ?? null;
+
+                    $detail->save();
                 }
             }
 
+
         }
 
-        // Optionally, you can redirect the user after successful submission
-        return redirect()->route('question.bank.index')->with('success', 'Questions created successfully.');
+        return redirect()
+            ->route('question.bank.index')
+            ->with('success', 'Questions created successfully');
     }
+
 
     public function questionBankUpdate(Request $request, $id)
     {
-        //dd($request->all());
-        $validatedData = $request->validate([
+        $request->validate([
             'language' => 'required',
             'question_category' => 'required',
             'question_type' => 'required',
             'fee_type' => 'required',
             'commission_id' => 'required',
-            'previous_year' => 'nullable|integer',
             'category_id' => 'required',
-            'sub_category_id' => 'nullable',
             'subject_id' => 'required',
-            'chapter_id' => 'nullable',
-            'topic' => 'nullable',
-            'has_instruction' => 'nullable',
-            'instruction' => 'nullable',
-            'has_option_e' => 'nullable',
-            'question.*' => 'required_if:question_type,MCQ',
-            'answer.*' => 'required_if:question_type,MCQ',
-            'option_a.*' => 'required_if:question_type,MCQ',
-            'option_b.*' => 'required_if:question_type,MCQ',
-            'option_c.*' => 'required_if:question_type,MCQ',
-            'option_d.*' => 'required_if:question_type,MCQ',
-            'option_e.*' => 'nullable|string',
-            'passage_question_type' => 'required_if:question_type,Story Based',
+            'question.*' => 'required',
         ]);
 
-        // Create a new instance of QuestionBank model
-        // $questionBank = new QuestionBank();
+        /* ======================================
+           UPDATE MAIN QUESTION (ONLY ONE RECORD)
+        ====================================== */
+        $question = Question::findOrFail($id);
 
-        // // Assign values to the model properties
-        // $questionBank->language = $request->language;
-        // $questionBank->question_category = $request->question_category;
-        // $questionBank->commission_id = $request->commission_id;
-        // $questionBank->previous_year = $request->previous_year;
-        // $questionBank->category_id = $request->category_id;
-        // $questionBank->sub_category_id = $request->sub_category_id;
-        // $questionBank->chapter_id = $request->chapter_id;
-        // $questionBank->subject_id = $request->subject_id;
-        // $questionBank->topic = $request->topic;
-        // $questionBank->has_instruction = $request->has_instruction ? true : false;
-        // $questionBank->instruction = $request->has_instruction ? $request->instruction : null;
-        // $questionBank->has_option_e = $request->has_option_e ? true : false;
+        $question->language = $request->language;
+        $question->question_category = $request->question_category;
+        $question->question_type = $request->question_type;
+        $question->fee_type = $request->fee_type;
+        $question->previous_year = $request->previous_year;
+        $question->commission_id = $request->commission_id;
+        $question->category_id = $request->category_id;
+        $question->sub_category_id = $request->sub_category_id;
+        $question->subject_id = $request->subject_id;
+        $question->chapter_id = $request->chapter_id;
+        $question->topic = $request->topic;
 
-        // // Save the question bank to the database
-        // $questionBank->save();
+        // MAIN QUESTION TEXT
+        $question->question = $request->question[0];
 
-        // Process and save each question associated with this question bank
-        foreach ($request->question as $key => $questionData) {
-            if (isset($questionData) && $questionData != "") {
-                // QuestionBank::where('id',$questionBank->id)->update(['question' => $questionData]);
-                // Create a new instance of Question model
-                $question = Question::find($id);
+        $question->has_instruction = $request->has_instruction ? true : false;
+        $question->instruction = $request->has_instruction ? $request->instruction : null;
+        $question->has_option_e = $request->has_option_e ? true : false;
+        $question->show_on_pyq = $request->show_on_pyq ?? 'no';
 
-                // Assign values to the model properties
-                $question->language = $request->language;
-                $question->question_category = $request->question_category;
-                $question->question_type = $request->question_type;
-                $question->fee_type = $request->fee_type;
-                $question->commission_id = $request->commission_id;
-                $question->previous_year = $request->previous_year;
-                $question->category_id = $request->category_id;
-                $question->sub_category_id = $request->sub_category_id;
-                $question->chapter_id = $request->chapter_id;
-                $question->subject_id = $request->subject_id;
-                $question->topic = $request->topic;
-                $question->has_instruction = $request->has_instruction ? true : false;
-                $question->instruction = $request->has_instruction ? $request->instruction : null;
-                $question->has_option_e = $request->has_option_e ? true : false;
-                $question->show_on_pyq = $request->show_on_pyq == "yes" ? "yes" : "no";
-                // $question->question_bank_id = $questionBank->id; // Assign the question bank ID
-                $question->question = $questionData;
-                $question->answer = $request->answer[$key] ?? NULL;
-                $question->option_a = $request->option_a[$key] ?? NULL;
-                $question->option_b = $request->option_b[$key] ?? NULL;
-                $question->option_c = $request->option_c[$key] ?? NULL;
-                $question->option_d = $request->option_d[$key] ?? NULL;
-                $question->option_e = $request->has_option_e ? $request->option_e[$key] ?? null : null;
-                $question->passage_question_type = $request->passage_question_type ?? NULL;
-                $question->answer_format = $request->answer_format[$key] ?? NULL;
-                // Save solution from text editor instead of file upload
-                $solutionText = $request->solution[$key] ?? null;
-                $question->has_solution = (!empty($request->has_solution) && !empty($solutionText)) ? 'yes' : 'no';
-                $question->solution = $solutionText;
-
-                // Save the question to the database
-                $question->save();
-
-
-                if (isset($request->question_type) && $request->question_type == 'Story Based') {
-                    QuestionDetail::where('question_id', $question->id)->delete();
-                    if ($request->passage_question_type == 'reasoning_subjective') {
-                        foreach ($request->reasoning_passage_questions as $t => $passagequestionData) {
-                            if (isset($passagequestionData) && $passagequestionData != "") {
-                                $detailData = [
-                                    'question_id' => $question->id,
-                                    'question' => $passagequestionData,
-                                ];
-                                if (isset($request->reasoning_passage_solution[$t]) && $request->reasoning_passage_solution[$t] !== null) {
-                                    $detailData['solution'] = $request->reasoning_passage_solution[$t];
-                                }
-                                QuestionDetail::create($detailData);
-                            }
-
-                        }
-                    }
-                    if ($request->passage_question_type == 'multiple_choice') {
-
-                        foreach ($request->passage_mcq_questions as $k => $passagemcqquestionData) {
-                            if (isset($passagemcqquestionData) && $passagemcqquestionData != "") {
-                                $detailData = [
-                                    'question_id' => $question->id,
-                                    'question' => $passagemcqquestionData,
-                                    'answer' => strtoupper($request->multiple_choice_passage_answer[$k]) ?? NULL,
-                                    'option_a' => $request->multiple_choice_passage_option_a[$k],
-                                    'option_b' => $request->multiple_choice_passage_option_b[$k],
-                                    'option_c' => $request->multiple_choice_passage_option_c[$k],
-                                    'option_d' => $request->multiple_choice_passage_option_d[$k],
-                                ];
-                                if (isset($request->passage_mcq_solution[$k]) && $request->passage_mcq_solution[$k] !== null) {
-                                    $detailData['solution'] = $request->passage_mcq_solution[$k];
-                                }
-                                QuestionDetail::create($detailData);
-                            }
-                        }
-                    }
-
-                }
-                // QuestionBank::where('id', $questionBank->id)->update(['question' => $questionData]);
-            }
+        /* ======================================
+           MCQ / SUBJECTIVE MAIN ANSWER
+        ====================================== */
+        if ($request->question_type === 'MCQ') {
+            $question->answer = $request->answer[0] ?? null;
+            $question->option_a = $request->option_a[0] ?? null;
+            $question->option_b = $request->option_b[0] ?? null;
+            $question->option_c = $request->option_c[0] ?? null;
+            $question->option_d = $request->option_d[0] ?? null;
+            $question->option_e = $request->has_option_e ? ($request->option_e[0] ?? null) : null;
         }
 
-        // Optionally, you can redirect the user after successful submission
-        return redirect()->route('question.bank.index')->with('success', 'Questions updated successfully.');
+        if ($request->question_type === 'Subjective') {
+            $question->answer_format = $request->answer_format[0] ?? null;
+        }
+
+        $solution = $request->solution[0] ?? null;
+        $question->has_solution = !empty($solution) ? 'yes' : 'no';
+        $question->solution = $solution;
+
+        $question->save();
+
+        /* ======================================
+           STORY BASED → SUB QUESTIONS
+        ====================================== */
+        if ($request->question_type === 'Story Based') {
+
+            $incomingIds = [];
+
+            foreach ($request->sub_question as $sIndex => $subQuestionText) {
+
+                // Skip empty sub questions
+                if (empty(strip_tags($subQuestionText))) {
+                    continue;
+                }
+
+                $subId = $request->sub_question_id[$sIndex] ?? null;
+
+                // 🔹 EXISTING sub-question → update
+                if (!empty($subId)) {
+                    $detail = QuestionDetail::where('id', $subId)
+                        ->where('question_id', $question->id)
+                        ->first();
+                }
+                // 🔹 NEW sub-question → create
+                else {
+                    $detail = new QuestionDetail();
+                    $detail->question_id = $question->id;
+                }
+
+                if (!$detail) {
+                    continue;
+                }
+
+                $detail->question = $subQuestionText;
+                $detail->type = $request->sub_question_type[$sIndex] ?? 'mcq';
+
+                /* ===============================
+                   MCQ SUB QUESTION
+                =============================== */
+                if ($detail->type === 'mcq') {
+                    $detail->option_a = $request->option_a[$sIndex] ?? null;
+                    $detail->option_b = $request->option_b[$sIndex] ?? null;
+                    $detail->option_c = $request->option_c[$sIndex] ?? null;
+                    $detail->option_d = $request->option_d[$sIndex] ?? null;
+                    $detail->answer = $request->answer[$sIndex] ?? null;
+
+                    // clear reasoning-only fields
+                    $detail->answer_format = null;
+                }
+
+                /* ===============================
+                   REASONING / SUBJECTIVE
+                =============================== */
+                if ($detail->type === 'reasoning') {
+                    $detail->answer_format = $request->answer_format[$sIndex] ?? null;
+
+                    // clear MCQ-only fields
+                    $detail->option_a = null;
+                    $detail->option_b = null;
+                    $detail->option_c = null;
+                    $detail->option_d = null;
+                    $detail->answer = null;
+                }
+
+                /* ===============================
+                   SOLUTION
+                =============================== */
+                $detail->solution = $request->solution[$sIndex] ?? null;
+
+                $detail->save();
+
+                // Track IDs that are still valid
+                $incomingIds[] = $detail->id;
+            }
+
+            /* ===============================
+               DELETE REMOVED SUB QUESTIONS
+            =============================== */
+            QuestionDetail::where('question_id', $question->id)
+                ->whereNotIn('id', $incomingIds)
+                ->delete();
+        }
+
+
+        /* ======================================
+           RECHECK STATUS (ONLY IF REJECTED)
+        ====================================== */
+        if ($question->status === 'Rejected') {
+
+            $status = 'Done';
+            $note = null;
+
+            $cleanQuestion = trim(preg_replace('/\s+/', ' ', strip_tags($question->question)));
+
+            $duplicate = Question::whereRaw(
+                'LOWER(REPLACE(REPLACE(REPLACE(question, "<p>", ""), "</p>", ""), "&nbsp;", "")) LIKE ?',
+                ['%' . strtolower($cleanQuestion) . '%']
+            )
+                ->where('commission_id', $request->commission_id)
+                ->where('category_id', $request->category_id)
+                ->where('sub_category_id', $request->sub_category_id)
+                ->where('subject_id', $request->subject_id)
+                ->where('id', '!=', $question->id)
+                ->exists();
+
+            if ($duplicate) {
+                $status = 'Rejected';
+                $note = 'Already Exists Question.';
+            }
+
+            // MCQ format check
+            if ($status !== 'Rejected' && $request->question_type === 'MCQ') {
+                if (
+                    empty($question->question) ||
+                    empty($question->option_a) ||
+                    empty($question->option_b) ||
+                    empty($question->option_c) ||
+                    empty($question->option_d) ||
+                    empty($question->answer)
+                ) {
+                    $status = 'Rejected';
+                    $note = 'Question Format Issue';
+                }
+            }
+
+            // Subjective format check
+            if ($status !== 'Rejected' && $request->question_type === 'Subjective') {
+                if (empty($question->answer_format)) {
+                    $status = 'Rejected';
+                    $note = 'Please enter Answer format';
+                }
+            }
+
+            // Story Based format check
+            if ($status !== 'Rejected' && $request->question_type === 'Story Based') {
+                if (empty($request->sub_question)) {
+                    $status = 'Rejected';
+                    $note = 'Question Format Issue';
+                }
+            }
+
+            $question->status = $status;
+            $question->note = $note;
+            $question->save();
+        }
+
+        return redirect()
+            ->route('question.bank.index')
+            ->with('success', 'Question updated successfully');
     }
 
     public function ImportQuestions(Request $request)

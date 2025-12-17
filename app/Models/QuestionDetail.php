@@ -12,6 +12,7 @@ class QuestionDetail extends Model
     protected $fillable = [
         'question_id',
         'question',
+        'type',
         'answer',
         'option_a',
         'option_b',

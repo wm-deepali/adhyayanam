@@ -36,6 +36,7 @@
                             <th scope="col">Exam Date</th>
                             <th scope="col">Examination Commission</th>
                             <th scope="col">Link</th>
+                            <th>Added By</th>
                             <th scope="col">Actions</th>
                         </tr>
                     </thead>
@@ -62,14 +63,14 @@
                 dom: '<"row margin-bottom-12"<"col-sm-12"<"pull-left"l><"pull-right"fr><"pull-right margin-left-10 "B>>>tip',
                 buttons: {
                     buttons: [
-                          @if(\App\Helpers\Helper::canAccess('manage_upcoming_exams_delete'))
-                        {
-                            className: 'btn bg-red color-palette btn-flat hidden delete_btn pull-left',
-                            text: 'Bulk Delete',
-                            action: function (e, dt, node, config) {
-                                multi_delete();
-                            }
-                        },
+                        @if(\App\Helpers\Helper::canAccess('manage_upcoming_exams_delete'))
+                                        {
+                                className: 'btn bg-red color-palette btn-flat hidden delete_btn pull-left',
+                                text: 'Bulk Delete',
+                                action: function (e, dt, node, config) {
+                                    multi_delete();
+                                }
+                            },
                         @endif
                         { extend: 'copy', className: 'btn bg-teal color-palette btn-flat', footer: true, exportOptions: { columns: [1, 2, 3, 4, 5, 6, 7, 8, 9] } },
                         { extend: 'excel', className: 'btn bg-teal color-palette btn-flat', footer: true, exportOptions: { columns: [1, 2, 3, 4, 5, 6, 7, 8, 9] } },
@@ -102,6 +103,7 @@
                     { data: 'examination_date', name: 'examination_date' },
                     { data: 'commission', name: 'commission' },
                     { data: 'link', name: 'link' },
+                    { data: 'created_by', name: 'created_by' },
                     { data: 'action', name: 'action', orderable: false, searchable: false },
                 ],
                 lengthMenu: [10, 50, 100],

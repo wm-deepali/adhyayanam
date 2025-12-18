@@ -82,6 +82,7 @@
                                 <th scope="col" width="10%">Type</th>
                                 <th scope="col">Image</th>
                                 <th scope="col">Thumbnail</th>
+                                 <th>Added By</th>
                                 <th scope="col">Actions</th>
                             </tr>
                         </thead>
@@ -95,6 +96,7 @@
                                     <td>{{ $blog->type }}</td>
                                     <td><img src="{{ asset('storage/' . $blog->image) }}" alt="Image" width="50"></td>
                                     <td><img src="{{ asset('storage/' . $blog->thumbnail) }}" alt="Thumbnail" width="50"></td>
+                                    <td>{{ $blog->user ? $blog->user->name : 'N/A'  }}</td>
                                     <td>
                                         @if(
                                                 \App\Helpers\Helper::canAccess('manage_blog_edit') ||

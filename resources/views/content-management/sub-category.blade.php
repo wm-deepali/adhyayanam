@@ -37,6 +37,7 @@
                             <th scope="col">Image</th>
                             <th scope="col">Alt Tag</th>
                             <th scope="col">Status</th>
+                            <th scope="col">Added By</th>
                             <th scope="col">Actions</th>
                         </tr>
                     </thead>
@@ -64,7 +65,7 @@
                 buttons: {
                     buttons: [
                         @if(\App\Helpers\Helper::canAccess('manage_subcategory_delete'))
-                             {
+                                     {
                                 className: 'btn bg-red color-palette btn-flat hidden delete_btn pull-left',
                                 text: 'Bulk Delete',
                                 action: function (e, dt, node, config) {
@@ -105,6 +106,7 @@
                     { data: 'image', name: 'image', orderable: false, searchable: false },
                     { data: 'alt_tag', name: 'alt_tag', orderable: false, searchable: false },
                     { data: 'status', name: 'status', orderable: false, searchable: false },
+                    { data: 'created_by', name: 'created_by' },
                     { data: 'action', name: 'action', orderable: false, searchable: false },
                 ],
                 lengthMenu: [10, 50, 100],

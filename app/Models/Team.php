@@ -15,5 +15,11 @@ class Team extends Model
         'experience',
         'education',
         'profile_image',
+        'created_by'
     ];
+
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
 }

@@ -33,6 +33,7 @@
                             <th scope="col">Chapter Number</th>
                             <th scope="col">Description</th>
                             <th scope="col">Status</th>
+                             <th scope="col">Added By</th>
                             <th scope="col">Actions</th>
                         </tr>
                     </thead>
@@ -96,6 +97,7 @@
                     { data: 'chapter_number', name: 'chapter_number' },
                     { data: 'description', name: 'description' },
                     { data: 'status', name: 'status' },
+                    { data: 'created_by', name: 'created_by' },
                     { data: 'action', name: 'action', orderable: false, searchable: false },
                 ],
                 lengthMenu: [10, 50, 100],

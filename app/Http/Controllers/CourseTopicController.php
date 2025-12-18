@@ -18,7 +18,7 @@ class CourseTopicController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $data = CourseTopic::all();
+            $data = CourseTopic::with('creator')->latest()->get();
 
             return Datatables::of($data)
                 ->addIndexColumn()
@@ -41,6 +41,11 @@ class CourseTopicController extends Controller
                         $status = '<span class="badge badge-secondary">Inactive</span>';
                     }
                     return $status;
+                })
+                ->addColumn('created_by', function ($row) {
+                    return $row->creator
+                        ? $row->creator->name
+                        : '<span class="text-muted">N/A</span>';
                 })
                 ->addColumn('action', function ($row) {
                     $actionBtn = '';
@@ -69,7 +74,7 @@ class CourseTopicController extends Controller
                     return $actionBtn;
                 })
 
-                ->rawColumns(['checkbox', 'subject', 'status', 'action'])
+                ->rawColumns(['checkbox', 'subject', 'status', 'action', 'created_by'])
                 ->make(true);
         }
         return view('content-management.course-topic');
@@ -113,6 +118,7 @@ class CourseTopicController extends Controller
             'topic_number' => $request->topic_number,
             'description' => $request->description,
             'status' => $request->status,
+            'created_by' => auth()->id(),
         ]);
 
         return redirect()->route('topic.index')->with('success', 'Topic created successfully!');

@@ -19,6 +19,7 @@ class CourseTopic extends Model
         'topic_number',
         'description',
         'status',
+        'created_by'
     ];
     public function subject()
     {
@@ -32,5 +33,10 @@ class CourseTopic extends Model
     public function studyMaterials()
     {
         return $this->hasMany(StudyMaterial::class, 'topic_id');
+    }
+
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
     }
 }

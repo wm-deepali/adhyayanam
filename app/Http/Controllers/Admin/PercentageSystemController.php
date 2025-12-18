@@ -23,12 +23,14 @@ class PercentageSystemController extends Controller
     {
         $request->validate([
             'from_percentage' => 'required|numeric|min:0|max:100',
-            'to_percentage'   => 'required|numeric|min:0|max:100|gte:from_percentage',
-            'division'         => 'required|string',
-            'status'          => 'required|in:active,inactive',
+            'to_percentage' => 'required|numeric|min:0|max:100|gte:from_percentage',
+            'division' => 'required|string',
+            'status' => 'required|in:active,inactive',
         ]);
 
-        PercentageSystem::create($request->all());
+        $data = $request->all();
+        $data['created_by'] = auth()->id();
+        PercentageSystem::create($data);
 
         return redirect()->route('percentage.system.index')->with('success', 'Percentage range added successfully.');
     }
@@ -43,9 +45,9 @@ class PercentageSystemController extends Controller
     {
         $request->validate([
             'from_percentage' => 'required|numeric|min:0|max:100',
-            'to_percentage'   => 'required|numeric|min:0|max:100|gte:from_percentage',
-            'division'         => 'required|string',
-            'status'          => 'required|in:active,inactive',
+            'to_percentage' => 'required|numeric|min:0|max:100|gte:from_percentage',
+            'division' => 'required|string',
+            'status' => 'required|in:active,inactive',
         ]);
 
         $percentage = PercentageSystem::findOrFail($id);

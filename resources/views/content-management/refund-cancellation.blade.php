@@ -39,6 +39,17 @@
                         @if(\App\Helpers\Helper::canAccess('manage_refund_edit'))
                             <button type="submit" class="btn btn-primary">Save Page</button>
                         @endif
+                        @if($refund->updated_at)
+                            <div class="mt-3 text-muted">
+                                <small>
+                                    Last updated
+                                    @if($refund->updater)
+                                        by <strong>{{ $refund->updater->name }}</strong>
+                                    @endif
+                                    on {{ $refund->updated_at->format('d M Y, h:i A') }}
+                                </small>
+                            </div>
+                        @endif
                     </form>
                 </div>
             </div>

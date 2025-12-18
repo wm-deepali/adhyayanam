@@ -51,6 +51,7 @@ class SubAdminController extends Controller
             'role_group_id' => $request->role_group_id,
             'date_of_birth' => $request->date_of_birth,
             'gender' => $request->gender,
+            'created_by' => auth()->id(),
         ]);
 
         $user->username = "10000" . $user->id;
@@ -96,14 +97,14 @@ class SubAdminController extends Controller
             'gender' => $validated['gender'] ?? null,
         ];
 
-        
+
         // Update password ONLY if provided
         if (!empty($validated['password'])) {
             $data['password'] = bcrypt($validated['password']);
         }
-        
+
         $user->update($data);
-        
+
         return redirect()
             ->route('sub-admins.index')
             ->with('success', 'Sub Admin updated successfully.');

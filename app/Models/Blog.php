@@ -17,11 +17,13 @@ class Blog extends Model
         'description',
         'type',
         'image',
-        'thumbnail'
+        'thumbnail',
+        'created_by'
     ];
 
     public function user()
     {
         return $this->belongsTo(User::class);
     }
+    
 }

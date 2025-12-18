@@ -49,7 +49,11 @@ class TeacherController extends Controller
                 ->addColumn('total_paid', function ($teacher) {
                     return number_format($teacher->total_paid_amount, 2);
                 })
-
+                ->addColumn('created_by', function ($row) {
+                    return $row->creator
+                        ? $row->creator->name
+                        : '<span class="text-muted">N/A</span>';
+                })
                 ->addColumn('status', function ($teacher) {
                     return $teacher->status ? 'Active' : 'Inactive';
                 })
@@ -156,7 +160,7 @@ class TeacherController extends Controller
                 })
 
 
-                ->rawColumns(['checkbox', 'profile_picture', 'status', 'action'])
+                ->rawColumns(['checkbox', 'profile_picture', 'status', 'action', 'created_by'])
                 ->make(true);
         }
         return view('admin.teachers.index');
@@ -225,7 +229,7 @@ class TeacherController extends Controller
         $teacher->city = $request->city;
         $teacher->pin_code = $request->pin_code;
         $teacher->can_conduct_live_classes = $request->has('can_conduct_live_classes') ? 1 : 0;
-
+        $teacher->can_check_tests = $request->has('can_check_tests') ? 1 : 0;
         $teacher->allow_languages = $request->language ?? [];
 
         // Store hashed password
@@ -251,6 +255,7 @@ class TeacherController extends Controller
         $teacher->bank_branch = $request->bank_branch;
         $teacher->ifsc_code = $request->ifsc_code;
         $teacher->swift_code = $request->swift_code;
+        $teacher->created_by = auth()->id();
 
         // Files
         $fileFields = [
@@ -387,7 +392,7 @@ class TeacherController extends Controller
         $teacher->pin_code = $request->pin_code;
         $teacher->allow_languages = $request->language ?? [];
         $teacher->can_conduct_live_classes = $request->has('can_conduct_live_classes') ? 1 : 0;
-
+        $teacher->can_check_tests = $request->has('can_check_tests') ? 1 : 0;
 
         // Update Question Permissions and Payment
         $permissions = $request->question_type_permission ?? [];

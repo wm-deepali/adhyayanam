@@ -26,7 +26,7 @@ class TestResultController extends Controller
                 ->latest()
                 ->paginate(20, ['*'], 'published_page'),
 
-            'teachers' => Teacher::all()
+            'teachers' => Teacher::where('can_check_tests', 1)->get()
         ]);
     }
 

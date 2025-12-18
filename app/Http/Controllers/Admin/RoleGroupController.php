@@ -32,6 +32,7 @@ class RoleGroupController extends Controller
             'name' => $request->name,
             'type' => $request->type,
             'permissions' => $request->permissions ?? [],
+            'created_by' => auth()->id(),
         ]);
 
         return redirect()->route('role-groups.index')->with('success', 'Role Group created successfully.');

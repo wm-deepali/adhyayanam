@@ -69,6 +69,7 @@
                             <th scope="col">Designation</th>
                             <th scope="col">Experience</th>
                             <th scope="col">Education</th>
+                            <th>Added By</th>
                             <th scope="col">Actions</th>
                         </tr>
                     </thead>
@@ -83,6 +84,7 @@
                                 <td>{{ $team->designation ?? "--" }}</td>
                                 <td>{{ $team->experience ?? "--" }}</td>
                                 <td>{{ $team->education ?? "--" }}</td>
+                                <td>{{ $team->creator ? $team->creator->name : 'N/A'  }}</td>
                                 <td>
                                     @if(
                                             \App\Helpers\Helper::canAccess('manage_team_edit') ||

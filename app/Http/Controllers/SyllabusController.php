@@ -105,6 +105,7 @@ class SyllabusController extends Controller
             'pdf' => $pdfPath,
             'detail_content' => $request->detail_content,
             'status' => $request->status,
+            'created_by' => auth()->id(),
         ]);
 
         return redirect()->route('syllabus.index')

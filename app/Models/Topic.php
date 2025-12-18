@@ -12,10 +12,16 @@ class Topic extends Model
     protected $fillable=[
         'name',
         'description',
+        'created_by'
     ];
 
     public function currentAffair()
     {
         return $this->hasMany(CurrentAffair::class);
+    }
+
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
     }
 }

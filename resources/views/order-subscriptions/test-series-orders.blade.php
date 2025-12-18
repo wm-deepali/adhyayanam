@@ -51,7 +51,7 @@ Test Series Orders
                                         @endif
 
                                         @if(\App\Helpers\Helper::canAccess('manage_students'))
-                                            <a href="{{ route('students.student-profile-detail', $res->student->id) }}"
+                                            <a href="{{ route('students.student-profile-detail', $res->student->id ?? 0) }}"
                                                 title="View Student Profile">
                                                 <i class="fa fa-user-graduate"></i>
                                             </a>

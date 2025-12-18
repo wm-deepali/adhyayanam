@@ -144,7 +144,7 @@
 
                     <th>Marks Obtained</th>
                     <td>
-                        @if($attempt->status === 'evaluated')
+                        @if($attempt->status === 'published')
                             <span class="text-success fw-bold">
                                 {{ $attempt->final_score }}
                             </span>
@@ -160,7 +160,7 @@
                         @php $status = strtolower($attempt->status) @endphp
 
                         <span class="fw-bold 
-                                                                                            {{ $status == 'evaluated' ? 'text-success' :
+                    {{ $status == 'published' ? 'text-success' :
         ($status == 'pending' ? 'text-warning' : 'text-primary') }}">
                             {{ ucfirst($status) }}
                         </span>

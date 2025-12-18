@@ -18,6 +18,7 @@ class Subject extends Model
         'name',
         'subject_code',
         'status',
+        'created_by'
     ];
 
     // Define the relationship with SubCategory
@@ -48,5 +49,10 @@ class Subject extends Model
     public function pyqSubject()
     {
         return $this->hasMany(PyqSubject::class, 'subject_id');
+    }
+
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
     }
 }

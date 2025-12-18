@@ -36,6 +36,13 @@
                             <button class="btn btn-primary" type="submit">Save</button>
                         </div>
                     @endif
+                    @if($popUp->created_at)
+                        <div class="text-muted">
+                            Last updated by
+                            <strong>{{ $popUp->creator->name ?? 'N/A' }}</strong>
+                            on {{ $popUp->updated_at->format('d M Y, h:i A') }}
+                        </div>
+                    @endif
 
                 </form>
             </div>

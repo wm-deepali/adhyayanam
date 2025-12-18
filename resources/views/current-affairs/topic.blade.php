@@ -29,6 +29,7 @@ Adhyayanam | Current Affairs Categories
                             <th scope="col" width="1%">#</th>
                             <th scope="col">Category Name</th>
                             <th scope="col">Description</th>
+                            <th>Added By</th>
                             <th scope="col">Created At</th>
                             <th scope="col">Action</th>
                         </tr>
@@ -39,6 +40,7 @@ Adhyayanam | Current Affairs Categories
                             <th scope="row">{{ $loop->iteration }}</th>
                             <td>{{ $topic->name }}</td>
                             <td>{{ $topic->description ?? '' }}</td>
+                            <td>{{ $topic->creator ? $topic->creator->name : 'N/A'  }}</td>
                             <td>{{ $topic->created_at->format('d M Y, h:i A') }}</td>
                             <td>
     @if(

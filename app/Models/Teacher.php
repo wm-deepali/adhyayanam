@@ -71,6 +71,8 @@ class Teacher extends Authenticatable implements CanResetPasswordContract
         // Status
         'status',
         'can_conduct_live_classes',
+        'created_by',
+        'can_check_tests'
     ];
 
     /**
@@ -90,6 +92,7 @@ class Teacher extends Authenticatable implements CanResetPasswordContract
         'pending' => 'decimal:2',
         'dob' => 'datetime',
         'can_conduct_live_classes' => 'boolean',
+        'can_check_tests'=> 'boolean'
     ];
 
     protected $hidden = [
@@ -160,5 +163,9 @@ class Teacher extends Authenticatable implements CanResetPasswordContract
         return $this->hasMany(StudentHomeworkSubmission::class, 'teacher_id');
     }
 
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
 
 }

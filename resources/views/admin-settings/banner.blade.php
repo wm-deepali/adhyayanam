@@ -92,6 +92,7 @@ Banner Setting
                         <th scope="col">Title</th>
                         <th scope="col">Position</th>
                         <th scope="col">Link</th>
+                        <th>Added By</th>
                         <th scope="col">Action</th>
                     </tr>
                 </thead>
@@ -103,6 +104,7 @@ Banner Setting
                         <td>{{$data->name}}</td>
                         <td>{{$data->position}}</td>
                         <td>{{$data->link}}</td>
+                        <td>{{ $data->creator ? $dara->creator->name : 'N/A'  }}</td>
                         <td>
     @if(\App\Helpers\Helper::canAccess('manage_banner_edit'))
         <a href="{{ route('settings.banner.edit', $data->id) }}" class="btn btn-sm btn-primary">

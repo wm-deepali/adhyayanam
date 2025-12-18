@@ -21,6 +21,7 @@ class ExaminationCommission extends Model
         'image',
         'alt_tag',
         'status',
+        'created_by'
     ];
 
     public function categories()
@@ -31,4 +32,10 @@ class ExaminationCommission extends Model
     {
         return $this->hasMany(Course::class);
     }
+
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
 }

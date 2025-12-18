@@ -47,7 +47,8 @@ class User extends Authenticatable implements HasMedia, MustVerifyEmail
         'role_group_id',
         'date_of_birth',
         'gender',
-        'username'
+        'username',
+        'created_by'
     ];
 
     /**
@@ -145,6 +146,11 @@ class User extends Authenticatable implements HasMedia, MustVerifyEmail
     public function homeworkSubmissions()
     {
         return $this->hasMany(StudentHomeworkSubmission::class, 'student_id');
+    }
+
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
     }
 
 }

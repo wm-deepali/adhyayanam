@@ -21,6 +21,7 @@ class Syllabus extends Model
         'pdf',
         'detail_content',
         'status',
+        'created_by'
     ];
 
     /**
@@ -45,5 +46,10 @@ class Syllabus extends Model
     public function subject()
     {
         return $this->belongsTo(\App\Models\Subject::class, 'subject_id');
+    }
+
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
     }
 }

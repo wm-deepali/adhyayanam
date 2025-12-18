@@ -9,11 +9,17 @@ class PopUp extends Model
 {
     use HasFactory;
 
-    protected $table='pop_up';
+    protected $table = 'pop_up';
 
-    protected $fillable=[
+    protected $fillable = [
         'pop_image',
         'link',
-        'title'
+        'title',
+        'created_by'
     ];
+
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
 }

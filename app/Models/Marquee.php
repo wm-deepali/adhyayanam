@@ -9,10 +9,16 @@ class Marquee extends Model
 {
     use HasFactory;
 
-    protected $table='marquee';
+    protected $table = 'marquee';
 
-    protected $fillable=[
+    protected $fillable = [
         'title',
-        'link'
+        'link',
+        'created_by'
     ];
+
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
 }

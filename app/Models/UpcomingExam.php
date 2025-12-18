@@ -18,10 +18,16 @@ class UpcomingExam extends Model
         'examination_date',
         'link',
         'pdf',
+        'created_by'
     ];
 
     public function exam_commission()
     {
         return $this->belongsTo(ExaminationCommission::class,'commission_id');
+    }
+
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
     }
 }

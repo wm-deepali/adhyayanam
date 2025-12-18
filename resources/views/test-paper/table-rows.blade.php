@@ -53,6 +53,7 @@
                             <td>{{$bank->total_marks}}<br/><span class="badge badge-secondary">{{$bank->duration ?? ""}} mins</span></td>
 
                             <td>Active</td>
+                            <td>{{ $bank->creator ? $bank->creator->name : 'N/A' }}</td>
                                <td>
         <div class="dropdown">
             <button class="btn btn-secondary dropdown-toggle btn-sm" type="button"

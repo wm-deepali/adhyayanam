@@ -26,5 +26,11 @@ class ProgrammeFeature extends Model
         'icon_title2',
         'icon_title3',
         'icon_title4',
+        'created-by'
     ];
+
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
 }

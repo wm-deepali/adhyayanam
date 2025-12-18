@@ -43,6 +43,7 @@
                             <th scope="col">Discount</th>
                             <th scope="col">Offered Price</th>
                             <th scope="col">Duration</th>
+                            <th>Added By</th>
                             <th scope="col">Action</th>
                         </tr>
                     </thead>
@@ -61,6 +62,7 @@
                                 <td>{{$data->discount}}</td>
                                 <td>{{$data->offered_price}}</td>
                                 <td>{{$data->duration ?? "0"}} Days</td>
+                                <td>{{ $data->creator ? $data->creator->name : 'N/A'  }}</td>
                                 <td>
                                     @if(
                                             \App\Helpers\Helper::canAccess('manage_batches') ||

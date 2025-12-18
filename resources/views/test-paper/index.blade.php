@@ -120,6 +120,7 @@
                                 <th scope="col">Total Marks/<br />Durations</th>
 
                                 <th scope="col">Status</th>
+                                <th scope="col">Added By</th>
                                 <th scope="col">Action</th>
                             </tr>
                         </thead>

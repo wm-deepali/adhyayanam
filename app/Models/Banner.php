@@ -13,6 +13,12 @@ class Banner extends Model
         'name',
         'position',
         'image',
-        'link'
+        'link',
+        'created_by'
     ];
+
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
 }

@@ -19,10 +19,17 @@ class Page extends Model
         'youtube_url',
         'image1',
         'image2',
-        'status'
+        'status',
+        'updated_by'
     ];
     public function seo()
     {
         return $this->hasOne(SEO::class);
     }
+   
+    public function updater()
+    {
+        return $this->belongsTo(User::class, 'updated_by');
+    }
+
 }

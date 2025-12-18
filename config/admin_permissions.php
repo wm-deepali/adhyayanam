@@ -217,7 +217,7 @@ return [
     'Settings' => [
         'manage_user_wallet' => ['label' => 'User Wallet', 'actions' => ['manage', 'add']],
         'manage_percentage' => ['label' => 'Manage Percentage', 'actions' => ['manage', 'add', 'edit', 'delete']],
-        'manage_users' => ['label' => 'Users', 'actions' => ['manage', 'add', 'edit', 'delete']],
+        // 'manage_users' => ['label' => 'Users', 'actions' => ['manage', 'add', 'edit', 'delete']],
         // 'manage_roles' => ['label' => 'Roles', 'actions' => ['manage', 'add', 'edit', 'status', 'delete']],
         // 'manage_permissions' => ['label' => 'Permissions', 'actions' => ['manage']],
         'manage_seo' => ['label' => 'SEO', 'actions' => ['manage', 'add']],

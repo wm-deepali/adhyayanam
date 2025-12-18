@@ -16,6 +16,7 @@ class PyqContent extends Model
         'subject_id',
         'heading',
         'detail_content',
+        'created_by'
     ];
 
     public function examinationCommission()
@@ -36,5 +37,10 @@ class PyqContent extends Model
     public function subject()
     {
         return $this->belongsTo(subject::class, 'subject_id');
+    }
+
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
     }
 }

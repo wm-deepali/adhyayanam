@@ -34,6 +34,7 @@
                             <th scope="col">Name</th>
                             <th scope="col">Subject Code</th>
                             <th scope="col">Status</th>
+                            <th scope="col">Added By</th>
                             <th scope="col">Actions</th>
                         </tr>
                     </thead>
@@ -99,6 +100,7 @@
                     { data: 'name', name: 'name' },
                     { data: 'subject_code', name: 'subject_code' },
                     { data: 'status', name: 'status', orderable: false, searchable: false },
+                    { data: 'created_by', name: 'created_by' },
                     { data: 'action', name: 'action', orderable: false, searchable: false },
                 ],
                 lengthMenu: [10, 50, 100],

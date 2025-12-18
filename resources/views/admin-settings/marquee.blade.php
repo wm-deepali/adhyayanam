@@ -53,6 +53,7 @@ Marquee Setting
                         <th scope="col">Date & Time</th>
                         <th scope="col">Title</th>
                         <th scope="col">Link</th>
+                        <th>Added By</th>
                         <th scope="col">Action</th>
                     </tr>
                 </thead>
@@ -62,6 +63,7 @@ Marquee Setting
                         <th scope="row">{{ Carbon\Carbon::parse($data->created_at)->format('d M Y'); }}</th>
                         <td>{{$data->title}}</td>
                         <td>{{$data->link}}</td>
+                        <td>{{ $data->creator ? $data->creator->name : 'N/A'  }}</td>
                         <td>
     @if(\App\Helpers\Helper::canAccess('manage_marquee_edit'))
         <a href="{{ route('settings.marquee.edit', $data->id) }}"

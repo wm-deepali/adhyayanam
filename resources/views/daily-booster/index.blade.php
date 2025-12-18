@@ -33,6 +33,7 @@
                             <th scope="col">Thumbnail</th>
                             <th scope="col">Video Title</th>
                             <th scope="col">Short Description</th>
+                            <th>Added By</th>
                             <th scope="col">Actions</th>
                         </tr>
                     </thead>
@@ -60,7 +61,7 @@
                 buttons: {
                     buttons: [
                         @if(\App\Helpers\Helper::canAccess('manage_daily_booster_delete'))
-                                {
+                                                {
                                 className: 'btn bg-red color-palette btn-flat hidden delete_btn pull-left',
                                 text: 'Bulk Delete',
                                 action: function (e, dt, node, config) {
@@ -95,6 +96,7 @@
                     { data: 'image', name: 'image', orderable: false, searchable: false },
                     { data: 'title', name: 'title' },
                     { data: 'short_description', name: 'short_description' },
+                    { data: 'created_by', name: 'created_by' },
                     { data: 'action', name: 'action', orderable: false, searchable: false },
                 ],
                 lengthMenu: [10, 50, 100],

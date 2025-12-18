@@ -39,6 +39,17 @@
                         @if(\App\Helpers\Helper::canAccess('manage_privacy_edit'))
                             <button type="submit" class="btn btn-primary">Save Page</button>
                         @endif
+                        @if($privacy->updated_at)
+                            <div class="mt-3 text-muted">
+                                <small>
+                                    Last updated
+                                    @if($privacy->updater)
+                                        by <strong>{{ $privacy->updater->name }}</strong>
+                                    @endif
+                                    on {{ $privacy->updated_at->format('d M Y, h:i A') }}
+                                </small>
+                            </div>
+                        @endif
                     </form>
                 </div>
             </div>

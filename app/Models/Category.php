@@ -21,6 +21,7 @@ class Category extends Model
         'image',
         'alt_tag',
         'status',
+        'created_by'
     ];
 
     public function subCategories()
@@ -38,4 +39,10 @@ class Category extends Model
     {
         return $this->hasMany(TestSeries::class);
     }
+
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
 }

@@ -31,6 +31,7 @@
                             <th scope="col">Description</th>
                             <th scope="col">Keywords</th>
                             <th scope="col">Canonical</th>
+                            <th>Added By</th>
                             <th scope="col">Actions</th>
                         </tr>
                     </thead>
@@ -43,6 +44,7 @@
                                 <td>{{$seo->description}}</td>
                                 <td>{{$seo->keywords}}</td>
                                 <td>{{$seo->canonical}}</td>
+                                <td>{{ $seo->creator ? $seo->creator->name : 'N/A'  }}</td>
                                 <td></td>
                             </tr>
                         @endforeach

@@ -13,6 +13,7 @@ class RoleGroup extends Model
         'name',
         'type',
         'permissions',
+        'created_by'
     ];
 
     protected $casts = [
@@ -25,5 +26,10 @@ class RoleGroup extends Model
     public function users()
     {
         return $this->hasMany(User::class, 'role_group_id');
+    }
+
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
     }
 }

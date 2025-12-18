@@ -53,6 +53,7 @@
                                 <th scope="col" width="15%">Question</th>
                                 <th scope="col">Answer</th>
                                 <th scope="col" width="10%">Type</th>
+                                <th>Added By</th>
                                 <th scope="col" width="10%">Actions</th>
                             </tr>
                         </thead>
@@ -63,6 +64,7 @@
                                     <td>{{ $faq->question }}</td>
                                     <td>{{ $faq->answer }}</td>
                                     <td>{{ $faq->type ?? "--" }}</td>
+                                     <td>{{ $faq->creator ? $faq->creator->name : 'N/A'  }}</td>
                                     <td>
                                         <div class="dropdown">
                                             <button class="btn btn-secondary dropdown-toggle btn-sm" type="button"

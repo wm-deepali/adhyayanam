@@ -68,6 +68,18 @@
                         @if(\App\Helpers\Helper::canAccess('manage_about_edit'))
                             <button type="submit" class="btn btn-primary">Save Page</button>
                         @endif
+                        @if($about->updated_at)
+                            <div class="mt-3 text-muted">
+                                <small>
+                                    Last updated
+                                    @if($about->updater)
+                                        by <strong>{{ $about->updater->name }}</strong>
+                                    @endif
+                                    on {{ $about->updated_at->format('d M Y, h:i A') }}
+                                </small>
+                            </div>
+                        @endif
+
                     </form>
                 </div>
 

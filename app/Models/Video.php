@@ -39,6 +39,7 @@ class Video extends Model
         'status',
         'support',
         'no_of_times_can_view',
+        'created_by'
     ];
 
 
@@ -95,4 +96,8 @@ class Video extends Model
         return $this->hasMany(StudentHomeworkSubmission::class);
     }
 
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
 }

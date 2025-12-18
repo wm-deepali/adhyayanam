@@ -20,6 +20,7 @@ class Chapter extends Model
         'chapter_number',
         'description',
         'status',
+        'created_by'
     ];
 
     // Define the relationship with the Subject model
@@ -41,5 +42,10 @@ class Chapter extends Model
     public function studyMaterials()
     {
         return $this->hasMany(StudyMaterial::class, 'chapter_id');
+    }
+
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
     }
 }

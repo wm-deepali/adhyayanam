@@ -21,6 +21,8 @@
 
         </td>
         <td>Active</td>
+        <td>{{ $res->creator ? $res->creator->name : 'N/A'  }}</td>
+
         <td>
             <div class="dropdown">
                 <button class="btn btn-secondary dropdown-toggle btn-sm" type="button" data-bs-toggle="dropdown"
@@ -30,14 +32,14 @@
                 <ul class="dropdown-menu">
                     @if(\App\Helpers\Helper::canAccess('manage_test_bank'))
                         <li>
-                            <a class="dropdown-item" href="{{ route('test.paper.view', $bank->id) }}">
+                            <a class="dropdown-item" href="{{ route('test.paper.view', $res->id) }}">
                                 <i class="fas fa-eye"></i> View
                             </a>
                         </li>
                     @endif
                     @if(\App\Helpers\Helper::canAccess('manage_test_bank_edit'))
                         <li>
-                            <a class="dropdown-item" href="{{ route('test.paper.edit', $bank->id) }}">
+                            <a class="dropdown-item" href="{{ route('test.paper.edit', $res->id) }}">
                                 <i class="fas fa-edit"></i> Edit
                             </a>
                         </li>

@@ -505,6 +505,7 @@ class TestController extends Controller
                     'mrp' => $mrp,
                     'discount' => $discount,
                     'offer_price' => $offer_price,
+                    'created_by' => auth()->id(),
                 );
 
                 //echo "<pre>";print_r($testData);exit;

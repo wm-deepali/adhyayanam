@@ -89,7 +89,7 @@
                                 </div>
                             @endforelse
                         </div>
-                        
+
                         @if(\App\Helpers\Helper::canAccess('manage_user_wallet_add'))
                             <button type="button" class="btn btn-primary btn-sm mt-2" id="addMoreRule">
                                 + Add More
@@ -107,6 +107,15 @@
                         </div>
                     @endif
 
+                    @if($settings->updated_at)
+                        <small class="text-muted">
+                            Last updated by
+                            <strong>{{ $settings->updater->name ?? '' }}</strong>
+                            on {{ $settings->updated_at->format('d M Y, h:i A') }}
+                        </small>
+                    @endif
+
+
                 </form>
             </div>
         </div>
@@ -119,23 +128,23 @@
             const newRule = document.createElement('div');
             newRule.classList.add('row', 'g-2', 'bonus-rule', 'mb-2', 'align-items-center');
             newRule.innerHTML = `
-                    <input type="hidden" name="rule_id[]" value="">
-                    <div class="col-md-3">
-                        <input type="number" name="min_deposit[]" class="form-control" placeholder="Minimum Deposit" required>
-                    </div>
-                    <div class="col-md-3">
-                        <input type="number" name="extra_bonus_value[]" class="form-control" placeholder="Bonus Value" required>
-                    </div>
-                    <div class="col-md-3">
-                        <select name="bonus_type[]" class="form-select" required>
-                            <option value="percentage">Percentage (%)</option>
-                            <option value="fixed">Fixed Amount</option>
-                        </select>
-                    </div>
-                    <div class="col-md-3 text-end">
-                        <button type="button" class="btn btn-danger btn-sm removeRule">Remove</button>
-                    </div>
-                `;
+                        <input type="hidden" name="rule_id[]" value="">
+                        <div class="col-md-3">
+                            <input type="number" name="min_deposit[]" class="form-control" placeholder="Minimum Deposit" required>
+                        </div>
+                        <div class="col-md-3">
+                            <input type="number" name="extra_bonus_value[]" class="form-control" placeholder="Bonus Value" required>
+                        </div>
+                        <div class="col-md-3">
+                            <select name="bonus_type[]" class="form-select" required>
+                                <option value="percentage">Percentage (%)</option>
+                                <option value="fixed">Fixed Amount</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 text-end">
+                            <button type="button" class="btn btn-danger btn-sm removeRule">Remove</button>
+                        </div>
+                    `;
             container.appendChild(newRule);
         });
 

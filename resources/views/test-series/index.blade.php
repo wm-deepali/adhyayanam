@@ -107,6 +107,7 @@
 
                                 <th scope="col">Total Test</th>
                                 <th scope="col">Package Cost</th>
+                                <th scope="col">Added By</th>
                                 <th scope="col">Actions</th>
                             </tr>
                         </thead>

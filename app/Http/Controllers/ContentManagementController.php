@@ -83,6 +83,8 @@ class ContentManagementController extends Controller
 
         $data = $request->only(['heading1', 'description1', 'youtube_url']);
 
+        $data['updated_by'] = auth()->id();
+
         if ($request->hasFile('image1')) {
             $imagePath = $request->file('image1')->store('images', 'public');
             $data['image1'] = $imagePath;
@@ -108,6 +110,7 @@ class ContentManagementController extends Controller
         ]);
 
         $data = $request->only(['heading1', 'description1']);
+        $data['updated_by'] = auth()->id();
         Page::updateOrCreate(
             ['id' => 2], // Condition to match existing record
             $data
@@ -129,6 +132,7 @@ class ContentManagementController extends Controller
         ]);
 
         $data = $request->only(['heading1', 'description1']);
+        $data['updated_by'] = auth()->id();
         Page::updateOrCreate(
             ['id' => 3], // Condition to match existing record
             $data
@@ -149,6 +153,7 @@ class ContentManagementController extends Controller
         ]);
 
         $data = $request->only(['heading1', 'description1']);
+        $data['updated_by'] = auth()->id();
         Page::updateOrCreate(
             ['id' => 4], // Condition to match existing record
             $data
@@ -168,6 +173,7 @@ class ContentManagementController extends Controller
         ]);
 
         $data = $request->only(['heading1', 'description1']);
+        $data['updated_by'] = auth()->id();
         Page::updateOrCreate(
             ['id' => 5], // Condition to match existing record
             $data
@@ -227,7 +233,7 @@ class ContentManagementController extends Controller
 
     public function blogArticles()
     {
-        $data['blogs'] = Blog::all();
+        $data['blogs'] = Blog::latest()->get();
         return view('content-management.blog-articles', $data);
     }
 
@@ -333,11 +339,11 @@ class ContentManagementController extends Controller
         ]);
 
         $data = $request->all();
-
         if ($request->hasFile('profile_image')) {
             $data['profile_image'] = $request->file('profile_image')->store('profiles', 'public');
         }
 
+        $data['created_by'] = auth()->id();
         Team::create($data);
 
         return redirect()->back()->with('success', 'Team Member created successfully!');
@@ -411,6 +417,7 @@ class ContentManagementController extends Controller
             $imagePath2 = $request->file('image2')->store('images', 'public');
             $data['image2'] = $imagePath2;
         }
+        $data['updated_by'] = auth()->id();
         Page::updateOrCreate(
             ['id' => 6], // Condition to match existing record
             $data
@@ -421,7 +428,7 @@ class ContentManagementController extends Controller
     // Existing methods
     public function faq()
     {
-        $data['faqs'] = Faq::all();
+        $data['faqs'] = Faq::latest()->get();
         return view('content-management.faq', $data);
     }
 
@@ -432,8 +439,9 @@ class ContentManagementController extends Controller
             'answer' => 'required|string',
             'type' => 'nullable|string',
         ]);
-
-        Faq::create($request->all());
+        $data = $request->all();
+        $data['created_by'] = auth()->id();
+        Faq::create($data);
 
         return redirect()->route('cm.faq')->with('success', 'FAQ added successfully!');
     }
@@ -491,7 +499,9 @@ class ContentManagementController extends Controller
             'canonical' => 'required|url|max:255',
         ]);
 
-        SEO::create($request->all());
+        $data = $request->all();
+        $data['created_by'] = auth()->id();
+        SEO::create($data);
 
         return redirect()->route('seo.index')->with('success', 'SEO details saved successfully!');
     }
@@ -499,7 +509,7 @@ class ContentManagementController extends Controller
     public function examinationIndex(Request $request)
     {
         if ($request->ajax()) {
-            $data = ExaminationCommission::all();
+            $data = ExaminationCommission::with('creator')->latest()->get();
 
             return Datatables::of($data)
                 ->addIndexColumn()
@@ -534,6 +544,11 @@ class ContentManagementController extends Controller
                     }
                     return $status;
                 })
+                ->addColumn('created_by', function ($row) {
+                    return $row->creator
+                        ? $row->creator->name
+                        : '<span class="text-muted">N/A</span>';
+                })
                 ->addColumn('action', function ($row) {
 
                     $actionBtn = '';
@@ -565,7 +580,7 @@ class ContentManagementController extends Controller
                     return $actionBtn ?: '-';
                 })
 
-                ->rawColumns(['checkbox', 'image', 'status', 'meta_title', 'meta_description', 'meta_keyword', 'canonical_url', 'alt_tag', 'action'])
+                ->rawColumns(['checkbox', 'image', 'status', 'meta_title', 'meta_description', 'meta_keyword', 'canonical_url', 'alt_tag', 'created_by', 'action'])
                 ->make(true);
         }
         return view('content-management.exam-commission');
@@ -607,9 +622,11 @@ class ContentManagementController extends Controller
             'image' => $imagePath,
             'alt_tag' => $request->alt_tag,
             'status' => $request->status,
+            'created_by' => auth()->id(),
         ]);
         return redirect()->back()->with('success', 'Examination Commission added successfully.');
     }
+
     public function examinationDelete($id)
     {
         $exam = ExaminationCommission::findOrFail($id);
@@ -670,7 +687,7 @@ class ContentManagementController extends Controller
     public function categoryIndex(Request $request)
     {
         if ($request->ajax()) {
-            $data = Category::with('examinationCommission')->get();
+            $data = Category::with('examinationCommission', 'creator')->latest()->get();
 
             return Datatables::of($data)
                 ->addIndexColumn()
@@ -699,6 +716,11 @@ class ContentManagementController extends Controller
                 ->addColumn('image', function ($row) {
                     $image = '<img style="width: 35px" src="' . asset('storage/' . $row->image) . '" alt="">';
                     return $image;
+                })
+                ->addColumn('created_by', function ($row) {
+                    return $row->creator
+                        ? $row->creator->name
+                        : '<span class="text-muted">N/A</span>';
                 })
                 ->addColumn('status', function ($row) {
                     if ($row->status == 1) {
@@ -740,7 +762,7 @@ class ContentManagementController extends Controller
                     return $buttons ?: '-';
                 })
 
-                ->rawColumns(['checkbox', 'commission', 'status', 'meta_title', 'meta_description', 'meta_keyword', 'canonical_url', 'alt_tag', 'image', 'action'])
+                ->rawColumns(['checkbox', 'commission', 'status', 'meta_title', 'meta_description', 'meta_keyword', 'canonical_url', 'alt_tag', 'image', 'created_by', 'action'])
                 ->make(true);
         }
         return view('content-management.category');
@@ -824,6 +846,7 @@ class ContentManagementController extends Controller
         $examCommission->image = $imagePath;
         $examCommission->alt_tag = $request->alt_tag;
         $examCommission->status = $request->status;
+        $examCommission->created_by = auth()->id();
 
         // Save the ExaminationCommission instance to the database
         $examCommission->save();
@@ -849,8 +872,7 @@ class ContentManagementController extends Controller
     public function subCategoryIndex(Request $request)
     {
         if ($request->ajax()) {
-            $data = SubCategory::with('category')->get();
-
+            $data = SubCategory::with('category', 'creator')->latest()->get();
             return Datatables::of($data)
                 ->addIndexColumn()
                 ->addColumn('checkbox', function ($row) {
@@ -887,6 +909,11 @@ class ContentManagementController extends Controller
                     }
                     return $status;
                 })
+                ->addColumn('created_by', function ($row) {
+                    return $row->creator
+                        ? $row->creator->name
+                        : '<span class="text-muted">N/A</span>';
+                })
                 ->addColumn('action', function ($row) {
 
                     $buttons = '';
@@ -920,7 +947,7 @@ class ContentManagementController extends Controller
                     return $buttons ?: '-';
                 })
 
-                ->rawColumns(['checkbox', 'commission', 'status', 'meta_title', 'meta_description', 'meta_keyword', 'canonical_url', 'alt_tag', 'action', 'image'])
+                ->rawColumns(['checkbox', 'commission', 'status', 'meta_title', 'meta_description', 'meta_keyword', 'canonical_url', 'alt_tag', 'action', 'image', 'created_by'])
                 ->make(true);
         }
         return view('content-management.sub-category');
@@ -963,6 +990,7 @@ class ContentManagementController extends Controller
         $examCommission->image = $imagePath;
         $examCommission->alt_tag = $request->alt_tag;
         $examCommission->status = $request->status;
+        $examCommission->created_by = auth()->id();
 
         // Save the ExaminationCommission instance to the database
         $examCommission->save();
@@ -1010,7 +1038,7 @@ class ContentManagementController extends Controller
     public function subjectIndex(Request $request)
     {
         if ($request->ajax()) {
-            $data = Subject::all();
+            $data = Subject::with('creator')->latest()->get();
 
             return Datatables::of($data)
                 ->addIndexColumn()
@@ -1034,6 +1062,11 @@ class ContentManagementController extends Controller
                         $status = '<span class="badge badge-secondary">Inactive</span>';
                     }
                     return $status;
+                })
+                ->addColumn('created_by', function ($row) {
+                    return $row->creator
+                        ? $row->creator->name
+                        : '<span class="text-muted">N/A</span>';
                 })
                 ->addColumn('action', function ($row) {
 
@@ -1068,7 +1101,7 @@ class ContentManagementController extends Controller
                     return $buttons ?: '-';
                 })
 
-                ->rawColumns(['checkbox', 'subcat', 'category', 'commission', 'status', 'action'])
+                ->rawColumns(['checkbox', 'subcat', 'category', 'commission', 'status', 'action', 'created_by'])
                 ->make(true);
         }
         return view('content-management.subject');
@@ -1130,6 +1163,7 @@ class ContentManagementController extends Controller
             'name' => $request->name,
             'subject_code' => $request->subject_code,
             'status' => $request->status,
+            'created_by' => auth()->id(),
         ]);
 
         return redirect()->route('cm.subject')->with('success', 'Subject created successfully!');
@@ -1144,7 +1178,7 @@ class ContentManagementController extends Controller
     public function chapterIndex(Request $request)
     {
         if ($request->ajax()) {
-            $data = Chapter::all();
+            $data = Chapter::with('creator')->latest()->get();
 
             return Datatables::of($data)
                 ->addIndexColumn()
@@ -1163,6 +1197,11 @@ class ContentManagementController extends Controller
                         $status = '<span class="badge badge-secondary">Inactive</span>';
                     }
                     return $status;
+                })
+                ->addColumn('created_by', function ($row) {
+                    return $row->creator
+                        ? $row->creator->name
+                        : '<span class="text-muted">N/A</span>';
                 })
                 ->addColumn('action', function ($row) {
 
@@ -1197,7 +1236,7 @@ class ContentManagementController extends Controller
                     return $buttons ?: '-';
                 })
 
-                ->rawColumns(['checkbox', 'subject', 'status', 'action'])
+                ->rawColumns(['checkbox', 'subject', 'status', 'action', 'created_by'])
                 ->make(true);
         }
         return view('content-management.chapter');
@@ -1232,6 +1271,7 @@ class ContentManagementController extends Controller
             'chapter_number' => $request->chapter_number,
             'description' => $request->description,
             'status' => $request->status,
+            'created_by' => auth()->id(),
         ]);
 
         return redirect()->route('cm.chapter')->with('success', 'Chapter created successfully!');
@@ -1302,7 +1342,7 @@ class ContentManagementController extends Controller
     public function courseIndex(Request $request)
     {
         if ($request->ajax()) {
-            $data = Course::with('examinationCommission', 'category', 'subCategory')->latest()->get();
+            $data = Course::with('examinationCommission', 'category', 'subCategory', 'creator')->latest()->get();
             return Datatables::of($data)
                 ->addIndexColumn()
                 ->addColumn('checkbox', function ($row) {
@@ -1341,6 +1381,11 @@ class ContentManagementController extends Controller
                 })
                 ->addColumn('type', function ($row) {
                     return $row->based_on ?? '--';
+                })
+                ->addColumn('created_by', function ($row) {
+                    return $row->creator
+                        ? $row->creator->name
+                        : '<span class="text-muted">N/A</span>';
                 })
                 ->addColumn('action', function ($row) {
 
@@ -1398,7 +1443,7 @@ class ContentManagementController extends Controller
         </div>
     ';
                 })
-                ->rawColumns(['checkbox', 'fee', 'image', 'duration', 'category', 'subcat', 'commission', 'action'])
+                ->rawColumns(['checkbox', 'fee', 'image', 'duration', 'category', 'subcat', 'commission', 'action', 'created_by'])
                 ->make(true);
         }
         return view('content-management.course');
@@ -1583,6 +1628,7 @@ class ContentManagementController extends Controller
         $course->meta_description = $request->meta_description;
         $course->image_alt_tag = $request->image_alt_tag;
         $course->course_mode = $request->course_mode;
+        $course->created_by = auth()->id();
         $course->save();
 
         return redirect()->route('courses.course.index')->with('success', 'Course created successfully');
@@ -1683,7 +1729,7 @@ class ContentManagementController extends Controller
 
     public function topicIndex()
     {
-        $data['topics'] = Topic::all();
+        $data['topics'] = Topic::latest()->get();
         return view('current-affairs.topic', $data);
     }
 
@@ -1697,6 +1743,7 @@ class ContentManagementController extends Controller
         Topic::create([
             'name' => $request->name,
             'description' => $request->description,
+            'created_by' => auth()->id(),
         ]);
 
         return redirect()->back()->with('success', 'Topic added successfully.');
@@ -1802,6 +1849,7 @@ class ContentManagementController extends Controller
             'meta_title' => $request->meta_title,
             'meta_keyword' => $request->meta_keyword,
             'meta_description' => $request->meta_description,
+            'created_by' => auth()->id(),
         ]);
 
         return redirect()->route('current.affairs.index')->with('success', 'Current Affair added successfully!');
@@ -1878,7 +1926,7 @@ class ContentManagementController extends Controller
     public function studyMaterialIndex(Request $request)
     {
         if ($request->ajax()) {
-            $data = StudyMaterial::orderBy('created_at', 'DESC')->get();
+            $data = StudyMaterial::with('creator')->orderBy('created_at', 'DESC')->get();
             return Datatables::of($data)
                 ->addIndexColumn()
                 ->addColumn('checkbox', function ($row) {
@@ -1927,7 +1975,11 @@ class ContentManagementController extends Controller
                         ? '<span class="badge badge-success">Active</span>'
                         : '<span class="badge badge-secondary">Inactive</span>';
                 })
-
+                ->addColumn('created_by', function ($row) {
+                    return $row->creator
+                        ? $row->creator->name
+                        : '<span class="text-muted">N/A</span>';
+                })
                 ->addColumn('action', function ($row) {
 
                     $items = '';
@@ -2002,7 +2054,8 @@ class ContentManagementController extends Controller
                     'examination_detail',
                     'payment_type',
                     'status',
-                    'action'
+                    'action',
+                    'created_by'
                 ])
 
                 ->make(true);
@@ -2014,7 +2067,7 @@ class ContentManagementController extends Controller
 
     public function studyMaterialShow($id)
     {
-        $material = StudyMaterial::with(['commission', 'category', 'subCategory','sections'])->findOrFail($id);
+        $material = StudyMaterial::with(['commission', 'category', 'subCategory', 'sections'])->findOrFail($id);
         return view('study-material.show', compact('material'));
     }
 
@@ -2131,6 +2184,7 @@ class ContentManagementController extends Controller
         $studyMaterial->meta_description = $validatedData['meta_description'] ?? null;
         $studyMaterial->based_on = $basedOn; // Optional, for reference
         $studyMaterial->language = $validatedData['language'];
+        $studyMaterial->created_by = auth()->id();
         $studyMaterial->save();
 
         if (!empty($validatedData['titles']) && !empty($validatedData['descriptions'])) {
@@ -2396,6 +2450,11 @@ class ContentManagementController extends Controller
                     }
                     return '--';
                 })
+                ->addColumn('created_by', function ($row) {
+                    return $row->creator
+                        ? $row->creator->name
+                        : '<span class="text-muted">N/A</span>';
+                })
                 ->addColumn('action', function ($row) {
 
                     $buttons = '';
@@ -2451,7 +2510,7 @@ class ContentManagementController extends Controller
         </div>';
                 })
 
-                ->rawColumns(['checkbox', 'created_at', 'image', 'action'])
+                ->rawColumns(['checkbox', 'created_at', 'image', 'action', 'created_by'])
                 ->make(true);
         }
 
@@ -2539,6 +2598,7 @@ class ContentManagementController extends Controller
             $data['thumbnail'] = $request->file('thumbnail')->store('thumbnails', 'public');
         }
 
+        $data['created_by'] = auth()->id();
         DailyBooster::create($data);
 
         return redirect()->route('daily.boost.index')->with('success', 'Daily Booster created successfully.');
@@ -2567,6 +2627,11 @@ class ContentManagementController extends Controller
                     return $row->status == 1
                         ? '<span class="badge badge-success">Active</span>'
                         : '<span class="badge badge-secondary">Inactive</span>';
+                })
+                ->addColumn('created_by', function ($row) {
+                    return $row->creator
+                        ? $row->creator->name
+                        : '<span class="text-muted">N/A</span>';
                 })
                 ->addColumn('action', function ($row) {
 
@@ -2627,7 +2692,7 @@ class ContentManagementController extends Controller
             </ul>
         </div>';
                 })
-                ->rawColumns(['checkbox', 'created_at', 'status', 'action'])
+                ->rawColumns(['checkbox', 'created_at', 'status', 'action', 'created_by'])
                 ->make(true);
         }
 
@@ -2693,6 +2758,8 @@ class ContentManagementController extends Controller
             'status'
         ]);
 
+        $data['created_by'] = auth()->id();
+
         if ($request->hasFile('pdf')) {
             $data['pdf'] = $request->file('pdf')->store('pdfs', 'public');
         }
@@ -2710,7 +2777,7 @@ class ContentManagementController extends Controller
 
     public function testSeriesIndex()
     {
-        $data['test_series'] = TestSeries::with('category')->orderBy('created_at', 'desc')->paginate(10);
+        $data['test_series'] = TestSeries::with('category', 'creator')->orderBy('created_at', 'desc')->paginate(10);
         $data['commissions'] = ExaminationCommission::get();
         return view('test-series.index', $data);
     }
@@ -2845,6 +2912,7 @@ class ContentManagementController extends Controller
 
         // ✅ Update total_paper after saving details
         $testseries->total_paper = $totalPaperCount;
+        $testseries->created_by = auth()->id();
         $testseries->save();
 
         return response()->json([
@@ -3044,6 +3112,11 @@ class ContentManagementController extends Controller
                         ? '<span class="badge badge-success">Active</span>'
                         : '<span class="badge badge-secondary">Inactive</span>';
                 })
+                ->addColumn('created_by', function ($row) {
+                    return $row->creator
+                        ? $row->creator->name
+                        : '<span class="text-muted">N/A</span>';
+                })
                 ->addColumn('action', function ($row) {
 
                     $actions = '';
@@ -3100,7 +3173,7 @@ class ContentManagementController extends Controller
         </div>';
                 })
 
-                ->rawColumns(['checkbox', 'created_at', 'commission', 'status', 'action'])
+                ->rawColumns(['checkbox', 'created_at', 'commission', 'status', 'action', 'created_by'])
                 ->make(true);
         }
 
@@ -3173,6 +3246,7 @@ class ContentManagementController extends Controller
             $data['pdf'] = $request->file('pdf')->store('examinations');
         }
 
+        $data['created_by'] = auth()->id();
         UpcomingExam::create($data);
 
         return redirect()->back()->with('success', 'Upcoming created successfully.');
@@ -4486,6 +4560,7 @@ class ContentManagementController extends Controller
             $validatedData['banner_image'] = $bannerPath;
         }
 
+        $validatedData['created_by'] = auth()->id();
         // Create a new BatchAndProgramme instance and save the data
         BatchProgramme::create($validatedData);
 
@@ -4578,6 +4653,7 @@ class ContentManagementController extends Controller
         ]);
 
         $data = $request->all();
+        $data['created_by'] = auth()->id();
         if ($request->hasFile('company_logo')) {
             $data['company_logo'] = $request->file('company_logo')->store('uploads', 'public');
         }
@@ -4603,7 +4679,7 @@ class ContentManagementController extends Controller
             'twitter' => 'nullable|string',
             'whatsapp' => 'nullable|string',
         ]);
-
+        $validatedData['created_by'] = auth()->id();
         SocialMedia::updateOrCreate(['id' => 1], $validatedData);
 
         return redirect()->back()->with('success', 'Social media settings updated successfully!');
@@ -4710,6 +4786,7 @@ class ContentManagementController extends Controller
         $banner->position = $request->input('position');
         $banner->name = $request->input('name');
         $banner->link = $request->input('link', '');
+        $banner->created_by = auth()->id();
         $banner->save();
 
         return redirect()->route('settings.banner.index')->with('success', 'Banner added successfully.');
@@ -4762,7 +4839,7 @@ class ContentManagementController extends Controller
         $programmeFeature->icon_title2 = $request->icon_title2;
         $programmeFeature->icon_title3 = $request->icon_title3;
         $programmeFeature->icon_title4 = $request->icon_title4;
-
+        $programmeFeature->created_by = auth()->id();
         $programmeFeature->save();
 
         return redirect()->route('settings.programme_feature.index')->with('success', 'Programme Feature created successfully.');
@@ -4786,6 +4863,7 @@ class ContentManagementController extends Controller
             'link',
         ]);
 
+        $data['created_by'] = auth()->id();
         Marquee::create($data);
 
         return redirect()->route('settings.marquee.index')->with('success', 'Marquee created successfully.');
@@ -4827,9 +4905,9 @@ class ContentManagementController extends Controller
         if ($request->hasFile('pop_image')) {
             $pop_image = $request->file('pop_image')->store('uploads', 'public');
         }
-        $pop->pop_image = $pop_image;
         $pop->title = $request->title;
         $pop->link = $request->link;
+        $pop->created_by = auth()->id();
         $pop->save();
 
         return redirect()->back()->with('success', 'PopUp created successfully.');
@@ -4853,6 +4931,7 @@ class ContentManagementController extends Controller
         $feature->short_description1 = $request->input('short_description1');
         $feature->short_description2 = $request->input('short_description2');
         $feature->short_description3 = $request->input('short_description3');
+        $feature->created_by = auth()->id();
 
         // Handle image upload for icon1
         if ($request->hasFile('icon1')) {
@@ -4904,7 +4983,7 @@ class ContentManagementController extends Controller
         // Save or update main wallet setting
         $setting = WalletSetting::updateOrCreate(
             ['id' => 1],
-            ['welcome_bonus' => $request->welcome_bonus]
+            ['welcome_bonus' => $request->welcome_bonus, 'updated_by' => auth()->id(),]
         );
 
         $existingIds = $setting->bonusRules()->pluck('id')->toArray();
@@ -5009,6 +5088,7 @@ class ContentManagementController extends Controller
             'subject_id' => $request->input('subject_id'),
             'heading' => $request->input('heading'),
             'detail_content' => $request->input('detail_content'),
+            'created_by' => auth()->id(),
         ]);
 
         // Save the PyqContent

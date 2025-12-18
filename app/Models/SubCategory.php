@@ -20,15 +20,22 @@ class SubCategory extends Model
         'image',
         'alt_tag',
         'status',
+        'created_by'
     ];
 
     public function subjects()
     {
         return $this->hasMany(Subject::class, 'sub_category_id');
     }
-    
+
     public function category()
     {
         return $this->belongsTo(Category::class, 'category_id');
     }
+    
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
 }

@@ -32,6 +32,7 @@
                             <th scope="col">Title</th>
                             <th scope="col">Start Date</th>
                             <th scope="col">Status</th>
+                            <th>Added By</th>
                             <th scope="col">Actions</th>
                         </tr>
                     </thead>
@@ -59,7 +60,7 @@
                 buttons: {
                     buttons: [
                         @if(\App\Helpers\Helper::canAccess('manage_test_planner_delete'))
-                                {
+                                                {
                                 className: 'btn bg-red color-palette btn-flat hidden delete_btn pull-left',
                                 text: 'Bulk Delete',
                                 action: function (e, dt, node, config) {
@@ -93,6 +94,7 @@
                     { data: 'title', name: 'title' },
                     { data: 'start_date', name: 'start_date' },
                     { data: 'status', name: 'status', orderable: false, searchable: false },
+                    { data: 'created_by', name: 'created_by' },
                     { data: 'action', name: 'action', orderable: false, searchable: false },
                 ],
                 lengthMenu: [10, 50, 100],

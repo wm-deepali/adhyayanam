@@ -16,5 +16,11 @@ class TestPlanner extends Model
         'detail_content',
         'pdf',
         'status',
+        'created_at'
     ];
+
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
 }

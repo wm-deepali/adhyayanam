@@ -39,7 +39,8 @@ class Course extends Model
         'chapter_id',
         'topic_id',
         'based_on',
-        'course_mode'
+        'course_mode',
+        'created_by'
     ];
 
     protected $casts = [
@@ -80,5 +81,10 @@ class Course extends Model
     public function topics()
     {
         return CourseTopic::whereIn('id', $this->topic_id ?? [])->get();
+    }
+
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
     }
 }

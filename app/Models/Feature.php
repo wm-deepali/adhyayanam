@@ -9,9 +9,9 @@ class Feature extends Model
 {
     use HasFactory;
 
-    protected $table='feature';
+    protected $table = 'feature';
 
-    protected $fillable=[
+    protected $fillable = [
         'heading',
         'title1',
         'title2',
@@ -21,6 +21,12 @@ class Feature extends Model
         'icon3',
         'short_description1',
         'short_description2',
-        'short_description3'
+        'short_description3',
+        'created_by'
     ];
+
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
 }

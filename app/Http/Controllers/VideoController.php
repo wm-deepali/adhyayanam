@@ -152,6 +152,7 @@ class VideoController extends Controller
                     'video_type' => $request->video_type[$i] ?? null,
                     'video_url' => $request->video_url[$i] ?? null,
                     'duration' => $request->duration[$i] ?? null,
+                    'created_by' => auth()->id(),
                 ];
 
                 if ($request->hasFile("video_image.$i")) {
@@ -209,6 +210,7 @@ class VideoController extends Controller
                     'live_link' => $request->live_link[$i] ?? null,
                     'status' => $request->live_status[$i] ?? 'active',
                     'content' => $request->live_content[$i] ?? null,
+                    'created_by' => auth()->id(),
                 ];
 
                 // ✅ Images

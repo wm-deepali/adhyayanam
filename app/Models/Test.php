@@ -61,7 +61,8 @@ class Test extends Model
 
         'mrp',
         'discount',
-        'offer_price'
+        'offer_price',
+        'created_by'
     ];
 
     public function subject()
@@ -96,5 +97,10 @@ class Test extends Model
         return $this->belongsTo(ExaminationCommission::class, 'competitive_commission_id');
     }
 
+
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
 
 }

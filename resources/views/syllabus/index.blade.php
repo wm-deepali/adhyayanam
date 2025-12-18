@@ -60,6 +60,7 @@
                                 <th scope="col">Sub Category</th>
                                 <th scope="col">PDF</th>
                                 <th scope="col">Status</th>
+                                 <th>Added By</th>
                                 <th scope="col" class="text-center">Action</th>
                             </tr>
                         </thead>
@@ -90,6 +91,7 @@
                                             <span class="badge bg-danger">Inactive</span>
                                         @endif
                                     </td>
+                                    <td>{{ $res->creator ? $res->creator->name : 'N/A'  }}</td>
                                     <td class="text-center">
                                         <div class="dropdown">
                                             <button class="btn btn-sm btn-secondary dropdown-toggle" type="button"

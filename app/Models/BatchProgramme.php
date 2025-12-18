@@ -30,5 +30,11 @@ class BatchProgramme extends Model
         'meta_keyword',
         'meta_description',
         'image_alt_tag',
+        'created_at'
     ];
+
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
 }

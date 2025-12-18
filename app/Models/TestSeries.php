@@ -26,7 +26,8 @@ class TestSeries extends Model
         'price',
         'discount',
         'test_generated_by',
-        'total_paper'
+        'total_paper',
+        'created_by'
     ];
 
     public function category()
@@ -52,5 +53,10 @@ class TestSeries extends Model
     public function tests()
     {
         return $this->hasManyThrough(Test::class, TestSeriesDetail::class, 'test_series_id', 'id', 'id', 'test_id');
+    }
+
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
     }
 }

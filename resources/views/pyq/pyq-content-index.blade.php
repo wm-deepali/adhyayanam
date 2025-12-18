@@ -26,6 +26,7 @@
                             <th>Category</th>
                             <th>Sub Category</th>
                             <th>Heading</th>
+                            <th>Added By</th>
                             <th class="text-center">Actions</th>
                         </tr>
                     </thead>
@@ -37,6 +38,7 @@
                                 <td>{{ $pyqContent->category->name ?? '—' }}</td>
                                 <td>{{ $pyqContent->subCategory->name ?? '—' }}</td>
                                 <td>{{ $pyqContent->heading ?? '—' }}</td>
+                                <td>{{ $pyqContent->creator ? $pyqContent->creator->name : 'N/A'  }}</td>
                                 <td class="text-center">
                                     <div class="dropdown">
                                         <button class="btn btn-sm btn-secondary dropdown-toggle" type="button"

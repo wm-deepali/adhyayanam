@@ -35,6 +35,7 @@
                             <th>Wallet Balance</th>
                             <th>Total Paid</th>
                             <th>Status</th>
+                            <th>Added By</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -97,6 +98,7 @@
                     { data: 'wallet_balance', name: 'wallet_balance', orderable: false, searchable: false },
                     { data: 'total_paid', name: 'total_paid', orderable: false, searchable: false },
                     { data: 'status', name: 'status', orderable: false, searchable: false },
+                    { data: 'created_by', name: 'created_by' },
                     { data: 'action', name: 'action', orderable: false, searchable: false },
                 ],
                 order: [[2, 'asc']],

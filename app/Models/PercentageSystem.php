@@ -12,6 +12,12 @@ class PercentageSystem extends Model
         'from_percentage',
         'to_percentage',
         'division',
-        'status'
+        'status',
+        'created_by'
     ];
+
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
 }

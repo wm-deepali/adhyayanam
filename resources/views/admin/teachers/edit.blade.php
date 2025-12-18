@@ -142,6 +142,22 @@
     </small>
 </div>
 
+ {{-- Test Check Permissions --}}
+                    <h4 class="mt-4 mb-2">Evaluate Tests Permissions</h4>
+
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="can_check_tests" name="can_check_tests"
+                                value="1" {{ isset($teacher) && $teacher->can_check_tests ? 'checked' : '' }}>
+                            <label class="form-check-label" for="can_check_tests">
+                                Allow this teacher to Evaluate Test Papers
+                            </label>
+                        </div>
+                        <small class="form-text text-muted">
+                            If enabled, this teacher will appear in the “Assign Teacher to Test” list.
+                        </small>
+
+                    </div>
 
                     {{-- Account Setup --}}
                     <h4 class="mt-4 mb-3">Account Setup</h4>

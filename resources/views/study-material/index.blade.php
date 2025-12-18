@@ -49,6 +49,7 @@
                                     <th scope="col">Payment Type</th>
                                     <th scope="col">Package Type</th>
                                     <th scope="col">Status</th>
+                                    <th scope="col">Added By</th>
                                     <th scope="col">Actions</th>
                                 </tr>
                             </thead>
@@ -72,6 +73,7 @@
                                     <th scope="col">Payment Type</th>
                                     <th scope="col">Package Type</th>
                                     <th scope="col">Status</th>
+                                    <th scope="col">Added By</th>
                                     <th scope="col">Actions</th>
                                 </tr>
                             </thead>
@@ -137,6 +139,7 @@
                     { data: 'payment_type', name: 'payment_type' },
                     { data: 'package_type', name: 'package_type' },
                     { data: 'status', name: 'status', orderable: false, searchable: false },
+                    { data: 'created_by', name: 'created_by' },
                     { data: 'action', name: 'action', orderable: false, searchable: false },
                 ],
 
@@ -235,6 +238,7 @@
                         { data: 'payment_type', name: 'payment_type' },
                         { data: 'package_type', name: 'package_type' },
                         { data: 'status', name: 'status', orderable: false, searchable: false },
+                        { data: 'created_by', name: 'created_by' },
                         { data: 'action', name: 'action', orderable: false, searchable: false },
                     ],
                     lengthMenu: [10, 50, 100],

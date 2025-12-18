@@ -17,6 +17,7 @@
                         <th>Role Group Name</th>
                         <!-- <th>Type</th> -->
                         <th>Total Permissions</th>
+                        <th>Added By</th>
                         <th width="150">Action</th>
                     </tr>
                 </thead>
@@ -27,7 +28,7 @@
                             <td>{{ $group->name }}</td>
                             <!-- <td>{{ $group->type ?? '-' }}</td> -->
                             <td>{{ is_array($group->permissions) ? count($group->permissions) : 0 }}</td>
-
+                            <td>{{ $group->creator ? $group->creator->name : 'N/A'  }}</td>
                             <td>
                                 @if(\App\Helpers\Helper::canAccess('manage_role_groups_edit'))
                                     <a href="{{ route('role-groups.edit', $group->id) }}" class="btn btn-sm btn-warning">

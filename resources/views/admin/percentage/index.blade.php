@@ -26,6 +26,7 @@
                         <th>Percentage</th>
                         <th>Division</th>
                         <th>Status</th>
+                        <th>Added By</th>
                         <th width="70">Action</th>
                     </tr>
                 </thead>
@@ -40,6 +41,8 @@
                             <td>{{ $p->division }}</td>
 
                             <td>{{ $p->status }}</td>
+
+                            <td>{{ $p->creator ? $p->creator->name : 'N/A'  }}</td>
 
                             <td>
                                 {{-- EDIT --}}

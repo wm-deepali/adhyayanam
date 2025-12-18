@@ -76,6 +76,13 @@
                             <button class="btn btn-primary" type="submit">Save</button>
                         </div>
                     @endif
+                      @if($feature->created_at)
+                        <div class="text-muted">
+                            Last updated by
+                            <strong>{{ $feature->creator->name ?? 'N/A' }}</strong>
+                             on {{ $feature->updated_at->format('d M Y, h:i A') }}
+                        </div>
+                    @endif
                 </form>
             </div>
         </div>

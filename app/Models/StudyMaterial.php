@@ -35,7 +35,8 @@ class StudyMaterial extends Model
         'discount',
         'price',
         'based_on',
-        'language'
+        'language',
+        'created_by'
     ];
 
 
@@ -85,5 +86,9 @@ class StudyMaterial extends Model
         return $this->hasMany(StudyMaterialSection::class, 'study_material_id');
     }
 
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
 
 }

@@ -885,7 +885,7 @@
                     </li>
                 @endif
 
-                @if(Helper::canAccess('manage_users'))
+                <!-- @if(Helper::canAccess('manage_users'))
                     <li class="nav-item">
                         <a class="nav-link" href="{{route('users.index')}}" target="_top">
                             <svg class="nav-icon">
@@ -894,7 +894,7 @@
                             {{ __('Users') }}
                         </a>
                     </li>
-                @endif
+                @endif -->
 
                 @if(Helper::canAccess('manage_seo'))
                     <li class="nav-item">

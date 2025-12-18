@@ -24,11 +24,17 @@ class CurrentAffair extends Model
         'meta_title',
         'meta_keyword',
         'meta_description',
+        'created_by'
     ];
 
     // Relationship with Topic
     public function topic()
     {
         return $this->belongsTo(Topic::class);
+    }
+
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
     }
 }

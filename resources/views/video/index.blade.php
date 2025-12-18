@@ -66,31 +66,32 @@
                                             <th>Source</th>
                                             <th>Ratings</th>
                                             <th>Status</th>
+                                            <th>Added By</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach ($videos as $topic)
+                                        @foreach ($videos as $video)
                                             <tr>
-                                                <td>{{ $topic->created_at->format('Y-m-d H:i:s') }}</td>
-                                                <td>{{ $topic->title }}</td>
-                                                <td>{{ $topic->chapter->name ?? "-" }}</td>
-                                                <td>{{ $topic->course->name ?? "-" }}</td>
-                                                <td>{{ $topic->category->name ?? "-" }}</td>
-                                                <td>{{ $topic->course_type }}</td>
-                                                <td>{{ $topic->duration }}</td>
+                                                <td>{{ $video->created_at->format('Y-m-d H:i:s') }}</td>
+                                                <td>{{ $video->title }}</td>
+                                                <td>{{ $video->chapter->name ?? "-" }}</td>
+                                                <td>{{ $video->course->name ?? "-" }}</td>
+                                                <td>{{ $video->category->name ?? "-" }}</td>
+                                                <td>{{ $video->course_type }}</td>
+                                                <td>{{ $video->duration }}</td>
                                                 <td>
-                                                    @if ($topic->assignment)
-                                                        <img src="{{ asset('storage/' . $topic->assignment) }}" alt="{{ $topic->name }}"
+                                                    @if ($video->assignment)
+                                                        <img src="{{ asset('storage/' . $video->assignment) }}" alt="{{ $video->name }}"
                                                             style="max-width: 80px;">
                                                     @else
                                                         No Image
                                                     @endif
                                                 </td>
-                                                <td>{{ $topic->video_type }}</td>
+                                                <td>{{ $video->video_type }}</td>
                                                 <td>
                                                     @php
-                                                        $rating = $topic->rating;
+                                                        $rating = $video->rating;
                                                         $fullStars = floor($rating);
                                                         $hasHalfStar = ceil($rating - $fullStars) > 0;
                                                         $totalStars = 5;
@@ -105,7 +106,8 @@
                                                         <i class="fa fa-star text-muted"></i>
                                                     @endfor
                                                 </td>
-                                                <td>{{ $topic->status ? 'Active' : 'Inactive' }}</td>
+                                                <td>{{ $video->status ? 'Active' : 'Inactive' }}</td>
+                                               <td>{{ $video->creator ? $video->creator->name : 'N/A'  }}</td>
                                                 <td>
                                                     @php
                                                         $canView = \App\Helpers\Helper::canAccess('manage_video');
@@ -126,7 +128,7 @@
                                                                 @if($canView)
                                                                     <li>
                                                                         <a class="dropdown-item"
-                                                                            href="{{ route('video.show', $topic->id) }}">
+                                                                            href="{{ route('video.show', $video->id) }}">
                                                                             <i class="fa fa-eye text-primary me-2"></i> View
                                                                         </a>
                                                                     </li>
@@ -136,7 +138,7 @@
                                                                 @if($canEdit)
                                                                     <li>
                                                                         <a class="dropdown-item"
-                                                                            href="{{ route('video.edit', $topic->id) }}">
+                                                                            href="{{ route('video.edit', $video->id) }}">
                                                                             <i class="fa fa-edit text-success me-2"></i> Edit
                                                                         </a>
                                                                     </li>
@@ -145,7 +147,7 @@
                                                                 {{-- DELETE --}}
                                                                 @if($canDelete)
                                                                     <li>
-                                                                        <form action="{{ route('video.destroy', $topic->id) }}"
+                                                                        <form action="{{ route('video.destroy', $video->id) }}"
                                                                             method="POST" onsubmit="return confirm('Are you sure?')">
                                                                             @csrf
                                                                             @method('DELETE')
@@ -185,6 +187,7 @@
                                             <th>Start Time</th>
                                             <th>End Time</th>
                                             <th>Status</th>
+                                             <th>Added By</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
@@ -199,6 +202,8 @@
                                                 <td>{{ $class->start_time }}</td>
                                                 <td>{{ $class->end_time }}</td>
                                                 <td>{{ $class->status ? 'Active' : 'Inactive' }}</td>
+                                               <td>{{ $class->creator ? $class->creator->name : 'N/A'  }}</td>
+
                                                 <td>
     @php
         $canView   = \App\Helpers\Helper::canAccess('manage_videos');

@@ -95,7 +95,18 @@
                         </div>
                     @endif
                     @if(\App\Helpers\Helper::canAccess('manage_vision_edit'))
-                    <button type="submit" class="btn btn-primary">Save Page</button>
+                        <button type="submit" class="btn btn-primary">Save Page</button>
+                    @endif
+                    @if($vision->updated_at)
+                        <div class="mt-3 text-muted">
+                            <small>
+                                Last updated
+                                @if($vision->updater)
+                                    by <strong>{{ $vision->updater->name }}</strong>
+                                @endif
+                                on {{ $vision->updated_at->format('d M Y, h:i A') }}
+                            </small>
+                        </div>
                     @endif
                 </form>
             </div>

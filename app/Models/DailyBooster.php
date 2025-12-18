@@ -21,5 +21,11 @@ class DailyBooster extends Model
         'meta_title',
         'meta_keyword',
         'meta_description',
+        'created_by'
     ];
+
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
 }

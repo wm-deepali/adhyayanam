@@ -63,6 +63,13 @@
                     @if(\App\Helpers\Helper::canAccess('manage_social_add'))
                         <button type="submit" class="btn btn-primary">Save</button>
                     @endif
+                    @if($settings->created_at)
+                        <div class="text-muted">
+                            Last updated by
+                            <strong>{{ $settings->creator->name ?? 'N/A' }}</strong>
+                             on {{ $settings->updated_at->format('d M Y, h:i A') }}
+                        </div>
+                    @endif
                 </form>
             </div>
         </div>

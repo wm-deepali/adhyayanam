@@ -56,7 +56,7 @@ if (isset($test->testseries) && count($test->testseries) > 0) {
                             </td>
                             
                             <td>{{ $test->price }}</td>
-                           
+                        <td>{{ $test->creator ? $test->creator->name: 'N/A'}}</td>
                             <td>
                                <div class="dropdown">
     <button class="btn btn-secondary dropdown-toggle btn-sm" type="button"

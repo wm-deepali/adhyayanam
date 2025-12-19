@@ -166,7 +166,7 @@
                                         </div>
                                         <div class="form-group">
                                             <label>Enter Question</label>
-                                            <textarea class="form-control quesckeditor"
+                                            <textarea class="form-control ckeditor"
                                                 name="question[]">{{$question->question}}</textarea>
                                         </div>
                                         <div class="form-group">
@@ -214,7 +214,7 @@
                                         </div>
                                         <div class="form-group">
                                             <label>Enter Question</label>
-                                            <textarea class="form-control quesckeditor"
+                                            <textarea class="form-control ckeditor"
                                                 name="question[]">{{$question->question}}</textarea>
                                         </div>
                                         <div class="form-group">

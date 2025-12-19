@@ -15,15 +15,25 @@
 
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <div>
-                        <h5 class="card-title">{{ ucwords($paper->name ?? "") }} ({{ $paper->test_code ?? "" }})</h5>
-                        <h6 class="card-subtitle mb-2 text-muted">View Test Paper details below.</h6>
+                        <h5 class="card-title">
+                            {{ ucwords($paper->name ?? "") }} ({{ $paper->test_code ?? "" }})
+                        </h5>
+                        <h6 class="card-subtitle mb-2 text-muted">
+                            View Test Paper details below.
+                        </h6>
                     </div>
-                    <div>
+
+                    <div class="d-flex gap-2">
+                        <a href="{{ route('test.bank.index')}}" class="btn btn-secondary">
+                            <i class="fa fa-arrow-left"></i> Back
+                        </a>
+
                         <a href="{{ route('test-papers.download', $paper->id) }}" class="btn btn-primary">
                             <i class="fa fa-download"></i> Download PDF
                         </a>
                     </div>
                 </div>
+
 
                 <div class="mt-2">
                     <div class="row">
@@ -220,58 +230,58 @@
 
                         @if($testDetails->count())
                             @foreach($testDetails as $testDetail)
-                                        @if(!empty($testDetail->parent_question_id))
-                                            {{-- ✅ Sub Question --}}
-                                            @php
-                                                $subQuestion = \App\Helpers\Helper::getSubQuestionDetails(
-                                                    $testDetail->question_id,
-                                                    $testDetail->test_question_type,
-                                                    $testDetail->sub_negative_mark,
-                                                    $testDetail->sub_positive_mark
-                                                );
+                                @if(!empty($testDetail->parent_question_id))
+                                    {{-- ✅ Sub Question --}}
+                                    @php
+                                        $subQuestion = \App\Helpers\Helper::getSubQuestionDetails(
+                                            $testDetail->question_id,
+                                            $testDetail->test_question_type,
+                                            $testDetail->sub_negative_mark,
+                                            $testDetail->sub_positive_mark
+                                        );
 
-                                                $marks = $testDetail->positive_mark ?? $paper->positive_marks_per_question;
+                                        $marks = $testDetail->positive_mark ?? $paper->positive_marks_per_question;
 
-                                                // ✅ Get parent main index (e.g. Q1)
-                                                $parentIndex = $parentMainIndex[$testDetail->parent_question_id] ?? 0;
+                                        // ✅ Get parent main index (e.g. Q1)
+                                        $parentIndex = $parentMainIndex[$testDetail->parent_question_id] ?? 0;
 
-                                                // ✅ Track sub-index per parent
-                                                $subIndex[$testDetail->parent_question_id] = ($subIndex[$testDetail->parent_question_id] ?? 0) + 1;
+                                        // ✅ Track sub-index per parent
+                                        $subIndex[$testDetail->parent_question_id] = ($subIndex[$testDetail->parent_question_id] ?? 0) + 1;
 
-                                                // ✅ Convert sub-index to Roman (i, ii, iii, ...)
-                                                $romanIndex = strtolower(\App\Helpers\Helper::toRoman($subIndex[$testDetail->parent_question_id]));
-                                            @endphp
+                                        // ✅ Convert sub-index to Roman (i, ii, iii, ...)
+                                        $romanIndex = strtolower(\App\Helpers\Helper::toRoman($subIndex[$testDetail->parent_question_id]));
+                                    @endphp
 
-                                            @include('test-series.sub-questions', [
-                                                'question' => $subQuestion,
-                                                'marks' => $marks,
-                                                'negative_marks' => $testDetail->negative_mark ?? $paper->negative_marks_per_question,
-                                                'index' => $romanIndex,
-                                                'parentIndex' => $parentIndex
-                                            ])
-                                         @elseif($testDetail->question)
-                                    {{-- ✅ Main Question --}}
-                                            @php
+                                    @include('test-series.sub-questions', [
+                                        'question' => $subQuestion,
+                                        'marks' => $marks,
+                                        'negative_marks' => $testDetail->negative_mark ?? $paper->negative_marks_per_question,
+                                        'index' => $romanIndex,
+                                        'parentIndex' => $parentIndex
+                                    ])
+                                 @elseif($testDetail->question)
+                                                        {{-- ✅ Main Question --}}
+                                              @php
                                                 $question = $testDetail->question;
                                                 $marks = $testDetail->positive_mark ?? $paper->positive_marks_per_question;
                                                 $parentMainIndex[$testDetail->question_id] = $mainIndex;
                                             @endphp
 
-                                                    @include('test-series.questions', [
-                                                        'question' => $question,
-                                                        'marks' => $marks,
-                                                        'negative_marks' => $testDetail->negative_mark ?? $paper->negative_marks_per_question,
-                                                        'index' => $mainIndex
-                                                    ])
-                                        @php $mainIndex++; @endphp
-                                @endif
+                                                                                                 @include('test-series.questions', [
+                                                                                                    'question' => $question,
+                                                                                                    'marks' => $marks,
+                                                                                                    'negative_marks' => $testDetail->negative_mark ?? $paper->negative_marks_per_question,
+                                                                                                    'index' => $mainIndex
+                                                                                                ])
+                                                                @php $mainIndex++; @endphp
+                                        @endif
                             @endforeach
                         @else
-        <p class="text-center">No questions found for this test paper.</p>
-    @endif
+                                <p class="text-center">No questions found for this test paper.</p>
+                            @endif
 
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 @endsection

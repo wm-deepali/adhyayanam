@@ -69,13 +69,18 @@
     <div class="bg-light rounded">
         <div class="card">
             <div class="card-body">
-                <div class="d-flex">
-                    <div class="col">
-                        <h5 class="card-title">{{ ucwords($test_series->title ?? "") }}</h5>
-                        <h6 class="card-subtitle mb-2 text-muted">View Test Series section here.</h6>
-                    </div>
-                </div>
+               <div class="d-flex justify-content-between align-items-center">
+    <div class="col">
+        <h5 class="card-title">{{ ucwords($test_series->title ?? "") }}</h5>
+        <h6 class="card-subtitle mb-2 text-muted">View Test Series section here.</h6>
+    </div>
 
+    <div>
+        <a href="{{ route('test.series.index') }}" class="btn btn-secondary">
+            <i class="fa fa-arrow-left"></i> Back
+        </a>
+    </div>
+</div>
                 <div class="mt-2">
                     @include('layouts.includes.messages')
                 </div>

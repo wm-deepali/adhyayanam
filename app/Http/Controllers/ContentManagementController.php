@@ -3884,12 +3884,15 @@ class ContentManagementController extends Controller
             'file' => 'required|mimes:docx,xlsx',
         ]);
 
+        DB::beginTransaction();
+
         try {
             $questionData = array();
             if ($request->file->getClientOriginalExtension() == 'docx') {
                 $filename = $request->file;
-                $time = microtime();
-                $outputPath = storage_path($time . '.html');
+                $time = microtime(true);
+                $outputPath = storage_path('import_' . $time . '.html');
+
 
                 $filename = $request->file->getRealPath();
 
@@ -3912,26 +3915,26 @@ class ContentManagementController extends Controller
                 $dom->loadFromFile($outputPath);
 
                 $tables = $dom->find('table');
-                $successCount = 0;
-                $pendingCount = 0;
-                $rejectedCount = 0;
-                $successdata = [];
-                $pendingdata = [];
-                $rejecteddata = [];
-                $option_a = NULL;
-                $option_b = NULL;
-                $option_c = NULL;
-                $option_d = NULL;
-                $option_e = NULL;
-                $image = NULL;
-                $solution = NULL;
-                $answer = NULL;
-                $instruction = NULL;
-                $has_option_e = false;
-                $has_solution = "no";
-                $has_instruction = false;
+
+
                 if ($request->question_type == 'MCQ') {
+
                     for ($i = 0; $i < count($tables); $i++) {
+                        $questionData = [];
+                        $option_b = NULL;
+                        $option_c = NULL;
+                        $option_a = NULL;
+                        $option_d = NULL;
+                        $option_e = NULL;
+                        $image = NULL;
+                        $solution = NULL;
+                        $answer = NULL;
+                        $instruction = NULL;
+                        $has_option_e = false;
+                        $has_solution = "no";
+                        $has_instruction = false;
+                        $show_on_pyq = 'no';
+
                         try {
                             $question = $tables[$i]->find('tr', 0)->find('td', 1)->innerHtml;
                             if ($tables[$i]->find('tr', 1)->find('td', 1)->find('p')->innerHtml == '&nbsp;') {
@@ -4006,35 +4009,32 @@ class ContentManagementController extends Controller
                                 $has_instruction = true;
                             }
 
+                            // Solution (optional) - ROW 8 
+                            $tr8 = $tables[$i]->find('tr', 8);
+                            $td8 = $tr8 ? $tr8->find('td', 1) : null;
+                            $p8 = $td8 ? $td8->find('p') : null;
 
-                            $solution = null;
-                            $has_solution = 'no';
+                            $rawHtml = $p8 ? trim($p8->innerHtml) : '';
+                            $textOnly = trim(strip_tags($rawHtml));
 
-                            $tryRows = [8, 9];
-
-                            foreach ($tryRows as $rowIdx) {
-
-                                $tr = $tables[$i]->find('tr', $rowIdx);
-                                $td = $tr ? $tr->find('td', 1) : null;
-                                $p = $td ? $td->find('p') : null;
-
-                                // Raw HTML
-                                $rawHtml = $p ? trim($p->innerHtml) : '';
-
-                                // Text-only content (after removing tags)
-                                $textOnly = trim(strip_tags($rawHtml));
-
-                                // Check if empty
-                                if ($textOnly === '' || $rawHtml === '&nbsp;' || $textOnly === '&nbsp;') {
-                                    continue; // move to next row
-                                }
-
-                                // Valid solution found → KEEP full HTML
-                                $solution = $rawHtml;
+                            if ($textOnly !== '' && $textOnly !== '&nbsp;' && $rawHtml !== '&nbsp;') {
+                                $solution = $rawHtml;   // keep full HTML
                                 $has_solution = 'yes';
-                                break;
                             }
 
+                            // PYQ (optional) - ROW 9
+                            $tr9 = $tables[$i]->find('tr', 9);
+                            $td9 = $tr9 ? $tr9->find('td', 1) : null;
+                            $p9 = $td9 ? $td9->find('p') : null;
+
+                            $rawPyqHtml = $p9 ? trim($p9->innerHtml) : '';
+                            $textPyq = strtolower(trim(strip_tags($rawPyqHtml)));
+
+                            if ($textPyq === 'yes') {
+                                $show_on_pyq = 'yes';
+                            } else {
+                                $show_on_pyq = 'no';
+                            }
 
                             // Finally, set status once
                             if ($rejectQuestion) {
@@ -4043,35 +4043,6 @@ class ContentManagementController extends Controller
                             } else {
                                 $questionData['status'] = 'Done'; // or success after insert
                             }
-
-                            // $que =   QuestionBank::where('question',$question)
-                            // // ->where('question_category',$request->question_category)
-                            // // ->where('commission_id',$request->commission_id)
-                            // // ->where('category_id',$request->category_id)
-                            //  ->where('subject_id',$request->subject_id)
-                            // ->where('topic',$request->topic);
-
-                            // $que = $que->first();
-
-                            // Create a new instance of QuestionBank model
-                            // $questionBank = new QuestionBank();
-
-                            // // Assign values to the model properties
-                            // $questionBank->language = $request->language;
-                            // $questionBank->question_category = $request->question_category;
-                            // $questionBank->commission_id = $request->commission_id;
-                            // $questionBank->previous_year = $request->previous_year;
-                            // $questionBank->category_id = $request->category_id;
-                            // $questionBank->subject_id = $request->subject_id;
-                            // $questionBank->topic = $request->topic;
-                            // $questionBank->has_instruction = $has_instruction;
-                            // $questionBank->instruction = $instruction;
-                            // $questionBank->has_option_e = $has_option_e;
-                            // $questionBank->question = $question;
-                            // // Save the question bank to the database
-                            // $questionBank->save();
-
-
 
                             $questionData['language'] = $request->language;
                             $questionData['question_category'] = $request->question_category;
@@ -4084,7 +4055,6 @@ class ContentManagementController extends Controller
                             $questionData['chapter_id'] = $request->chapter_id;
                             $questionData['subject_id'] = $request->subject_id;
                             $questionData['topic'] = $request->topic;
-                            //$questionData['question_bank_id'] = $questionBank->id ?? 0;
                             $questionData['question'] = $question;
                             $questionData['option_a'] = $option_a;
                             $questionData['option_b'] = $option_b;
@@ -4095,10 +4065,9 @@ class ContentManagementController extends Controller
                             $questionData['answer'] = strtoupper(Str::of($answer)->trim());
                             $questionData['has_solution'] = $has_solution;
                             $questionData['solution'] = $solution;
-
+                            $questionData['show_on_pyq'] = $show_on_pyq;
                             $questionData['added_by_id'] = auth()->id(); // Logged in teacher/user
                             $questionData['added_by_type'] = 'user';
-
                             $que = Question::where('question', $question)->where('commission_id', $request->commission_id)->where('category_id', $request->category_id)
                                 ->where('sub_category_id', $request->sub_category_id)
                                 ->where('subject_id', $request->subject_id);
@@ -4108,7 +4077,7 @@ class ContentManagementController extends Controller
                             $que = $que->first();
 
                             if ($que) {
-                                $rejectedCount = $rejectedCount + 1;
+
                                 $questionData['status'] = "Rejected";
                                 $questionData['note'] = "Already Exists Question.";
                                 $qsave = Question::create($questionData);
@@ -4116,15 +4085,10 @@ class ContentManagementController extends Controller
                             } else {
 
                                 $insert = Question::create($questionData);
-                                if ($insert) {
-                                    $successCount = $successCount + 1;
-                                    $successdata[] = $questionData;
-                                }
-
                             }
                         } catch (\Exception $ex) {
+
                             $question = $tables[$i]->find('tr', 0)->find('td', 1)->innerHtml ?? NULL;
-                            $rejectedCount = $rejectedCount + 1;
                             $questionData['status'] = "Rejected";
                             $questionData['question_type'] = $request->question_type;
                             $questionData['question'] = $question;
@@ -4137,6 +4101,21 @@ class ContentManagementController extends Controller
                 } elseif ($request->question_type == 'Subjective') {
 
                     for ($i = 1; $i < count($tables); $i++) {
+                        $questionData = [];
+                        $option_a = NULL;
+                        $option_b = NULL;
+                        $option_c = NULL;
+                        $option_d = NULL;
+                        $option_e = NULL;
+                        $image = NULL;
+                        $solution = NULL;
+                        $answer = NULL;
+                        $instruction = NULL;
+                        $has_option_e = false;
+                        $has_solution = "no";
+                        $has_instruction = false;
+                        $show_on_pyq = 'no';
+
                         try {
                             $question = $tables[$i]->find('tr', 0)->find('td', 1)->innerHtml;
                             if ($tables[$i]->find('tr', 1)->find('td', 1)->find('p')->innerHtml == '&nbsp;') {
@@ -4153,15 +4132,18 @@ class ContentManagementController extends Controller
                                     $image = NULL;
                                 }
 
-
                             }
+
+                            // answer format - ROW 2
                             $answer_format = "text input";
                             if ($tables[$i]->find('tr', 2)->find('td', 1)->find('p')->innerHtml == '&nbsp;') {
                                 $answer_format = "text input";
                             } else {
                                 $answer_format = $tables[$i]->find('tr', 2)->find('td', 1)->find('p')->innerHtml;
                             }
-                            // Get the <p> inside row 3
+
+
+                            // solution (optional) - ROW 3
                             $tr = $tables[$i]->find('tr', 3);
                             $td = $tr ? $tr->find('td', 1) : null;
                             $p = $td ? $td->find('p') : null;
@@ -4177,11 +4159,12 @@ class ContentManagementController extends Controller
                                 $solution = null;
                                 $has_solution = 'no';
                             } else {
-                                // Keep full HTML
+
                                 $solution = $rawHtml;
                                 $has_solution = 'yes';
                             }
 
+                            // instruction (optional) - ROW 4
                             if ($tables[$i]->find('tr', 4)->find('td', 1)->find('p')->innerHtml == '&nbsp;') {
                                 $instruction = NULL;
                                 $has_instruction = false;
@@ -4189,6 +4172,23 @@ class ContentManagementController extends Controller
                                 $instruction = $tables[$i]->find('tr', 4)->find('td', 1)->innerHtml;
                                 $has_instruction = true;
                             }
+
+                            // PYQ (optional) - ROW 5
+                            $tr5 = $tables[$i]->find('tr', 5);
+                            $td5 = $tr5 ? $tr5->find('td', 1) : null;
+                            $p5 = $td5 ? $td5->find('p') : null;
+
+                            $rawPyqHtml = $p5 ? trim($p5->innerHtml) : '';
+                            $textPyq = strtolower(trim(strip_tags($rawPyqHtml)));
+
+                            if ($textPyq === 'yes') {
+                                $show_on_pyq = 'yes';
+                            } else {
+                                $show_on_pyq = 'no';
+                            }
+
+
+
                             $questionData['language'] = $request->language;
                             $questionData['question_category'] = $request->question_category;
                             $questionData['question_type'] = $request->question_type;
@@ -4207,6 +4207,9 @@ class ContentManagementController extends Controller
                             $questionData['has_solution'] = $has_solution;
                             $questionData['instruction'] = $instruction;
                             $questionData['has_instruction'] = $has_instruction;
+                            $questionData['show_on_pyq'] = $show_on_pyq;
+                            $questionData['added_by_id'] = auth()->id(); // Logged in teacher/user
+                            $questionData['added_by_type'] = 'user';
 
                             $que = Question::where('question', $question)->where('commission_id', $request->commission_id)->where('category_id', $request->category_id)
                                 ->where('sub_category_id', $request->sub_category_id)
@@ -4216,27 +4219,24 @@ class ContentManagementController extends Controller
                             }
                             $que = $que->first();
                             if (!$answer_format) {
-                                $rejectedCount = $rejectedCount + 1;
+
                                 $questionData['status'] = "Rejected";
                                 $questionData['note'] = "Please enter Answer format";
                                 $qsave = Question::create($questionData);
 
                             } elseif ($que) {
-                                $rejectedCount = $rejectedCount + 1;
+
                                 $questionData['status'] = "Rejected";
                                 $questionData['note'] = "Already Exists Question.";
                                 $qsave = Question::create($questionData);
                             } else {
-                                $successCount = $successCount + 1;
+                                $questionData['status'] = 'Done';
                                 $insert = Question::create($questionData);
-                                $successdata[] = $questionData;
                             }
 
                         } catch (\Exception $ex) {
 
                             $question = $tables[$i]->find('tr', 0)->find('td', 1)->innerHtml;
-                            $rejectedCount = $rejectedCount + 1;
-
                             $questionData['question_type'] = $request->question_type;
                             $questionData['question'] = $question;
                             $questionData['note'] = 'Question Format Issue';
@@ -4246,7 +4246,24 @@ class ContentManagementController extends Controller
                         }
                     }
                 } elseif ($request->question_type == 'Story Based') {
-                    // try {
+                    $questionData = [];
+                    $option_a = NULL;
+                    $option_b = NULL;
+                    $option_c = NULL;
+                    $option_d = NULL;
+                    $option_e = NULL;
+                    $image = NULL;
+                    $solution = NULL;
+                    $answer = NULL;
+                    $instruction = NULL;
+                    $has_option_e = false;
+                    $has_solution = "no";
+                    $has_instruction = false;
+                    $show_on_pyq = 'no';
+
+                    if (!isset($tables[1])) {
+                        throw new \Exception('Invalid Story Based document format');
+                    }
 
                     $question = $tables[1]->find('tr', 0)->find('td', 1)->innerHtml;
                     if ($tables[1]->find('tr', 1)->find('td', 1)->find('p')->innerHtml == '&nbsp;') {
@@ -4262,16 +4279,8 @@ class ContentManagementController extends Controller
                         } else {
                             $image = NULL;
                         }
-
-
                     }
-                    // if ($tables[1]->find('tr', 2)->find('td', 1)->find('p')->innerHtml == '&nbsp;') {
-                    $solution = NULL;
-                    $has_solution = 'no';
-                    // } else {
-                    //     $solution = $tables[1]->find('tr', 2)->find('td', 1)->innerHtml;
-                    //     $has_solution = 'yes';
-                    // }
+
                     if ($tables[1]->find('tr', 2)->find('td', 1)->find('p')->innerHtml == '&nbsp;') {
                         $instruction = NULL;
                         $has_instruction = false;
@@ -4279,13 +4288,21 @@ class ContentManagementController extends Controller
                         $instruction = $tables[1]->find('tr', 2)->find('td', 1)->innerHtml;
                         $has_instruction = true;
                     }
-                    $answer_format = NULL;
-                    if ($request->passage_question_type == 'reasoning_subjective') {
-                        if ($tables[1]->find('tr', 3)->find('td', 1)->find('p')->innerHtml == '&nbsp;') {
-                            $answer_format = 'text';
-                        } else {
-                            $answer_format = $tables[1]->find('tr', 3)->find('td', 1)->find('p');
-                        }
+
+                    // PYQ (Story Based - Passage level) -> ROW 3
+                    $show_on_pyq = 'no';
+
+                    $trPyq = $tables[1]->find('tr', 3);
+                    $tdPyq = $trPyq ? $trPyq->find('td', 1) : null;
+                    $pPyq = $tdPyq ? $tdPyq->find('p') : null;
+
+                    $rawPyqHtml = $pPyq ? trim($pPyq->innerHtml) : '';
+                    $textPyq = strtolower(trim(strip_tags($rawPyqHtml)));
+
+                    if ($textPyq === 'yes') {
+                        $show_on_pyq = 'yes';
+                    } else {
+                        $show_on_pyq = 'no';
                     }
 
 
@@ -4303,10 +4320,13 @@ class ContentManagementController extends Controller
                     $questionData['topic'] = $request->topic;
                     $questionData['question'] = $question;
                     $questionData['solution'] = $solution;
-                    $questionData['answer_format'] = $answer_format;
+                    $questionData['answer_format'] = null;
                     $questionData['has_solution'] = $has_solution;
                     $questionData['instruction'] = $instruction;
                     $questionData['has_instruction'] = $has_instruction;
+                    $questionData['show_on_pyq'] = $show_on_pyq;
+                    $questionData['added_by_id'] = auth()->id(); // Logged in teacher/user
+                    $questionData['added_by_type'] = 'user';
 
                     $que = Question::where('question', $question)->where('commission_id', $request->commission_id)->where('category_id', $request->category_id)
                         ->where('sub_category_id', $request->sub_category_id)
@@ -4316,47 +4336,69 @@ class ContentManagementController extends Controller
                     }
                     $que = $que->first();
                     if ($que) {
-                        $rejectedCount = $rejectedCount + 1;
                         $questionData['status'] = "Rejected";
                         $questionData['note'] = "Already Exists Question.";
                         $ques = Question::create($questionData);
 
                     } else {
-                        $successCount = $successCount + 1;
-                        $successdata[] = $questionData;
+                        $questionData['status'] = 'Done';
                         $ques = Question::create($questionData);
                     }
 
                     if ($ques) {
                         //if($request->passage_question_type == 'reasoning_subjective') {
                         for ($i = 2; $i < count($tables); $i++) {
-
-                            $option_c = $tables[$i]->find('tr', 3);
-                            if (!isset($option_c) && $option_c == "") {
+                            $tr4 = $tables[$i]->find('tr', 4);
+                            if (!$tr4) {
+                                // ✅ Subjective sub-question
                                 $passage_question = $tables[$i]->find('tr', 0)->find('td', 1)->innerHtml;
-                                $passage_answer_format = NULL;
-                                if ($tables[$i]->find('tr', 1)->find('td', 1)->find('p')->innerHtml == '&nbsp;') {
-                                    $passage_answer_format = NULL;
-                                } else {
-                                    $passage_answer_format = $tables[$i]->find('tr', 1)->find('td', 1)->find('p');
+
+                                // ---------- ANSWER FORMAT ----------
+                                $passage_answer_format = null;
+                                $afTr = $tables[$i]->find('tr', 1);
+                                $afTd = $afTr ? $afTr->find('td', 1) : null;
+
+                                if ($afTd) {
+                                    $rawAfHtml = trim($afTd->innerHtml);
+                                    $decoded = html_entity_decode($rawAfHtml, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                                    $textOnly = trim(str_replace("\xc2\xa0", '', strip_tags($decoded)));
+
+                                    if ($textOnly !== '') {
+                                        // ✅ store clean text (NOT <p> node)
+                                        $passage_answer_format = $textOnly; // e.g. "text"
+                                    }
                                 }
-                                // Try to read per-subquestion solution at row 2
-                                $detail_solution = NULL;
+
+                                // ---------- SOLUTION ----------
+                                $detail_solution = null;
                                 $solTr = $tables[$i]->find('tr', 2);
                                 $solTd = $solTr ? $solTr->find('td', 1) : null;
-                                if ($solTd && trim($solTd->innerHtml) !== '' && $solTd->innerHtml !== '&nbsp;') {
-                                    $detail_solution = $solTd->innerHtml;
+
+                                if ($solTd) {
+                                    $rawHtml = trim($solTd->innerHtml);
+                                    $decoded = html_entity_decode($rawHtml, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                                    $textOnly = trim(str_replace("\xc2\xa0", '', strip_tags($decoded)));
+
+                                    if ($textOnly !== '') {
+                                        $detail_solution = $rawHtml; // keep HTML for solution
+                                    }
                                 }
-                                $question_detail = ([
+
+                                // ---------- SAVE ----------
+                                $question_detail = [
                                     'question_id' => $ques->id,
                                     'question' => $passage_question,
-                                    'answer_format' => $passage_answer_format,
-                                ]);
-                                if ($detail_solution !== NULL) {
+                                    'answer_format' => $passage_answer_format, // ✅ string
+                                    'type' => 'reasoning'
+                                ];
+
+                                if ($detail_solution !== null) {
                                     $question_detail['solution'] = $detail_solution;
                                 }
+
                                 QuestionDetail::create($question_detail);
                             } else {
+                                // ✅ MCQ sub-question
                                 $passage_question = $tables[$i]->find('tr', 0)->find('td', 1)->innerHtml;
                                 $option_a = $tables[$i]->find('tr', 1)->find('td', 1)->find('p')->innerHtml;
                                 $option_b = $tables[$i]->find('tr', 2)->find('td', 1)->find('p')->innerHtml;
@@ -4382,18 +4424,38 @@ class ContentManagementController extends Controller
 
                                 $passage_answer = $tables[$i]->find('tr', 6)->find('td', 1)->find('p')->innerHtml;
                                 // Try to read per-subquestion solution at row 7 or 8
-                                $detail_solution = NULL;
+                                $detail_solution = null;
+
+                                // ---------- ROW 7 ----------
                                 $solTr = $tables[$i]->find('tr', 7);
                                 $solTd = $solTr ? $solTr->find('td', 1) : null;
-                                if ($solTd && trim($solTd->innerHtml) !== '' && $solTd->innerHtml !== '&nbsp;') {
-                                    $detail_solution = $solTd->innerHtml;
-                                } else {
-                                    $solTr2 = $tables[$i]->find('tr', 8);
-                                    $solTd2 = $solTr2 ? $solTr2->find('td', 1) : null;
-                                    if ($solTd2 && trim($solTd2->innerHtml) !== '' && $solTd2->innerHtml !== '&nbsp;') {
-                                        $detail_solution = $solTd2->innerHtml;
+
+                                if ($solTd) {
+                                    $rawHtml = trim($solTd->innerHtml);
+                                    $decoded = html_entity_decode($rawHtml, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                                    $textOnly = trim(str_replace("\xc2\xa0", '', strip_tags($decoded)));
+
+                                    if ($textOnly !== '') {
+                                        $detail_solution = $rawHtml;
                                     }
                                 }
+
+                                // ---------- FALLBACK TO ROW 8 ----------
+                                if ($detail_solution === null) {
+                                    $solTr2 = $tables[$i]->find('tr', 8);
+                                    $solTd2 = $solTr2 ? $solTr2->find('td', 1) : null;
+
+                                    if ($solTd2) {
+                                        $rawHtml2 = trim($solTd2->innerHtml);
+                                        $decoded2 = html_entity_decode($rawHtml2, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                                        $textOnly2 = trim(str_replace("\xc2\xa0", '', strip_tags($decoded2)));
+
+                                        if ($textOnly2 !== '') {
+                                            $detail_solution = $rawHtml2;
+                                        }
+                                    }
+                                }
+
                                 $question_detail = ([
                                     'question_id' => $ques->id,
                                     'question' => $passage_question,
@@ -4404,6 +4466,7 @@ class ContentManagementController extends Controller
                                     'option_d' => $option_d,
                                     'option_e' => $option_e,
                                     'has_option_e' => $has_option_e,
+                                    'type' => 'mcq'
                                 ]);
                                 if ($detail_solution !== NULL) {
                                     $question_detail['solution'] = $detail_solution;
@@ -4412,63 +4475,22 @@ class ContentManagementController extends Controller
                             }
 
                         }
-
-
-
-
-                        // } elseif($request->passage_question_type == 'multiple_choice') {
-
-                        // }
                     }
 
-                    // } catch (\Exception $ex) {
-                    //     $question = $tables[1]->find('tr', 0)->find('td', 1)->innerHtml;
-                    //     $rejectedCount = $rejectedCount + 1;
-                    //     $questionData = [];
-                    //     $questionData['question'] = $question;
-                    //     $questionData['note'] = 'Question Format Issue';
-                    //     $questionData['question_type'] = $request->question_type;
-                    //     $questionData['status'] = "Rejected";
-                    //     $ques = Question::create($questionData);
-                    // }
                 }
 
                 DB::commit();
                 return redirect()->route('question.bank.index')->with('success', 'Questions created successfully.');
-                // session(['success_data' => $successdata]);
-                // session(['pending_data' => $pendingdata]);
-                // session(['rejected_data' => $rejecteddata]);
-                // return response()->json([
-                //     'success' => true,
-                //     'successCount' => $successCount,
-                //     'rejectedCount' => $rejectedCount,
-                //     'pendingCount' => count($tables) - $successCount - $rejectedCount - 1,
-                //     'msgText' => 'Upload Successfull',
-                // ]);
-                // return redirect(route('admin.upload-question','type='.$exam_type))->with('success','Upload Successfull');
             } else {
                 $import = new QuestionsImport($request->all());
 
                 $import->import($request->file);
                 // dd($import);
                 $file = $request->file('file');
-
-                $successCount = $import->getSuccessCount();
-                $rejectedCount = $import->getRejectedCount();
-                $pendingCount = $import->getRowCount() - $successCount - $rejectedCount;
                 DB::commit();
-                // return response()->json([
-                //     'success' => true,
-                //     'successCount' => $successCount,
-                //     'rejectedCount' => $rejectedCount,
-                //     'pendingCount' => $pendingCount,
-                //     'msgText' => 'Question Updated Successfully',
-                // ]);
                 return redirect()->route('question.bank.index')->with('success', 'Questions created successfully.');
-                // return redirect(route('admin.upload-question','type='.$exam_type))->with('success','Upload Successfull');
             }
         } catch (\Exception $ex) {
-            dd($ex);
             DB::rollback();
             return redirect()->route('question.bank.bulk-upload')->with('success', 'Something went wrong.');
         }

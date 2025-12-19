@@ -883,9 +883,9 @@ class QuestionBankController extends Controller
 
 
                             }
-                            $answer_format = NULL;
+                            $answer_format = "text input";
                             if ($tables[$i]->find('tr', 2)->find('td', 1)->find('p')->innerHtml == '&nbsp;') {
-                                $answer_format = NULL;
+                                $answer_format = "text input";
                             } else {
                                 $answer_format = $tables[$i]->find('tr', 2)->find('td', 1)->find('p')->innerHtml;
                             }
@@ -1011,7 +1011,7 @@ class QuestionBankController extends Controller
                         $answer_format = NULL;
                         if ($request->passage_question_type == 'reasoning_subjective') {
                             if ($tables[1]->find('tr', 3)->find('td', 1)->find('p')->innerHtml == '&nbsp;') {
-                                $answer_format = NULL;
+                                $answer_format = 'text';
                             } else {
                                 $answer_format = $tables[1]->find('tr', 3)->find('td', 1)->find('p');
                             }

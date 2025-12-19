@@ -194,12 +194,12 @@
                                     <div class="mb-3">
                                         <label>Answer Type</label>
                                         <select class="form-control" name="answer_format[]">
-                                            <option value="">Select</option>
+                                            <!-- <option value="">Select</option> -->
                                             <option value="audio">Audio</option>
                                             <option value="video">Video</option>
                                             <option value="image">Image</option>
                                             <option value="document">Document</option>
-                                            <option value="text input">Text Input</option>
+                                            <option value="text input" selected>Text Input</option>
                                         </select>
                                     </div>
                                     <div class="form-group solution-group" style="display: none;">
@@ -282,8 +282,8 @@
                                                 <div class="form-group">
                                                     <label>Answer Format</label>
                                                     <select class="form-control" name="answer_format[]">
-                                                        <option value="">Select</option>
-                                                        <option value="text">Text</option>
+                                                        <!-- <option value="">Select</option> -->
+                                                        <option value="text" selected>Text</option>
                                                         <option value="audio">Audio</option>
                                                         <option value="video">Video</option>
                                                         <option value="image">Image</option>

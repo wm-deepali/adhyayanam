@@ -614,30 +614,59 @@ class FrontController extends Controller
         return view('front.pyq-papers', $data);
     }
 
-    public function testseries($examid, $catid, $subcat)
+    public function testseries(Request $request, $examid, $catid, $subcat)
     {
         $data['subcat'] = SubCategory::findOrFail($subcat);
-        $data['categories'] = Category::where('exam_com_id', $examid)->get();
-        $data['testseries'] = TestSeries::where('exam_com_id', $examid)->where('category_id', $catid)->where('sub_category_id', $subcat)->paginate(10);
+
+        // Sidebar data
+        $data['subjects'] = Subject::where('sub_category_id', $subcat)->get();
+        $data['chapters'] = Chapter::where('sub_category_id', $subcat)->get();
+        $data['topics'] = CourseTopic::where('sub_category_id', $subcat)->get();
+
+        // Base query (menu-level filters)
+        $query = TestSeries::with('testseries')
+            ->where('exam_com_id', $examid)
+            ->where('category_id', $catid)
+            ->where('sub_category_id', $subcat);
+
+        /* ================= SEARCH ================= */
+        if ($request->filled('search')) {
+            $query->where('title', 'like', '%' . $request->search . '%');
+            $data['search'] = $request->search;
+        }
+
+        /* ================= SUBJECT FILTER ================= */
+        if ($request->filled('subject_id')) {
+            $subjectId = (int) $request->subject_id;
+
+            $query->whereHas('testseries', function ($q) use ($subjectId) {
+                $q->whereJsonContains('subject_ids', $subjectId);
+            });
+        }
+
+        /* ================= CHAPTER FILTER ================= */
+        if ($request->filled('chapter_id')) {
+            $chapterId = (int) $request->chapter_id;
+
+            $query->whereHas('testseries', function ($q) use ($chapterId) {
+                $q->whereJsonContains('chapter_ids', $chapterId);
+            });
+        }
+
+        /* ================= TOPIC FILTER ================= */
+        if ($request->filled('topic_id')) {
+            $topicId = (int) $request->topic_id;
+
+            $query->whereHas('testseries', function ($q) use ($topicId) {
+                $q->whereJsonContains('topic_ids', $topicId);
+            });
+        }
+
+        $data['testPackages'] = $query->paginate(10)->withQueryString();
+
         return view('front.test-series', $data);
     }
-    public function testseriesFilter(Request $request)
-    {
-        $data['subcat'] = array();
-        $data['testseries'] = TestSeries::where('category_id', $request->category_id)->paginate(10);
-        $data['categories'] = Category::get();
-        $data['filter_selected'] = $request->category_id;
-        return view('front.test-series', $data);
-    }
-    public function testseriesSearch(Request $request)
-    {
-        $search = $request->search_field;
-        $data['subcat'] = array();
-        $data['testseries'] = TestSeries::where('title', 'like', "%" . $search . "%")->paginate(10);
-        $data['categories'] = Category::get();
-        $data['search'] = $search;
-        return view('front.test-series', $data);
-    }
+
     public function testseriesDetail($slug)
     {
         $testseries = TestSeries::where('slug', $slug)->first();

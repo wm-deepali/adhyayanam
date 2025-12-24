@@ -159,7 +159,7 @@
                         </div>
                         <div class="col-md-6 sub-cat" {{$test_series->sub_category_id != '' ? 'hidecls' : ''}}>
                             <label for="sub_category_id">Sub Category *</label>
-                            <select id="sub_category_id" name="sub_category_id">
+                            <select class="form-control" id="sub_category_id" name="sub_category_id">
                                 <option value="">--Select--</option>
                                 @foreach($subcategories as $subcategory)
                                     <option value="{{ $subcategory->id }}" {{ $subcategory->id == $test_series->sub_category_id ? 'selected' : '' }}>{{ $subcategory->name }}</option>
@@ -241,424 +241,187 @@
                                         aria-labelledby="base-mcq">
                                         <div class="customquestiondiv">
                                             <div id="question-rows">
-                                                @php
-                                                    $groupedDetails = $test_series->testseries->groupBy('type_name');
-                                                @endphp
 
-                                                @if ($groupedDetails->isNotEmpty())
-                                                    @foreach ($groupedDetails as $typeName => $details)
-                                                        <div class="row question-row">
+                                                @foreach($preparedDetails as $row)
+
+                                                    @php
+                                                        $typeValue = $row['type'];
+                                                        $typeMap = [
+                                                            'Full Test' => 1,
+                                                            'Subject Wise' => 2,
+                                                            'Chapter Wise' => 3,
+                                                            'Topic Wise' => 4,
+                                                            'Current Affair' => 5,
+                                                            'Previous Year' => 6,
+                                                        ];
+                                                    @endphp
+
+                                                    <div class="question-row">
+
+                                                        {{-- ================= FILTER ROW ================= --}}
+                                                        <div class="row w-100 mb-3">
+
+                                                            {{-- Test Type --}}
                                                             <div class="col-md-4">
                                                                 <label>Test Type</label>
                                                                 <select class="form-control test_type" name="type[]">
                                                                     <option value="">Choose...</option>
-                                                                    <option value="1" {{ $typeName == 'Full Test' ? 'selected' : '' }}>Full Test</option>
-                                                                    <option value="2" {{ $typeName == 'Subject Wise' ? 'selected' : '' }}>Subject Wise</option>
-                                                                    <option value="3" {{ $typeName == 'Chapter Wise' ? 'selected' : '' }}>Chapter Wise</option>
-                                                                    <option value="4" {{ $typeName == 'Topic Wise' ? 'selected' : '' }}>Topic Wise</option>
-                                                                    <option value="5" {{ $typeName == 'Current Affair' ? 'selected' : '' }}>Current Affair</option>
-                                                                    <option value="6" {{ $typeName == 'Previous Year' ? 'selected' : '' }}>Previous Year</option>
+                                                                    @foreach($typeMap as $label => $val)
+                                                                        <option value="{{ $val }}" {{ $typeValue == $val ? 'selected' : '' }}>
+                                                                            {{ $label }}
+                                                                        </option>
+                                                                    @endforeach
                                                                 </select>
                                                             </div>
+
+                                                            {{-- Subjects --}}
+                                                            <div
+                                                                class="col-md-4 subject-filter {{ in_array($typeValue, [2, 3, 4]) ? '' : 'd-none' }}">
+                                                                <label>Subjects</label>
+                                                                <select class="form-control subject_ids" multiple>
+                                                                    @foreach($subjects as $subject)
+                                                                        <option value="{{ $subject->id }}" {{ in_array($subject->id, $row['subject_ids']) ? 'selected' : '' }}>
+                                                                            {{ $subject->name }}
+                                                                        </option>
+                                                                    @endforeach
+                                                                </select>
+                                                            </div>
+
+                                                            {{-- Chapters --}}
+                                                            <div
+                                                                class="col-md-4 chapter-filter {{ in_array($typeValue, [3, 4]) ? '' : 'd-none' }}">
+                                                                <label>Chapters</label>
+                                                                <select class="form-control chapter_ids" multiple>
+                                                                    @foreach($chapters as $chapter)
+                                                                        <option value="{{ $chapter->id }}" {{ in_array($chapter->id, $row['chapter_ids']) ? 'selected' : '' }}>
+                                                                            {{ $chapter->name }}
+                                                                        </option>
+                                                                    @endforeach
+                                                                </select>
+                                                            </div>
+
+                                                            {{-- Topics --}}
+                                                            <div
+                                                                class="col-md-4 topic-filter {{ $typeValue == 4 ? '' : 'd-none' }}">
+                                                                <label>Topics</label>
+                                                                <select class="form-control topic_ids" multiple>
+                                                                    @foreach($topics as $topic)
+                                                                        <option value="{{ $topic->id }}" {{ in_array($topic->id, $row['topic_ids']) ? 'selected' : '' }}>
+                                                                            {{ $topic->name }}
+                                                                        </option>
+                                                                    @endforeach
+                                                                </select>
+                                                            </div>
+
+                                                            {{-- Test Generated By --}}
                                                             <div class="col-md-4">
                                                                 <label>Test Selections</label>
                                                                 <select class="form-control test_generated_by"
                                                                     name="test_generated_by[]">
-                                                                    <option value="">Choose...</option>
-                                                                    <option value="manual" {{ $details->first()->test_generated_by == 'manual' ? 'selected' : '' }}>Manual</option>
-                                                                    <option value="random" {{ $details->first()->test_generated_by == 'random' ? 'selected' : '' }}>Random</option>
+                                                                    <option value="manual" {{ $row['test_generated_by'] == 'manual' ? 'selected' : '' }}>Manual</option>
+                                                                    <option value="random" {{ $row['test_generated_by'] == 'random' ? 'selected' : '' }}>Random</option>
                                                                 </select>
                                                             </div>
 
+                                                            {{-- Total Papers --}}
                                                             <div class="col-md-4">
                                                                 <label>No. of Paper</label>
-                                                                <input type="text" name="total_paper[]"
-                                                                    class="form-control total_paper"
-                                                                    value="{{ $details->count() }}">
+                                                                <input type="text" class="form-control total_paper"
+                                                                    name="total_paper[]" value="{{ $row['total_paper'] }}">
                                                             </div>
+                                                        </div>
 
+                                                        {{-- ================= TEST PAPERS ================= --}}
+                                                        @foreach(['MCQ', 'Passage', 'Subjective', 'Combined'] as $paperType)
 
-                                                            <div class="col-md-5">
-                                                                <div class="box-area-questions">
-                                                                    <h4>Your Tests <span id="questioncountmcqshow"></span></h4>
-                                                                    <div class="box-questns">
-                                                                        <ul class="selected-questions customquestionselectedbox-mcq"
-                                                                            id="customquestionselectedbox-mcq">
-                                                                            @if(isset($test_series_details) && count($test_series_details) > 0)
-                                                                                @foreach($test_series_details as $testDetail)
-                                                                                    @if($testDetail->test_paper_type == 'MCQ')
-                                                                                        <li id="customquestionli">
-                                                                                            <label>
-                                                                                                <span class="questn-he">
-                                                                                                    <input type="checkbox" name="question[]"
-                                                                                                        class="question"
-                                                                                                        value="{!! $testDetail->test_id !!}">
-                                                                                                    <span
-                                                                                                        class="question-text">{!! $testDetail->test->name ?? "" !!}</span>
+                                                            <div class="row w-100 mb-3">
+
+                                                                {{-- Selected Tests --}}
+                                                                <div class="col-md-5">
+                                                                    <div class="box-area-questions">
+                                                                        <h4>Your Tests</h4>
+                                                                        <div class="box-questns">
+                                                                            <ul
+                                                                                class="selected-questions customquestionselectedbox-{{ strtolower($paperType) }}">
+                                                                                @foreach(($row['papers'][$paperType] ?? []) as $testDetail)
+                                                                                    <li>
+                                                                                        <label>
+                                                                                            <span class="questn-he">
+                                                                                                <input type="checkbox" class="question"
+                                                                                                    checked
+                                                                                                    value="{{ $testDetail->test_id }}">
+                                                                                                <span class="question-text">
+                                                                                                    {{ $testDetail->test->name ?? '' }}
+                                                                                                    <small class="text-muted d-block">
+                                                                                                        @if($testDetail->test->subject)
+                                                                                                            Subject:
+                                                                                                            {{ $testDetail->test->subject->name }}
+                                                                                                        @endif
+
+                                                                                                        @if($testDetail->test->subjectchapter)
+                                                                                                            | Chapter:
+                                                                                                            {{ $testDetail->test->chapter->name }}
+                                                                                                        @endif
+
+                                                                                                        @if($testDetail->test->subject->topic)
+                                                                                                            | Topic:
+                                                                                                            {{ $testDetail->test->topic->name }}
+                                                                                                        @endif
+                                                                                                    </small>
                                                                                                 </span>
-                                                                                            </label>
-                                                                                        </li>
-                                                                                    @endif
+                                                                                            </span>
+                                                                                        </label>
+                                                                                    </li>
                                                                                 @endforeach
-                                                                            @endif
-                                                                        </ul>
+                                                                            </ul>
+                                                                        </div>
                                                                     </div>
                                                                 </div>
-                                                            </div>
-                                                            <div class="col-sm-2">
-                                                                <div class="button-actns-questn">
-                                                                    <button class="btn btn-primary addquestiontoselected-mcq"
-                                                                        type="button" fdprocessedid="49r4zxe"><i
-                                                                            class="fa fa-arrow-left"></i></button>
-                                                                    <i class="fa fa-exchange"></i>
-                                                                    <button class="btn btn-danger removequestionfromselected-mcq"
-                                                                        type="button" fdprocessedid="2x8rl7"><i
-                                                                            class="fa fa-arrow-right"></i></button>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-md-5">
-                                                                <div class="box-area-questions">
-                                                                    <h4>MCQ Test Papers <span id="questioncountshow"></span></h4>
-                                                                    <div class="box-questns">
-                                                                        <ul class="customquestionbox-mcq"
-                                                                            id="customquestionbox-mcq">
-                                                                        </ul>
+
+                                                                {{-- Action Buttons --}}
+                                                                <div class="col-sm-2">
+                                                                    <div class="button-actns-questn">
+                                                                        <button
+                                                                            class="btn btn-primary addquestiontoselected-{{ strtolower($paperType) }}"
+                                                                            type="button">
+                                                                            <i class="fa fa-arrow-left"></i>
+                                                                        </button>
+                                                                        <i class="fa fa-exchange"></i>
+                                                                        <button
+                                                                            class="btn btn-danger removequestionfromselected-{{ strtolower($paperType) }}"
+                                                                            type="button">
+                                                                            <i class="fa fa-arrow-right"></i>
+                                                                        </button>
                                                                     </div>
                                                                 </div>
-                                                            </div>
-                                                            <div class="col-md-5">
-                                                                <div class="box-area-questions">
-                                                                    <h4>Your Tests <span id="questioncountpassageshow"></span></h4>
-                                                                    <div class="box-questns">
-                                                                        <ul class="selected-questions customquestionselectedbox-passage"
-                                                                            id="customquestionselectedbox-passage">
-                                                                            @if(isset($test_series_details) && count($test_series_details) > 0)
-                                                                                @foreach($test_series_details as $testDetail)
-                                                                                    @if($testDetail->test_paper_type == 'Passage')
-                                                                                        <li id="customquestionli">
-                                                                                            <label>
-                                                                                                <span class="questn-he">
-                                                                                                    <input type="checkbox" name="question[]"
-                                                                                                        class="question"
-                                                                                                        value="{!! $testDetail->test_id !!}">
-                                                                                                    <span
-                                                                                                        class="question-text">{!! $testDetail->test->name ?? "" !!}</span>
-                                                                                                </span>
-                                                                                            </label>
-                                                                                        </li>
-                                                                                    @endif
-                                                                                @endforeach
-                                                                            @endif
-                                                                        </ul>
+
+                                                                {{-- Available Tests --}}
+                                                                <div class="col-md-5">
+                                                                    <div class="box-area-questions">
+                                                                        <h4>{{ $paperType }} Test Papers</h4>
+                                                                        <div class="box-questns">
+                                                                            <ul
+                                                                                class="customquestionbox-{{ strtolower($paperType) }}">
+                                                                            </ul>
+                                                                        </div>
                                                                     </div>
                                                                 </div>
-                                                            </div>
-                                                            <div class="col-sm-2">
-                                                                <div class="button-actns-questn">
-                                                                    <button class="btn btn-primary addquestiontoselected-passage"
-                                                                        type="button" fdprocessedid="49r4zxe"><i
-                                                                            class="fa fa-arrow-left"></i></button>
-                                                                    <i class="fa fa-exchange"></i>
-                                                                    <button
-                                                                        class="btn btn-danger removequestionfromselected-passage"
-                                                                        type="button" fdprocessedid="2x8rl7"><i
-                                                                            class="fa fa-arrow-right"></i></button>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-md-5">
-                                                                <div class="box-area-questions">
-                                                                    <h4>Passage Test Papers <span id="questioncountshow"></span>
-                                                                    </h4>
-                                                                    <div class="box-questns">
-                                                                        <ul class="customquestionbox-passage"
-                                                                            id="customquestionbox-passage">
-                                                                        </ul>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-md-5">
-                                                                <div class="box-area-questions">
-                                                                    <h4>Your Tests <span id="questioncountsubjectiveshow"></span>
-                                                                    </h4>
-                                                                    <div class="box-questns">
-                                                                        <ul class="selected-questions customquestionselectedbox-subjective"
-                                                                            id="customquestionselectedbox-subjective">
-                                                                            @if(isset($test_series_details) && count($test_series_details) > 0)
-                                                                                @foreach($test_series_details as $testDetail)
-                                                                                    @if($testDetail->test_paper_type == 'Subjective')
-                                                                                        <li id="customquestionli">
-                                                                                            <label>
-                                                                                                <span class="questn-he">
-                                                                                                    <input type="checkbox" name="question[]"
-                                                                                                        class="question"
-                                                                                                        value="{!! $testDetail->test_id !!}">
-                                                                                                    <span
-                                                                                                        class="question-text">{!! $testDetail->test->name ?? "" !!}</span>
-                                                                                                </span>
-                                                                                            </label>
-                                                                                        </li>
-                                                                                    @endif
-                                                                                @endforeach
-                                                                            @endif
-                                                                        </ul>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-sm-2">
-                                                                <div class="button-actns-questn">
-                                                                    <button class="btn btn-primary addquestiontoselected-subjective"
-                                                                        type="button" fdprocessedid="49r4zxe"><i
-                                                                            class="fa fa-arrow-left"></i></button>
-                                                                    <i class="fa fa-exchange"></i>
-                                                                    <button
-                                                                        class="btn btn-danger removequestionfromselected-subjective"
-                                                                        type="button" fdprocessedid="2x8rl7"><i
-                                                                            class="fa fa-arrow-right"></i></button>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-md-5">
-                                                                <div class="box-area-questions">
-                                                                    <h4>Subjective Test Papers <span id="questioncountshow"></span>
-                                                                    </h4>
-                                                                    <div class="box-questns">
-                                                                        <ul class="customquestionbox-subjective"
-                                                                            id="customquestionbox-subjective">
-                                                                        </ul>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-md-5">
-                                                                <div class="box-area-questions">
-                                                                    <h4>Your Tests <span id="questioncountcombinedshow"></span></h4>
-                                                                    <div class="box-questns">
-                                                                        <ul class="selected-questions customquestionselectedbox-combined"
-                                                                            id="customquestionselectedbox-combined">
-                                                                            @if(isset($test_series_details) && count($test_series_details) > 0)
-                                                                                @foreach($test_series_details as $testDetail)
-                                                                                    @if($testDetail->test_paper_type == 'Combined')
-                                                                                        <li id="customquestionli">
-                                                                                            <label>
-                                                                                                <span class="questn-he">
-                                                                                                    <input type="checkbox" name="question[]"
-                                                                                                        class="question"
-                                                                                                        value="{!! $testDetail->test_id !!}"><span
-                                                                                                        class="question-text">{!! $testDetail->test->name ?? "" !!}</span>
-                                                                                                </span>
 
-                                                                                            </label>
-                                                                                        </li>
-                                                                                    @endif
-                                                                                @endforeach
-                                                                            @endif
-                                                                        </ul>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-sm-2">
-                                                                <div class="button-actns-questn">
-                                                                    <button class="btn btn-primary addquestiontoselected-combined"
-                                                                        type="button" fdprocessedid="49r4zxe"><i
-                                                                            class="fa fa-arrow-left"></i></button>
-                                                                    <i class="fa fa-exchange"></i>
-                                                                    <button
-                                                                        class="btn btn-danger removequestionfromselected-combined"
-                                                                        type="button" fdprocessedid="2x8rl7"><i
-                                                                            class="fa fa-arrow-right"></i></button>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-md-5">
-                                                                <div class="box-area-questions">
-                                                                    <h4>Combined Test Papers <span id="questioncountshow"></span>
-                                                                    </h4>
-                                                                    <div class="box-questns">
-                                                                        <ul class="customquestionbox-combined"
-                                                                            id="customquestionbox-combined">
-                                                                        </ul>
-                                                                    </div>
-                                                                </div>
                                                             </div>
 
-                                                            <div class="col-md-12 text-right mt-2">
-                                                                <button type="button"
-                                                                    class="btn btn-danger remove-row">Remove</button>
-                                                            </div>
-                                                        </div>
-                                                    @endforeach
-                                                @else
-                                                    <div class="row question-row">
-                                                        <div class="col-md-4">
-                                                            <label>Test Type</label>
-                                                            <select class="form-control test_type" name="type[]">
-                                                                <option value="">Choose...</option>
-                                                                <option value="1">Full Test</option>
-                                                                <option value="2">Subject Wise</option>
-                                                                <option value="3">Chapter Wise</option>
-                                                                <option value="4">Topic Wise</option>
-                                                                <option value="5">Current Affair</option>
-                                                                <option value="6">Previous Year</option>
-                                                            </select>
-                                                        </div>
-                                                        <div class="col-md-4">
-                                                            <label for="test_generated_by">Test Selections</label>
-                                                            <select id="test_generated_by" name="test_generated_by"
-                                                                class="form-control test_generated_by">
-                                                                <option value="">Choose...</option>
-                                                                <option value="manual">Manual</option>
-                                                                <option value="random">Random</option>
-                                                            </select>
-                                                        </div>
-
-                                                        <div class="col-md-4">
-                                                            <label for="title" class="form-label">No. of Paper</label>
-                                                            <input type="text" class="form-control total_paper"
-                                                                name="total_paper" placeholder="No. of Paper" required>
-                                                        </div>
-
-                                                        <div class="col-md-5">
-                                                            <div class="box-area-questions">
-                                                                <h4>Your Tests <span id="questioncountmcqshow"></span></h4>
-                                                                <div class="box-questns">
-                                                                    <ul class="selected-questions customquestionselectedbox-mcq"
-                                                                        id="customquestionselectedbox-mcq"></ul>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-sm-2">
-
-                                                            <div class="button-actns-questn">
-                                                                <button class="btn btn-primary addquestiontoselected-mcq"
-                                                                    type="button" fdprocessedid="49r4zxe"><i
-                                                                        class="fa fa-arrow-left"></i></button>
-                                                                <i class="fa fa-exchange"></i>
-                                                                <button class="btn btn-danger removequestionfromselected-mcq"
-                                                                    type="button" fdprocessedid="2x8rl7"><i
-                                                                        class="fa fa-arrow-right"></i></button>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-5">
-                                                            <div class="box-area-questions">
-                                                                <h4>MCQ Test Papers <span id="questioncountshow"></span></h4>
-                                                                <div class="box-questns">
-                                                                    <ul class="customquestionbox-mcq"
-                                                                        id="customquestionbox-mcq">
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-
-                                                        <div class="col-md-5">
-                                                            <div class="box-area-questions">
-                                                                <h4>Your Tests <span id="questioncountpassageshow"></span></h4>
-                                                                <div class="box-questns">
-                                                                    <ul class="selected-questions customquestionselectedbox-passage"
-                                                                        id="customquestionselectedbox-passage"></ul>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-sm-2">
-
-                                                            <div class="button-actns-questn">
-                                                                <button class="btn btn-primary addquestiontoselected-passage"
-                                                                    type="button" fdprocessedid="49r4zxe"><i
-                                                                        class="fa fa-arrow-left"></i></button>
-                                                                <i class="fa fa-exchange"></i>
-                                                                <button
-                                                                    class="btn btn-danger removequestionfromselected-passage"
-                                                                    type="button" fdprocessedid="2x8rl7"><i
-                                                                        class="fa fa-arrow-right"></i></button>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-5">
-                                                            <div class="box-area-questions">
-                                                                <h4>Passage Test Papers <span id="questioncountshow"></span>
-                                                                </h4>
-                                                                <div class="box-questns">
-                                                                    <ul class="customquestionbox-passage"
-                                                                        id="customquestionbox-passage">
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="col-md-5">
-                                                            <div class="box-area-questions">
-                                                                <h4>Your Tests <span id="questioncountsubjectiveshow"></span>
-                                                                </h4>
-                                                                <div class="box-questns">
-                                                                    <ul class="selected-questions customquestionselectedbox-subjective"
-                                                                        id="customquestionselectedbox-subjective"></ul>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-sm-2">
-
-                                                            <div class="button-actns-questn">
-                                                                <button class="btn btn-primary addquestiontoselected-subjective"
-                                                                    type="button" fdprocessedid="49r4zxe"><i
-                                                                        class="fa fa-arrow-left"></i></button>
-                                                                <i class="fa fa-exchange"></i>
-                                                                <button
-                                                                    class="btn btn-danger removequestionfromselected-subjective"
-                                                                    type="button" fdprocessedid="2x8rl7"><i
-                                                                        class="fa fa-arrow-right"></i></button>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-5">
-                                                            <div class="box-area-questions">
-                                                                <h4>Subjective Test Papers <span id="questioncountshow"></span>
-                                                                </h4>
-                                                                <div class="box-questns">
-                                                                    <ul class="customquestionbox-subjective"
-                                                                        id="customquestionbox-subjective">
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="col-md-5">
-                                                            <div class="box-area-questions">
-                                                                <h4>Your Tests <span id="questioncountcombinedshow"></span></h4>
-                                                                <div class="box-questns">
-                                                                    <ul class="selected-questions customquestionselectedbox-combined"
-                                                                        id="customquestionselectedbox-combined"></ul>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-sm-2">
-
-                                                            <div class="button-actns-questn">
-                                                                <button class="btn btn-primary addquestiontoselected-combined"
-                                                                    type="button" fdprocessedid="49r4zxe"><i
-                                                                        class="fa fa-arrow-left"></i></button>
-                                                                <i class="fa fa-exchange"></i>
-                                                                <button
-                                                                    class="btn btn-danger removequestionfromselected-combined"
-                                                                    type="button" fdprocessedid="2x8rl7"><i
-                                                                        class="fa fa-arrow-right"></i></button>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-5">
-                                                            <div class="box-area-questions">
-                                                                <h4>Combined Test Papers <span id="questioncountshow"></span>
-                                                                </h4>
-                                                                <div class="box-questns">
-                                                                    <ul class="customquestionbox-combined"
-                                                                        id="customquestionbox-combined">
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
+                                                        @endforeach
 
                                                         <div class="col-md-12 text-right mt-2">
                                                             <button type="button"
                                                                 class="btn btn-danger remove-row">Remove</button>
                                                         </div>
+
                                                     </div>
-                                                @endif
+
+                                                @endforeach
 
                                             </div>
+
                                             <div class="col-md-12 mt-3 text-right">
                                                 <button type="button" class="btn btn-primary" id="add-row">Add More</button>
                                             </div>
@@ -684,11 +447,54 @@
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
-        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
-        crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.ckeditor.com/4.16.2/standard/ckeditor.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
     <script>
+
+        $(document).ready(function () {
+    $('.question-row').each(function () {
+        initSelect2($(this));
+        toggleFilters($(this));
+    });
+});
+
+  
+
+        function toggleFilters(row) {
+            const type = row.find('.test_type').val();
+
+            // Hide all
+            row.find('.subject-filter, .chapter-filter, .topic-filter').addClass('d-none');
+
+            if (type == 2) {
+                row.find('.subject-filter').removeClass('d-none');
+            }
+
+            if (type == 3) {
+                row.find('.subject-filter, .chapter-filter').removeClass('d-none');
+            }
+
+            if (type == 4) {
+                row.find('.subject-filter, .chapter-filter, .topic-filter').removeClass('d-none');
+            }
+        }
+
+        $(document).on('change', '.test_type', function () {
+            const row = $(this).closest('.question-row');
+
+            // Reset selections
+            row.find('.subject_ids, .chapter_ids, .topic_ids')
+                .val(null)
+                .trigger('change');
+
+            toggleFilters(row);
+        });
+
+
+
         document.getElementById('fee_type').addEventListener('change', function () {
             var offerDiv = document.getElementById('price-div');
             var mrpDiv = document.getElementById('mrp-div');
@@ -760,35 +566,47 @@
             }
         });
 
-        $(document).ready(function () {
-            let rowIndex = 1;
-            $('#add-row').on('click', function () {
-                let $original = $('.question-row:first');
-                let $clone = $original.clone();
-                rowIndex++;
-                $clone.find('input[type="text"], select').val('');
-                $clone.find('ul').empty();
-                $clone.find('span[id^="questioncount"]').text('');
+$(document).ready(function () {
 
-                $clone.find('[id]').each(function () {
-                    const oldId = $(this).attr('id');
-                    $(this).attr('id', oldId + '-' + rowIndex);
-                });
-                $clone.find('label[for]').each(function () {
-                    const oldFor = $(this).attr('for');
-                    $(this).attr('for', oldFor + '-' + rowIndex);
-                });
-                $('#question-rows').append($clone);
-            });
+$('#add-row').on('click', function () {
 
-            $(document).on('click', '.remove-row', function () {
-                if ($('.question-row').length > 1) {
-                    $(this).closest('.question-row').remove();
-                } else {
-                    alert('At least one test section is required.');
-                }
-            });
-        });
+    let $original = $('.question-row:first');
+
+    // 🔥 Destroy select2 safely
+    $original.find('.subject_ids, .chapter_ids, .topic_ids').each(function () {
+        if ($(this).hasClass('select2-hidden-accessible')) {
+            $(this).select2('destroy');
+        }
+    });
+
+    let $clone = $original.clone(false, false);
+
+    // RESET VALUES
+    $clone.find('input[type="text"]').val('');
+    $clone.find('select').val('');
+    $clone.find('ul').empty();
+
+    $clone.find('.subject-filter, .chapter-filter, .topic-filter')
+          .addClass('d-none');
+
+    $clone.find('.test_type').val('');
+
+    // REMOVE OLD SELECT2 DOM
+    $clone.find('.select2').remove();
+    $clone.find('[id]').removeAttr('id');
+
+    // APPEND
+    $('#question-rows').append($clone);
+
+    // 🔥 INIT SELECT2
+    initSelect2($clone);
+
+    // 🔥 LOAD SUBJECTS BASED ON CURRENT SUB-CATEGORY
+    loadSubjects($clone);
+});
+
+
+});
 
         $(document).on('change', '#exam_com_id', function (event) {
             $('#category_id').html("");
@@ -839,6 +657,8 @@
             }
         });
 
+
+
         $(document).on('change', '.test_type,.total_paper,.test_generated_by', function (event) {
             $(this).attr('disabled', true);
             var btn = $(this)
@@ -852,7 +672,18 @@
             formData.append('total_paper', total_paper);
             formData.append('test_type', $(this).closest('.question-row').find('.test_type').val());
             formData.append('test_generated_by', test_generated_by);
-            formData.append('fee_type', $('#fee_type').val());
+            formData.append('fee_type', $('#fee_type').val()); formData.append(
+                'subject_ids',
+                $(this).closest('.question-row').find('.subject_ids').val()
+            );
+            formData.append(
+                'chapter_ids',
+                $(this).closest('.question-row').find('.chapter_ids').val()
+            );
+            formData.append(
+                'topic_ids',
+                $(this).closest('.question-row').find('.topic_ids').val()
+            );
             $.ajax({
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -917,6 +748,9 @@
                 testType: [],
                 testSelections: [],
                 numPapers: [],
+                subjectIds: [],
+                chapterIds: [],
+                topicIds: [],
                 mcqselectedtestpaper: [],
                 passageselectedtestpaper: [],
                 subjectiveselectedtestpaper: [],
@@ -925,13 +759,18 @@
 
             // Gather additional data from the form
             $('.question-row').each(function () {
+
                 additionalData.testType.push($(this).find('.test_type').val());
                 additionalData.testSelections.push($(this).find('.test_generated_by').val());
                 additionalData.numPapers.push($(this).find('.total_paper').val());
-                let d1 = [];
-                let d2 = [];
-                let d3 = [];
-                let d4 = [];
+
+                // ✅ ADD THESE (YOU MISSED THEM)
+                additionalData.subjectIds.push($(this).find('.subject_ids').val() || []);
+                additionalData.chapterIds.push($(this).find('.chapter_ids').val() || []);
+                additionalData.topicIds.push($(this).find('.topic_ids').val() || []);
+
+                let d1 = [], d2 = [], d3 = [], d4 = [];
+
                 $(this).find('.customquestionselectedbox-mcq .question').each(function () {
                     d1.push($(this).val());
                 });
@@ -944,11 +783,13 @@
                 $(this).find('.customquestionselectedbox-combined .question').each(function () {
                     d4.push($(this).val());
                 });
-                additionalData.mcqselectedtestpaper.push(d1)
-                additionalData.passageselectedtestpaper.push(d2)
-                additionalData.subjectiveselectedtestpaper.push(d3)
-                additionalData.combinedselectedtestpaper.push(d4)
+
+                additionalData.mcqselectedtestpaper.push(d1);
+                additionalData.passageselectedtestpaper.push(d2);
+                additionalData.subjectiveselectedtestpaper.push(d3);
+                additionalData.combinedselectedtestpaper.push(d4);
             });
+
 
             // Append additional data to formData
             formData.append('additionalData', JSON.stringify(additionalData));
@@ -1125,6 +966,9 @@
             questionRow.find('.slide-menu-combined').append(testTemp);
         });
 
+
+
+
         $(document).on('click', '.removequestionfromselected-combined', function (event) {
             const questionRow = $(this).closest('.question-row');
             const selQuestions = questionRow.find('.customquestionselectedbox-combined li.questn-selected');
@@ -1138,6 +982,106 @@
 
             questionRow.find('.customquestionbox-combined').html(temp);
         });
+
+
+        $(document).on('change', '#sub_category_id', function () {
+
+    $('.question-row').each(function () {
+
+        const row = $(this);
+
+        // RESET OLD DATA
+        row.find('.subject_ids, .chapter_ids, .topic_ids')
+           .empty()
+           .val(null)
+           .trigger('change');
+
+        // LOAD NEW SUBJECTS
+        loadSubjects(row);
+    });
+});
+
+
+function initSelect2(row) {
+    row.find('.subject_ids, .chapter_ids, .topic_ids').select2({
+        width: '100%',
+        placeholder: 'Select'
+    });
+}
+
+function loadSubjects(row) {
+    let sub_category_id = $('#sub_category_id').val();
+    if (!sub_category_id) return;
+
+    $.ajax({
+        url: `{{ URL::to('fetch-subject-by-subcategory') }}/${sub_category_id}`,
+        type: 'GET',
+        dataType: 'json',
+        success: function (result) {
+            if (result.success) {
+                row.find('.subject_ids').html(result.html);
+                initSelect2(row);
+            }
+        }
+    });
+}
+
+        $(document).on('change', '.subject_ids', function () {
+            const row = $(this).closest('.question-row');
+            const subjectIds = $(this).val();
+
+            if (!row.find('.chapter-filter').hasClass('d-none')) {
+                $.ajax({
+                    url: `{{ URL::to('fetch-chapter-by-subject') }}/${subjectIds}`,
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function (result) {
+                        if (result.success) {
+                            if (result.html != '') {
+                                row.find('.chapter_ids').html(result.html);
+                                initSelect2(row); // ✅ IMPORTANT
+
+                            }
+                            else {
+                                row.find('.chapter_ids').val("").trigger('change');
+                            }
+
+                        } else {
+                            toastr.error('error encountered ' + result.msgText);
+                        }
+                    },
+                });
+            }
+        });
+
+        $(document).on('change', '.chapter_ids', function () {
+            const row = $(this).closest('.question-row');
+            const chapterIds = $(this).val();
+
+            if (!row.find('.topic-filter').hasClass('d-none')) {
+                $.ajax({
+                    url: `{{ URL::to('fetch-topic-by-chapter') }}/${chapterIds}`,
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function (result) {
+                        if (result.success) {
+                            if (result.html != '') {
+                                row.find('.topic_ids').html(result.html);
+                                initSelect2(row); // ✅ IMPORTANT
+
+                            }
+                            else {
+                                row.find('.topic_ids').val("").trigger('change');
+                            }
+
+                        } else {
+                            toastr.error('error encountered ' + result.msgText);
+                        }
+                    },
+                });
+            }
+        });
+
 
     </script>
 @endsection

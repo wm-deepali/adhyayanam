@@ -87,8 +87,7 @@ Route::get('/about', function () {
 
 Route::get('pyq-papers/{examid}/{catid}/{subcat}', [FrontController::class, 'pyqPapers'])->name('pyq-papers');
 Route::get('test-series/{examid}/{catid}/{subcat}', [FrontController::class, 'testseries'])->name('test-series');
-Route::post('test-series/filter', [FrontController::class, 'testseriesFilter'])->name('test-series.filter');
-Route::post('test-series/search', [FrontController::class, 'testseriesSearch'])->name('test-series.search');
+Route::get('test-series-detail/{slug}', [FrontController::class, 'testseriesDetail'])->name('test-series-detail');
 
 Route::get('live-test/{id}', [LiveTestController::class, 'livetest'])->name('live-test');
 Route::post('/fetch-question', [LiveTestController::class, 'fetchQuestion']);
@@ -97,7 +96,6 @@ Route::post('/finalize-test', [LiveTestController::class, 'finalizeStudentTest']
 Route::get('/test-result/{id}', [LiveTestController::class, 'viewTestResult'])->name('user.test-result');
 Route::post('/clear-answer', [LiveTestController::class, 'clearAnswer']);
 
-Route::get('test-series-detail/{slug}', [FrontController::class, 'testseriesDetail'])->name('test-series-detail');
 Route::get('subject-pyqs/{id}', [FrontController::class, 'subjectPapers'])->name('subject-pyqs');
 Route::post('/sendotopstudent', [FrontController::class, 'sendotopstudent'])->name('sendotopstudent');
 Route::post('/verifymobilenumberstudent', [FrontController::class, 'verifymobilenumberstudent'])->name('verifymobilenumberstudent');

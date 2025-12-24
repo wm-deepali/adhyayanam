@@ -2833,9 +2833,194 @@ class ContentManagementController extends Controller
         $data['categories'] = [];
         return view('test-series.create', $data);
     }
+
     public function testSeriesStore(Request $request)
     {
-        // ✅ Validate main test series fields
+        $validator = Validator::make($request->all(), [
+            'title' => 'required|string|max:512',
+            'slug' => 'required|string|max:512',
+            'fee_type' => 'required|in:free,paid',
+            'price' => 'required|numeric',
+            'mrp' => 'required|numeric',
+            'discount' => 'required|numeric',
+            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'code' => 422,
+                'errors' => $validator->errors(),
+            ]);
+        }
+
+        DB::beginTransaction();
+
+        try {
+
+            /* ================= MAIN SERIES ================= */
+            $data = $request->except([
+                '_token',
+                'additionalData',
+                'type',
+                'test_generated_by',
+                'total_paper'
+            ]);
+
+            if ($request->hasFile('logo')) {
+                $data['logo'] = $request->file('logo')->store('logos', 'public');
+            }
+
+            $data['created_by'] = auth()->id();
+
+            $testSeries = TestSeries::create($data);
+
+            /* ================= DETAILS ================= */
+            $additionalData = json_decode($request->input('additionalData'), true);
+
+            $typeNames = [
+                1 => 'Full Test',
+                2 => 'Subject Wise',
+                3 => 'Chapter Wise',
+                4 => 'Topic Wise',
+                5 => 'Current Affair',
+                6 => 'Previous Year',
+            ];
+
+            $paperMap = [
+                'mcqselectedtestpaper' => 'MCQ',
+                'passageselectedtestpaper' => 'Passage',
+                'subjectiveselectedtestpaper' => 'Subjective',
+                'combinedselectedtestpaper' => 'Combined',
+            ];
+
+            $totalPaperCount = 0;
+
+            foreach ($additionalData['testType'] ?? [] as $index => $testType) {
+
+                $testType = (int) $testType;
+                $testTypeName = $typeNames[$testType] ?? 'Unknown';
+                $testGeneratedBy = $additionalData['testSelections'][$index] ?? 'manual';
+
+                $subjectIds = array_map('intval', $additionalData['subjectIds'][$index] ?? []);
+                $chapterIds = array_map('intval', $additionalData['chapterIds'][$index] ?? []);
+                $topicIds = array_map('intval', $additionalData['topicIds'][$index] ?? []);
+
+                foreach ($paperMap as $key => $paperType) {
+
+                    foreach ($additionalData[$key][$index] ?? [] as $paperId) {
+
+                        TestSeriesDetail::create([
+                            'test_series_id' => $testSeries->id,
+                            'type' => $testType,
+                            'type_name' => $testTypeName,
+                            'test_id' => (int) $paperId,
+                            'test_paper_type' => $paperType,
+                            'test_generated_by' => $testGeneratedBy,
+
+                            // ✅ STORED AS ARRAY (AUTO JSON)
+                            'subject_ids' => $subjectIds,
+                            'chapter_ids' => $chapterIds,
+                            'topic_ids' => $topicIds,
+                        ]);
+
+                        $totalPaperCount++;
+                    }
+                }
+            }
+
+            $testSeries->update(['total_paper' => $totalPaperCount]);
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'msgText' => 'Test Series Created Successfully!',
+            ]);
+
+        } catch (\Exception $e) {
+
+            DB::rollBack();
+
+            return response()->json([
+                'success' => false,
+                'msgText' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    public function testSeriesEdit($id)
+    {
+        $series = TestSeries::with('testseries')->findOrFail($id);
+
+        $preparedDetails = [];
+
+        $grouped = $series->testseries->groupBy('type_name');
+
+        foreach ($grouped as $typeName => $details) {
+
+            $preparedDetails[] = [
+                'type_name' => $typeName,
+                'type' => $details->first()->type,
+                'test_generated_by' => $details->first()->test_generated_by,
+                'total_paper' => $details->count(),
+
+                // ✅ ALREADY ARRAYS
+                'subject_ids' => $details->pluck('subject_ids')->flatten()->unique()->values()->toArray(),
+                'chapter_ids' => $details->pluck('chapter_ids')->flatten()->unique()->values()->toArray(),
+                'topic_ids' => $details->pluck('topic_ids')->flatten()->unique()->values()->toArray(),
+
+                'papers' => $details->groupBy('test_paper_type'),
+            ];
+        }
+
+        $subjects = collect();
+        $chapters = collect();
+        $topics = collect();
+
+        if ($series->sub_category_id) {
+
+            $subjects = Subject::where('sub_category_id', $series->sub_category_id)->get();
+
+            $allSubjectIds = collect($preparedDetails)->pluck('subject_ids')->flatten()->unique();
+            $allChapterIds = collect($preparedDetails)->pluck('chapter_ids')->flatten()->unique();
+
+            if ($allSubjectIds->isNotEmpty()) {
+                $chapters = Chapter::whereIn('subject_id', $allSubjectIds)->get();
+            }
+
+            if ($allChapterIds->isNotEmpty()) {
+                $topics = Topic::whereIn('chapter_id', $allChapterIds)->get();
+            }
+        }
+
+        return view('test-series.edit', [
+            'test_series' => $series,
+            'preparedDetails' => $preparedDetails,
+            'commissions' => ExaminationCommission::get(),
+            'categories' => $series->exam_com_id
+                ? Category::where('exam_com_id', $series->exam_com_id)->get()
+                : collect(),
+            'subcategories' => $series->category_id
+                ? SubCategory::where('category_id', $series->category_id)->get()
+                : collect(),
+            'subjects' => $subjects,
+            'chapters' => $chapters,
+            'topics' => $topics,
+        ]);
+    }
+
+
+    public function testSeriesView($id)
+    {
+        $series = TestSeries::with('category', 'subcategory', 'commission', 'testseries', 'tests')->findOrFail($id);
+        $data['test_series'] = $series;
+
+        return view('test-series.view-test-series', $data);
+    }
+
+    public function testSeriesUpdate(Request $request, $id)
+    {
         $validator = Validator::make($request->all(), [
             'title' => 'required|string|max:512',
             'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
@@ -2852,150 +3037,29 @@ class ContentManagementController extends Controller
             ]);
         }
 
-        // ✅ Prepare data for saving Test Series
-        $data = $request->except(['_token', 'additionalData']);
-
-        if ($request->hasFile('logo')) {
-            $data['logo'] = $request->file('logo')->store('logos', 'public');
-        }
-
-        // ✅ Create Test Series record
-        $testseries = TestSeries::create($data);
-
-        // ✅ Decode additionalData JSON
-        $additionalData = json_decode($request->input('additionalData'), true);
-
-        // ✅ Define test type names
-        $typeNames = [
-            1 => "Full Test",
-            2 => "Subject Wise",
-            3 => "Chapter Wise",
-            4 => "Topic Wise",
-            5 => "Current Affair",
-            6 => "Previous Year",
-        ];
-
-        // ✅ Counter for total papers
-        $totalPaperCount = 0;
-
-        if (!empty($additionalData['testType'])) {
-            foreach ($additionalData['testType'] as $index => $testType) {
-                $testType = (int) $testType;
-                $testTypeName = $typeNames[$testType] ?? "Unknown Type";
-
-                $testGeneratedBy = $additionalData['testSelections'][$index] ?? ($data['test_generated_by'] ?? 'manual');
-
-                // ✅ Helper closure to save papers by type
-                $savePapers = function ($papers, $paperType) use ($testType, $testTypeName, $testGeneratedBy, $testseries, &$totalPaperCount) {
-                    if (isset($papers) && is_array($papers) && !empty($papers)) {
-                        foreach ($papers as $paperId) {
-                            TestSeriesDetail::create([
-                                'test_series_id' => $testseries->id,
-                                'type' => $testType,
-                                'type_name' => $testTypeName,
-                                'test_id' => $paperId,
-                                'test_paper_type' => $paperType,
-                                'test_generated_by' => $testGeneratedBy, // ✅ Added field
-                            ]);
-                            $totalPaperCount++; // ✅ Count total papers
-                        }
-                    }
-                };
-
-                // ✅ Save all types of papers dynamically
-                $savePapers($additionalData['mcqselectedtestpaper'][$index] ?? [], 'MCQ');
-                $savePapers($additionalData['passageselectedtestpaper'][$index] ?? [], 'Passage');
-                $savePapers($additionalData['subjectiveselectedtestpaper'][$index] ?? [], 'Subjective');
-                $savePapers($additionalData['combinedselectedtestpaper'][$index] ?? [], 'Combined');
-            }
-        }
-
-        // ✅ Update total_paper after saving details
-        $testseries->total_paper = $totalPaperCount;
-        $testseries->created_by = auth()->id();
-        $testseries->save();
-
-        return response()->json([
-            'success' => true,
-            'msgText' => 'Test Series Created Successfully!',
-        ]);
-    }
-
-    public function testSeriesEdit($id)
-    {
-        $series = TestSeries::with('category')->findOrFail($id);
-        $data['test_series'] = $series;
-        $data['test_series_details'] = TestSeriesDetail::where('test_series_id', $id)->get();
-        $data['commissions'] = ExaminationCommission::get();
-        $data['subjects'] = [];
-        $data['topics'] = [];
-
-        if ($series->exam_com_id != '' && $series->exam_com_id > 0) {
-
-            $data['categories'] = Category::where('exam_com_id', $series->exam_com_id)->get();
-        } else {
-            $data['categories'] = [];
-        }
-
-        if ($series->sub_category_id != NULL && $series->category_id != NULL) {
-            $subcategories = SubCategory::where('category_id', $series->category_id)->get();
-        } else {
-            $subcategories = array();
-        }
-        $data['subcategories'] = $subcategories;
-        return view('test-series.edit', $data);
-    }
-
-    public function testSeriesView($id)
-    {
-        $series = TestSeries::with('category', 'subcategory', 'commission', 'testseries', 'tests')->findOrFail($id);
-        $data['test_series'] = $series;
-
-        return view('test-series.view-test-series', $data);
-    }
-
-    public function testSeriesUpdate(Request $request, $id)
-    {
-        $validator = Validator::make($request->all(), [
-            'title' => 'required|string|max:512',
-            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
-            'price' => 'required',
-            'mrp' => 'required',
-            'discount' => 'required',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'code' => 422,
-                'errors' => $validator->errors(),
-            ]);
-        }
-
         $test = TestSeries::findOrFail($id);
+
+        /* ================= LOGO ================= */
         $data = $request->all();
 
-        // ✅ Handle logo upload
         if ($request->hasFile('logo')) {
             $data['logo'] = $request->file('logo')->store('logos', 'public');
         } else {
             $data['logo'] = $test->logo;
         }
 
-        // ✅ Decode JSON
+        /* ================= ADDITIONAL DATA ================= */
         $additionalData = json_decode($request->input('additionalData'), true);
 
-        // ✅ Type mapping
         $typeNames = [
-            1 => "Full Test",
-            2 => "Subject Wise",
-            3 => "Chapter Wise",
-            4 => "Topic Wise",
-            5 => "Current Affair",
-            6 => "Previous Year",
+            1 => 'Full Test',
+            2 => 'Subject Wise',
+            3 => 'Chapter Wise',
+            4 => 'Topic Wise',
+            5 => 'Current Affair',
+            6 => 'Previous Year',
         ];
 
-        // ✅ Paper types
         $paperTypes = [
             'mcqselectedtestpaper' => 'MCQ',
             'passageselectedtestpaper' => 'Passage',
@@ -3006,46 +3070,51 @@ class ContentManagementController extends Controller
         $keptIds = [];
         $totalPaperCount = 0;
 
-        if (!empty($additionalData['testType'])) {
-            foreach ($additionalData['testType'] as $index => $testType) {
-                $testType = (int) $testType;
-                $testTypeName = $typeNames[$testType] ?? 'Unknown Type';
-                $testGeneratedBy = $additionalData['testSelections'][$index] ?? ($data['test_generated_by'][$index] ?? 'manual');
+        /* ================= SAVE DETAILS ================= */
+        foreach ($additionalData['testType'] ?? [] as $index => $testType) {
 
-                foreach ($paperTypes as $key => $paperType) {
-                    if (!empty($additionalData[$key][$index])) {
-                        foreach ($additionalData[$key][$index] as $testPaperId) {
+            $testType = (int) $testType;
+            $testTypeName = $typeNames[$testType] ?? 'Unknown';
+            $testGeneratedBy = $additionalData['testSelections'][$index] ?? 'manual';
 
-                            // ✅ Either update or create
-                            $detail = TestSeriesDetail::firstOrNew([
-                                'test_series_id' => $id,
-                                'test_id' => $testPaperId,
-                                'test_paper_type' => $paperType,
-                                'type' => $testType,
-                            ]);
+            // ✅ ARRAY FORMAT [142,141]
+            $subjectIds = array_map('intval', $additionalData['subjectIds'][$index] ?? []);
+            $chapterIds = array_map('intval', $additionalData['chapterIds'][$index] ?? []);
+            $topicIds = array_map('intval', $additionalData['topicIds'][$index] ?? []);
 
-                            $detail->type_name = $testTypeName;
-                            $detail->test_generated_by = $testGeneratedBy;
-                            $detail->save();
+            foreach ($paperTypes as $key => $paperType) {
 
-                            $keptIds[] = $detail->id;
-                            $totalPaperCount++;
-                        }
-                    }
+                foreach ($additionalData[$key][$index] ?? [] as $testPaperId) {
+
+                    $detail = TestSeriesDetail::firstOrNew([
+                        'test_series_id' => $id,
+                        'test_id' => (int) $testPaperId,
+                        'test_paper_type' => $paperType,
+                        'type' => $testType,
+                    ]);
+
+                    $detail->type_name = $testTypeName;
+                    $detail->test_generated_by = $testGeneratedBy;
+
+                    // ✅ STORE AS ARRAY (AUTO JSON)
+                    $detail->subject_ids = $subjectIds;
+                    $detail->chapter_ids = $chapterIds;
+                    $detail->topic_ids = $topicIds;
+
+                    $detail->save();
+
+                    $keptIds[] = $detail->id;
+                    $totalPaperCount++;
                 }
             }
         }
 
-        // ✅ Delete only removed ones
-        if (!empty($keptIds)) {
-            TestSeriesDetail::where('test_series_id', $id)
-                ->whereNotIn('id', $keptIds)
-                ->delete();
-        } else {
-            TestSeriesDetail::where('test_series_id', $id)->delete();
-        }
+        /* ================= CLEANUP ================= */
+        TestSeriesDetail::where('test_series_id', $id)
+            ->whereNotIn('id', $keptIds)
+            ->delete();
 
-        // ✅ Update TestSeries main table
+        /* ================= UPDATE MAIN SERIES ================= */
         $test->update([
             'language' => $data['language'],
             'exam_com_id' => $data['exam_com_id'],
@@ -3069,9 +3138,6 @@ class ContentManagementController extends Controller
             'msgText' => 'Test Series Updated Successfully!',
         ]);
     }
-
-
-
 
     public function testSeriesDelete($id)
     {

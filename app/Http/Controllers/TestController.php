@@ -2597,13 +2597,14 @@ class TestController extends Controller
     }
     public function generatetestpaperbyselections(Request $request)
     {
+        // ✅ Validation
         $validator = Validator::make($request->all(), [
-            'test_generated_by' => 'required',
+            'test_generated_by' => 'required|in:manual,random',
             'language' => 'required',
             'fee_type' => 'required',
             'competitive_commission' => 'required',
             'exam_category' => 'required',
-            'total_paper' => 'required',
+            'total_paper' => 'required|integer|min:1',
             'test_type' => 'required',
         ]);
 
@@ -2616,7 +2617,8 @@ class TestController extends Controller
         }
 
         try {
-            $test_generated_by = $request->test_generated_by; // manual or random
+            // ✅ Basic inputs
+            $test_generated_by = $request->test_generated_by;
             $language = $request->language;
             $fee_type = $request->fee_type;
             $category_id = $request->exam_category;
@@ -2624,62 +2626,93 @@ class TestController extends Controller
             $commission_id = $request->competitive_commission;
             $total_paper = $request->total_paper;
 
-            // Function to apply filters dynamically (avoiding code repetition)
-            $applyFilters = function ($query) use ($paper_type) {
-                // Full test
+            // ✅ IMPORTANT: Convert Select2 values to arrays
+            $subjectIds = $request->subject_ids
+                ? explode(',', $request->subject_ids)
+                : [];
+
+            $chapterIds = $request->chapter_ids
+                ? explode(',', $request->chapter_ids)
+                : [];
+
+            $topicIds = $request->topic_ids
+                ? explode(',', $request->topic_ids)
+                : [];
+
+            // ✅ Apply filters dynamically
+            $applyFilters = function ($query) use ($paper_type, $subjectIds, $chapterIds, $topicIds) {
+
+                // Full Test
                 if ($paper_type == 1) {
-                    $query->where('paper_type', 0)->whereNull('topic_id')->whereNull('subject_id')->whereNull('chapter_id');
+                    $query->where('paper_type', 0)
+                        ->whereNull('subject_id')
+                        ->whereNull('chapter_id')
+                        ->whereNull('topic_id');
                 }
-                // Subject wise
+
+                // Subject Wise
                 elseif ($paper_type == 2) {
-                    $query->where('paper_type', 0)->whereNull('topic_id')->whereNotNull('subject_id')->whereNull('chapter_id');
+                    $query->where('paper_type', 0)
+                        ->whereIn('subject_id', $subjectIds)
+                        ->whereNull('chapter_id')
+                        ->whereNull('topic_id');
                 }
-                // Chapter wise
+
+                // Chapter Wise
                 elseif ($paper_type == 3) {
-                    $query->where('paper_type', 0)->whereNull('topic_id')->whereNotNull('chapter_id');
+                    $query->where('paper_type', 0)
+                        ->whereIn('chapter_id', $chapterIds)
+                        ->whereNull('topic_id');
                 }
-                // Topic wise
+
+                // Topic Wise
                 elseif ($paper_type == 4) {
-                    $query->where('paper_type', 0)->whereNotNull('topic_id');
+                    $query->where('paper_type', 0)
+                        ->whereIn('topic_id', $topicIds);
                 }
-                // Current affair
-                elseif ($paper_type == 5) {
-                    $query->where('paper_type', 2);
-                }
-                // Previous year
+
+                // Previous Year
                 elseif ($paper_type == 6) {
                     $query->where('paper_type', 1);
+                }
+
+                // Current Affair
+                elseif ($paper_type == 5) {
+                    $query->where('paper_type', 2);
                 }
 
                 return $query;
             };
 
-            // Common base query
+            // ✅ Base query builder
             $baseQuery = function ($type) use ($commission_id, $language, $category_id, $fee_type, $applyFilters, $test_generated_by, $total_paper) {
-                $query = Test::where('competitive_commission_id', $commission_id)
+                $query = Test::with(['subject', 'chapter', 'topic'])
+                    ->where('competitive_commission_id', $commission_id)
                     ->where('language', $language)
                     ->where('exam_category_id', $category_id)
                     ->where('test_type', $fee_type)
                     ->where('test_paper_type', $type);
 
+                // Apply paper filters
                 $query = $applyFilters($query);
 
-                // Randomize only if test_generated_by == random
+                // Random / Manual logic
                 if ($test_generated_by === 'random') {
                     $query->inRandomOrder();
                 } else {
-                    $query->orderBy('created_at', 'desc'); // latest first if manual
+                    $query->orderBy('created_at', 'desc');
                 }
 
                 return $query->limit($total_paper)->get();
             };
 
-            // Get papers by type
+            // ✅ Fetch papers
             $mcqtestpaper = $baseQuery('MCQ');
             $passagetestpaper = $baseQuery('Passage');
             $combinedtestpaper = $baseQuery('Combined');
             $subjectivetestpaper = $baseQuery('Subjective');
 
+            // ✅ Response
             return response()->json([
                 'success' => true,
                 'mcq_html' => view('admin.ajax.testpaperoptions', ['testpapers' => $mcqtestpaper])->render(),
@@ -2696,6 +2729,7 @@ class TestController extends Controller
             ]);
         }
     }
+
 
     public function generatetestsidepanelquestionslist(Request $request)
     {

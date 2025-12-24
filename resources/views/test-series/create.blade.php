@@ -159,7 +159,7 @@
                         </div>
                         <div class="col-md-6 sub-cat hidecls">
                             <label for="sub_category_id">Sub Category *</label>
-                            <select name="sub_category_id" id="sub_category_id">
+                            <select class="form-control" name="sub_category_id" id="sub_category_id">
                             </select>
                             <div class="text-danger validation-err" id="sub_category_id-err"></div>
 
@@ -229,175 +229,207 @@
                                         aria-labelledby="base-mcq">
                                         <div class="customquestiondiv">
                                             <div id="question-rows">
-                                                <div class="row question-row">
-                                                    <div class="col-md-4">
-                                                        <label>Test Type</label>
-                                                        <select class="form-control test_type" name="type[]">
-                                                            <option value="">Choose...</option>
-                                                            <option value="1">Full Test</option>
-                                                            <option value="2">Subject Wise</option>
-                                                            <option value="3">Chapter Wise</option>
-                                                            <option value="4">Topic Wise</option>
-                                                            <option value="5">Current Affair</option>
-                                                            <option value="6">Previous Year</option>
-                                                        </select>
-                                                    </div>
-                                                    <div class="col-md-4">
-                                                        <label for="test_generated_by">Test Selections</label>
-                                                        <select id="test_generated_by" name="test_generated_by"
-                                                            class="form-control test_generated_by">
-                                                            <option value="">Choose...</option>
-                                                            <option value="manual">Manual</option>
-                                                            <option value="random">Random</option>
-                                                        </select>
-                                                    </div>
+                                                <div class="question-row">
+                                                    <!-- ✅ FILTER ROW -->
+                                                    <div class="row w-100 mb-3">
+                                                        <div class="col-md-4">
+                                                            <label>Test Type</label>
+                                                            <select class="form-control test_type" name="type[]">
+                                                                <option value="">Choose...</option>
+                                                                <option value="1">Full Test</option>
+                                                                <option value="2">Subject Wise</option>
+                                                                <option value="3">Chapter Wise</option>
+                                                                <option value="4">Topic Wise</option>
+                                                                <option value="5">Current Affair</option>
+                                                                <option value="6">Previous Year</option>
+                                                            </select>
+                                                        </div>
+                                                        {{-- Subject Filter --}}
+                                                        <div class="col-md-4 subject-filter d-none">
+                                                            <label>Subjects</label>
+                                                            <select class="form-control subject_ids" multiple>
+                                                            </select>
+                                                        </div>
 
-                                                    <div class="col-md-4">
-                                                        <label for="title" class="form-label">No. of Paper</label>
-                                                        <input type="text" class="form-control total_paper"
-                                                            name="total_paper" placeholder="No. of Paper" required>
-                                                    </div>
+                                                        {{-- Chapter Filter --}}
+                                                        <div class="col-md-4 chapter-filter d-none">
+                                                            <label>Chapters</label>
+                                                            <select class="form-control chapter_ids" multiple>
+                                                            </select>
+                                                        </div>
 
-                                                    <div class="col-md-5">
-                                                        <div class="box-area-questions">
-                                                            <h4>Your Tests <span id="questioncountmcqshow"></span></h4>
-                                                            <div class="box-questns">
-                                                                <ul class="selected-questions customquestionselectedbox-mcq"
-                                                                    id="customquestionselectedbox-mcq"></ul>
+                                                        {{-- Topic Filter --}}
+                                                        <div class="col-md-4 topic-filter d-none">
+                                                            <label>Topics</label>
+                                                            <select class="form-control topic_ids" multiple>
+                                                            </select>
+                                                        </div>
+
+                                                        <div class="col-md-4">
+                                                            <label for="test_generated_by">Test Selections</label>
+                                                            <select class="form-control test_generated_by"
+                                                                name="test_generated_by[]">
+                                                                <option value="">Choose...</option>
+                                                                <option value="manual">Manual</option>
+                                                                <option value="random">Random</option>
+                                                            </select>
+                                                        </div>
+
+                                                        <div class="col-md-4">
+                                                            <label for="title" class="form-label">No. of Paper</label>
+                                                            <input type="text" class="form-control total_paper"
+                                                                name="total_paper" placeholder="No. of Paper" required>
+                                                        </div>
+
+                                                    </div>
+                                                    <div class="row w-100 mb-3">
+                                                        <div class="col-md-5">
+                                                            <div class="box-area-questions">
+                                                                <h4>Your Tests <span id="questioncountmcqshow"></span></h4>
+                                                                <div class="box-questns">
+                                                                    <ul class="selected-questions customquestionselectedbox-mcq"
+                                                                        id="customquestionselectedbox-mcq"></ul>
+                                                                </div>
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                    <div class="col-sm-2">
+                                                        <div class="col-sm-2">
 
-                                                        <div class="button-actns-questn">
-                                                            <button class="btn btn-primary addquestiontoselected-mcq"
-                                                                type="button" fdprocessedid="49r4zxe"><i
-                                                                    class="fa fa-arrow-left"></i></button>
-                                                            <i class="fa fa-exchange"></i>
-                                                            <button class="btn btn-danger removequestionfromselected-mcq"
-                                                                type="button" fdprocessedid="2x8rl7"><i
-                                                                    class="fa fa-arrow-right"></i></button>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-5">
-                                                        <div class="box-area-questions">
-                                                            <h4>MCQ Test Papers <span id="questioncountshow"></span></h4>
-                                                            <div class="box-questns">
-                                                                <ul class="customquestionbox-mcq"
-                                                                    id="customquestionbox-mcq">
-                                                                </ul>
+                                                            <div class="button-actns-questn">
+                                                                <button class="btn btn-primary addquestiontoselected-mcq"
+                                                                    type="button" fdprocessedid="49r4zxe"><i
+                                                                        class="fa fa-arrow-left"></i></button>
+                                                                <i class="fa fa-exchange"></i>
+                                                                <button
+                                                                    class="btn btn-danger removequestionfromselected-mcq"
+                                                                    type="button" fdprocessedid="2x8rl7"><i
+                                                                        class="fa fa-arrow-right"></i></button>
                                                             </div>
                                                         </div>
-                                                    </div>
-
-
-                                                    <div class="col-md-5">
-                                                        <div class="box-area-questions">
-                                                            <h4>Your Tests <span id="questioncountpassageshow"></span></h4>
-                                                            <div class="box-questns">
-                                                                <ul class="selected-questions customquestionselectedbox-passage"
-                                                                    id="customquestionselectedbox-passage"></ul>
+                                                        <div class="col-md-5">
+                                                            <div class="box-area-questions">
+                                                                <h4>MCQ Test Papers <span id="questioncountshow"></span>
+                                                                </h4>
+                                                                <div class="box-questns">
+                                                                    <ul class="customquestionbox-mcq"
+                                                                        id="customquestionbox-mcq">
+                                                                    </ul>
+                                                                </div>
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                    <div class="col-sm-2">
-
-                                                        <div class="button-actns-questn">
-                                                            <button class="btn btn-primary addquestiontoselected-passage"
-                                                                type="button" fdprocessedid="49r4zxe"><i
-                                                                    class="fa fa-arrow-left"></i></button>
-                                                            <i class="fa fa-exchange"></i>
-                                                            <button
-                                                                class="btn btn-danger removequestionfromselected-passage"
-                                                                type="button" fdprocessedid="2x8rl7"><i
-                                                                    class="fa fa-arrow-right"></i></button>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-5">
-                                                        <div class="box-area-questions">
-                                                            <h4>Passage Test Papers <span id="questioncountshow"></span>
-                                                            </h4>
-                                                            <div class="box-questns">
-                                                                <ul class="customquestionbox-passage"
-                                                                    id="customquestionbox-passage">
-                                                                </ul>
+                                                        <div class="col-md-5">
+                                                            <div class="box-area-questions">
+                                                                <h4>Your Tests <span id="questioncountpassageshow"></span>
+                                                                </h4>
+                                                                <div class="box-questns">
+                                                                    <ul class="selected-questions customquestionselectedbox-passage"
+                                                                        id="customquestionselectedbox-passage"></ul>
+                                                                </div>
                                                             </div>
                                                         </div>
-                                                    </div>
+                                                        <div class="col-sm-2">
 
-                                                    <div class="col-md-5">
-                                                        <div class="box-area-questions">
-                                                            <h4>Your Tests <span id="questioncountsubjectiveshow"></span>
-                                                            </h4>
-                                                            <div class="box-questns">
-                                                                <ul class="selected-questions customquestionselectedbox-subjective"
-                                                                    id="customquestionselectedbox-subjective"></ul>
+                                                            <div class="button-actns-questn">
+                                                                <button
+                                                                    class="btn btn-primary addquestiontoselected-passage"
+                                                                    type="button" fdprocessedid="49r4zxe"><i
+                                                                        class="fa fa-arrow-left"></i></button>
+                                                                <i class="fa fa-exchange"></i>
+                                                                <button
+                                                                    class="btn btn-danger removequestionfromselected-passage"
+                                                                    type="button" fdprocessedid="2x8rl7"><i
+                                                                        class="fa fa-arrow-right"></i></button>
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                    <div class="col-sm-2">
-
-                                                        <div class="button-actns-questn">
-                                                            <button class="btn btn-primary addquestiontoselected-subjective"
-                                                                type="button" fdprocessedid="49r4zxe"><i
-                                                                    class="fa fa-arrow-left"></i></button>
-                                                            <i class="fa fa-exchange"></i>
-                                                            <button
-                                                                class="btn btn-danger removequestionfromselected-subjective"
-                                                                type="button" fdprocessedid="2x8rl7"><i
-                                                                    class="fa fa-arrow-right"></i></button>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-5">
-                                                        <div class="box-area-questions">
-                                                            <h4>Subjective Test Papers <span id="questioncountshow"></span>
-                                                            </h4>
-                                                            <div class="box-questns">
-                                                                <ul class="customquestionbox-subjective"
-                                                                    id="customquestionbox-subjective">
-                                                                </ul>
+                                                        <div class="col-md-5">
+                                                            <div class="box-area-questions">
+                                                                <h4>Passage Test Papers <span id="questioncountshow"></span>
+                                                                </h4>
+                                                                <div class="box-questns">
+                                                                    <ul class="customquestionbox-passage"
+                                                                        id="customquestionbox-passage">
+                                                                    </ul>
+                                                                </div>
                                                             </div>
                                                         </div>
-                                                    </div>
 
-                                                    <div class="col-md-5">
-                                                        <div class="box-area-questions">
-                                                            <h4>Your Tests <span id="questioncountcombinedshow"></span></h4>
-                                                            <div class="box-questns">
-                                                                <ul class="selected-questions customquestionselectedbox-combined"
-                                                                    id="customquestionselectedbox-combined"></ul>
+                                                        <div class="col-md-5">
+                                                            <div class="box-area-questions">
+                                                                <h4>Your Tests <span
+                                                                        id="questioncountsubjectiveshow"></span>
+                                                                </h4>
+                                                                <div class="box-questns">
+                                                                    <ul class="selected-questions customquestionselectedbox-subjective"
+                                                                        id="customquestionselectedbox-subjective"></ul>
+                                                                </div>
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                    <div class="col-sm-2">
+                                                        <div class="col-sm-2">
 
-                                                        <div class="button-actns-questn">
-                                                            <button class="btn btn-primary addquestiontoselected-combined"
-                                                                type="button" fdprocessedid="49r4zxe"><i
-                                                                    class="fa fa-arrow-left"></i></button>
-                                                            <i class="fa fa-exchange"></i>
-                                                            <button
-                                                                class="btn btn-danger removequestionfromselected-combined"
-                                                                type="button" fdprocessedid="2x8rl7"><i
-                                                                    class="fa fa-arrow-right"></i></button>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-5">
-                                                        <div class="box-area-questions">
-                                                            <h4>Combined Test Papers <span id="questioncountshow"></span>
-                                                            </h4>
-                                                            <div class="box-questns">
-                                                                <ul class="customquestionbox-combined"
-                                                                    id="customquestionbox-combined">
-                                                                </ul>
+                                                            <div class="button-actns-questn">
+                                                                <button
+                                                                    class="btn btn-primary addquestiontoselected-subjective"
+                                                                    type="button" fdprocessedid="49r4zxe"><i
+                                                                        class="fa fa-arrow-left"></i></button>
+                                                                <i class="fa fa-exchange"></i>
+                                                                <button
+                                                                    class="btn btn-danger removequestionfromselected-subjective"
+                                                                    type="button" fdprocessedid="2x8rl7"><i
+                                                                        class="fa fa-arrow-right"></i></button>
                                                             </div>
                                                         </div>
-                                                    </div>
+                                                        <div class="col-md-5">
+                                                            <div class="box-area-questions">
+                                                                <h4>Subjective Test Papers <span
+                                                                        id="questioncountshow"></span>
+                                                                </h4>
+                                                                <div class="box-questns">
+                                                                    <ul class="customquestionbox-subjective"
+                                                                        id="customquestionbox-subjective">
+                                                                    </ul>
+                                                                </div>
+                                                            </div>
+                                                        </div>
 
+                                                        <div class="col-md-5">
+                                                            <div class="box-area-questions">
+                                                                <h4>Your Tests <span id="questioncountcombinedshow"></span>
+                                                                </h4>
+                                                                <div class="box-questns">
+                                                                    <ul class="selected-questions customquestionselectedbox-combined"
+                                                                        id="customquestionselectedbox-combined"></ul>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-2">
 
-                                                    <div class="col-md-12 text-right mt-2">
-                                                        <button type="button"
-                                                            class="btn btn-danger remove-row">Remove</button>
+                                                            <div class="button-actns-questn">
+                                                                <button
+                                                                    class="btn btn-primary addquestiontoselected-combined"
+                                                                    type="button" fdprocessedid="49r4zxe"><i
+                                                                        class="fa fa-arrow-left"></i></button>
+                                                                <i class="fa fa-exchange"></i>
+                                                                <button
+                                                                    class="btn btn-danger removequestionfromselected-combined"
+                                                                    type="button" fdprocessedid="2x8rl7"><i
+                                                                        class="fa fa-arrow-right"></i></button>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-5">
+                                                            <div class="box-area-questions">
+                                                                <h4>Combined Test Papers <span
+                                                                        id="questioncountshow"></span>
+                                                                </h4>
+                                                                <div class="box-questns">
+                                                                    <ul class="customquestionbox-combined"
+                                                                        id="customquestionbox-combined">
+                                                                    </ul>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-12 text-right mt-2">
+                                                            <button type="button"
+                                                                class="btn btn-danger remove-row">Remove</button>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -430,10 +462,10 @@
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
-        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
-        crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.ckeditor.com/4.16.2/standard/ckeditor.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <script>
         $(document).ready(function () {
@@ -466,6 +498,14 @@
                 }
             });
         });
+
+        function initSelect2(container = document) {
+            $(container).find('.subject_ids, .chapter_ids').select2({
+                placeholder: 'Select options',
+                width: '100%'
+            });
+        }
+
 
         // ✅ MCQ Section
         $(document).on('click', '.addquestiontoselected-mcq', function (event) {
@@ -506,7 +546,6 @@
             questionRow.find('.customquestionbox-mcq').html(temp);
         });
 
-
         // ✅ Passage Section
         $(document).on('click', '.addquestiontoselected-passage', function (event) {
             const questionRow = $(this).closest('.question-row');
@@ -545,7 +584,6 @@
 
             questionRow.find('.customquestionbox-passage').html(temp);
         });
-
 
         // ✅ Subjective Section
         $(document).on('click', '.addquestiontoselected-subjective', function (event) {
@@ -670,6 +708,7 @@
                 reader.readAsDataURL(input.files[0]);
             }
         });
+
         $(document).ready(function () {
             let rowIndex = 1;
 
@@ -698,6 +737,12 @@
 
                 // Append the cloned block
                 $('#question-rows').append($clone);
+                // Destroy old select2 before cloning
+                $clone.find('.select2').remove();
+
+                // Re-init Select2 for new row
+                initSelect2($clone);
+
             });
 
             // Remove block
@@ -709,7 +754,6 @@
                 }
             });
         });
-
 
         $(document).on('change', '#exam_com_id', function (event) {
 
@@ -763,6 +807,29 @@
 
         });
 
+        $(document).on('change', '.test_type', function () {
+            const row = $(this).closest('.question-row');
+            const type = $(this).val();
+
+            // Reset
+            row.find('.subject-filter, .chapter-filter, .topic-filter').addClass('d-none');
+            row.find('.subject_ids, .chapter_ids, .topic_ids').html('');
+
+            if (type == 2) {
+                row.find('.subject-filter').removeClass('d-none');
+                loadSubjects(row);
+            }
+
+            if (type == 3) {
+                row.find('.subject-filter, .chapter-filter').removeClass('d-none');
+                loadSubjects(row);
+            }
+
+            if (type == 4) {
+                row.find('.subject-filter, .chapter-filter, .topic-filter').removeClass('d-none');
+                loadSubjects(row);
+            }
+        });
 
 
         $(document).on('change', '.test_type,.total_paper,.test_generated_by', function (event) {
@@ -780,6 +847,19 @@
             formData.append('total_paper', total_paper);
             formData.append('test_type', $(this).closest('.question-row').find('.test_type').val());
             formData.append('test_generated_by', test_generated_by);
+            formData.append(
+                'subject_ids',
+                $(this).closest('.question-row').find('.subject_ids').val()
+            );
+            formData.append(
+                'chapter_ids',
+                $(this).closest('.question-row').find('.chapter_ids').val()
+            );
+            formData.append(
+                'topic_ids',
+                $(this).closest('.question-row').find('.topic_ids').val()
+            );
+
             $.ajax({
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -794,31 +874,31 @@
                 success: function (result) {
                     if (result.success) {
                         $(this).attr('disabled', false);
-                            if (test_generated_by == 'manual') {
-                                btn.closest('.question-row').find('.customquestionselectedbox-mcq').html('');
-                                btn.closest('.question-row').find('.customquestionbox-mcq').html(result.mcq_html);
+                        if (test_generated_by == 'manual') {
+                            btn.closest('.question-row').find('.customquestionselectedbox-mcq').html('');
+                            btn.closest('.question-row').find('.customquestionbox-mcq').html(result.mcq_html);
 
-                                btn.closest('.question-row').find('.customquestionselectedbox-passage').html('');
-                                btn.closest('.question-row').find('.customquestionbox-passage').html(result.passage_html);
+                            btn.closest('.question-row').find('.customquestionselectedbox-passage').html('');
+                            btn.closest('.question-row').find('.customquestionbox-passage').html(result.passage_html);
 
-                                btn.closest('.question-row').find('.customquestionselectedbox-subjective').html('');
-                                btn.closest('.question-row').find('.customquestionbox-subjective').html(result.subjective_html);
+                            btn.closest('.question-row').find('.customquestionselectedbox-subjective').html('');
+                            btn.closest('.question-row').find('.customquestionbox-subjective').html(result.subjective_html);
 
-                                btn.closest('.question-row').find('.customquestionselectedbox-combined').html('');
-                                btn.closest('.question-row').find('.customquestionbox-combined').html(result.combined_html);
-                            } else {
-                                btn.closest('.question-row').find('.customquestionbox-mcq').html('');
-                                btn.closest('.question-row').find('.customquestionselectedbox-mcq').html(result.mcq_html);
+                            btn.closest('.question-row').find('.customquestionselectedbox-combined').html('');
+                            btn.closest('.question-row').find('.customquestionbox-combined').html(result.combined_html);
+                        } else {
+                            btn.closest('.question-row').find('.customquestionbox-mcq').html('');
+                            btn.closest('.question-row').find('.customquestionselectedbox-mcq').html(result.mcq_html);
 
-                                btn.closest('.question-row').find('.customquestionbox-passage').html('');
-                                btn.closest('.question-row').find('.customquestionselectedbox-passage').html(result.passage_html);
+                            btn.closest('.question-row').find('.customquestionbox-passage').html('');
+                            btn.closest('.question-row').find('.customquestionselectedbox-passage').html(result.passage_html);
 
-                                btn.closest('.question-row').find('.customquestionbox-subjective').html('');
-                                btn.closest('.question-row').find('.customquestionselectedbox-subjective').html(result.subjective_html);
+                            btn.closest('.question-row').find('.customquestionbox-subjective').html('');
+                            btn.closest('.question-row').find('.customquestionselectedbox-subjective').html(result.subjective_html);
 
-                                btn.closest('.question-row').find('.customquestionbox-combined').html('');
-                                btn.closest('.question-row').find('.customquestionselectedbox-combined').html(result.combined_html);
-                            }
+                            btn.closest('.question-row').find('.customquestionbox-combined').html('');
+                            btn.closest('.question-row').find('.customquestionselectedbox-combined').html(result.combined_html);
+                        }
 
                     } else {
                         $(this).attr('disabled', false);
@@ -833,6 +913,7 @@
                 }
             })
         });
+
         $(document).on('click', '#add-test-btn', function (event) {
             $(this).attr('disabled', true);
             for (instance in CKEDITOR.instances) {
@@ -843,21 +924,33 @@
                 testType: [],
                 testSelections: [],
                 numPapers: [],
+                subjectIds: [],
+                chapterIds: [],
+                topicIds: [],
                 mcqselectedtestpaper: [],
                 passageselectedtestpaper: [],
                 subjectiveselectedtestpaper: [],
                 combinedselectedtestpaper: []
             };
 
+
             // Gather additional data from the form
             $('.question-row').each(function () {
+
                 additionalData.testType.push($(this).find('.test_type').val());
                 additionalData.testSelections.push($(this).find('.test_generated_by').val());
                 additionalData.numPapers.push($(this).find('.total_paper').val());
+
+                // ✅ ADD THESE 3 LINES
+                additionalData.subjectIds.push($(this).find('.subject_ids').val() || []);
+                additionalData.chapterIds.push($(this).find('.chapter_ids').val() || []);
+                additionalData.topicIds.push($(this).find('.topic_ids').val() || []);
+
                 let d1 = [];
                 let d2 = [];
                 let d3 = [];
                 let d4 = [];
+
                 $(this).find('.customquestionselectedbox-mcq .question').each(function () {
                     d1.push($(this).val());
                 });
@@ -870,10 +963,11 @@
                 $(this).find('.customquestionselectedbox-combined .question').each(function () {
                     d4.push($(this).val());
                 });
-                additionalData.mcqselectedtestpaper.push(d1)
-                additionalData.passageselectedtestpaper.push(d2)
-                additionalData.subjectiveselectedtestpaper.push(d3)
-                additionalData.combinedselectedtestpaper.push(d4)
+
+                additionalData.mcqselectedtestpaper.push(d1);
+                additionalData.passageselectedtestpaper.push(d2);
+                additionalData.subjectiveselectedtestpaper.push(d3);
+                additionalData.combinedselectedtestpaper.push(d4);
             });
 
             // Append additional data to formData
@@ -905,6 +999,81 @@
                     }
                 }
             })
+        });
+
+        function loadSubjects(row) {
+            let sub_category_id = $('#sub_category_id').val();
+            $.ajax({
+                headers: { "Access-Control-Allow-Origin": "*" },
+                url: `{{ URL::to('fetch-subject-by-subcategory/${sub_category_id}') }}`,
+                type: 'GET',
+                dataType: 'json',
+                success: function (result) {
+                    if (result.success) {
+                        row.find('.subject_ids').html(result.html);
+                        initSelect2(row); // ✅ IMPORTANT
+
+                    } else {
+                        //alert(result.msgText);
+                        //toastr.error('error encountered ' + result.msgText);
+                    }
+                },
+            });
+        }
+        $(document).on('change', '.subject_ids', function () {
+            const row = $(this).closest('.question-row');
+            const subjectIds = $(this).val();
+
+            if (!row.find('.chapter-filter').hasClass('d-none')) {
+                $.ajax({
+                    url: `{{ URL::to('fetch-chapter-by-subject/${subjectIds}') }}`,
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function (result) {
+                        if (result.success) {
+                            if (result.html != '') {
+                                row.find('.chapter_ids').html(result.html);
+                                initSelect2(row); // ✅ IMPORTANT
+
+                            }
+                            else {
+                                row.find('.chapter_ids').val("").trigger('change');
+                            }
+
+                        } else {
+                            toastr.error('error encountered ' + result.msgText);
+                        }
+                    },
+                });
+            }
+        });
+
+        $(document).on('change', '.chapter_ids', function () {
+            const row = $(this).closest('.question-row');
+            const chapterIds = $(this).val();
+
+            if (!row.find('.topic-filter').hasClass('d-none')) {
+                $.ajax({
+                    url: `{{ URL::to('fetch-topic-by-chapter/${chapterIds}') }}`,
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function (result) {
+                        if (result.success) {
+                            if (result.html != '') {
+                                row.find('.topic_ids').html(result.html);
+                                initSelect2(row); // ✅ IMPORTANT
+
+                            }
+                            else {
+                                row.find('.topic_ids').val("").trigger('change');
+                            }
+
+                        } else {
+                            toastr.error('error encountered ' + result.msgText);
+                        }
+                    },
+                });
+            }
         });
 
     </script>

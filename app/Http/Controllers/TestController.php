@@ -2810,7 +2810,24 @@ class TestController extends Controller
     {
         try {
             ini_set('memory_limit', '-1');
-            $datas = Chapter::where('status', 1)->where('subject_id', $subject)->get();
+            
+            // Handle comma-separated subject IDs
+            $subjectIds = explode(',', $subject);
+            $subjectIds = array_filter(array_map('intval', $subjectIds));
+            
+            if (empty($subjectIds)) {
+                return response()->json([
+                    "success" => false,
+                    'msgText' => 'No valid subject IDs provided',
+                ]);
+            }
+            
+            // If single ID, use where; if multiple, use whereIn
+            if (count($subjectIds) == 1) {
+                $datas = Chapter::where('status', 1)->where('subject_id', $subjectIds[0])->get();
+            } else {
+                $datas = Chapter::where('status', 1)->whereIn('subject_id', $subjectIds)->get();
+            }
 
             return response()->json([
                 "success" => true,
@@ -2830,7 +2847,24 @@ class TestController extends Controller
     {
         try {
             ini_set('memory_limit', '-1');
-            $datas = CourseTopic::where('status', 1)->where('chapter_id', $chapter)->get();
+            
+            // Handle comma-separated chapter IDs
+            $chapterIds = explode(',', $chapter);
+            $chapterIds = array_filter(array_map('intval', $chapterIds));
+            
+            if (empty($chapterIds)) {
+                return response()->json([
+                    "success" => false,
+                    'msgText' => 'No valid chapter IDs provided',
+                ]);
+            }
+            
+            // If single ID, use where; if multiple, use whereIn
+            if (count($chapterIds) == 1) {
+                $datas = CourseTopic::where('status', 1)->where('chapter_id', $chapterIds[0])->get();
+            } else {
+                $datas = CourseTopic::where('status', 1)->whereIn('chapter_id', $chapterIds)->get();
+            }
 
             return response()->json([
                 "success" => true,

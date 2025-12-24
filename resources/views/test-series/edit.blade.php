@@ -1002,10 +1002,48 @@ $('#add-row').on('click', function () {
 });
 
 
-function initSelect2(row) {
-    row.find('.subject_ids, .chapter_ids, .topic_ids').select2({
-        width: '100%',
-        placeholder: 'Select'
+function initSelect2(container = document) {
+    $(container).find('.subject_ids, .chapter_ids, .topic_ids').each(function() {
+        const $select = $(this);
+        // Destroy existing Select2 instance if it exists
+        if ($select.hasClass('select2-hidden-accessible')) {
+            $select.select2('destroy');
+        }
+        // Initialize Select2
+        $select.select2({
+            placeholder: 'Select options',
+            width: '100%'
+        });
+        
+        // Explicitly bind change event after Select2 initialization
+        if ($select.hasClass('subject_ids')) {
+            $select.off('change.select2Handler').on('change.select2Handler', function() {
+                handleSubjectChange(this);
+            });
+            // Also bind Select2 specific events
+            $select.off('select2:select.select2Handler select2:unselect.select2Handler select2:clear.select2Handler')
+                   .on('select2:select.select2Handler select2:unselect.select2Handler select2:clear.select2Handler', function(e) {
+                // Use setTimeout to ensure the value is updated before handling
+                setTimeout(function() {
+                    handleSubjectChange($select[0]);
+                }, 10);
+            });
+        }
+        
+        // Bind change event for chapter_ids
+        if ($select.hasClass('chapter_ids')) {
+            $select.off('change.select2Handler').on('change.select2Handler', function() {
+                handleChapterChange(this);
+            });
+            // Also bind Select2 specific events
+            $select.off('select2:select.select2Handler select2:unselect.select2Handler select2:clear.select2Handler')
+                   .on('select2:select.select2Handler select2:unselect.select2Handler select2:clear.select2Handler', function(e) {
+                // Use setTimeout to ensure the value is updated before handling
+                setTimeout(function() {
+                    handleChapterChange($select[0]);
+                }, 10);
+            });
+        }
     });
 }
 
@@ -1021,18 +1059,38 @@ function loadSubjects(row) {
             if (result.success) {
                 row.find('.subject_ids').html(result.html);
                 initSelect2(row);
+            } else {
+                console.error('Error loading subjects:', result.msgText);
             }
+        },
+        error: function(xhr, status, error) {
+            console.error('AJAX error loading subjects:', error);
+            console.error('Response:', xhr.responseText);
         }
     });
 }
 
-        $(document).on('change', '.subject_ids', function () {
-            const row = $(this).closest('.question-row');
-            const subjectIds = $(this).val();
+        function handleSubjectChange(element) {
+            const row = $(element).closest('.question-row');
+            const subjectIds = $(element).val();
+
+            // Clear topics when subject changes (since topics depend on chapters)
+            if (!row.find('.topic-filter').hasClass('d-none')) {
+                row.find('.topic_ids').html('<option value="">--Select--</option>').val("").trigger('change');
+            }
 
             if (!row.find('.chapter-filter').hasClass('d-none')) {
+                // Handle array of IDs - convert to comma-separated string for URL
+                let subjectIdsParam = Array.isArray(subjectIds) ? subjectIds.join(',') : (subjectIds || '');
+                
+                if (!subjectIdsParam) {
+                    // If no subjects selected, clear chapters
+                    row.find('.chapter_ids').html('<option value="">--Select--</option>').val("").trigger('change');
+                    return;
+                }
+                
                 $.ajax({
-                    url: `{{ URL::to('fetch-chapter-by-subject') }}/${subjectIds}`,
+                    url: `{{ URL::to('fetch-chapter-by-subject') }}/${subjectIdsParam}`,
                     type: 'GET',
                     dataType: 'json',
                     success: function (result) {
@@ -1040,27 +1098,56 @@ function loadSubjects(row) {
                             if (result.html != '') {
                                 row.find('.chapter_ids').html(result.html);
                                 initSelect2(row); // ✅ IMPORTANT
-
                             }
                             else {
-                                row.find('.chapter_ids').val("").trigger('change');
+                                row.find('.chapter_ids').html('<option value="">--Select--</option>').val("").trigger('change');
                             }
 
                         } else {
+                            console.error('Error fetching chapters:', result.msgText);
                             toastr.error('error encountered ' + result.msgText);
                         }
                     },
+                    error: function(xhr, status, error) {
+                        console.error('AJAX error fetching chapters:', error);
+                        console.error('Response:', xhr.responseText);
+                    }
                 });
+            } else {
+                console.log('Chapter filter is hidden, skipping chapter fetch');
             }
+        }
+
+        // Handle change event - works with both regular select and Select2 (event delegation)
+        $(document).on('change', '.subject_ids', function () {
+            handleSubjectChange(this);
         });
 
-        $(document).on('change', '.chapter_ids', function () {
-            const row = $(this).closest('.question-row');
-            const chapterIds = $(this).val();
+        // Handle Select2 specific events with delegation
+        $(document).on('select2:select select2:unselect select2:clear', '.subject_ids', function (e) {
+            const $select = $(this);
+            // Small delay to ensure value is updated
+            setTimeout(function() {
+                handleSubjectChange($select[0]);
+            }, 50);
+        });
+
+        function handleChapterChange(element) {
+            const row = $(element).closest('.question-row');
+            const chapterIds = $(element).val();
 
             if (!row.find('.topic-filter').hasClass('d-none')) {
+                // Handle array of IDs - convert to comma-separated string for URL
+                let chapterIdsParam = Array.isArray(chapterIds) ? chapterIds.join(',') : (chapterIds || '');
+                
+                if (!chapterIdsParam) {
+                    // If no chapters selected, clear topics
+                    row.find('.topic_ids').html('<option value="">--Select--</option>').val("").trigger('change');
+                    return;
+                }
+                
                 $.ajax({
-                    url: `{{ URL::to('fetch-topic-by-chapter') }}/${chapterIds}`,
+                    url: `{{ URL::to('fetch-topic-by-chapter') }}/${chapterIdsParam}`,
                     type: 'GET',
                     dataType: 'json',
                     success: function (result) {
@@ -1068,18 +1155,38 @@ function loadSubjects(row) {
                             if (result.html != '') {
                                 row.find('.topic_ids').html(result.html);
                                 initSelect2(row); // ✅ IMPORTANT
-
                             }
                             else {
-                                row.find('.topic_ids').val("").trigger('change');
+                                row.find('.topic_ids').html('<option value="">--Select--</option>').val("").trigger('change');
                             }
 
                         } else {
+                            console.error('Error fetching topics:', result.msgText);
                             toastr.error('error encountered ' + result.msgText);
                         }
                     },
+                    error: function(xhr, status, error) {
+                        console.error('AJAX error fetching topics:', error);
+                        console.error('Response:', xhr.responseText);
+                    }
                 });
+            } else {
+                console.log('Topic filter is hidden, skipping topic fetch');
             }
+        }
+
+        // Handle change event - works with both regular select and Select2 (event delegation)
+        $(document).on('change', '.chapter_ids', function () {
+            handleChapterChange(this);
+        });
+
+        // Handle Select2 specific events with delegation
+        $(document).on('select2:select select2:unselect select2:clear', '.chapter_ids', function (e) {
+            const $select = $(this);
+            // Small delay to ensure value is updated
+            setTimeout(function() {
+                handleChapterChange($select[0]);
+            }, 50);
         });
 
 

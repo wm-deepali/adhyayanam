@@ -13,6 +13,8 @@ use App\Models\TeacherExamMapping;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Yajra\DataTables\Facades\DataTables;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class TeacherController extends Controller
 {
@@ -188,108 +190,208 @@ class TeacherController extends Controller
 
     public function store(Request $request)
     {
-        // dd($request->all());
-        $request->validate([
-            // 🔹 Personal Info
+        /* ===============================
+         |  VALIDATION
+         =============================== */
+        $validator = Validator::make($request->all(), [
+
+            /* -------- Personal Info -------- */
             'full_name' => 'required|string|max:255',
-            'email' => 'required|email|unique:teachers,email',
-            'mobile_number' => 'required|string|max:15',
-            'confirm_account_number' => 'same:account_number',
+            'email' => 'required|email:rfc,dns|unique:teachers,email',
+            'mobile_number' => 'required|digits:10',
+            'whatsapp_number' => 'nullable|digits:10',
+            'gender' => 'nullable|in:male,female,other',
+            'dob' => 'nullable|date|before:today',
+            'highest_qualification' => 'nullable|string|max:255',
+            'total_experience' => 'nullable|numeric|min:0|max:60',
+
+            /* -------- Address -------- */
+            'address' => 'nullable|string|max:500',
+            'country' => 'nullable|string|max:100',
+            'state' => 'nullable|string|max:100',
+            'city' => 'nullable|string|max:100',
+            'pin_code' => 'nullable|digits_between:4,10',
+
+            /* -------- Password -------- */
             'password' => 'required|string|min:6|confirmed',
 
-            // 🔹 Images
-            'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            'aadhar_front' => 'nullable|mimes:jpeg,png,jpg,pdf|max:2048',
-            'aadhar_back' => 'nullable|mimes:jpeg,png,jpg,pdf|max:2048',
-            'pan_file' => 'nullable|mimes:jpeg,png,jpg,pdf|max:2048',
-            'cancelled_cheque' => 'nullable|mimes:jpeg,png,jpg,pdf|max:2048',
-            'qr_code' => 'nullable|mimes:jpeg,png,jpg,pdf|max:2048',
+            /* -------- Language -------- */
+            'language' => 'nullable|array',
+            'language.*' => 'in:1,2',
 
-            // 🔹 Docs
+            /* -------- Permissions -------- */
+            'can_conduct_live_classes' => 'nullable|boolean',
+            'can_check_tests' => 'nullable|boolean',
+
+            /* -------- Question Type -------- */
+            'question_type_permission' => 'nullable|array',
+            'question_type_permission.*' => 'in:MCQ,Subjective,Story / Passage-Based',
+
+            'pay_per_question' => 'nullable|array',
+            'pay_per_question.MCQ' => 'nullable|numeric|min:0',
+            'pay_per_question.Subjective' => 'nullable|numeric|min:0',
+            'pay_per_question.Story / Passage-Based' => 'nullable|numeric|min:0',
+
+            /* -------- Account Setup -------- */
+            'exam_type' => 'required|array|min:1',
+            'exam_type.*' => 'required|exists:exam_commissions,id',
+
+            'category' => 'nullable|array',
+            'category.*' => 'nullable|exists:exam_categories,id',
+
+            'sub_category' => 'nullable|array',
+            'sub_category.*' => 'nullable|exists:exam_sub_categories,id',
+
+            'subject' => 'nullable|array',
+            'subject.*' => 'nullable|exists:subjects,id',
+
+            /* -------- Bank -------- */
+            'upi_id' => 'nullable|string|max:255',
+            'account_name' => 'nullable|string|max:255',
+            'account_number' => 'nullable|string|max:30',
+            'confirm_account_number' => 'nullable|same:account_number',
+            'bank_name' => 'nullable|string|max:255',
+            'bank_branch' => 'nullable|string|max:255',
+            'ifsc_code' => 'nullable|regex:/^[A-Z]{4}0[A-Z0-9]{6}$/',
+            'swift_code' => 'nullable|string|max:20',
+
+            /* -------- Files -------- */
+            'profile_picture' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:2048',
+            'pan_file' => 'nullable|mimes:jpeg,jpg,png,webp,pdf|max:2048',
+            'aadhar_front' => 'nullable|mimes:jpeg,jpg,png,webp,pdf|max:2048',
+            'aadhar_back' => 'nullable|mimes:jpeg,jpg,png,webp,pdf|max:2048',
+            'cancelled_cheque' => 'nullable|mimes:jpeg,jpg,png,webp,pdf|max:2048',
+            'qr_code' => 'nullable|mimes:jpeg,jpg,png,webp,pdf|max:2048',
             'cv' => 'nullable|mimes:pdf,doc,docx|max:5120',
-            'education_docs.*' => 'nullable|mimes:pdf,doc,docx,jpeg,png,jpg|max:5120',
+            'education_docs' => 'nullable|array',
+            'education_docs.*' => 'mimes:pdf,doc,docx,jpeg,jpg,png|max:5120',
+            'pan_number' => 'nullable|string|max:20',
+            'aadhar_number' => 'nullable|digits:12',
+
+
         ]);
 
+        /* ===============================
+         |  CONDITIONAL VALIDATION
+         =============================== */
+        $validator->after(function ($validator) use ($request) {
 
-        // try {
-        $teacher = new Teacher();
+            $permissions = $request->question_type_permission ?? [];
 
-        // Personal
-        $teacher->full_name = $request->full_name;
-        $teacher->email = $request->email;
-        $teacher->mobile_number = $request->mobile_number;
-        $teacher->whatsapp_number = $request->whatsapp_number;
-        $teacher->gender = $request->gender;
-        $teacher->dob = $request->dob;
-        $teacher->highest_qualification = $request->highest_qualification;
-        $teacher->total_experience = $request->total_experience;
-        $teacher->full_address = $request->address;
-        $teacher->country = $request->country;
-        $teacher->state = $request->state;
-        $teacher->city = $request->city;
-        $teacher->pin_code = $request->pin_code;
-        $teacher->can_conduct_live_classes = $request->has('can_conduct_live_classes') ? 1 : 0;
-        $teacher->can_check_tests = $request->has('can_check_tests') ? 1 : 0;
-        $teacher->allow_languages = $request->language ?? [];
-
-        // Store hashed password
-        $teacher->password = Hash::make($request->password);
-
-        // Question Type Permission
-        $permissions = $request->question_type_permission ?? [];
-        $payments = $request->pay_per_question ?? [];
-
-        $teacher->allow_mcq = in_array('MCQ', $permissions);
-        $teacher->allow_subjective = in_array('Subjective', $permissions);
-        $teacher->allow_story = in_array('Story / Passage-Based', $permissions);
-
-        $teacher->pay_per_mcq = $payments['MCQ'] ?? 0;
-        $teacher->pay_per_subjective = $payments['Subjective'] ?? 0;
-        $teacher->pay_per_story = $payments['Story / Passage-Based'] ?? 0;
-
-        // Bank Details
-        $teacher->upi_id = $request->upi_id;
-        $teacher->account_name = $request->account_name;
-        $teacher->account_number = $request->account_number;
-        $teacher->bank_name = $request->bank_name;
-        $teacher->bank_branch = $request->bank_branch;
-        $teacher->ifsc_code = $request->ifsc_code;
-        $teacher->swift_code = $request->swift_code;
-        $teacher->created_by = auth()->id();
-
-        // Files
-        $fileFields = [
-            'profile_picture' => 'teachers/profile_pictures',
-            'cv' => 'teachers/cv',
-            'pan_file' => 'teachers/pan',
-            'aadhar_front' => 'teachers/aadhar',
-            'aadhar_back' => 'teachers/aadhar',
-            'cancelled_cheque' => 'teachers/bank',
-            'qr_code' => 'teachers/bank',
-        ];
-
-        foreach ($fileFields as $field => $path) {
-            if ($request->hasFile($field)) {
-                $teacher->$field = $request->file($field)->store($path, 'public');
+            if (
+                in_array('MCQ', $permissions) &&
+                empty($request->pay_per_question['MCQ'])
+            ) {
+                $validator->errors()->add('pay_per_question.MCQ', 'Pay per MCQ is required.');
             }
+
+            if (
+                in_array('Subjective', $permissions) &&
+                empty($request->pay_per_question['Subjective'])
+            ) {
+                $validator->errors()->add('pay_per_question.Subjective', 'Pay per Subjective is required.');
+            }
+
+            if (
+                in_array('Story / Passage-Based', $permissions) &&
+                empty($request->pay_per_question['Story / Passage-Based'])
+            ) {
+                $validator->errors()->add('pay_per_question.Story / Passage-Based', 'Pay per Story is required.');
+            }
+
+            if (!$request->subject || collect($request->subject)->filter()->isEmpty()) {
+                $validator->errors()->add('subject', 'At least one subject must be selected.');
+            }
+        });
+
+        if ($validator->fails()) {
+            return response()->json([
+                'errors' => $validator->errors()
+            ], 422);
         }
 
-        if ($request->hasFile('education_docs')) {
-            $paths = [];
-            foreach ($request->file('education_docs') as $file) {
-                $paths[] = $file->store('teachers/education_docs', 'public');
-            }
-            $teacher->education_docs = json_encode($paths);
-        }
+        /* ===============================
+         |  SAVE DATA (TRANSACTION)
+         =============================== */
+        DB::transaction(function () use ($request) {
 
-        $teacher->save();
-        // 🔹 Save Teacher Exam Mappings
-        if ($request->exam_type) {
+            $teacher = new Teacher();
+
+            /* -------- Personal -------- */
+            $teacher->full_name = $request->full_name;
+            $teacher->email = $request->email;
+            $teacher->mobile_number = $request->mobile_number;
+            $teacher->whatsapp_number = $request->whatsapp_number;
+            $teacher->gender = $request->gender;
+            $teacher->dob = $request->dob;
+            $teacher->highest_qualification = $request->highest_qualification;
+            $teacher->total_experience = $request->total_experience;
+            $teacher->full_address = $request->address;
+            $teacher->country = $request->country;
+            $teacher->state = $request->state;
+            $teacher->city = $request->city;
+            $teacher->pin_code = $request->pin_code;
+
+            $teacher->can_conduct_live_classes = $request->has('can_conduct_live_classes');
+            $teacher->can_check_tests = $request->has('can_check_tests');
+            $teacher->allow_languages = $request->language ?? [];
+
+            $teacher->password = Hash::make($request->password);
+
+            /* -------- Question Permissions -------- */
+            $permissions = $request->question_type_permission ?? [];
+            $payments = $request->pay_per_question ?? [];
+
+            $teacher->allow_mcq = in_array('MCQ', $permissions);
+            $teacher->allow_subjective = in_array('Subjective', $permissions);
+            $teacher->allow_story = in_array('Story / Passage-Based', $permissions);
+
+            $teacher->pay_per_mcq = $payments['MCQ'] ?? 0;
+            $teacher->pay_per_subjective = $payments['Subjective'] ?? 0;
+            $teacher->pay_per_story = $payments['Story / Passage-Based'] ?? 0;
+
+            /* -------- Bank -------- */
+            $teacher->upi_id = $request->upi_id;
+            $teacher->account_name = $request->account_name;
+            $teacher->account_number = $request->account_number;
+            $teacher->bank_name = $request->bank_name;
+            $teacher->bank_branch = $request->bank_branch;
+            $teacher->ifsc_code = $request->ifsc_code;
+            $teacher->swift_code = $request->swift_code;
+            $teacher->pan_number = $request->pan_number;
+            $teacher->aadhar_number = $request->aadhar_number;
+
+            $teacher->created_by = auth()->id();
+
+            /* -------- Files -------- */
+            $fileFields = [
+                'profile_picture' => 'teachers/profile_pictures',
+                'cv' => 'teachers/cv',
+                'pan_file' => 'teachers/pan',
+                'aadhar_front' => 'teachers/aadhar',
+                'aadhar_back' => 'teachers/aadhar',
+                'cancelled_cheque' => 'teachers/bank',
+                'qr_code' => 'teachers/bank',
+            ];
+
+            foreach ($fileFields as $field => $path) {
+                if ($request->hasFile($field)) {
+                    $teacher->$field = $request->file($field)->store($path, 'public');
+                }
+            }
+
+            if ($request->hasFile('education_docs')) {
+                $docs = [];
+                foreach ($request->file('education_docs') as $file) {
+                    $docs[] = $file->store('teachers/education_docs', 'public');
+                }
+                $teacher->education_docs = json_encode($docs);
+            }
+
+            $teacher->save();
+
+            /* -------- Exam Mapping -------- */
             foreach ($request->exam_type as $index => $examTypeId) {
-                // Skip if exam_type is empty
-                if (!$examTypeId)
-                    continue;
-
                 TeacherExamMapping::create([
                     'teacher_id' => $teacher->id,
                     'exam_type_id' => $examTypeId,
@@ -298,13 +400,12 @@ class TeacherController extends Controller
                     'subject_id' => $request->subject[$index] ?? null,
                 ]);
             }
-        }
+        });
 
-        return redirect()->route('manage-teachers.index')->with('success', 'Teacher created successfully!');
-
-        // } catch (\Exception $e) {
-        //     return back()->withInput()->with('error', 'Error: ' . $e->getMessage());
-        // }
+        return response()->json([
+            'success' => true,
+            'message' => 'Teacher created successfully!'
+        ]);
     }
 
     // Show edit form
@@ -352,164 +453,226 @@ class TeacherController extends Controller
     }
 
 
-    // Update teacher data
-
     public function update(Request $request, Teacher $teacher)
     {
-        $request->validate([
-            // 🔹 Personal Info
+        /* ===============================
+         |  VALIDATION
+         =============================== */
+        $validator = Validator::make($request->all(), [
+
+            /* -------- Personal Info -------- */
             'full_name' => 'required|string|max:255',
-            'email' => 'required|email|unique:teachers,email,' . $teacher->id,
-            'mobile_number' => 'required|string|max:15',
-            'confirm_account_number' => 'same:account_number',
+            'email' => 'required|email:rfc,dns|unique:teachers,email,' . $teacher->id,
+            'mobile_number' => 'required|digits:10',
+            'whatsapp_number' => 'nullable|digits:10',
+            'gender' => 'nullable|in:male,female,other',
+            'dob' => 'nullable|date|before:today',
+            'highest_qualification' => 'nullable|string|max:255',
+            'total_experience' => 'nullable|numeric|min:0|max:60',
 
-            // 🔹 Images
-            'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            'aadhar_front' => 'nullable|mimes:jpeg,png,jpg,pdf|max:2048',
-            'aadhar_back' => 'nullable|mimes:jpeg,png,jpg,pdf|max:2048',
-            'pan_file' => 'nullable|mimes:jpeg,png,jpg,pdf|max:2048',
-            'cancelled_cheque' => 'nullable|mimes:jpeg,png,jpg,pdf|max:2048',
-            'qr_code' => 'nullable|mimes:jpeg,png,jpg,pdf|max:2048',
+            /* -------- Address -------- */
+            'address' => 'nullable|string|max:500',
+            'country' => 'nullable|string|max:100',
+            'state' => 'nullable|string|max:100',
+            'city' => 'nullable|string|max:100',
+            'pin_code' => 'nullable|digits_between:4,10',
 
-            // 🔹 Docs
+            /* -------- Language -------- */
+            'language' => 'nullable|array',
+            'language.*' => 'in:1,2',
+
+            /* -------- Permissions -------- */
+            'can_conduct_live_classes' => 'nullable|boolean',
+            'can_check_tests' => 'nullable|boolean',
+
+            /* -------- Question Type -------- */
+            'question_type_permission' => 'nullable|array',
+            'question_type_permission.*' => 'in:MCQ,Subjective,Story / Passage-Based',
+
+            'pay_per_question' => 'nullable|array',
+            'pay_per_question.MCQ' => 'nullable|numeric|min:0',
+            'pay_per_question.Subjective' => 'nullable|numeric|min:0',
+            'pay_per_question.Story / Passage-Based' => 'nullable|numeric|min:0',
+
+            /* -------- Account Setup -------- */
+            'exam_type' => 'required|array|min:1',
+            'exam_type.*' => 'required|exists:exam_commissions,id',
+
+            'category' => 'nullable|array',
+            'category.*' => 'nullable|exists:exam_categories,id',
+
+            'sub_category' => 'nullable|array',
+            'sub_category.*' => 'nullable|exists:exam_sub_categories,id',
+
+            'subject' => 'nullable|array',
+            'subject.*' => 'nullable|exists:subjects,id',
+
+            /* -------- Bank -------- */
+            'upi_id' => 'nullable|string|max:255',
+            'account_name' => 'nullable|string|max:255',
+            'account_number' => 'nullable|string|max:30',
+            'confirm_account_number' => 'nullable|same:account_number',
+            'bank_name' => 'nullable|string|max:255',
+            'bank_branch' => 'nullable|string|max:255',
+            'ifsc_code' => 'nullable|regex:/^[A-Z]{4}0[A-Z0-9]{6}$/',
+            'swift_code' => 'nullable|string|max:20',
+
+            /* -------- Files -------- */
+            'profile_picture' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:2048',
+            'pan_file' => 'nullable|mimes:jpeg,jpg,png,webp,pdf|max:2048',
+            'aadhar_front' => 'nullable|mimes:jpeg,jpg,png,webp,pdf|max:2048',
+            'aadhar_back' => 'nullable|mimes:jpeg,jpg,png,webp,pdf|max:2048',
+            'cancelled_cheque' => 'nullable|mimes:jpeg,jpg,png,webp,pdf|max:2048',
+            'qr_code' => 'nullable|mimes:jpeg,jpg,png,webp,pdf|max:2048',
             'cv' => 'nullable|mimes:pdf,doc,docx|max:5120',
-            'education_docs.*' => 'nullable|mimes:pdf,doc,docx,jpeg,png,jpg|max:5120',
+            'education_docs' => 'nullable|array',
+            'education_docs.*' => 'mimes:pdf,doc,docx,jpeg,jpg,png|max:5120',
+
+            'pan_number' => 'nullable|string|max:20',
+            'aadhar_number' => 'nullable|digits:12',
         ]);
 
-        // Update basic info
-        $teacher->full_name = $request->full_name;
-        $teacher->email = $request->email;
-        $teacher->mobile_number = $request->mobile_number;
-        $teacher->whatsapp_number = $request->whatsapp_number;
-        $teacher->gender = $request->gender;
-        $teacher->dob = $request->dob;
-        $teacher->highest_qualification = $request->highest_qualification;
-        $teacher->total_experience = $request->total_experience;
-        $teacher->full_address = $request->address;
-        $teacher->country = $request->country;
-        $teacher->state = $request->state;
-        $teacher->city = $request->city;
-        $teacher->pin_code = $request->pin_code;
-        $teacher->allow_languages = $request->language ?? [];
-        $teacher->can_conduct_live_classes = $request->has('can_conduct_live_classes') ? 1 : 0;
-        $teacher->can_check_tests = $request->has('can_check_tests') ? 1 : 0;
+        /* ===============================
+         |  CONDITIONAL VALIDATION
+         =============================== */
+        $validator->after(function ($validator) use ($request) {
 
-        // Update Question Permissions and Payment
-        $permissions = $request->question_type_permission ?? [];
-        $payments = $request->pay_per_question ?? [];
+            $permissions = $request->question_type_permission ?? [];
 
-        $teacher->allow_mcq = in_array('MCQ', $permissions);
-        $teacher->allow_subjective = in_array('Subjective', $permissions);
-        $teacher->allow_story = in_array('Story / Passage-Based', $permissions);
-
-        $teacher->pay_per_mcq = $payments['MCQ'] ?? 0;
-        $teacher->pay_per_subjective = $payments['Subjective'] ?? 0;
-        $teacher->pay_per_story = $payments['Story / Passage-Based'] ?? 0;
-
-        // Bank details
-        $teacher->upi_id = $request->upi_id;
-        $teacher->account_name = $request->account_name;
-        $teacher->account_number = $request->account_number;
-        $teacher->bank_name = $request->bank_name;
-        $teacher->bank_branch = $request->bank_branch;
-        $teacher->ifsc_code = $request->ifsc_code;
-        $teacher->swift_code = $request->swift_code;
-
-        // Handling file uploads and deleting old files if updated
-        $fileFields = [
-            'profile_picture' => 'teachers/profile_pictures',
-            'cv' => 'teachers/cv',
-            'pan_file' => 'teachers/pan',
-            'aadhar_front' => 'teachers/aadhar',
-            'aadhar_back' => 'teachers/aadhar',
-            'cancelled_cheque' => 'teachers/bank',
-            'qr_code' => 'teachers/bank',
-        ];
-
-        foreach ($fileFields as $field => $path) {
-            if ($request->hasFile($field)) {
-                // Delete old file if exists
-                if ($teacher->$field && Storage::disk('public')->exists($teacher->$field)) {
-                    Storage::disk('public')->delete($teacher->$field);
-                }
-
-                // Store new file
-                $teacher->$field = $request->file($field)->store($path, 'public');
+            if (
+                in_array('MCQ', $permissions) &&
+                empty($request->pay_per_question['MCQ'])
+            ) {
+                $validator->errors()->add('pay_per_question.MCQ', 'Pay per MCQ is required.');
             }
+
+            if (
+                in_array('Subjective', $permissions) &&
+                empty($request->pay_per_question['Subjective'])
+            ) {
+                $validator->errors()->add('pay_per_question.Subjective', 'Pay per Subjective is required.');
+            }
+
+            if (
+                in_array('Story / Passage-Based', $permissions) &&
+                empty($request->pay_per_question['Story / Passage-Based'])
+            ) {
+                $validator->errors()->add('pay_per_question.Story / Passage-Based', 'Pay per Story is required.');
+            }
+
+            if (!$request->subject || collect($request->subject)->filter()->isEmpty()) {
+                $validator->errors()->add('subject', 'At least one subject must be selected.');
+            }
+        });
+
+        if ($validator->fails()) {
+            return back()
+                ->withErrors($validator)
+                ->withInput();
         }
 
-        // Handling multiple education documents (delete old and save new)
-        if ($request->hasFile('education_docs')) {
-            // Delete old education docs
-            if ($teacher->education_docs) {
-                $oldDocs = json_decode($teacher->education_docs, true);
-                if (is_array($oldDocs)) {
-                    foreach ($oldDocs as $oldFile) {
-                        if (Storage::disk('public')->exists($oldFile)) {
-                            Storage::disk('public')->delete($oldFile);
-                        }
+        /* ===============================
+         |  UPDATE DATA (TRANSACTION)
+         =============================== */
+        DB::transaction(function () use ($request, $teacher) {
+
+            /* -------- Personal -------- */
+            $teacher->full_name = $request->full_name;
+            $teacher->email = $request->email;
+            $teacher->mobile_number = $request->mobile_number;
+            $teacher->whatsapp_number = $request->whatsapp_number;
+            $teacher->gender = $request->gender;
+            $teacher->dob = $request->dob;
+            $teacher->highest_qualification = $request->highest_qualification;
+            $teacher->total_experience = $request->total_experience;
+            $teacher->full_address = $request->address;
+            $teacher->country = $request->country;
+            $teacher->state = $request->state;
+            $teacher->city = $request->city;
+            $teacher->pin_code = $request->pin_code;
+
+            $teacher->allow_languages = $request->language ?? [];
+            $teacher->can_conduct_live_classes = $request->has('can_conduct_live_classes');
+            $teacher->can_check_tests = $request->has('can_check_tests');
+
+            /* -------- Question Permissions -------- */
+            $permissions = $request->question_type_permission ?? [];
+            $payments = $request->pay_per_question ?? [];
+
+            $teacher->allow_mcq = in_array('MCQ', $permissions);
+            $teacher->allow_subjective = in_array('Subjective', $permissions);
+            $teacher->allow_story = in_array('Story / Passage-Based', $permissions);
+
+            $teacher->pay_per_mcq = $payments['MCQ'] ?? 0;
+            $teacher->pay_per_subjective = $payments['Subjective'] ?? 0;
+            $teacher->pay_per_story = $payments['Story / Passage-Based'] ?? 0;
+
+            /* -------- Bank -------- */
+            $teacher->upi_id = $request->upi_id;
+            $teacher->account_name = $request->account_name;
+            $teacher->account_number = $request->account_number;
+            $teacher->bank_name = $request->bank_name;
+            $teacher->bank_branch = $request->bank_branch;
+            $teacher->ifsc_code = $request->ifsc_code;
+            $teacher->swift_code = $request->swift_code;
+            $teacher->pan_number = $request->pan_number;
+            $teacher->aadhar_number = $request->aadhar_number;
+
+            /* -------- Files -------- */
+            $fileFields = [
+                'profile_picture' => 'teachers/profile_pictures',
+                'cv' => 'teachers/cv',
+                'pan_file' => 'teachers/pan',
+                'aadhar_front' => 'teachers/aadhar',
+                'aadhar_back' => 'teachers/aadhar',
+                'cancelled_cheque' => 'teachers/bank',
+                'qr_code' => 'teachers/bank',
+            ];
+
+            foreach ($fileFields as $field => $path) {
+                if ($request->hasFile($field)) {
+                    if ($teacher->$field && Storage::disk('public')->exists($teacher->$field)) {
+                        Storage::disk('public')->delete($teacher->$field);
+                    }
+                    $teacher->$field = $request->file($field)->store($path, 'public');
+                }
+            }
+
+            if ($request->hasFile('education_docs')) {
+                if ($teacher->education_docs) {
+                    foreach (json_decode($teacher->education_docs, true) ?? [] as $oldFile) {
+                        Storage::disk('public')->delete($oldFile);
                     }
                 }
-            }
 
-            // Store new education documents
-            $paths = [];
-            foreach ($request->file('education_docs') as $file) {
-                $paths[] = $file->store('teachers/education_docs', 'public');
-            }
-            $teacher->education_docs = json_encode($paths);
-        }
-
-        $teacher->save();
-
-        // Update Teacher Exam Mappings
-        if ($request->exam_type) {
-            // Prepare incoming mappings from request
-            $inputMappings = $request->input('exam_type', []);
-            $inputCategories = $request->input('category', []);
-            $inputSubCategories = $request->input('sub_category', []);
-            $inputSubjects = $request->input('subject', []);
-
-            // To keep track mappings for update, create and delete
-            $receivedMappingIds = [];
-
-            foreach ($inputMappings as $index => $examTypeId) {
-                if (!$examTypeId)
-                    continue; // skip empty
-
-                // Search existing mapping with same exam_type_id and possibly other keys
-                $existing = $teacher->examMappings()
-                    ->where('exam_type_id', $examTypeId)
-                    ->where('category_id', $inputCategories[$index] ?? null)
-                    ->where('sub_category_id', $inputSubCategories[$index] ?? null)
-                    ->where('subject_id', $inputSubjects[$index] ?? null)
-                    ->first();
-
-                if ($existing) {
-                    // Already exists, so no need to create, just track its id
-                    $receivedMappingIds[] = $existing->id;
-                } else {
-                    // Create new mapping
-                    $mapping = new TeacherExamMapping();
-                    $mapping->teacher_id = $teacher->id;
-                    $mapping->exam_type_id = $examTypeId;
-                    $mapping->category_id = $inputCategories[$index] ?? null;
-                    $mapping->sub_category_id = $inputSubCategories[$index] ?? null;
-                    $mapping->subject_id = $inputSubjects[$index] ?? null;
-                    $mapping->save();
-
-                    $receivedMappingIds[] = $mapping->id;
+                $docs = [];
+                foreach ($request->file('education_docs') as $file) {
+                    $docs[] = $file->store('teachers/education_docs', 'public');
                 }
+                $teacher->education_docs = json_encode($docs);
             }
 
-            // Delete mappings that exist in DB but not in the current request
-            $teacher->examMappings()
-                ->whereNotIn('id', $receivedMappingIds)
-                ->delete();
-        }
+            $teacher->save();
 
-        return redirect()->route('manage-teachers.index')->with('success', 'Teacher updated successfully!');
+            /* -------- Exam Mapping Sync -------- */
+            $teacher->examMappings()->delete();
+
+            foreach ($request->exam_type as $index => $examTypeId) {
+                TeacherExamMapping::create([
+                    'teacher_id' => $teacher->id,
+                    'exam_type_id' => $examTypeId,
+                    'category_id' => $request->category[$index] ?? null,
+                    'sub_category_id' => $request->sub_category[$index] ?? null,
+                    'subject_id' => $request->subject[$index] ?? null,
+                ]);
+            }
+        });
+
+        return redirect()
+            ->route('manage-teachers.index')
+            ->with('success', 'Teacher updated successfully!');
     }
+
 
     public function changePassword(Request $request, Teacher $teacher)
     // Validate password and confirmation

@@ -93,6 +93,7 @@
                                         <select id="question-category" class="form-control" name="question_category">
                                             <option value="0">Normal</option>
                                             <option value="1">Previous Year</option>
+                                            <option value="2">Current Affair</option>
                                         </select>
                                     </div>
                                     <div class="mb-3 previous-year-group" id="previous-year" style="display: none;">

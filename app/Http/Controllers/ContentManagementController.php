@@ -3450,7 +3450,7 @@ class ContentManagementController extends Controller
     public function pendingQuestionBankIndex(Request $request)
     {
         // dd('here');
-        $query = Question::whereIn('status', ['Done', 'Pending', 'resubmitted']);
+        $query = Question::whereIn('status', ['Pending', 'resubmitted']);
 
         if ($request->ajax()) {
             // ✅ Filter by teacher or admin

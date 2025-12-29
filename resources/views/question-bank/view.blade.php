@@ -220,11 +220,16 @@
                             <div class="col-md-12">
                                 <p><strong>D)</strong> {!! $question->option_d ?? "" !!}</p>
                             </div>
-                            @if(strip_tags($question->option_e) != "")
-                                <div class="col-md-12">
-                                    <p><strong>E)</strong> {!! $question->option_e ?? "" !!}</p>
-                                </div>
-                            @endif
+                           @php
+    $optionE = trim(html_entity_decode(strip_tags($question->option_e ?? '')));
+@endphp
+
+@if($optionE !== '')
+    <div class="col-md-12">
+        <p><strong>E)</strong> {!! $question->option_e !!}</p>
+    </div>
+@endif
+
                             <div class="col-md-12">
                                 <p><strong>Answer: </strong> {!! $question->answer ?? "" !!}</p>
                             </div>
@@ -274,11 +279,15 @@
                                             <p><strong>D)</strong> {!! $details->option_d ?? "" !!}</p>
                                         </div>
                                     @endif
-                                    @if(strip_tags($details->option_e) != "")
-                                        <div class="col-md-12">
-                                            <p><strong>E)</strong> {!! $details->option_e ?? "" !!}</p>
-                                        </div>
-                                    @endif
+                                                               @php
+    $optionE = trim(html_entity_decode(strip_tags($details->option_e ?? '')));
+@endphp
+
+@if($optionE !== '')
+    <div class="col-md-12">
+        <p><strong>E)</strong> {!! $details->option_e !!}</p>
+    </div>
+@endif
                                     @if(strip_tags($details->answer) != "")
                                         <div class="col-md-12">
                                             <p><strong>Answer: </strong> {!! $details->answer ?? "" !!}</p>

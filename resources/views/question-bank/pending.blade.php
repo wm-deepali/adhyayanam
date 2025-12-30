@@ -57,51 +57,52 @@
                 }).fail(function (jqXHR, ajaxOptions, thrownError) {
                     alert('No response from server');
                 });
-            
+
             });
-            document.querySelectorAll('.deleteBtn').forEach(button => {
-                button.addEventListener('click', function () {
-                    const id = this.dataset.id;
-                    const url = this.dataset.url;
 
-                    Swal.fire({
-                        title: 'Are you sure?',
-                        text: "This question will be permanently deleted!",
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#d33',
-                        cancelButtonColor: '#3085d6',
-                        confirmButtonText: 'Yes, delete it!'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            axios.delete(url, {
-                                data: {
-                                    _token: '{{ csrf_token() }}'
-                                }
-                            })
-                                .then(response => {
+            // 🔥 DELETE BUTTON – EVENT DELEGATION
+            $(document).on('click', '.deleteBtn', function () {
 
-                                    Swal.fire({
-                                        icon: 'success',
-                                        title: 'Deleted!',
-                                        text: 'The question has been deleted successfully.',
-                                        timer: 1500,
-                                        showConfirmButton: false
-                                    });
-                                })
-                                .catch(error => {
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Oops!',
-                                        text: 'Something went wrong while deleting the question.'
-                                    });
-                                    console.error(error);
-                                });
-                        }
-                    });
+                const id = $(this).data('id');
+                const url = $(this).data('url');
+
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "This question will be permanently deleted!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Yes, delete it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        axios.delete(url, {
+                            data: {
+                                _token: '{{ csrf_token() }}'
+                            }
+                        }).then(() => {
+
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Deleted!',
+                                text: 'The question has been deleted successfully.',
+                                timer: 1500,
+                                showConfirmButton: false
+                            });
+
+                            // ✅ Optional: remove row instantly
+                            $(this).closest('tr').remove();
+
+                        }).catch(() => {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops!',
+                                text: 'Something went wrong while deleting the question.'
+                            });
+                        });
+                    }
                 });
             });
-
 
         });
     </script>

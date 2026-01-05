@@ -20,7 +20,7 @@ Create|Category
             <form method="POST" action="{{ route('cm.category.store') }}" enctype="multipart/form-data">
                 @csrf
                 <div class="mb-3">
-                    <label for="exam_com_id" class="form-label">Course Type</label>
+                    <label for="exam_com_id" class="form-label">Examination Commission</label>
                     <select class="form-select" name="exam_com_id">
                         <option value="" selected disabled>None</option>
                         @foreach($examinationCommissions as $commission)

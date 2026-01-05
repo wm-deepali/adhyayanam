@@ -11,6 +11,7 @@ class SubCategory extends Model
     protected $table = 'sub_category';
 
     protected $fillable = [
+        'examination_commission_id',
         'category_id',
         'name',
         'meta_title',
@@ -28,11 +29,16 @@ class SubCategory extends Model
         return $this->hasMany(Subject::class, 'sub_category_id');
     }
 
+    public function ExaminationCommission()
+    {
+        return $this->belongsTo(ExaminationCommission::class, 'examination_commission_id');
+    }
+    
     public function category()
     {
         return $this->belongsTo(Category::class, 'category_id');
     }
-    
+
     public function creator()
     {
         return $this->belongsTo(User::class, 'created_by');

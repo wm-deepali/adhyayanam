@@ -19,14 +19,38 @@ Edit|Sub Category
             </div>
             <form method="POST" action="{{ route('cm.sub-category.update',$subCat->id) }}" enctype="multipart/form-data">
                 @csrf
-               <div class="mb-3">
-                    <label for="category_id" class="form-label">Category</label>
-                    <select class="form-select" name="category_id">
-                        @foreach($categories as $category)
-                            <option value="{{ $category->id }}" {{$category->id == $subCat->category_id ? 'selected':''}}>{{ $category->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
+                <div class="mb-3">
+    <label class="form-label">Examination Commission</label>
+    <select class="form-select"
+            id="commission_id"
+            name="examination_commission_id"
+            required>
+
+        <option value="" disabled>Select Commission</option>
+
+        @foreach($commissions as $commission)
+            <option value="{{ $commission->id }}"
+                {{ $commission->id == $subCat->examination_commission_id ? 'selected' : '' }}>
+                {{ $commission->name }}
+            </option>
+        @endforeach
+    </select>
+</div>
+
+              <div class="mb-3">
+    <label class="form-label">Category</label>
+    <select class="form-select" name="category_id" id="category_id" required>
+        <option value="" disabled>Select Category</option>
+
+        @foreach($categories as $category)
+            <option value="{{ $category->id }}"
+                {{ $category->id == $subCat->category_id ? 'selected' : '' }}>
+                {{ $category->name }}
+            </option>
+        @endforeach
+    </select>
+</div>
+
                 <div class="mb-3">
                     <label for="name" class="form-label">Name</label>
                     <input type="text" class="form-control" name="name" placeholder="Name" value="{{$subCat->name ?? ''}}" required>
@@ -101,4 +125,37 @@ Edit|Sub Category
         </div>
     </div>
 </div>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    const commissionSelect = document.getElementById('commission_id');
+    const categorySelect = document.getElementById('category_id');
+
+    commissionSelect.addEventListener('change', function () {
+
+        const commissionId = this.value;
+
+        categorySelect.innerHTML =
+            '<option selected disabled>Loading categories...</option>';
+
+        fetch(`{{ url('fetch-exam-category-by-commission') }}/${commissionId}`)
+            .then(res => res.json())
+            .then(result => {
+
+                if (result.success) {
+                    categorySelect.innerHTML = result.html;
+                } else {
+                    categorySelect.innerHTML =
+                        '<option value="" disabled>No categories found</option>';
+                }
+            })
+            .catch(() => {
+                categorySelect.innerHTML =
+                    '<option value="" disabled>Error loading categories</option>';
+            });
+    });
+
+});
+</script>
+
 @endsection

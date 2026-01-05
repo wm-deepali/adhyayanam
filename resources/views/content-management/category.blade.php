@@ -28,7 +28,7 @@
                             <th class="text-center">
                                 <input type="checkbox" class="group_check checkbox">
                             </th>
-                            <th scope="col">Course Type</th>
+                            <th scope="col">Examination Commission</th>
                             <th scope="col">Name</th>
                             <th scope="col">Meta Title</th>
                             <th scope="col">Meta Keywords</th>

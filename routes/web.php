@@ -356,6 +356,7 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
             Route::get('/', [ContentManagementController::class, 'subCategoryIndex'])->name('cm.sub.category')->middleware('custom.permission:manage_subcategory');
             Route::get('/create', [ContentManagementController::class, 'subCategoryCreate'])->name('cm.sub-category.create')->middleware('custom.permission:manage_subcategory_add');
             Route::post('/create/store', [ContentManagementController::class, 'subCategoryStore'])->name('cm.sub-category.store')->middleware('custom.permission:manage_subcategory_add');
+            Route::get('/show/{id}', [ContentManagementController::class, 'subCategoryShow'])->name('cm.sub.category.show');
             Route::get('/edit/{id}', [ContentManagementController::class, 'subCategoryEdit'])->name('cm.sub.category.edit')->middleware('custom.permission:manage_subcategory_edit');
             Route::post('/update/{id}', [ContentManagementController::class, 'subCategoryUpdate'])->name('cm.sub-category.update')->middleware('custom.permission:manage_subcategory_edit');
             Route::delete('/delete/{id}', [ContentManagementController::class, 'subCategoryDelete'])->name('cm.sub-category.delete')->middleware('custom.permission:manage_subcategory_delete');

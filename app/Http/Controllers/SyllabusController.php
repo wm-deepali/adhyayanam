@@ -9,37 +9,133 @@ use App\Models\SubCategory;
 use App\Models\Subject;
 use App\Models\ExaminationCommission;
 use Illuminate\Support\Facades\Storage;
-
+use Yajra\DataTables\Facades\DataTables;
 class SyllabusController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
+
+
     public function index(Request $request)
     {
-        $query = Syllabus::with(['commission', 'category', 'subCategory', 'subject']);
+        // 🔹 AJAX request → DataTable JSON
+        if ($request->ajax()) {
 
-        if ($request->filled('search')) {
-            $search = $request->search;
+            $query = Syllabus::with([
+                'commission',
+                'category',
+                'subCategory',
+                'subject',
+                'creator'
+            ])->orderBy('created_at', 'DESC');
 
-            $query->where('title', 'like', "%{$search}%")
-                ->orWhereHas('subject', function ($q) use ($search) {
-                    $q->where('name', 'like', "%{$search}%");
+            return DataTables::of($query)
+                ->addIndexColumn() // # column
+
+                // Date & Time
+                ->editColumn('created_at', function ($res) {
+                    return $res->created_at
+                        ? $res->created_at->format('d M Y, h:i A')
+                        : '-';
                 })
-                ->orWhereHas('commission', function ($q) use ($search) {
-                    $q->where('name', 'like', "%{$search}%");
+
+                // ✅ TYPE (this was missing earlier)
+                ->addColumn('type', function ($res) {
+                    return $res->type ?? '-';
                 })
-                ->orWhereHas('category', function ($q) use ($search) {
-                    $q->where('name', 'like', "%{$search}%");
+
+                // Subject
+                ->addColumn('subject', function ($res) {
+                    return $res->subject->name ?? '_';
                 })
-                ->orWhereHas('subCategory', function ($q) use ($search) {
-                    $q->where('name', 'like', "%{$search}%");
-                });
+
+                // Exam Commission
+                ->addColumn('commission', function ($res) {
+                    return $res->commission->name ?? '_';
+                })
+
+                // Category
+                ->addColumn('category', function ($res) {
+                    return $res->category->name ?? '_';
+                })
+
+                // Sub Category
+                ->addColumn('subcategory', function ($res) {
+                    return $res->subCategory->name ?? '_';
+                })
+
+                // PDF
+                ->addColumn('pdf', function ($res) {
+                    if ($res->pdf) {
+                        return '<a href="' . asset('storage/' . $res->pdf) . '" target="_blank">
+                                <img height="40" src="' . asset('img/pdficon.png') . '" alt="PDF">
+                            </a>';
+                    }
+                    return '<span class="text-muted">No PDF</span>';
+                })
+
+                // Status
+                ->addColumn('status', function ($res) {
+                    return $res->status
+                        ? '<span class="badge bg-success">Active</span>'
+                        : '<span class="badge bg-danger">Inactive</span>';
+                })
+
+                // Added By
+                ->addColumn('created_by', function ($res) {
+                    return $res->creator ? $res->creator->name : 'N/A';
+                })
+
+                // Action (same dropdown you already use)
+                ->addColumn('action', function ($res) {
+
+                    $html = '<div class="dropdown">
+                    <button class="btn btn-sm btn-secondary dropdown-toggle"
+                        type="button" data-bs-toggle="dropdown">
+                        Actions
+                    </button>
+                    <ul class="dropdown-menu">';
+
+                    if (\App\Helpers\Helper::canAccess('manage_syllabus')) {
+                        $html .= '<li>
+                        <a class="dropdown-item" href="' . route('syllabus.show', $res->id) . '">
+                            <i class="fa fa-eye text-primary me-2"></i> View
+                        </a>
+                    </li>';
+                    }
+
+                    if (\App\Helpers\Helper::canAccess('manage_syllabus_edit')) {
+                        $html .= '<li>
+                        <a class="dropdown-item" href="' . route('syllabus.edit', $res->id) . '">
+                            <i class="fa fa-edit text-primary me-2"></i> Edit
+                        </a>
+                    </li>';
+                    }
+
+                    if (\App\Helpers\Helper::canAccess('manage_syllabus_delete')) {
+                        $html .= '<li>
+                        <form action="' . route('syllabus.destroy', $res->id) . '" method="POST">
+                            ' . csrf_field() . method_field('DELETE') . '
+                            <button type="submit" class="dropdown-item text-danger"
+                                onclick="return confirm(\'Are you sure?\')">
+                                <i class="fa fa-trash me-2"></i> Delete
+                            </button>
+                        </form>
+                    </li>';
+                    }
+
+                    $html .= '</ul></div>';
+
+                    return $html;
+                })
+
+                ->rawColumns(['pdf', 'status', 'action'])
+                ->make(true);
         }
 
-        $syllabusList = $query->orderBy('created_at', 'DESC')->get();
-
-        return view('syllabus.index', compact('syllabusList'));
+        // 🔹 Normal page load
+        return view('syllabus.index');
     }
 
 

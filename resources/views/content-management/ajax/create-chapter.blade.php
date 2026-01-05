@@ -81,7 +81,7 @@ Create|Chapter
 
                 <div class="mb-3">
                     <label for="description" class="form-label">Description</label>
-                    <input type="text" class="form-control" name="description" placeholder="Description" required>
+                    <input type="text" class="form-control" name="description" placeholder="Description">
                     @if ($errors->has('description'))
                         <span class="text-danger text-left">{{ $errors->first('description') }}</span>
                     @endif

@@ -869,165 +869,268 @@ class ContentManagementController extends Controller
         // Redirect back with a success message
         return redirect()->back()->with('success', 'Category deleted successfully!');
     }
+
     public function subCategoryIndex(Request $request)
     {
         if ($request->ajax()) {
-            $data = SubCategory::with('category', 'creator')->latest()->get();
-            return Datatables::of($data)
+
+            $data = SubCategory::with(
+                'category',
+                'creator',
+                'examinationCommission'
+            )->latest();
+
+            return DataTables::of($data)
                 ->addIndexColumn()
+
                 ->addColumn('checkbox', function ($row) {
-                    return '<input type="checkbox" class="column_checkbox career_checkbox" id="' . $row->id . '" name="career_checkbox[]" />';
+                    return '<input type="checkbox" class="column_checkbox career_checkbox"
+                        id="' . $row->id . '" name="career_checkbox[]" />';
                 })
 
-                ->addColumn('category', function ($row) {
-                    return $row->category->name ?? '';
-                })
-                ->addColumn('meta_title', function ($row) {
-                    return $row->meta_title ?? '--';
-                })
-                ->addColumn('meta_description', function ($row) {
-                    return $row->meta_description ?? '--';
-                })
-                ->addColumn('meta_keyword', function ($row) {
-                    return $row->meta_keyword ?? '--';
-                })
-                ->addColumn('canonical_url', function ($row) {
-                    return $row->canonical_url ?? '--';
-                })
-                ->addColumn('alt_tag', function ($row) {
-                    return $row->alt_tag ?? '--';
-                })
+                ->addColumn(
+                    'commission',
+                    fn($row) =>
+                    $row->examinationCommission->name ?? '--'
+                )
+
+                ->addColumn(
+                    'category',
+                    fn($row) =>
+                    $row->category->name ?? '--'
+                )
+
                 ->addColumn('image', function ($row) {
-                    $image = '<img style="width: 35px" src="' . asset('storage/' . $row->image) . '" alt="">';
-                    return $image;
-                })
-                ->addColumn('status', function ($row) {
-                    if ($row->status == 1) {
-                        $status = '<span class="badge badge-success">Active</span>';
-                    } else {
-                        $status = '<span class="badge badge-secondary">Inactive</span>';
-                    }
-                    return $status;
-                })
-                ->addColumn('created_by', function ($row) {
-                    return $row->creator
-                        ? $row->creator->name
+                    return $row->image
+                        ? '<img src="' . asset('storage/' . $row->image) . '" width="35">'
                         : '<span class="text-muted">N/A</span>';
                 })
+
+                ->addColumn(
+                    'status',
+                    fn($row) =>
+                    $row->status
+                    ? '<span class="badge badge-success">Active</span>'
+                    : '<span class="badge badge-secondary">Inactive</span>'
+                )
+
+                ->addColumn(
+                    'created_by',
+                    fn($row) =>
+                    $row->creator->name ?? 'N/A'
+                )
+
                 ->addColumn('action', function ($row) {
 
-                    $buttons = '';
+                    $items = '';
 
-                    // EDIT permission
+                    // ✅ SHOW
+                    if (\App\Helpers\Helper::canAccess('manage_subcategory')) {
+                        $items .= '
+            <li>
+                <a class="dropdown-item"
+                   href="' . route('cm.sub.category.show', $row->id) . '">
+                    <i class="fa fa-eye me-2 text-info"></i> View
+                </a>
+            </li>';
+                    }
+
+                    // ✅ EDIT
                     if (\App\Helpers\Helper::canAccess('manage_subcategory_edit')) {
-                        $editUrl = route('cm.sub.category.edit', $row->id);
-                        $buttons .= '
-            <a href="' . $editUrl . '" class="btn btn-sm btn-primary" title="Edit">
-                <i class="fa fa-file"></i>
-            </a>
-        ';
+                        $items .= '
+            <li>
+                <a class="dropdown-item"
+                   href="' . route('cm.sub.category.edit', $row->id) . '">
+                    <i class="fa fa-edit me-2 text-primary"></i> Edit
+                </a>
+            </li>';
                     }
 
-                    // DELETE permission
+                    // ✅ DELETE
                     if (\App\Helpers\Helper::canAccess('manage_subcategory_delete')) {
-                        $buttons .= '
-            <form action="' . route('cm.sub-category.delete', $row->id) . '" method="POST" style="display:inline">
-                ' . csrf_field() . '
-                ' . method_field("DELETE") . '
-                <button type="submit"
-                        class="btn btn-sm btn-danger"
-                        title="Delete"
-                        onclick="return confirm(\'Are you sure?\')">
-                    <i class="fa fa-trash"></i>
-                </button>
-            </form>
-        ';
+                        $items .= '
+            <li>
+                <form method="POST"
+                      action="' . route('cm.sub-category.delete', $row->id) . '"
+                      onsubmit="return confirm(\'Are you sure?\')">
+                    ' . csrf_field() . method_field('DELETE') . '
+                    <button type="submit"
+                            class="dropdown-item text-danger">
+                        <i class="fa fa-trash me-2"></i> Delete
+                    </button>
+                </form>
+            </li>';
                     }
 
-                    return $buttons ?: '-';
-                })
+                    // ❌ If no permission at all
+                    if ($items === '') {
+                        return '-';
+                    }
 
-                ->rawColumns(['checkbox', 'commission', 'status', 'meta_title', 'meta_description', 'meta_keyword', 'canonical_url', 'alt_tag', 'action', 'image', 'created_by'])
+                    // ✅ FINAL DROPDOWN
+                    return '
+        <div class="dropdown">
+            <button class="btn btn-sm btn-secondary dropdown-toggle"
+                    type="button"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false">
+                Action
+            </button>
+            <ul class="dropdown-menu">
+                ' . $items . '
+            </ul>
+        </div>';
+                })
+                ->rawColumns(['checkbox', 'commission', 'image', 'status', 'action'])
                 ->make(true);
         }
+
         return view('content-management.sub-category');
     }
+
+    public function subCategoryShow($id)
+    {
+        $subCat = SubCategory::with([
+            'category',
+            'examinationCommission',
+            'creator'
+        ])->findOrFail($id);
+
+        return view('content-management.ajax.show-sub-category', compact('subCat'));
+    }
+
+
     public function subCategoryCreate()
     {
-        $data['categories'] = Category::all();
+        $data['commissions'] = ExaminationCommission::where('status', 1)->get();
         return view('content-management.ajax.create-sub-category', $data);
     }
 
     public function subCategoryStore(Request $request)
     {
         $request->validate([
-            'category_id' => 'nullable|integer',
+            'examination_commission_id' => 'required|exists:examination_commission,id',
+            'category_id' => 'required|exists:category,id',
             'name' => 'required|string|max:255',
             'meta_title' => 'nullable|string|max:255',
             'meta_keyword' => 'nullable|string|max:255',
             'meta_description' => 'nullable|string',
             'canonical_url' => 'nullable|string|max:255',
-            'image' => 'nullable|image|max:2048', // Assuming the image is optional and its maximum size is 2MB
+            'image' => 'nullable|image|max:2048',
             'alt_tag' => 'nullable|string|max:255',
             'status' => 'required|boolean',
         ]);
 
-        // Handle image upload
-        if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('sub_category_images', 'public');
-        } else {
-            $imagePath = null;
+        // ✅ Ensure category belongs to selected commission
+        $categoryValid = Category::where('id', $request->category_id)
+            ->where('exam_com_id', $request->examination_commission_id)
+            ->exists();
+
+        if (!$categoryValid) {
+            return back()->withErrors([
+                'category_id' => 'Selected category does not belong to selected examination commission.'
+            ])->withInput();
         }
 
-        // Create a new instance of ExaminationCommission model
-        $examCommission = new SubCategory();
-        $examCommission->category_id = $request->category_id;
-        $examCommission->name = $request->name;
-        $examCommission->meta_title = $request->meta_title;
-        $examCommission->meta_keyword = $request->meta_keyword;
-        $examCommission->meta_description = $request->meta_description;
-        $examCommission->canonical_url = $request->canonical_url;
-        $examCommission->image = $imagePath;
-        $examCommission->alt_tag = $request->alt_tag;
-        $examCommission->status = $request->status;
-        $examCommission->created_by = auth()->id();
+        // Image upload
+        $imagePath = null;
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')
+                ->store('sub_category_images', 'public');
+        }
 
-        // Save the ExaminationCommission instance to the database
-        $examCommission->save();
-        return redirect()->back()->with('success', 'Sub Category added successfully.');
+        SubCategory::create([
+            'examination_commission_id' => $request->examination_commission_id,
+            'category_id' => $request->category_id,
+            'name' => $request->name,
+            'meta_title' => $request->meta_title,
+            'meta_keyword' => $request->meta_keyword,
+            'meta_description' => $request->meta_description,
+            'canonical_url' => $request->canonical_url,
+            'image' => $imagePath,
+            'alt_tag' => $request->alt_tag,
+            'status' => $request->status,
+            'created_by' => auth()->id(),
+        ]);
+
+        return redirect()
+            ->route('cm.sub.category')
+            ->with('success', 'Sub Category added successfully.');
     }
+
 
     public function subCategoryEdit($id)
     {
-        $data['subCat'] = SubCategory::findOrFail($id);
-        $data['categories'] = Category::all();
+        $subCat = SubCategory::findOrFail($id);
+
+        $data['subCat'] = $subCat;
+
+        // All active commissions
+        $data['commissions'] = ExaminationCommission::where('status', 1)->get();
+
+        // Categories ONLY of selected commission
+        $data['categories'] = Category::where(
+            'exam_com_id',
+            $subCat->examination_commission_id
+        )->get();
+
         return view('content-management.ajax.edit-sub-category', $data);
     }
 
+
     public function subCategoryUpdate(Request $request, $id)
     {
-        if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('sub_category_images', 'public');
-        } else {
-            $imagePath = null;
+        $request->validate([
+            'examination_commission_id' => 'required|exists:examination_commission,id',
+            'category_id' => 'required|exists:category,id',
+            'name' => 'required|string|max:255',
+            'meta_title' => 'nullable|string|max:255',
+            'meta_keyword' => 'nullable|string|max:255',
+            'meta_description' => 'nullable|string',
+            'canonical_url' => 'nullable|string|max:255',
+            'image' => 'nullable|image|max:2048',
+            'alt_tag' => 'nullable|string|max:255',
+            'status' => 'required|boolean',
+        ]);
+
+        $subCategory = SubCategory::findOrFail($id);
+
+        // ✅ Safety: category must belong to selected commission
+        $categoryValid = Category::where('id', $request->category_id)
+            ->where('exam_com_id', $request->examination_commission_id)
+            ->exists();
+
+        if (!$categoryValid) {
+            return back()->withErrors([
+                'category_id' => 'Selected category does not belong to selected examination commission.'
+            ])->withInput();
         }
 
-        // Create a new instance of ExaminationCommission model
-        $examCommission = SubCategory::findOrFail($id);
-        $examCommission->category_id = $request->category_id;
-        $examCommission->name = $request->name;
-        $examCommission->meta_title = $request->meta_title;
-        $examCommission->meta_keyword = $request->meta_keyword;
-        $examCommission->meta_description = $request->meta_description;
-        $examCommission->canonical_url = $request->canonical_url;
-        $examCommission->image = $imagePath;
-        $examCommission->alt_tag = $request->alt_tag;
-        $examCommission->status = $request->status;
+        // ✅ Image handling (keep old image if not uploaded)
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')
+                ->store('sub_category_images', 'public');
+            $subCategory->image = $imagePath;
+        }
 
-        // Save the ExaminationCommission instance to the database
-        $examCommission->save();
-        return redirect()->back()->with('success', 'Sub Category Updated successfully.');
+        // ✅ Update fields
+        $subCategory->examination_commission_id = $request->examination_commission_id;
+        $subCategory->category_id = $request->category_id;
+        $subCategory->name = $request->name;
+        $subCategory->meta_title = $request->meta_title;
+        $subCategory->meta_keyword = $request->meta_keyword;
+        $subCategory->meta_description = $request->meta_description;
+        $subCategory->canonical_url = $request->canonical_url;
+        $subCategory->alt_tag = $request->alt_tag;
+        $subCategory->status = $request->status;
+
+        $subCategory->save();
+
+        return redirect()
+            ->route('cm.sub.category')
+            ->with('success', 'Sub Category updated successfully.');
     }
+
 
     public function subCategoryDelete($id)
     {
@@ -1258,7 +1361,7 @@ class ContentManagementController extends Controller
             'subject_id' => 'required|exists:subject,id',
             'name' => 'required|string|max:255',
             'chapter_number' => 'nullable|string|max:255',
-            'description' => 'required|string',
+            'description' => 'nullable|string',
             'status' => 'required|boolean',
         ]);
 
@@ -1315,7 +1418,7 @@ class ContentManagementController extends Controller
             'subject_id' => 'required|exists:subject,id',
             'name' => 'required|string|max:255',
             'chapter_number' => 'required|string|max:255',
-            'description' => 'required|string',
+            'description' => 'nullable|string',
             'status' => 'required|boolean',
         ]);
 

@@ -19,18 +19,26 @@ Create|Sub-Category
             </div>
             <form method="POST" action="{{ route('cm.sub-category.store') }}" enctype="multipart/form-data">
                 @csrf
+
                 <div class="mb-3">
-                    <label for="category_id" class="form-label">Category</label>
-                    <select class="form-select" name="category_id">
-                        <option value="" selected disabled>None</option>
-                        @foreach($categories as $category)
-                            <option value="{{ $category->id }}">{{ $category->name }}</option>
-                        @endforeach
-                    </select>
-                    <!-- @error('category_id')
-                        <span class="text-danger">{{ $message }}</span>
-                    @enderror -->
-                </div>
+    <label class="form-label">Examination Commission</label>
+    <select class="form-select" id="commission_id"  name="examination_commission_id">
+        <option value="" selected disabled>Select Commission</option>
+        @foreach($commissions as $commission)
+            <option value="{{ $commission->id }}">
+                {{ $commission->name }}
+            </option>
+        @endforeach
+    </select>
+</div>
+
+              <div class="mb-3">
+    <label class="form-label">Category</label>
+    <select class="form-select" name="category_id" id="category_id" required>
+        <option value="" selected disabled>Select Category</option>
+    </select>
+</div>
+
             
                 <div class="mb-3">
                     <label for="name" class="form-label">Name</label>
@@ -106,4 +114,36 @@ Create|Sub-Category
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    const commissionSelect = document.getElementById('commission_id');
+    const categorySelect = document.getElementById('category_id');
+
+    commissionSelect.addEventListener('change', function () {
+
+        const commissionId = this.value;
+        categorySelect.innerHTML =
+            '<option selected disabled>Loading categories...</option>';
+
+        fetch(`{{ url('fetch-exam-category-by-commission/') }}/${commissionId}`)
+            .then(res => res.json())
+            .then(result => {
+
+               if (result.success) {
+                            $('#category_id').html(result.html);
+                        } else {
+                            $('#category_id').html('<option value="" disabled>No categories found</option>');
+                        }
+            })
+            .catch(() => {
+                categorySelect.innerHTML =
+                    '<option value="" disabled>Error loading categories</option>';
+            });
+    });
+
+});
+</script>
+
 @endsection

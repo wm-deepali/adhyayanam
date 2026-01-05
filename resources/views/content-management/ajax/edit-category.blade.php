@@ -20,7 +20,7 @@ Edit|Category
             <form method="POST" action="{{ route('cm.category.update') }}" enctype="multipart/form-data">
                 @csrf
                 <div class="mb-3">
-                    <label for="exam_com_id" class="form-label">Course Type</label>
+                    <label for="exam_com_id" class="form-label">Examination Commission</label>
                     <select class="form-select" name="exam_com_id">
                         @foreach($examinationCommissions as $commission)
                         @if($category->exam_com_id==$commission->id)

@@ -51,7 +51,7 @@ class CourseTopicController extends Controller
                     $actionBtn = '';
 
                     if (\App\Helpers\Helper::canAccess('manage_chapter_edit')) {
-                        $editUrl = route('cm.chapter.edit', $row->id);
+                        $editUrl = route('topic.edit', $row->id);
                         $actionBtn .= ' 
             <a href="' . $editUrl . '" class="btn btn-sm btn-primary" title="Edit">
                 <i class="fa fa-file"></i>
@@ -61,7 +61,7 @@ class CourseTopicController extends Controller
 
                     if (\App\Helpers\Helper::canAccess('manage_chapter_delete')) {
                         $actionBtn .= '
-            <form action="' . route('cm.chapter.delete', $row->id) . '" method="POST" style="display:inline">
+            <form action="' . route('topic.destroy', $row->id) . '" method="POST" style="display:inline">
                 ' . csrf_field() . '
                 ' . method_field("DELETE") . '
                 <button type="submit" class="btn btn-sm btn-danger" title="Delete">
@@ -104,7 +104,7 @@ class CourseTopicController extends Controller
             'chapter_id' => 'required|exists:chapter,id',
             'name' => 'required|string|max:255',
             'chapter_number' => 'nullable|string|max:255',
-            'description' => 'required|string',
+            'description' => 'nullable|string',
             'status' => 'required|boolean',
         ]);
 
@@ -159,7 +159,7 @@ class CourseTopicController extends Controller
             'chapter_id' => 'required|exists:chapter,id',
             'name' => 'required|string|max:255',
             'chapter_number' => 'nullable|string|max:255',
-            'description' => 'required|string',
+            'description' => 'nullable|string',
             'status' => 'required|boolean',
         ]);
 

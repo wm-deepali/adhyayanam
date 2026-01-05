@@ -102,7 +102,7 @@
                     <div class="mb-3">
                         <label for="description" class="form-label">Description</label>
                         <input type="text" class="form-control" name="description" value="{{$chapter->description}}"
-                            placeholder="Description" required>
+                            placeholder="Description">
                         @if ($errors->has('description'))
                             <span class="text-danger text-left">{{ $errors->first('description') }}</span>
                         @endif

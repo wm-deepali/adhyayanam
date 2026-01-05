@@ -28,12 +28,9 @@
                             <th class="text-center">
                                 <input type="checkbox" class="group_check checkbox">
                             </th>
+                              <th scope="col">Examination Commission</th>
                             <th scope="col">Category</th>
                             <th scope="col">Name</th>
-                            <th scope="col">Meta Title</th>
-                            <th scope="col">Meta Keywords</th>
-                            <th scope="col">Meta Description</th>
-                            <th scope="col">Canonical Url</th>
                             <th scope="col">Image</th>
                             <th scope="col">Alt Tag</th>
                             <th scope="col">Status</th>
@@ -96,13 +93,9 @@
 
                 columns: [
                     { data: 'checkbox', name: 'checkbox', orderable: false, searchable: false },
+                      { data: 'commission', name: 'commission' },
                     { data: 'category', name: 'category' },
                     { data: 'name', name: 'name' },
-                    { data: 'meta_title', name: 'meta_title' },
-                    { data: 'meta_keyword', name: 'meta_keyword' },
-                    { data: 'meta_description', name: 'meta_description' },
-                    { data: 'meta_description', name: 'meta_description' },
-                    { data: 'canonical_url', name: 'canonical_url', orderable: false, searchable: false },
                     { data: 'image', name: 'image', orderable: false, searchable: false },
                     { data: 'alt_tag', name: 'alt_tag', orderable: false, searchable: false },
                     { data: 'status', name: 'status', orderable: false, searchable: false },

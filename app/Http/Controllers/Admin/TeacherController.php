@@ -234,16 +234,16 @@ class TeacherController extends Controller
 
             /* -------- Account Setup -------- */
             'exam_type' => 'required|array|min:1',
-            'exam_type.*' => 'required|exists:exam_commissions,id',
+            'exam_type.*' => 'required|exists:examination_commission,id',
 
             'category' => 'nullable|array',
-            'category.*' => 'nullable|exists:exam_categories,id',
+            'category.*' => 'nullable|exists:category,id',
 
             'sub_category' => 'nullable|array',
-            'sub_category.*' => 'nullable|exists:exam_sub_categories,id',
+            'sub_category.*' => 'nullable|exists:sub_category,id',
 
             'subject' => 'nullable|array',
-            'subject.*' => 'nullable|exists:subjects,id',
+            'subject.*' => 'nullable|exists:subject,id',
 
             /* -------- Bank -------- */
             'upi_id' => 'nullable|string|max:255',
@@ -496,16 +496,16 @@ class TeacherController extends Controller
 
             /* -------- Account Setup -------- */
             'exam_type' => 'required|array|min:1',
-            'exam_type.*' => 'required|exists:exam_commissions,id',
+            'exam_type.*' => 'required|exists:examination_commission,id',
 
             'category' => 'nullable|array',
-            'category.*' => 'nullable|exists:exam_categories,id',
+            'category.*' => 'nullable|exists:category,id',
 
             'sub_category' => 'nullable|array',
-            'sub_category.*' => 'nullable|exists:exam_sub_categories,id',
+            'sub_category.*' => 'nullable|exists:sub_category,id',
 
             'subject' => 'nullable|array',
-            'subject.*' => 'nullable|exists:subjects,id',
+            'subject.*' => 'nullable|exists:subject,id',
 
             /* -------- Bank -------- */
             'upi_id' => 'nullable|string|max:255',

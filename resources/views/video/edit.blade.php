@@ -399,7 +399,7 @@
     </div>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="//cdn.ckeditor.com/4.14.1/standard/ckeditor.js"></script>
+    <script src="https://cdn.ckeditor.com/4.16.2/full/ckeditor.js"></script>
 
     <script>
 
@@ -409,10 +409,16 @@
             }
 
  if ($('#video_content').length && !CKEDITOR.instances.video_content) {
-    CKEDITOR.replace('video_content');
+      CKEDITOR.replace('video_content', {
+    filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
+    filebrowserUploadMethod: 'form'
+});
 }
 if ($('#live_content').length && !CKEDITOR.instances.live_content) {
-    CKEDITOR.replace('live_content');
+      CKEDITOR.replace('live_content', {
+    filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
+    filebrowserUploadMethod: 'form'
+});
 }
 
 

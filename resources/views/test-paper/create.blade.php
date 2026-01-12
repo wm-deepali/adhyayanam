@@ -549,18 +549,13 @@
             </div>
         </div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
-    <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
+  <script src="https://cdn.ckeditor.com/4.16.2/full/ckeditor.js"></script>
     <script>
-        let testInstructionEditor;
-        ClassicEditor.create(document.querySelector('#test_instruction'))
-            .then(editor => {
-                testInstructionEditor = editor;
-            })
-            .catch(error => {
-                console.error('CKEditor initialization error:', error);
-            });
 
+    CKEDITOR.replace('test_instruction', {
+        filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
+        filebrowserUploadMethod: 'form'
+    });
 
         function togglePriceSection() {
             const paperType = $('#paper_type').val();

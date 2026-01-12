@@ -67,7 +67,7 @@
                             </div>
 
                             <button type="submit" class="btn btn-primary">Save Blog</button>
-                    </form>
+                        </form>
                     @else
                         <div class="alert alert-warning">You don’t have permission to add blogs.</div>
                     @endif
@@ -82,7 +82,7 @@
                                 <th scope="col" width="10%">Type</th>
                                 <th scope="col">Image</th>
                                 <th scope="col">Thumbnail</th>
-                                 <th>Added By</th>
+                                <th>Added By</th>
                                 <th scope="col">Actions</th>
                             </tr>
                         </thead>
@@ -128,7 +128,8 @@
                                                                 @csrf
                                                                 @method('DELETE')
                                                                 <button type="submit" class="dropdown-item text-danger">
-                                                                    <i class="fa fa-trash me-1" style="color:#dc3545!important"></i> Delete
+                                                                    <i class="fa fa-trash me-1" style="color:#dc3545!important"></i>
+                                                                    Delete
                                                                 </button>
                                                             </form>
                                                         </li>
@@ -150,10 +151,13 @@
             </div>
         </div>
     </div>
-    <script src="https://cdn.ckeditor.com/4.16.2/standard/ckeditor.js"></script>
+    <script src="https://cdn.ckeditor.com/4.16.2/full/ckeditor.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            CKEDITOR.replace('editor');
+            CKEDITOR.replace('editor', {
+                filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
+                filebrowserUploadMethod: 'form'
+            });
         });
     </script>
 @endsection

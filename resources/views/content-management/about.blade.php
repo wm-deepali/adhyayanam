@@ -86,42 +86,13 @@
             </div>
         </div>
     </div>
-    <!--<script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>-->
-    <script src="https://cdn.ckeditor.com/4.16.2/standard/ckeditor.js"></script>
+    <script src="https://cdn.ckeditor.com/4.16.2/full/ckeditor.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            CKEDITOR.replace('editor');
-            // var quill = new Quill('.quill-editor', {
-            // modules: {
-            //     toolbar: [
-            //     [{ header: [1, 2, false] }],
-            //     ['bold', 'italic', 'underline'],
-            //     ['image', 'code-block'],
-            //     ],
-            // },
-            // placeholder: 'Compose an epic...',
-            // theme: 'snow', // or 'bubble'
-            // });
-
-            // const form = document.getElementById('about-form');
-            // form.addEventListener('submit', (event) => {
-            //     event.preventDefault(); // Prevent default form submission
-
-            //     // Get Quill content as HTML
-            //     const description = quill.root.innerHTML;
-
-            //     // Create a hidden input to hold the Quill content
-            //     const hiddenInput = document.createElement('input');
-            //     hiddenInput.type = 'hidden';
-            //     hiddenInput.name = 'description1';
-            //     hiddenInput.value = description;
-
-            //     // Append the hidden input to the form
-            //     form.appendChild(hiddenInput);
-
-            //     // Submit the form
-            //     form.submit();
-            // });
+             CKEDITOR.replace('editor', {
+                filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
+                filebrowserUploadMethod: 'form'
+            });
         });
     </script>
 @endsection

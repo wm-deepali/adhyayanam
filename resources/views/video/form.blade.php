@@ -307,7 +307,7 @@
 </form>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-<script src="//cdn.ckeditor.com/4.14.1/standard/ckeditor.js"></script>
+ <script src="https://cdn.ckeditor.com/4.16.2/full/ckeditor.js"></script>
 <script>
 
 
@@ -319,7 +319,10 @@
                 this.id = 'editor_' + Math.random().toString(36).substr(2, 9);
             }
             if (!CKEDITOR.instances[this.id]) {
-                CKEDITOR.replace(this.id);
+                   CKEDITOR.replace(this.id, {
+    filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
+    filebrowserUploadMethod: 'form'
+});
             }
         });
     }

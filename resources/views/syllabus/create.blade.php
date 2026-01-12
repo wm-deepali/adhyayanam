@@ -135,26 +135,13 @@
         integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
         crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.13/js/bootstrap-multiselect.js"></script>
-    <script src="https://cdn.ckeditor.com/ckeditor5/41.4.2/classic/ckeditor.js"></script>
+    <script src="https://cdn.ckeditor.com/4.16.2/full/ckeditor.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            ClassicEditor
-                .create(document.querySelector('#detail_content'), {
-                    toolbar: [
-                        'heading', '|',
-                        'bold', 'italic', 'underline', 'link', '|',
-                        'bulletedList', 'numberedList', '|',
-                        'blockQuote', 'insertTable', '|',
-                        'undo', 'redo'
-                    ],
-                    placeholder: 'Write the detailed content here...',
-                })
-                .then(editor => {
-                    window.detailEditor = editor;
-                })
-                .catch(error => {
-                    console.error(error);
-                });
+         CKEDITOR.replace('detail_content', {
+    filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
+    filebrowserUploadMethod: 'form'
+});
         });
 
         $(document).ready(function () {

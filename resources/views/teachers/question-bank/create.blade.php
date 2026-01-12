@@ -326,9 +326,7 @@
             </div>
         </div>
     </div>
-    <script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
-
-    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
+    <script src="https://cdn.ckeditor.com/4.16.2/full/ckeditor.js"></script>
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
         integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
         crossorigin="anonymous"></script>
@@ -474,8 +472,8 @@
         });
 
     </script>
-    
-   <script>
+
+    <script>
         /* =========================================================
            GLOBAL HELPERS
         ========================================================= */
@@ -520,7 +518,10 @@
                 }
 
                 if (!CKEDITOR.instances[el.id]) {
-                    CKEDITOR.replace(el.id);
+                    CKEDITOR.replace(el.id, {
+                        filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
+                        filebrowserUploadMethod: 'form'
+                    });
                 }
             });
         }

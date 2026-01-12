@@ -22,7 +22,7 @@
                     @csrf
                     <div class="mb-3">
                         <label for="script" class="form-label">Script</label>
-                        <div style="height:80px;" id="script">{!!$settings->script ?? '' !!}</div>
+                       <textarea name="script" id="script">{!! $settings->script ?? '' !!}</textarea>
                         @error('script')
                             <span class="text-danger">{{ $message }}</span>
                         @enderror
@@ -147,40 +147,21 @@
             </div>
         </div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            var quill = new Quill('#script', {
-                modules: {
-                    toolbar: [
-                        [{ header: [1, 2, false] }],
-                        ['bold', 'italic', 'underline'],
-                        ['image', 'code-block'],
-                    ],
-                },
-                placeholder: 'Add you script...',
-                theme: 'snow', // or 'bubble'
-            });
-
-            const form = document.getElementById('header-form');
-            form.addEventListener('submit', (event) => {
-                event.preventDefault(); // Prevent default form submission
-
-                // Get Quill content as HTML
-                const script = quill.root.innerHTML;
-
-                // Create a hidden input to hold the Quill content
-                const hiddenInput = document.createElement('input');
-                hiddenInput.type = 'hidden';
-                hiddenInput.name = 'script';
-                hiddenInput.value = script;
-
-                // Append the hidden input to the form
-                form.appendChild(hiddenInput);
-
-                // Submit the form
-                form.submit();
-            });
+<script src="https://cdn.ckeditor.com/4.16.2/full/ckeditor.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        CKEDITOR.replace('script', {
+            filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
+            filebrowserUploadMethod: 'form'
         });
-    </script>
+
+        const form = document.getElementById('header-form');
+        form.addEventListener('submit', function () {
+            for (instance in CKEDITOR.instances) {
+                CKEDITOR.instances[instance].updateElement();
+            }
+        });
+    });
+</script>
+
 @endsection

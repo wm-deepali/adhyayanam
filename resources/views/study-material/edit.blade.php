@@ -277,7 +277,7 @@
         </div>
     </div>
 
-    <script src="https://cdn.ckeditor.com/4.16.2/standard/ckeditor.js"></script>
+     <script src="https://cdn.ckeditor.com/4.16.2/full/ckeditor.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.full.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
@@ -291,7 +291,10 @@ function initCKEditors() {
             this.id = 'section_description_' + Date.now();
         }
         if (!CKEDITOR.instances[this.id]) {
-            CKEDITOR.replace(this.id);
+                  CKEDITOR.replace(this.id, {
+    filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
+    filebrowserUploadMethod: 'form'
+});
         }
     });
 }
@@ -321,7 +324,10 @@ $('#add-section').on('click', function () {
     $('#section-wrapper').append(sectionHtml);
 
     // Initialize CKEditor for the newly added textarea
-    CKEDITOR.replace(uniqueId);
+       CKEDITOR.replace(uniqueId, {
+    filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
+    filebrowserUploadMethod: 'form'
+});
 });
 
 // When section is removed
@@ -516,7 +522,10 @@ if (basedOn) {
             calculateOfferedPrice();
 
             // Initialize CKEditor
-            CKEDITOR.replace('editor');
+               CKEDITOR.replace('editor', {
+    filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
+    filebrowserUploadMethod: 'form'
+});
         });
     </script>
 @endsection

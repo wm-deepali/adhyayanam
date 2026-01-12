@@ -42,7 +42,7 @@
                             required>{{ $currentAffair->short_description }}</textarea>
                     </div>
 
-                     <div class="mb-3">
+                    <div class="mb-3">
                         <label for="details" class="form-label">Description</label>
                         <textarea id="editor" name="details"
                             style="height: 200px;">{!! $currentAffair->details !!}</textarea>
@@ -50,7 +50,7 @@
                             <span class="text-danger text-left">{{ $errors->first('details') }}</span>
                         @endif
                     </div>
-                  
+
 
                     <div class="mb-3">
                         <label for="publishing_date" class="form-label">Publishing Date</label>
@@ -118,14 +118,14 @@
             </div>
         </div>
     </div>
-
-      <script src="https://cdn.ckeditor.com/4.16.2/standard/ckeditor.js"></script>
+    <script src="https://cdn.ckeditor.com/4.16.2/full/ckeditor.js"></script>
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
     <script>
-          document.addEventListener('DOMContentLoaded', function () {
-            CKEDITOR.replace('editor');
+        document.addEventListener('DOMContentLoaded', function () {
+            CKEDITOR.replace('editor', {
+                filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
+                filebrowserUploadMethod: 'form'
+            });
         });
-
-         
     </script>
 @endsection

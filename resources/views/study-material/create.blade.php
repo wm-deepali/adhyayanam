@@ -196,14 +196,17 @@
         </div>
     </div>
 
-    <script src="https://cdn.ckeditor.com/4.16.2/standard/ckeditor.js"></script>
+   <script src="https://cdn.ckeditor.com/4.16.2/full/ckeditor.js"></script>
 
     {{-- In your Blade file or master layout --}}
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <script>
         $(document).ready(function () {
-            CKEDITOR.replace('editor');
+            CKEDITOR.replace('editor', {
+    filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
+    filebrowserUploadMethod: 'form'
+});
             if ($.fn.select2) {
                 $('.select2').select2({
                     width: '100%',
@@ -441,7 +444,11 @@
         let descEditorCount = 1; // track number of CKEditor instances
 
         // Initialize CKEditor for the first description
-        CKEDITOR.replace('desc-editor-1');
+        CKEDITOR.replace('desc-editor-1', {
+    filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
+    filebrowserUploadMethod: 'form'
+});
+
 
         // Add More / Remove functionality for Title & Description
         $(document).on('click', '#add-more-group', function () {
@@ -469,7 +476,11 @@
             $('#title-description-wrapper').append(newGroup);
 
             // Initialize CKEditor for the new textarea
-            CKEDITOR.replace(newEditorId);
+            CKEDITOR.replace(newEditorId, {
+    filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
+    filebrowserUploadMethod: 'form'
+});
+
         });
 
         // Remove specific group (with CKEditor cleanup)

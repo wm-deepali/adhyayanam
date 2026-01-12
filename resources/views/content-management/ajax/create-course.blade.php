@@ -355,7 +355,7 @@
         integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU=" crossorigin="anonymous"></script>
     <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
 
-    <script src="https://cdn.ckeditor.com/4.16.2/standard/ckeditor.js"></script>
+   <script src="https://cdn.ckeditor.com/4.16.2/full/ckeditor.js"></script>
     <script>
 
         $(document).ready(function () {
@@ -380,8 +380,16 @@
                 calculateOfferedPrice();
             });
 
-            CKEDITOR.replace('detail_content');
-            CKEDITOR.replace('course_overview');
+CKEDITOR.replace('detail_content', {
+    filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
+    filebrowserUploadMethod: 'form'
+});
+
+CKEDITOR.replace('course_overview', {
+    filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
+    filebrowserUploadMethod: 'form'
+});
+
             setInterval(function () {
                 $(document).find(".cke_notifications_area").remove();
             }, 100);

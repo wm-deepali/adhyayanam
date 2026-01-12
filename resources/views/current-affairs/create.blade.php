@@ -55,7 +55,7 @@
                             <span class="text-danger text-left">{{ $errors->first('details') }}</span>
                         @endif
                     </div>
-                    
+
                     <div class="mb-3">
                         <label for="publishing_date" class="form-label">Publishing Date</label>
                         <input id="publishing_date" type="date" class="form-control" name="publishing_date"
@@ -128,12 +128,15 @@
             </div>
         </div>
     </div>
-     <script src="https://cdn.ckeditor.com/4.16.2/standard/ckeditor.js"></script>
+    <script src="https://cdn.ckeditor.com/4.16.2/full/ckeditor.js"></script>
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
 
-   <script>
+    <script>
         document.addEventListener('DOMContentLoaded', function () {
-            CKEDITOR.replace('editor');
+            CKEDITOR.replace('editor', {
+                filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
+                filebrowserUploadMethod: 'form'
+            });
         });
-   </script>
+    </script>
 @endsection

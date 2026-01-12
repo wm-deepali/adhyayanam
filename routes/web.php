@@ -36,6 +36,7 @@ use App\Http\Controllers\Teacher\TeacherResultController;
 use App\Http\Controllers\Admin\PercentageSystemController;
 use App\Http\Controllers\Admin\AdminHomeworkController;
 use \App\Http\Controllers\Teacher\TeacherHomeworkController;
+use App\Http\Controllers\CKEditorController;
 
 /*
 |--------------------------------------------------------------------------
@@ -803,6 +804,8 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
             /* ---------------- FEATURE SETTINGS ---------------- */
             Route::get('/feature-settings', [ContentManagementController::class, 'featureSettingsIndex'])->name('settings.feature.index')->middleware('custom.permission:manage_feature');
             Route::post('/feature-settings/store', [ContentManagementController::class, 'featureSettingsStore'])->name('settings.feature.store')->middleware('custom.permission:manage_feature_add');
+
+            Route::post('ckeditor/upload', [CKEditorController::class, 'upload'])->name('ckeditor.upload');
 
         });
 

@@ -339,6 +339,7 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
             Route::post('/create/store', [ContentManagementController::class, 'examinationStore'])->name('cm.exam.store')->middleware('custom.permission:manage_exam_add');
             Route::delete('/delete/{id}', [ContentManagementController::class, 'examinationDelete'])->name('cm.exam.destroy')->middleware('custom.permission:manage_exam_delete');
             Route::get('/bulk-delete', [ContentManagementController::class, 'examinationBulkDelete'])->name('cm.exam.bulk-delete')->middleware('custom.permission:manage_exam_delete');
+            Route::get('/{id}', [ContentManagementController::class, 'examinationShow'])->name('cm.exam.show');
         });
 
         // CATEGORY ROUTES
@@ -350,6 +351,7 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
             Route::post('/create/store', [ContentManagementController::class, 'categoryStore'])->name('cm.category.store')->middleware('custom.permission:manage_category_add');
             Route::delete('/delete/{id}', [ContentManagementController::class, 'categoryDelete'])->name('cm.category.delete')->middleware('custom.permission:manage_category_delete');
             Route::get('/bulk-delete', [ContentManagementController::class, 'categoryBulkDelete'])->name('cm.category.bulk-delete')->middleware('custom.permission:manage_category_delete');
+            Route::get('/{id}', [ContentManagementController::class, 'categoryShow'])->name('cm.category.show');
         });
 
         // SUB CATEGORY ROUTES
@@ -384,6 +386,7 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
             Route::post('/update/{id}', [ContentManagementController::class, 'chapterUpdate'])->name('cm.chapter.update')->middleware('custom.permission:manage_chapter_edit');
             Route::delete('/delete/{id}', [ContentManagementController::class, 'chapterDelete'])->name('cm.chapter.delete')->middleware('custom.permission:manage_chapter_delete');
             Route::get('/bulk-delete', [ContentManagementController::class, 'chapterBulkDelete'])->name('cm.chapter.bulk-delete')->middleware('custom.permission:manage_chapter_delete');
+            Route::get('/view/{id}', [ContentManagementController::class, 'chapterView'])->name('cm.chapter.view');
         });
 
         // TOPIC ROUTES

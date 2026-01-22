@@ -16,15 +16,15 @@ class TestResultController extends Controller
         return view('admin.results.index', [
             'pending' => StudentTestAttempt::where('status', 'pending')
                 ->latest()
-                ->paginate(20, ['*'], 'pending_page'),
+                ->paginate(10, ['*'], 'pending_page'),
 
             'under_review' => StudentTestAttempt::where('status', 'under_review')
                 ->latest()
-                ->paginate(20, ['*'], 'review_page'),
+                ->paginate(10, ['*'], 'review_page'),
 
             'published' => StudentTestAttempt::where('status', 'published')
                 ->latest()
-                ->paginate(20, ['*'], 'published_page'),
+                ->paginate(10, ['*'], 'published_page'),
 
             'teachers' => Teacher::where('can_check_tests', 1)->get()
         ]);

@@ -1,6 +1,6 @@
-<div class="bg-light rounded">
-    <div class="card shadow-sm">
-        <div class="card-body">
+<div class="rounded">
+    <!-- <div class="card shadow-sm"> -->
+        <!-- <div class="card-body"> -->
 
             <h4 class="mb-3">{{ $title }}</h4>
 
@@ -183,8 +183,8 @@
                 {{ $attempts->links() }}
             </div>
 
-        </div>
-    </div>
+        <!-- </div> -->
+    <!-- </div> -->
 </div>
 
 <!-- Assign Teacher Modal -->

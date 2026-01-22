@@ -8,11 +8,12 @@ Create|Course Type
 <div class="bg-light rounded">
     <div class="card">
         <div class="card-body">
-            <div class="d-flex">
-                <div class="col">
+             <div class="d-flex justify-content-between">
+                <div>
                     <h5 class="card-title">Create</h5>
                     <h6 class="card-subtitle mb-2 text-muted"> Add Course Type Commission here.</h6>
                 </div>
+                <a href="{{ route('cm.category') }}" class="btn btn-secondary" style="height: fit-content;">← Back</a>
             </div>
             <div class="mt-2">
                 @include('layouts.includes.messages')
@@ -95,7 +96,6 @@ Create|Course Type
                 </div>
             
                 <button type="submit" class="btn btn-primary">Save</button>
-                <a href="{{route('cm.exam')}}" class="btn">Back</a>
             </form>
             
         </div>

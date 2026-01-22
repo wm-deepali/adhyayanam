@@ -13,6 +13,7 @@ Edit|Category
                     <h5 class="card-title">Create</h5>
                     <h6 class="card-subtitle mb-2 text-muted"> Edit Category here.</h6>
                 </div>
+                 <a href="{{ route('cm.category') }}" class="btn btn-secondary" style="height: fit-content;">← Back</a>
             </div>
             <div class="mt-2">
                 @include('layouts.includes.messages')
@@ -71,7 +72,7 @@ Edit|Category
                     @enderror
                 </div>
             
-                <div class="mb-3">
+                <!-- <div class="mb-3">
                     <label for="image" class="form-label">Image</label>
                     <input type="file" class="form-control" name="image" accept="image/*" value="{{$category->image ?? ""}}">
                     @error('image')
@@ -85,7 +86,7 @@ Edit|Category
                     @error('alt_tag')
                         <span class="text-danger">{{ $message }}</span>
                     @enderror
-                </div>
+                </div> -->
             
                 <div class="mb-3">
                     <label for="status" class="form-label">Status</label>
@@ -101,7 +102,6 @@ Edit|Category
                 </div>
             
                 <button type="submit" class="btn btn-primary">Save</button>
-                <a href="{{route('cm.category')}}" class="btn">Back</a>
             </form>
         </div>
     </div>

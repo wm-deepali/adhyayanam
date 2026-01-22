@@ -25,6 +25,7 @@
                         <h5 class="card-title">Update</h5>
                         <h6 class="card-subtitle mb-2 text-muted"> Edit Chapter here.</h6>
                     </div>
+                    <a href="{{ route('cm.chapter') }}" class="btn btn-secondary" style="height: fit-content;">← Back</a>
                 </div>
                 <div class="mt-2">
                     @include('layouts.includes.messages')
@@ -50,7 +51,8 @@
                         <select class="form-select" name="category_id" id="category_id" required>
                             @foreach($categories as $category)
                                 <option @if($chapter->category_id == $category->id) selected @endif value="{{ $category->id }}">
-                                    {{ $category->name }}</option>
+                                    {{ $category->name }}
+                                </option>
                             @endforeach
                         </select>
                         @error('category_id')
@@ -73,7 +75,8 @@
                             <option value="">Select </option>
                             @foreach($subjects as $subject)
                                 <option @if($chapter->subject_id == $subject->id) selected @endif value="{{ $subject->id }}">
-                                    {{ $subject->name }}</option>
+                                    {{ $subject->name }}
+                                </option>
                             @endforeach
                         </select>
                         @error('subject_id')
@@ -99,14 +102,14 @@
                         @endif
                     </div>
 
-                    <div class="mb-3">
+                    <!-- <div class="mb-3">
                         <label for="description" class="form-label">Description</label>
                         <input type="text" class="form-control" name="description" value="{{$chapter->description}}"
                             placeholder="Description">
                         @if ($errors->has('description'))
                             <span class="text-danger text-left">{{ $errors->first('description') }}</span>
                         @endif
-                    </div>
+                    </div> -->
 
                     <div class="mb-3">
                         <label for="status" class="form-label">Status</label>
@@ -119,7 +122,6 @@
                         @endif
                     </div>
                     <button type="submit" class="btn btn-primary">Save</button>
-                    <a href="{{route('cm.chapter')}}" class="btn">Back</a>
                 </form>
 
             </div>

@@ -8,8 +8,19 @@
     <div class="bg-light rounded">
         <div class="card">
             <div class="card-body">
-                <h5 class="card-title">Create</h5>
-                <h6 class="card-subtitle mb-2 text-muted">Create Study Material here.</h6>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div>
+                        <h5 class="card-title mb-0">Create</h5>
+                        <h6 class="card-subtitle text-muted">Create Study Material here.</h6>
+                    </div>
+
+                    <div>
+                        <a href="{{ route('study.material.index') }}" class="btn btn-secondary">
+                            ← Back
+                        </a>
+                    </div>
+                </div>
+
 
                 <div class="mt-2">
                     @include('layouts.includes.messages')
@@ -190,13 +201,12 @@
                     </div>
 
                     <button type="submit" class="btn btn-primary">Save</button>
-                    <a href="{{ route('study.material.index') }}" class="btn btn-secondary">Back</a>
                 </form>
             </div>
         </div>
     </div>
 
-   <script src="https://cdn.ckeditor.com/4.16.2/full/ckeditor.js"></script>
+    <script src="https://cdn.ckeditor.com/4.16.2/full/ckeditor.js"></script>
 
     {{-- In your Blade file or master layout --}}
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -204,9 +214,9 @@
     <script>
         $(document).ready(function () {
             CKEDITOR.replace('editor', {
-    filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
-    filebrowserUploadMethod: 'form'
-});
+                filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
+                filebrowserUploadMethod: 'form'
+            });
             if ($.fn.select2) {
                 $('.select2').select2({
                     width: '100%',
@@ -445,9 +455,9 @@
 
         // Initialize CKEditor for the first description
         CKEDITOR.replace('desc-editor-1', {
-    filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
-    filebrowserUploadMethod: 'form'
-});
+            filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
+            filebrowserUploadMethod: 'form'
+        });
 
 
         // Add More / Remove functionality for Title & Description
@@ -456,30 +466,30 @@
             const newEditorId = `desc-editor-${descEditorCount}`;
 
             const newGroup = `
-            <div class="title-description-group mb-2 border rounded p-2">
-                <div class="row">
-                    <div class="col-md-12 mb-2">
-                        <input type="text" class="form-control" name="titles[]" placeholder="Title" required>
-                    </div>
-                    <div class="col-md-12 mb-2">
-                        <textarea class="form-control description-editor" id="${newEditorId}" name="descriptions[]" placeholder="Description" rows="3" required></textarea>
-                    </div>
-                    <div class="col-md-1 d-flex align-items-center">
+                <div class="title-description-group mb-2 border rounded p-2">
+                    <div class="row">
+                        <div class="col-md-12 mb-2">
+                            <input type="text" class="form-control" name="titles[]" placeholder="Title" required>
+                        </div>
+                        <div class="col-md-12 mb-2">
+                            <textarea class="form-control description-editor" id="${newEditorId}" name="descriptions[]" placeholder="Description" rows="3" required></textarea>
+                        </div>
                         <div class="col-md-1 d-flex align-items-center">
-                                             <button type="button" class="btn btn-danger btn-sm remove-group">Remove</button>
+                            <div class="col-md-1 d-flex align-items-center">
+                                                 <button type="button" class="btn btn-danger btn-sm remove-group">Remove</button>
 
-                                        </div>
+                                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>`;
+                </div>`;
 
             $('#title-description-wrapper').append(newGroup);
 
             // Initialize CKEditor for the new textarea
             CKEDITOR.replace(newEditorId, {
-    filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
-    filebrowserUploadMethod: 'form'
-});
+                filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
+                filebrowserUploadMethod: 'form'
+            });
 
         });
 

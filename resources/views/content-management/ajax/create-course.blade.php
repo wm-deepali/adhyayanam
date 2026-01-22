@@ -13,6 +13,8 @@
                         <h5 class="card-title">Create</h5>
                         <h6 class="card-subtitle mb-2 text-muted"> Add Course here.</h6>
                     </div>
+                    <a href="{{ route('courses.course.index') }}" class="btn btn-secondary" style="height: fit-content;">←
+                        Back</a>
                 </div>
                 <div class="mt-2">
                     @include('layouts.includes.messages')
@@ -22,7 +24,7 @@
                     @csrf
                     <div class="row">
                         <div class="col-md-6">
-                            
+
                             <div class="mb-3">
                                 <label for="feature" class="form-label">Feature</label>
                                 <input class="form-control" id="feature" name="feature" type="checkbox" data-toggle="toggle"
@@ -171,7 +173,7 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="discount" class="form-label">Discount</label>
+                                <label for="discount" class="form-label">Discount (%)</label>
                                 <input type="number" class="form-control" id="discount" name="discount"
                                     placeholder="Discount" required>
                                 @error('discount')
@@ -343,7 +345,7 @@
                     </div>
 
                     <button type="submit" class="btn btn-primary">Save</button>
-                    <a href="{{ route('courses.course.index') }}" class="btn">Back</a>
+
                 </form>
             </div>
         </div>
@@ -355,24 +357,26 @@
         integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU=" crossorigin="anonymous"></script>
     <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
 
-   <script src="https://cdn.ckeditor.com/4.16.2/full/ckeditor.js"></script>
+    <script src="https://cdn.ckeditor.com/4.16.2/full/ckeditor.js"></script>
     <script>
 
         $(document).ready(function () {
 
             function calculateOfferedPrice() {
                 let courseFee = parseFloat($('#course_fee').val()) || 0;
-                let discount = parseFloat($('#discount').val()) || 0;
+                let discountPercent = parseFloat($('#discount').val()) || 0;
 
-                // Prevent negative price
-                let offeredPrice = courseFee - discount;
-                if (offeredPrice < 0) offeredPrice = 0;
-                if (discount > courseFee) {
-                    discount = courseFee;
-                    $('#discount').val(courseFee);
+                if (discountPercent > 100) {
+                    discountPercent = 100;
+                    $('#discount').val(100);
                 }
-                $('#offered_price').val(offeredPrice);
 
+                let discountAmount = (courseFee * discountPercent) / 100;
+                let offeredPrice = courseFee - discountAmount;
+
+                if (offeredPrice < 0) offeredPrice = 0;
+
+                $('#offered_price').val(Math.round(offeredPrice));
             }
 
             // Recalculate on input
@@ -380,15 +384,15 @@
                 calculateOfferedPrice();
             });
 
-CKEDITOR.replace('detail_content', {
-    filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
-    filebrowserUploadMethod: 'form'
-});
+            CKEDITOR.replace('detail_content', {
+                filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
+                filebrowserUploadMethod: 'form'
+            });
 
-CKEDITOR.replace('course_overview', {
-    filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
-    filebrowserUploadMethod: 'form'
-});
+            CKEDITOR.replace('course_overview', {
+                filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
+                filebrowserUploadMethod: 'form'
+            });
 
             setInterval(function () {
                 $(document).find(".cke_notifications_area").remove();

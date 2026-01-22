@@ -18,6 +18,19 @@ class LiveTestController extends Controller
         $decodeId = base64_decode($id);
         $studentId = auth()->id();
 
+        // 🔒 RULE: Only one test can be in progress
+        $existingAttempt = StudentTestAttempt::where('student_id', $studentId)
+            ->where('status', 'in_progress')
+            ->where('test_id', '!=', $decodeId)
+            ->first();
+
+        if ($existingAttempt) {
+            return back()->withErrors([
+                'test' => 'You already have an active test in progress. Please complete it before starting a new test.'
+            ]);
+
+        }
+
         $test = Test::where('id', $decodeId)->firstOrFail();
 
         $attempt = StudentTestAttempt::where('student_id', $studentId)
@@ -41,7 +54,7 @@ class LiveTestController extends Controller
 
         $questionList = array_values(array_filter($questionList));
 
-        // ========================= ANSWER COUNT =========================
+        // ================= ANSWER COUNT =================
         $answeredQuery = StudentTestAnswer::where('attempt_id', $attempt->id)
             ->whereNull('parent_question_id')
             ->where(function ($q) {
@@ -51,8 +64,6 @@ class LiveTestController extends Controller
             });
 
         $answeredCount = $answeredQuery->count();
-
-        // 👉 Here we fetch Answered Question IDs
         $answeredIds = $answeredQuery->pluck('question_id')->toArray();
 
         $totalQuestions = count($questionList);
@@ -65,9 +76,10 @@ class LiveTestController extends Controller
             'total_questions' => $totalQuestions,
             'answered_count' => $answeredCount,
             'pending_count' => $pendingCount,
-            'answered_ids' => $answeredIds, // 👉 Sending to UI
+            'answered_ids' => $answeredIds,
         ]);
     }
+
 
     public function fetchQuestion(Request $request)
     {
@@ -425,11 +437,22 @@ class LiveTestController extends Controller
 
             $finalScore = $earnedPositive + $earnedNegative;
 
-            $pendingQuestions = StudentTestAnswer::where('attempt_id', $attempt->id)
-                ->where('requires_manual_check', true)
-                ->count();
+            // $pendingQuestions = StudentTestAnswer::where('attempt_id', $attempt->id)
+            //     ->where('requires_manual_check', true)
+            //     ->count();
+            // $status = $pendingQuestions > 0 ? "pending" : "published";
 
-            $status = $pendingQuestions > 0 ? "pending" : "published";
+            $hasSubjectiveQuestions = TestDetail::where('test_id', $testId)
+                ->whereHas('question', function ($q) {
+                    $q->whereIn('question_type', ['Subjective', 'Story Based']);
+                })
+                ->exists();
+
+            if ($hasSubjectiveQuestions) {
+                $status = 'pending';
+            } else {
+                $status = 'published';
+            }
 
             $durationSeconds = $test->duration * 60;
             $timeTaken = $durationSeconds - $remainingTime;

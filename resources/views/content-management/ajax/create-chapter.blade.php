@@ -18,6 +18,7 @@ Create|Chapter
                     <h5 class="card-title">Create</h5>
                     <h6 class="card-subtitle mb-2 text-muted"> Add Chapter here.</h6>
                 </div>
+                 <a href="{{ route('cm.chapter') }}" class="btn btn-secondary" style="height: fit-content;">← Back</a>
             </div>
             <div class="mt-2">
                 @include('layouts.includes.messages')
@@ -79,13 +80,13 @@ Create|Chapter
                     @endif
                 </div>
 
-                <div class="mb-3">
+                <!-- <div class="mb-3">
                     <label for="description" class="form-label">Description</label>
                     <input type="text" class="form-control" name="description" placeholder="Description">
                     @if ($errors->has('description'))
                         <span class="text-danger text-left">{{ $errors->first('description') }}</span>
                     @endif
-                </div>
+                </div> -->
             
                 <div class="mb-3">
                     <label for="status" class="form-label">Status</label>
@@ -98,7 +99,6 @@ Create|Chapter
                     @endif
                 </div>
                 <button type="submit" class="btn btn-primary">Save</button>
-                <a href="{{route('cm.chapter')}}" class="btn">Back</a>
             </form>
             
         </div>

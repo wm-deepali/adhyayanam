@@ -24,6 +24,7 @@
                         <h5 class="card-title">Edit</h5>
                         <h6 class="card-subtitle mb-2 text-muted"> Edit Topic here.</h6>
                     </div>
+                    <a href="{{ route('topic.index') }}" class="btn btn-secondary" style="height: fit-content;">← Back</a>
                 </div>
                 <div class="mt-2">
                     @include('layouts.includes.messages')
@@ -37,7 +38,8 @@
                             <option value="" selected disabled>None</option>
                             @foreach($commissions as $commission)
                                 <option @if($topic->exam_com_id == $commission->id) selected @endif value="{{ $commission->id }}">
-                                    {{ $commission->name }}</option>
+                                    {{ $commission->name }}
+                                </option>
                             @endforeach
                         </select>
                         @error('exam_com_id')
@@ -49,7 +51,8 @@
                         <select class="form-select" name="category_id" id="category_id" required>
                             @foreach($categories as $category)
                                 <option @if($topic->category_id == $category->id) selected @endif value="{{ $category->id }}">
-                                    {{ $category->name }}</option>
+                                    {{ $category->name }}
+                                </option>
                             @endforeach
                         </select>
                         @error('category_id')
@@ -72,7 +75,8 @@
                             <option value="">Select </option>
                             @foreach($subjects as $subject)
                                 <option @if($topic->subject_id == $subject->id) selected @endif value="{{ $subject->id }}">
-                                    {{ $subject->name }}</option>
+                                    {{ $subject->name }}
+                                </option>
                             @endforeach
                         </select>
                         @error('subject_id')
@@ -85,7 +89,8 @@
                             <option value="">Select</option>
                             @foreach($chapters as $chapter)
                                 <option @if($topic->chapter_id == $chapter->id) selected @endif value="{{ $chapter->id }}">
-                                    {{ $chapter->name }}</option>
+                                    {{ $chapter->name }}
+                                </option>
                             @endforeach
                         </select>
                         @error('chapter_id')
@@ -110,15 +115,15 @@
                             <span class="text-danger text-left">{{ $errors->first('topic_number') }}</span>
                         @endif
                     </div>
-
-                    <div class="mb-3">
-                        <label for="description" class="form-label">Description</label>
-                        <input type="text" class="form-control" name="description" placeholder="Description"
-                            value="{{$topic->description}}">
-                        @if ($errors->has('description'))
-                            <span class="text-danger text-left">{{ $errors->first('description') }}</span>
-                        @endif
-                    </div>
+                    <!-- 
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <input type="text" class="form-control" name="description" placeholder="Description"
+                                value="{{$topic->description}}">
+                            @if ($errors->has('description'))
+                                <span class="text-danger text-left">{{ $errors->first('description') }}</span>
+                            @endif
+                        </div> -->
 
                     <div class="mb-3">
                         <label for="status" class="form-label">Status</label>
@@ -131,7 +136,6 @@
                         @endif
                     </div>
                     <button type="submit" class="btn btn-primary">Save</button>
-                    <a href="{{route('cm.chapter')}}" class="btn">Back</a>
                 </form>
 
             </div>

@@ -29,6 +29,11 @@ class Chapter extends Model
         return $this->belongsTo(Subject::class, 'subject_id');
     }
 
+    public function examinationCommission()
+    {
+        return $this->belongsTo(ExaminationCommission::class, 'exam_com_id');
+    }
+
     public function category()
     {
         return $this->belongsTo(Category::class, 'category_id');

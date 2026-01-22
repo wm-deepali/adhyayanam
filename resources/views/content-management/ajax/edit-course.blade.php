@@ -13,6 +13,8 @@
                         <h5 class="card-title">Edit</h5>
                         <h6 class="card-subtitle mb-2 text-muted"> Edit Course here.</h6>
                     </div>
+                    <a href="{{ route('courses.course.index') }}" class="btn btn-secondary" style="height: fit-content;">←
+                        Back</a>
                 </div>
                 <div class="mt-2">
                     @include('layouts.includes.messages')
@@ -30,18 +32,20 @@
                             </div>
                         </div>
                         <div class="col-md-6">
-    <div class="mb-3">
-        <label for="course_mode" class="form-label">Course Mode</label>
-        <select class="form-control" name="course_mode" id="course_mode" required>
-            <option value="" disabled {{ empty($course->course_mode) ? 'selected' : '' }}>None</option>
-            <option value="Online" {{ $course->course_mode == 'Online' ? 'selected' : '' }}>Online</option>
-            <option value="Video Learning" {{ $course->course_mode == 'Video Learning' ? 'selected' : '' }}>Video Learning</option>
-        </select>
-        @error('course_mode')
-            <span class="text-danger">{{ $message }}</span>
-        @enderror
-    </div>
-</div>
+                            <div class="mb-3">
+                                <label for="course_mode" class="form-label">Course Mode</label>
+                                <select class="form-control" name="course_mode" id="course_mode" required>
+                                    <option value="" disabled {{ empty($course->course_mode) ? 'selected' : '' }}>None
+                                    </option>
+                                    <option value="Online" {{ $course->course_mode == 'Online' ? 'selected' : '' }}>Online
+                                    </option>
+                                    <option value="Video Learning" {{ $course->course_mode == 'Video Learning' ? 'selected' : '' }}>Video Learning</option>
+                                </select>
+                                @error('course_mode')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
+                        </div>
 
                     </div>
                     <div class="row">
@@ -150,8 +154,7 @@
                                         $selectedTopics = $course->topic_id ?? [];
                                     @endphp
                                     @foreach($topics as $topic)
-                                        <option value="{{ $topic->id }}" {{ in_array($topic->id, $selectedTopics) ? 'selected' : '' }}>
-                                            {{ $topic->name }}
+                                        <option value="{{ $topic->id }}" {{ in_array($topic->id, $selectedTopics) ? 'selected' : '' }}>{{ $topic->name }}
                                         </option>
                                     @endforeach
                                 </select>
@@ -182,8 +185,8 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="course_fee" class="form-label">Fee</label>
-                                <input type="number" class="form-control" id="course_fee" name="course_fee" placeholder="Fee"
-                                    value="{{ $course->course_fee }}" required>
+                                <input type="number" class="form-control" id="course_fee" name="course_fee"
+                                    placeholder="Fee" value="{{ $course->course_fee }}" required>
                                 @error('course_fee')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
@@ -194,9 +197,9 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="discount" class="form-label">Discount</label>
-                                <input type="number" class="form-control" id="discount" name="discount" placeholder="Discount"
-                                    value="{{ $course->discount }}" required>
+                                <label for="discount" class="form-label">Discount (%)</label>
+                                <input type="number" class="form-control" id="discount" name="discount"
+                                    placeholder="Discount" value="{{ $course->discount }}" required>
                                 @error('discount')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
@@ -205,8 +208,8 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="offered_price" class="form-label">Offered Price</label>
-                                <input type="number" class="form-control" id="offered_price" name="offered_price" placeholder="Offered Price"
-                                    value="{{ $course->offered_price }}" required readonly>
+                                <input type="number" class="form-control" id="offered_price" name="offered_price"
+                                    placeholder="Offered Price" value="{{ $course->offered_price }}" required readonly>
                                 @error('offered_price')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
@@ -237,22 +240,24 @@
                         </div>
                     </div>
 
-                    
+
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
-    <label for="language_of_teaching" class="form-label">Languages</label>
-    @php
-        $selectedLanguages = (array) $course->language_of_teaching;
-    @endphp
-    <select class="form-control select2" name="language_of_teaching[]" multiple>
-        <option value="English" {{ in_array('English', $selectedLanguages) ? 'selected' : '' }}>English</option>
-        <option value="Hindi" {{ in_array('Hindi', $selectedLanguages) ? 'selected' : '' }}>Hindi</option>
-    </select>
-    @error('language_of_teaching')
-        <span class="text-danger">{{ $message }}</span>
-    @enderror
-</div>
+                                <label for="language_of_teaching" class="form-label">Languages</label>
+                                @php
+                                    $selectedLanguages = (array) $course->language_of_teaching;
+                                @endphp
+                                <select class="form-control select2" name="language_of_teaching[]" multiple>
+                                    <option value="English" {{ in_array('English', $selectedLanguages) ? 'selected' : '' }}>
+                                        English</option>
+                                    <option value="Hindi" {{ in_array('Hindi', $selectedLanguages) ? 'selected' : '' }}>
+                                        Hindi</option>
+                                </select>
+                                @error('language_of_teaching')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
 
                         </div>
                         <div class="col-md-6">
@@ -377,85 +382,87 @@
                     </div>
 
                     <button type="submit" class="btn btn-primary">Save</button>
-                    <a href="{{ route('courses.course.index') }}" class="btn">Back</a>
                 </form>
             </div>
         </div>
     </div>
-   {{-- In your Blade file or master layout --}}
+    {{-- In your Blade file or master layout --}}
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"
         integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"
         integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU=" crossorigin="anonymous"></script>
     <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
 
-  <script src="https://cdn.ckeditor.com/4.16.2/full/ckeditor.js"></script>
+    <script src="https://cdn.ckeditor.com/4.16.2/full/ckeditor.js"></script>
     <script>
 
-$(document).ready(function () {
+        $(document).ready(function () {
 
-    function calculateOfferedPrice() {
-        let courseFee = parseFloat($('#course_fee').val()) || 0;
-        let discount  = parseFloat($('#discount').val()) || 0;
+            function calculateOfferedPrice() {
+                let courseFee = parseFloat($('#course_fee').val()) || 0;
+                let discountPercent = parseFloat($('#discount').val()) || 0;
 
-        // Discount cannot be more than fee
-        if (discount > courseFee) {
-            discount = courseFee;
-            $('#discount').val(courseFee);
+                if (discountPercent > 100) {
+                    discountPercent = 100;
+                    $('#discount').val(100);
+                }
+
+                let discountAmount = (courseFee * discountPercent) / 100;
+                let offeredPrice = courseFee - discountAmount;
+
+                if (offeredPrice < 0) offeredPrice = 0;
+
+                $('#offered_price').val(Math.round(offeredPrice));
+            }
+
+            // Auto calculate on change
+            $('#course_fee, #discount').on('input', function () {
+                calculateOfferedPrice();
+            });
+
+            // 🔥 IMPORTANT: calculate once on page load (edit mode)
+            calculateOfferedPrice();
+
+        });
+
+
+        let isEditLoad = true;
+
+        function updateDisableSelects() {
+            let subjects = $('#subject_id').val() || [];
+            let chapters = $('#chapter_id').val() || [];
+
+            $('#chapter_id').prop('disabled', false);
+            $('#topic_id').prop('disabled', false);
+
+            if (subjects.length > 1) {
+                if (!isEditLoad) {
+                    $('#chapter_id').val(null).trigger('change');
+                    $('#topic_id').val(null).trigger('change');
+                }
+                $('#chapter_id').prop('disabled', true);
+                $('#topic_id').prop('disabled', true);
+            } else if (chapters.length > 1) {
+                if (!isEditLoad) {
+                    $('#topic_id').val(null).trigger('change');
+                }
+                $('#topic_id').prop('disabled', true);
+            }
+
+            isEditLoad = false;
         }
 
-        let offeredPrice = courseFee - discount;
-        $('#offered_price').val(offeredPrice);
-    }
 
-    // Auto calculate on change
-    $('#course_fee, #discount').on('input', function () {
-        calculateOfferedPrice();
-    });
+        $(document).ready(function () {
+            CKEDITOR.replace('detail_content', {
+                filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
+                filebrowserUploadMethod: 'form'
+            });
 
-    // 🔥 IMPORTANT: calculate once on page load (edit mode)
-    calculateOfferedPrice();
-
-});
-
-
- let isEditLoad = true;
-
-function updateDisableSelects() {
-    let subjects = $('#subject_id').val() || [];
-    let chapters = $('#chapter_id').val() || [];
-
-    $('#chapter_id').prop('disabled', false);
-    $('#topic_id').prop('disabled', false);
-
-    if (subjects.length > 1) {
-        if (!isEditLoad) {
-            $('#chapter_id').val(null).trigger('change');
-            $('#topic_id').val(null).trigger('change');
-        }
-        $('#chapter_id').prop('disabled', true);
-        $('#topic_id').prop('disabled', true);
-    } else if (chapters.length > 1) {
-        if (!isEditLoad) {
-            $('#topic_id').val(null).trigger('change');
-        }
-        $('#topic_id').prop('disabled', true);
-    }
-
-    isEditLoad = false;
-}
-
-
- $(document).ready(function () {
-         CKEDITOR.replace('detail_content', {
-    filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
-    filebrowserUploadMethod: 'form'
-});
-
-CKEDITOR.replace('course_overview', {
-    filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
-    filebrowserUploadMethod: 'form'
-});
+            CKEDITOR.replace('course_overview', {
+                filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
+                filebrowserUploadMethod: 'form'
+            });
             setInterval(function () {
                 $(document).find(".cke_notifications_area").remove();
             }, 100);
@@ -471,12 +478,12 @@ CKEDITOR.replace('course_overview', {
                 console.error("❌ Select2 not loaded!");
             }
 
-          
+
             const examinationCommissionSelect = document.getElementById('examination_commission_id');
             const categorySelect = document.getElementById('category_id');
             const subCategorySelect = document.getElementById('sub_category_id');
 
-             // On Subcategory change -> fetch Subjects
+            // On Subcategory change -> fetch Subjects
             $('#sub_category_id').on('change', function () {
                 let subCategoryId = $(this).val();
                 if (subCategoryId) {
@@ -511,15 +518,15 @@ CKEDITOR.replace('course_overview', {
                             if (result.success) {
                                 let previousChapters = $('#chapter_id').val() || [];
 
-$('#chapter_id').html(result.html);
+                                $('#chapter_id').html(result.html);
 
-$('#chapter_id option').each(function () {
-    if (previousChapters.includes($(this).val())) {
-        $(this).prop('selected', true);
-    }
-});
+                                $('#chapter_id option').each(function () {
+                                    if (previousChapters.includes($(this).val())) {
+                                        $(this).prop('selected', true);
+                                    }
+                                });
 
-$('#chapter_id').trigger('change');
+                                $('#chapter_id').trigger('change');
                             } else {
                                 $('#chapter_id').html('<option value="">--Select--</option>').trigger('change');
                             }
@@ -553,59 +560,59 @@ $('#chapter_id').trigger('change');
             });
 
 
-           // Initialize Based On on page load from PHP model value
-    let initialBasedOn = @json($course->based_on ?? '');
-    if (initialBasedOn) {
-        $('#based_on').val(initialBasedOn);
-        $('#based-on-value').text(initialBasedOn);
-        $('#based-on-text').show();
-    } else {
-        $('#based-on-text').hide();
-    }
+            // Initialize Based On on page load from PHP model value
+            let initialBasedOn = @json($course->based_on ?? '');
+            if (initialBasedOn) {
+                $('#based_on').val(initialBasedOn);
+                $('#based-on-value').text(initialBasedOn);
+                $('#based-on-text').show();
+            } else {
+                $('#based-on-text').hide();
+            }
 
-              updateDisableSelects();
+            updateDisableSelects();
 
-    // Bind to change events
-    $('#subject_id, #chapter_id').on('change', function() {
-        updateDisableSelects();
-   let subCategory = $('#sub_category_id').val();
+            // Bind to change events
+            $('#subject_id, #chapter_id').on('change', function () {
+                updateDisableSelects();
+                let subCategory = $('#sub_category_id').val();
 
-let subjects = $('#subject_id').val();
-if (!Array.isArray(subjects)) subjects = subjects ? [subjects] : [];
+                let subjects = $('#subject_id').val();
+                if (!Array.isArray(subjects)) subjects = subjects ? [subjects] : [];
 
-let chapters = $('#chapter_id').val();
-if (!Array.isArray(chapters)) chapters = chapters ? [chapters] : [];
+                let chapters = $('#chapter_id').val();
+                if (!Array.isArray(chapters)) chapters = chapters ? [chapters] : [];
 
-let topics = $('#topic_id').val();
-if (!Array.isArray(topics)) topics = topics ? [topics] : [];
+                let topics = $('#topic_id').val();
+                if (!Array.isArray(topics)) topics = topics ? [topics] : [];
 
-let basedOn = '';
+                let basedOn = '';
 
-if (subjects.length === 0 && subCategory) {
-    basedOn = 'Sub Category Based';
-} else if (subjects.length > 1) {
-    basedOn = 'Combined Subject Based';
-} else if (subjects.length === 1 && chapters.length === 0) {
-    basedOn = 'Subject Based';
-} else if (chapters.length > 1 && topics.length === 0) {
-    basedOn = 'Combined Chapter Based';
-} else if (chapters.length === 1 && topics.length === 0) {
-    basedOn = 'Chapter Based';
-} else if (topics.length >= 1) {
-    basedOn = (topics.length > 1) ? 'Combined Topic Based' : 'Topic Based';
-} else {
-    basedOn = '';
-}
+                if (subjects.length === 0 && subCategory) {
+                    basedOn = 'Sub Category Based';
+                } else if (subjects.length > 1) {
+                    basedOn = 'Combined Subject Based';
+                } else if (subjects.length === 1 && chapters.length === 0) {
+                    basedOn = 'Subject Based';
+                } else if (chapters.length > 1 && topics.length === 0) {
+                    basedOn = 'Combined Chapter Based';
+                } else if (chapters.length === 1 && topics.length === 0) {
+                    basedOn = 'Chapter Based';
+                } else if (topics.length >= 1) {
+                    basedOn = (topics.length > 1) ? 'Combined Topic Based' : 'Topic Based';
+                } else {
+                    basedOn = '';
+                }
 
-$('#based_on').val(basedOn);
-if (basedOn) {
-    $('#based-on-value').text(basedOn);
-    $('#based-on-text').show();
-} else {
-    $('#based-on-text').hide();
-}
+                $('#based_on').val(basedOn);
+                if (basedOn) {
+                    $('#based-on-value').text(basedOn);
+                    $('#based-on-text').show();
+                } else {
+                    $('#based-on-text').hide();
+                }
 
-    });
+            });
 
             examinationCommissionSelect.addEventListener('change', function () {
                 const examinationCommissionId = this.value;
@@ -630,12 +637,12 @@ if (basedOn) {
                         categorySelect.innerHTML = '<option value="" selected disabled>None</option>';
                         let selectedCategory = "{{ $course->category_id }}";
 
-response.categories.forEach(category => {
-    categorySelect.innerHTML +=
-        `<option value="${category.id}" ${category.id == selectedCategory ? 'selected' : ''}>
-            ${category.name}
-        </option>`;
-});
+                        response.categories.forEach(category => {
+                            categorySelect.innerHTML +=
+                                `<option value="${category.id}" ${category.id == selectedCategory ? 'selected' : ''}>
+                    ${category.name}
+                </option>`;
+                        });
 
                     },
                     error: function (error) {

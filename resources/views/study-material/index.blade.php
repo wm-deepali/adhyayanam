@@ -5,246 +5,185 @@
 @endsection
 
 @section('content')
-    <div class="bg-light rounded">
-        <div class="card">
-            <div class="card-body">
-                <div class="d-flex">
-                    <div class="col">
-                        <h5 class="card-title">Study Material</h5>
-                        <h6 class="card-subtitle mb-2 text-muted">Manage your Study Material section here.</h6>
-                    </div>
-                    @if(\App\Helpers\Helper::canAccess('manage_study_material_add'))
-                        <div class="justify-content-end">
-                            <a href='{{route('study.material.create')}}' class="btn btn-primary">&#43; Add</a>
-                        </div>
-                    @endif
-                </div>
-                <div class="mt-2">
-                    @include('layouts.includes.messages')
+<div class="bg-light rounded">
+    <div class="card">
+        <div class="card-body">
+
+            <div class="d-flex mb-3">
+                <div class="col">
+                    <h5 class="card-title">Study Material</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">
+                        Manage your Study Material section here.
+                    </h6>
                 </div>
 
-                <!-- Tabs -->
-                <ul class="nav nav-tabs" id="studyMaterialTabs" role="tablist">
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="free-tab" data-bs-toggle="tab" data-bs-target="#free"
-                            type="button" role="tab" aria-controls="free" aria-selected="true">Free</button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="paid-tab" data-bs-toggle="tab" data-bs-target="#paid" type="button"
-                            role="tab" aria-controls="paid" aria-selected="false">Paid</button>
-                    </li>
-                </ul>
-                <div class="tab-content mt-4" id="studyMaterialTabsContent">
-                    <!-- Free Study Materials Tab -->
-                    <div class="tab-pane fade show active" id="free" role="tabpanel" aria-labelledby="free-tab">
-                        <table class="table table-striped table-responsive table-bordered" id="freeMaterial">
-                            <thead>
-                                <tr>
-                                    <th class="text-center">
-                                        <input type="checkbox" class="group_check checkbox">
-                                    </th>
-                                    <th scope="col" width="12%">Date & Time</th>
-                                    <th scope="col">Title</th>
-                                    <th scope="col">Examination Detail</th>
-                                    <th scope="col">Payment Type</th>
-                                    <th scope="col">Package Type</th>
-                                    <th scope="col">Status</th>
-                                    <th scope="col">Added By</th>
-                                    <th scope="col">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-
-                            </tbody>
-                        </table>
+                @if(\App\Helpers\Helper::canAccess('manage_study_material_add'))
+                    <div class="justify-content-end">
+                        <a href="{{ route('study.material.create') }}" class="btn btn-primary">
+                            + Add
+                        </a>
                     </div>
+                @endif
+            </div>
 
-                    <!-- Paid Study Materials Tab -->
-                    <div class="tab-pane fade" id="paid" role="tabpanel" aria-labelledby="paid-tab">
-                        <table class="table table-striped table-responsive table-bordered" id="paidMaterial">
-                            <thead>
-                                <tr>
-                                    <th class="text-center">
-                                        <input type="checkbox" class="group_check checkbox">
-                                    </th>
-                                    <th scope="col" width="12%">Date & Time</th>
-                                    <th scope="col">Title</th>
-                                    <th scope="col">Examination Detail</th>
-                                    <th scope="col">Payment Type</th>
-                                    <th scope="col">Package Type</th>
-                                    <th scope="col">Status</th>
-                                    <th scope="col">Added By</th>
-                                    <th scope="col">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
+            @include('layouts.includes.messages')
 
-                            </tbody>
-                        </table>
-                    </div>
+            {{-- Tabs --}}
+            <ul class="nav nav-tabs" id="studyMaterialTabs" role="tablist">
+                <li class="nav-item">
+                    <button class="nav-link active" id="free-tab" data-bs-toggle="tab"
+                        data-bs-target="#free" type="button">
+                        Free
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" id="paid-tab" data-bs-toggle="tab"
+                        data-bs-target="#paid" type="button">
+                        Paid
+                    </button>
+                </li>
+            </ul>
+
+            <div class="tab-content mt-4">
+
+                {{-- FREE --}}
+                <div class="tab-pane fade show active" id="free">
+                    <table class="table table-bordered table-striped" id="freeMaterial">
+                        <thead>
+                        <tr>
+                            <th><input type="checkbox" class="group_check"></th>
+                            <th>Date & Time</th>
+                            <th>Title</th>
+                            <th>Examination Detail</th>
+                            <th>Payment Type</th>
+                            <th>Package Type</th>
+                            <th>Status</th>
+                            <th>Added By</th>
+                            <th>Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
                 </div>
+
+                {{-- PAID --}}
+                <div class="tab-pane fade" id="paid">
+                    <table class="table table-bordered table-striped" id="paidMaterial">
+                        <thead>
+                        <tr>
+                            <th><input type="checkbox" class="group_check"></th>
+                            <th>Date & Time</th>
+                            <th>Title</th>
+                            <th>Examination Detail</th>
+                            <th>Payment Type</th>
+                            <th>Package Type</th>
+                            <th>Status</th>
+                            <th>Added By</th>
+                            <th>Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+
             </div>
         </div>
     </div>
+</div>
 @endsection
+
 @push('after-scripts')
-    <script type="text/javascript">
-        $(function () {
-            gb_DataTable = $("#freeMaterial").DataTable({
-                autoWidth: false,
-                order: [0, "ASC"],
+<script>
+let freeTable, paidTable;
+
+$(document).ready(function () {
+
+    /* ================= FREE TABLE ================= */
+    freeTable = $('#freeMaterial').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: {
+            url: "{{ route('study.material.index') }}",
+            data: { type: 0 }
+        },
+        columns: [
+            { data: 'checkbox', orderable:false, searchable:false },
+            { data: 'created_at' },
+            { data: 'title' },
+            { data: 'examination_detail' },
+            { data: 'payment_type' },
+            { data: 'package_type' },
+            { data: 'status', orderable:false },
+            { data: 'created_by' },
+            { data: 'action', orderable:false, searchable:false },
+        ],
+        order: [[1, 'desc']],
+        lengthMenu: [10, 50, 100],
+    });
+
+    /* ================= PAID TABLE (INIT ONCE) ================= */
+    $('#paid-tab').on('shown.bs.tab', function () {
+
+        if (!$.fn.DataTable.isDataTable('#paidMaterial')) {
+
+            paidTable = $('#paidMaterial').DataTable({
                 processing: true,
                 serverSide: true,
-                searchDelay: 2000,
-                paging: true,
-                ajax: "{{ route('study.material.index') }}",
-                iDisplayLength: "10",
-                dom: '<"row margin-bottom-12"<"col-sm-12"<"pull-left"l><"pull-right"fr><"pull-right margin-left-10 "B>>>tip',
-                buttons: {
-                    buttons: [
-                        @if(\App\Helpers\Helper::canAccess('manage_study_material_delete'))
-                                {
-                                className: 'btn bg-red color-palette btn-flat hidden delete_btn pull-left',
-                                text: 'Bulk Delete',
-                                action: function (e, dt, node, config) {
-                                    multi_delete();
-                                }
-                            },
-                        @endif
-                        { extend: 'copy', className: 'btn bg-teal color-palette btn-flat', footer: true, exportOptions: { columns: [1, 2, 3, 4, 5, 6] } },
-                        { extend: 'excel', className: 'btn bg-teal color-palette btn-flat', footer: true, exportOptions: { columns: [1, 2, 3, 4, 5, 6] } },
-                        { extend: 'pdf', className: 'btn bg-teal color-palette btn-flat', footer: true, exportOptions: { columns: [1, 2, 3, 4, 5, 6] } },
-                        { extend: 'print', className: 'btn bg-teal color-palette btn-flat', footer: true, exportOptions: { columns: [1, 2, 3, 4, 5, 6] } },
-                        { extend: 'csv', className: 'btn bg-teal color-palette btn-flat', footer: true, exportOptions: { columns: [1, 2, 3, 4, 5, 6] } },
-                        { extend: 'colvis', className: 'btn bg-teal color-palette btn-flat', footer: true, text: 'Columns' },
-
-                    ]
-                },
-                columnDefs: [
-                    {
-                        'targets': 0,
-                        'checkboxes': {
-                            'selectRow': true
-                        }
-                    }
-                ],
-                select: {
-                    'style': 'multi'
+                ajax: {
+                    url: "{{ route('study.material.index') }}",
+                    data: { type: 1 }
                 },
                 columns: [
-                    { data: 'checkbox', name: 'checkbox', orderable: false, searchable: false },
-                    { data: 'created_at', name: 'created_at' },
-                    { data: 'title', name: 'title' },
-                    { data: 'examination_detail', name: 'examination_detail' },
-                    { data: 'payment_type', name: 'payment_type' },
-                    { data: 'package_type', name: 'package_type' },
-                    { data: 'status', name: 'status', orderable: false, searchable: false },
-                    { data: 'created_by', name: 'created_by' },
-                    { data: 'action', name: 'action', orderable: false, searchable: false },
+                    { data: 'checkbox', orderable:false, searchable:false },
+                    { data: 'created_at' },
+                    { data: 'title' },
+                    { data: 'examination_detail' },
+                    { data: 'payment_type' },
+                    { data: 'package_type' },
+                    { data: 'status', orderable:false },
+                    { data: 'created_by' },
+                    { data: 'action', orderable:false, searchable:false },
                 ],
-
+                order: [[1, 'desc']],
                 lengthMenu: [10, 50, 100],
             });
-        });
 
-
-        function multi_delete() {
-            var id = [];
-            if (confirm("Are you sure you want to Delete this data?")) {
-                $('.career_checkbox:checked').each(function () {
-                    id.push($(this).attr('id'));
-                });
-                if (id.length > 0) {
-                    $.ajax({
-                        url: "{{ route('study.material.bulk-delete')}}",
-                        method: "get",
-                        data: { id: id },
-                        success: function (data) {
-                            $('#freeMaterial').DataTable().ajax.reload();
-                            alert(data);
-
-                        }
-                    });
-                }
-                else {
-                    alert("Please select atleast one checkbox");
-                }
-            }
+        } else {
+            paidTable.ajax.reload();
         }
-    </script>
+    });
 
+});
 
-    <script type="text/javascript">
+/* ================= GROUP CHECKBOX ================= */
+$(document).on('change', '.group_check', function () {
+    $('.column_checkbox').prop('checked', this.checked);
+});
 
-        $('.group_check').on('change', function (event) {
-            if (event.target.checked) {
-                $(".column_checkbox").prop("checked", true);
-            }
-            else {
-                $(".column_checkbox").prop("checked", false);
-            }
-        });
+/* ================= BULK DELETE ================= */
+function multi_delete() {
+    let ids = [];
+    $('.career_checkbox:checked').each(function () {
+        ids.push($(this).attr('id'));
+    });
 
-        $(document).ready(function () {
-            $('#paid-tab').click(function () {
-                event.preventDefault();
-                gb_DataTable = $("#paidMaterial").DataTable({
-                    autoWidth: false,
-                    order: [0, "ASC"],
-                    processing: true,
-                    serverSide: true,
-                    searchDelay: 2000,
-                    paging: true,
-                    ajax: {
-                        url: "{{ route('study.material.index') }}",
-                        data: { 'type': 1 },
-                    },
-                    iDisplayLength: "10",
-                    dom: '<"row margin-bottom-12"<"col-sm-12"<"pull-left"l><"pull-right"fr><"pull-right margin-left-10 "B>>>tip',
-                    buttons: {
-                        buttons: [
-                            {
-                                className: 'btn bg-red color-palette btn-flat hidden delete_btn pull-left',
-                                text: 'Bulk Delete',
-                                action: function (e, dt, node, config) {
-                                    multi_delete();
-                                }
-                            },
-                            { extend: 'copy', className: 'btn bg-teal color-palette btn-flat', footer: true, exportOptions: { columns: [1, 2, 3, 4, 5, 6] } },
-                            { extend: 'excel', className: 'btn bg-teal color-palette btn-flat', footer: true, exportOptions: { columns: [1, 2, 3, 4, 5, 6] } },
-                            { extend: 'pdf', className: 'btn bg-teal color-palette btn-flat', footer: true, exportOptions: { columns: [1, 2, 3, 4, 5, 6] } },
-                            { extend: 'print', className: 'btn bg-teal color-palette btn-flat', footer: true, exportOptions: { columns: [1, 2, 3, 4, 5, 6] } },
-                            { extend: 'csv', className: 'btn bg-teal color-palette btn-flat', footer: true, exportOptions: { columns: [1, 2, 3, 4, 5, 6] } },
-                            { extend: 'colvis', className: 'btn bg-teal color-palette btn-flat', footer: true, text: 'Columns' },
+    if (!ids.length) {
+        alert('Please select at least one record');
+        return;
+    }
 
-                        ]
-                    },
-                    columnDefs: [
-                        {
-                            'targets': 0,
-                            'checkboxes': {
-                                'selectRow': true
-                            }
-                        }
-                    ],
-                    select: {
-                        'style': 'multi'
-                    },
-                    columns: [
-                        { data: 'checkbox', name: 'checkbox', orderable: false, searchable: false },
-                        { data: 'created_at', name: 'created_at' },
-                        { data: 'title', name: 'title' },
-                        { data: 'examination_detail', name: 'examination_detail' },
-                        { data: 'payment_type', name: 'payment_type' },
-                        { data: 'package_type', name: 'package_type' },
-                        { data: 'status', name: 'status', orderable: false, searchable: false },
-                        { data: 'created_by', name: 'created_by' },
-                        { data: 'action', name: 'action', orderable: false, searchable: false },
-                    ],
-                    lengthMenu: [10, 50, 100],
-                });
+    if (!confirm('Are you sure you want to delete selected items?')) return;
 
-            });
-        });
-    </script>
+    $.ajax({
+        url: "{{ route('study.material.bulk-delete') }}",
+        method: "GET",
+        data: { id: ids },
+        success: function (response) {
+            freeTable.ajax.reload();
+            if (paidTable) paidTable.ajax.reload();
+            alert(response);
+        }
+    });
+}
+</script>
 @endpush

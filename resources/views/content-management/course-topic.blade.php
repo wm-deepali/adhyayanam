@@ -16,19 +16,13 @@
         </h6>
     </div>
 
-    <div class="d-flex gap-2">
-        {{-- Back Button --}}
-        <a href="{{ url()->previous() }}" class="btn btn-secondary">
-            ← Back
-        </a>
-
         {{-- Add Button --}}
         @if(\App\Helpers\Helper::canAccess('manage_topic_add'))
             <a href="{{ route('topic.create') }}" class="btn btn-primary">
                 &#43; Add
             </a>
         @endif
-    </div>
+   
 </div>
 
                 <div class="mt-2">
@@ -44,7 +38,7 @@
                             <th scope="col" width="15%">Chapter Name</th>
                             <th scope="col">Name</th>
                             <th scope="col">Topic Number</th>
-                            <th scope="col">Description</th>
+                            <!-- <th scope="col">Description</th> -->
                             <th scope="col">Status</th>
                             <th scope="col">Added By</th>
                             <th scope="col">Actions</th>
@@ -104,7 +98,7 @@
                     { data: 'chapter', name: 'chapter' },
                     { data: 'name', name: 'name' },
                     { data: 'topic_number', name: 'topic_number' },
-                    { data: 'description', name: 'description' },
+                    // { data: 'description', name: 'description' },
                     { data: 'status', name: 'status' },
                     { data: 'created_by', name: 'created_by' },
                     { data: 'action', name: 'action', orderable: false, searchable: false },

@@ -9,17 +9,23 @@
     <div class="bg-light rounded">
         <div class="card">
             <div class="card-body">
-                <h5 class="card-title">Edit</h5>
-                <h6 class="card-subtitle mb-2 text-muted">Edit Study Material here.</h6>
-
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div>
+                        <h5 class="card-title">Edit</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">Edit Study Material here.</h6>
+                    </div>
+                    <div>
+                        <a href="{{ route('study.material.index') }}" class="btn btn-secondary">
+                            ← Back
+                        </a>
+                    </div>
+                </div>
                 <div class="mt-2">
                     @include('layouts.includes.messages')
                 </div>
                 <form id="study-form" method="POST" action="{{ route('study.material.update', $material->id) }}"
                     enctype="multipart/form-data">
                     @csrf
-
-
                     <div class="mb-3">
                         <label>Select Examination Commission</label>
                         <select class="form-control " name="commission_id" id="exam_com_id" required>
@@ -32,20 +38,19 @@
                         </select>
                     </div>
                     <div class="mb-3">
-    <label for="language" class="form-label">Select Language</label>
-    <select class="form-control" name="language" id="language" required>
-        <option value="">--Select--</option>
-        <option value="hindi" {{ $material->language == 'hindi' ? 'selected' : '' }}>Hindi</option>
-        <option value="english" {{ $material->language == 'english' ? 'selected' : '' }}>English</option>
-    </select>
-</div>
+                        <label for="language" class="form-label">Select Language</label>
+                        <select class="form-control" name="language" id="language" required>
+                            <option value="">--Select--</option>
+                            <option value="hindi" {{ $material->language == 'hindi' ? 'selected' : '' }}>Hindi</option>
+                            <option value="english" {{ $material->language == 'english' ? 'selected' : '' }}>English</option>
+                        </select>
+                    </div>
                     <div class="mb-3">
                         <label>Select Category</label>
                         <select class="form-control" name="category_id" id="category_id" required>
                             <option value="">--Select--</option>
                             @foreach($categories as $category)
-                                <option value="{{ $category->id }}" {{ $material->category_id == $category->id ? 'selected' : '' }}>
-                                    {{ $category->name }}
+                                <option value="{{ $category->id }}" {{ $material->category_id == $category->id ? 'selected' : '' }}>{{ $category->name }}
                                 </option>
                             @endforeach
                         </select>
@@ -69,8 +74,7 @@
                                 $selectedSubjects = $material->subject_id ?? [];
                             @endphp
                             @foreach($subjects as $subject)
-                                <option value="{{ $subject->id }}" {{ in_array($subject->id, $selectedSubjects) ? 'selected' : '' }}>
-                                    {{ $subject->name }}
+                                <option value="{{ $subject->id }}" {{ in_array($subject->id, $selectedSubjects) ? 'selected' : '' }}>{{ $subject->name }}
                                 </option>
                             @endforeach
                         </select>
@@ -83,8 +87,7 @@
                                 $selectedChapters = $material->chapter_id ?? [];
                             @endphp
                             @foreach($chapters as $chapter)
-                                <option value="{{ $chapter->id }}" {{ in_array($chapter->id, $selectedChapters) ? 'selected' : '' }}>
-                                    {{ $chapter->name }}
+                                <option value="{{ $chapter->id }}" {{ in_array($chapter->id, $selectedChapters) ? 'selected' : '' }}>{{ $chapter->name }}
                                 </option>
                             @endforeach
                         </select>
@@ -104,7 +107,7 @@
                         </select>
                     </div>
 
-                     <input type="hidden" name="based_on" id="based_on" value="">
+                    <input type="hidden" name="based_on" id="based_on" value="">
                     <div class="alert alert-info mt-2" id="based-on-text" style="display:none;">
                         <strong>Based On:</strong> <span id="based-on-value"></span>
                     </div>
@@ -137,39 +140,43 @@
                         @endif
                     </div>
 
-                     <!-- ✅ NEW SECTION: Dynamic Material Sections -->
+                    <!-- ✅ NEW SECTION: Dynamic Material Sections -->
                     <hr>
                     <h5>Study Material Sections</h5>
                     <div id="section-wrapper">
-    @if(isset($sections) && count($sections) > 0)
-        @foreach($sections as $index => $section)
-            <div class="section-block border p-3 mb-3 rounded">
-                <input type="hidden" name="section_ids[]" value="{{ $section->id }}">
-                <div class="d-flex justify-content-between align-items-center">
-                    <strong>Section {{ $loop->iteration }}</strong>
-                    <button type="button" class="btn btn-danger btn-sm remove-section">Remove</button>
-                </div>
-                <div class="mt-2">
-                    <input type="text" name="titles[]" class="form-control mb-2"
-                        value="{{ $section->title }}" placeholder="Section Title" required>
-                    <textarea name="descriptions[]" id="section_description_{{ $loop->index }}" class="form-control ckeditor-section" rows="3" placeholder="Section Description" required>{{ $section->description }}</textarea>
-                </div>
-            </div>
-        @endforeach
-    @else
-        <div class="section-block border p-3 mb-3 rounded">
-            <div class="d-flex justify-content-between align-items-center">
-                <strong>Section 1</strong>
-                <button type="button" class="btn btn-danger btn-sm remove-section">Remove</button>
-            </div>
-            <div class="mt-2">
-                <input type="text" name="titles[]" class="form-control mb-2"
-                    placeholder="Section Title" required>
-                <textarea name="descriptions[]" id="section_description_0" class="form-control ckeditor-section" rows="3" placeholder="Section Description" required></textarea>
-            </div>
-        </div>
-    @endif
-</div>
+                        @if(isset($sections) && count($sections) > 0)
+                            @foreach($sections as $index => $section)
+                                <div class="section-block border p-3 mb-3 rounded">
+                                    <input type="hidden" name="section_ids[]" value="{{ $section->id }}">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <strong>Section {{ $loop->iteration }}</strong>
+                                        <button type="button" class="btn btn-danger btn-sm remove-section">Remove</button>
+                                    </div>
+                                    <div class="mt-2">
+                                        <input type="text" name="titles[]" class="form-control mb-2" value="{{ $section->title }}"
+                                            placeholder="Section Title" required>
+                                        <textarea name="descriptions[]" id="section_description_{{ $loop->index }}"
+                                            class="form-control ckeditor-section" rows="3" placeholder="Section Description"
+                                            required>{{ $section->description }}</textarea>
+                                    </div>
+                                </div>
+                            @endforeach
+                        @else
+                            <div class="section-block border p-3 mb-3 rounded">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <strong>Section 1</strong>
+                                    <button type="button" class="btn btn-danger btn-sm remove-section">Remove</button>
+                                </div>
+                                <div class="mt-2">
+                                    <input type="text" name="titles[]" class="form-control mb-2" placeholder="Section Title"
+                                        required>
+                                    <textarea name="descriptions[]" id="section_description_0"
+                                        class="form-control ckeditor-section" rows="3" placeholder="Section Description"
+                                        required></textarea>
+                                </div>
+                            </div>
+                        @endif
+                    </div>
 
                     <button type="button" class="btn btn-success btn-sm" id="add-section">+ Add Section</button>
                     <!-- ✅ END NEW SECTION -->
@@ -237,8 +244,8 @@
                     </div>
 
                     <div class="mb-3 form-check">
-                        <input type="checkbox" class="form-check-input" id="is_pdf_downloadable"
-                            name="is_pdf_downloadable" value="1" {{ $material->is_pdf_downloadable ? 'checked' : '' }}>
+                        <input type="checkbox" class="form-check-input" id="is_pdf_downloadable" name="is_pdf_downloadable"
+                            value="1" {{ $material->is_pdf_downloadable ? 'checked' : '' }}>
                         <label class="form-check-label" for="is_pdf_downloadable">PDF Downloadable</label>
                     </div>
 
@@ -270,98 +277,97 @@
                     </div>
 
                     <button type="submit" class="btn btn-primary">Update</button>
-                    <a href="{{ route('study.material.index') }}" class="btn">Back</a>
                 </form>
 
             </div>
         </div>
     </div>
 
-     <script src="https://cdn.ckeditor.com/4.16.2/full/ckeditor.js"></script>
+    <script src="https://cdn.ckeditor.com/4.16.2/full/ckeditor.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.full.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
     <script>
 
- // Initialize CKEditor for existing section descriptions
-function initCKEditors() {
-    $('.ckeditor-section').each(function() {
-        if (!this.id) {
-            this.id = 'section_description_' + Date.now();
+        // Initialize CKEditor for existing section descriptions
+        function initCKEditors() {
+            $('.ckeditor-section').each(function () {
+                if (!this.id) {
+                    this.id = 'section_description_' + Date.now();
+                }
+                if (!CKEDITOR.instances[this.id]) {
+                    CKEDITOR.replace(this.id, {
+                        filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
+                        filebrowserUploadMethod: 'form'
+                    });
+                }
+            });
         }
-        if (!CKEDITOR.instances[this.id]) {
-                  CKEDITOR.replace(this.id, {
-    filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
-    filebrowserUploadMethod: 'form'
-});
-        }
-    });
-}
 
-// Run on page load
-initCKEditors();
+        // Run on page load
+        initCKEditors();
 
-// When new section is added
-$('#add-section').on('click', function () {
-    let sectionCount = $('.section-block').length + 1;
-    let uniqueId = 'section_description_' + Date.now();
+        // When new section is added
+        $('#add-section').on('click', function () {
+            let sectionCount = $('.section-block').length + 1;
+            let uniqueId = 'section_description_' + Date.now();
 
-    let sectionHtml = `
-        <div class="section-block border p-3 mb-3 rounded">
-            <input type="hidden" name="section_ids[]" value="">
-            <div class="d-flex justify-content-between align-items-center">
-                <strong>Section ${sectionCount}</strong>
-                <button type="button" class="btn btn-danger btn-sm remove-section">Remove</button>
+            let sectionHtml = `
+            <div class="section-block border p-3 mb-3 rounded">
+                <input type="hidden" name="section_ids[]" value="">
+                <div class="d-flex justify-content-between align-items-center">
+                    <strong>Section ${sectionCount}</strong>
+                    <button type="button" class="btn btn-danger btn-sm remove-section">Remove</button>
+                </div>
+                <div class="mt-2">
+                    <input type="text" name="titles[]" class="form-control mb-2" placeholder="Section Title" required>
+                    <textarea name="descriptions[]" id="${uniqueId}" class="form-control ckeditor-section" rows="3" placeholder="Section Description" required></textarea>
+                </div>
             </div>
-            <div class="mt-2">
-                <input type="text" name="titles[]" class="form-control mb-2" placeholder="Section Title" required>
-                <textarea name="descriptions[]" id="${uniqueId}" class="form-control ckeditor-section" rows="3" placeholder="Section Description" required></textarea>
-            </div>
-        </div>
-    `;
+        `;
 
-    $('#section-wrapper').append(sectionHtml);
+            $('#section-wrapper').append(sectionHtml);
 
-    // Initialize CKEditor for the newly added textarea
-       CKEDITOR.replace(uniqueId, {
-    filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
-    filebrowserUploadMethod: 'form'
-});
-});
+            // Initialize CKEditor for the newly added textarea
+            CKEDITOR.replace(uniqueId, {
+                filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
+                filebrowserUploadMethod: 'form'
+            });
+        });
 
-// When section is removed
-$(document).on('click', '.remove-section', function () {
-    let textarea = $(this).closest('.section-block').find('textarea')[0];
-    if (textarea && CKEDITOR.instances[textarea.id]) {
-        CKEDITOR.instances[textarea.id].destroy(true);
-    }
-    $(this).closest('.section-block').remove();
-});
+        // When section is removed
+        $(document).on('click', '.remove-section', function () {
+            let textarea = $(this).closest('.section-block').find('textarea')[0];
+            if (textarea && CKEDITOR.instances[textarea.id]) {
+                CKEDITOR.instances[textarea.id].destroy(true);
+            }
+            $(this).closest('.section-block').remove();
+        });
 
 
 
         function updateDisableSelects() {
-    let subjects = $('#subject_id').val() || [];
-    let chapters = $('#chapter_id').val() || [];
+            let subjects = $('#subject_id').val() || [];
+            let chapters = $('#chapter_id').val() || [];
 
-    // Enable all by default
-    $('#chapter_id').prop('disabled', false).trigger('change.select2');
-    $('#topic_id').prop('disabled', false).trigger('change.select2');
+            // Enable all by default
+            $('#chapter_id').prop('disabled', false).trigger('change.select2');
+            $('#topic_id').prop('disabled', false).trigger('change.select2');
 
-    if (subjects.length > 1) {
-        $('#chapter_id').val(null).trigger('change');
-        $('#chapter_id').prop('disabled', true).trigger('change.select2');
-        $('#topic_id').val(null).trigger('change');
-        $('#topic_id').prop('disabled', true).trigger('change.select2');
-    } else if (chapters.length > 1) {
-        $('#topic_id').val(null).trigger('change');
-        $('#topic_id').prop('disabled', true).trigger('change.select2');
-    }
-}
+            if (subjects.length > 1) {
+                $('#chapter_id').val(null).trigger('change');
+                $('#chapter_id').prop('disabled', true).trigger('change.select2');
+                $('#topic_id').val(null).trigger('change');
+                $('#topic_id').prop('disabled', true).trigger('change.select2');
+            } else if (chapters.length > 1) {
+                $('#topic_id').val(null).trigger('change');
+                $('#topic_id').prop('disabled', true).trigger('change.select2');
+            }
+        }
 
         $(document).ready(function () {
-            
+
             // Initialize Select2 on all selects with .select2 class
             $('.select2').select2({
                 width: '100%',
@@ -369,59 +375,59 @@ $(document).on('click', '.remove-section', function () {
                 allowClear: true
             });
 
-// Initialize Based On on page load from PHP model value
-    let initialBasedOn = @json($material->based_on ?? '');
-    if (initialBasedOn) {
-        $('#based_on').val(initialBasedOn);
-        $('#based-on-value').text(initialBasedOn);
-        $('#based-on-text').show();
-    } else {
-        $('#based-on-text').hide();
-    }
+            // Initialize Based On on page load from PHP model value
+            let initialBasedOn = @json($material->based_on ?? '');
+            if (initialBasedOn) {
+                $('#based_on').val(initialBasedOn);
+                $('#based-on-value').text(initialBasedOn);
+                $('#based-on-text').show();
+            } else {
+                $('#based-on-text').hide();
+            }
 
-              updateDisableSelects();
+            updateDisableSelects();
 
-    // Bind to change events
-    $('#subject_id, #chapter_id').on('change', function() {
-        updateDisableSelects();
-   let subCategory = $('#sub_category_id').val();
+            // Bind to change events
+            $('#subject_id, #chapter_id').on('change', function () {
+                updateDisableSelects();
+                let subCategory = $('#sub_category_id').val();
 
-let subjects = $('#subject_id').val();
-if (!Array.isArray(subjects)) subjects = subjects ? [subjects] : [];
+                let subjects = $('#subject_id').val();
+                if (!Array.isArray(subjects)) subjects = subjects ? [subjects] : [];
 
-let chapters = $('#chapter_id').val();
-if (!Array.isArray(chapters)) chapters = chapters ? [chapters] : [];
+                let chapters = $('#chapter_id').val();
+                if (!Array.isArray(chapters)) chapters = chapters ? [chapters] : [];
 
-let topics = $('#topic_id').val();
-if (!Array.isArray(topics)) topics = topics ? [topics] : [];
+                let topics = $('#topic_id').val();
+                if (!Array.isArray(topics)) topics = topics ? [topics] : [];
 
-let basedOn = '';
+                let basedOn = '';
 
-if (subjects.length === 0 && subCategory) {
-    basedOn = 'Sub Category Based';
-} else if (subjects.length > 1) {
-    basedOn = 'Combined Subject Based';
-} else if (subjects.length === 1 && chapters.length === 0) {
-    basedOn = 'Subject Based';
-} else if (chapters.length > 1 && topics.length === 0) {
-    basedOn = 'Combined Chapter Based';
-} else if (chapters.length === 1 && topics.length === 0) {
-    basedOn = 'Chapter Based';
-} else if (topics.length >= 1) {
-    basedOn = (topics.length > 1) ? 'Combined Topic Based' : 'Topic Based';
-} else {
-    basedOn = '';
-}
+                if (subjects.length === 0 && subCategory) {
+                    basedOn = 'Sub Category Based';
+                } else if (subjects.length > 1) {
+                    basedOn = 'Combined Subject Based';
+                } else if (subjects.length === 1 && chapters.length === 0) {
+                    basedOn = 'Subject Based';
+                } else if (chapters.length > 1 && topics.length === 0) {
+                    basedOn = 'Combined Chapter Based';
+                } else if (chapters.length === 1 && topics.length === 0) {
+                    basedOn = 'Chapter Based';
+                } else if (topics.length >= 1) {
+                    basedOn = (topics.length > 1) ? 'Combined Topic Based' : 'Topic Based';
+                } else {
+                    basedOn = '';
+                }
 
-$('#based_on').val(basedOn);
-if (basedOn) {
-    $('#based-on-value').text(basedOn);
-    $('#based-on-text').show();
-} else {
-    $('#based-on-text').hide();
-}
+                $('#based_on').val(basedOn);
+                if (basedOn) {
+                    $('#based-on-value').text(basedOn);
+                    $('#based-on-text').show();
+                } else {
+                    $('#based-on-text').hide();
+                }
 
-    });
+            });
 
 
             // Chained dropdown AJAX updates on edit
@@ -522,10 +528,10 @@ if (basedOn) {
             calculateOfferedPrice();
 
             // Initialize CKEditor
-               CKEDITOR.replace('editor', {
-    filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
-    filebrowserUploadMethod: 'form'
-});
+            CKEDITOR.replace('editor', {
+                filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
+                filebrowserUploadMethod: 'form'
+            });
         });
     </script>
 @endsection

@@ -28,6 +28,14 @@
         }
     </style>
 
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="mb-0">Evaluate Attempt</h4>
+
+    <a href="{{ url()->previous() }}" class="btn btn-secondary btn-sm">
+        ← Back to Test Attempts
+    </a>
+</div>
+
     <form id="adminEvaluationForm" enctype="multipart/form-data">
         @csrf
         <input type="hidden" name="attempt_id" value="{{ $attempt->id }}">

@@ -33,10 +33,10 @@
                             </th>
                             <th scope="col">Name</th>
                             <th scope="col">Description</th>
-                            <th scope="col">Meta Title</th>
-                            <th scope="col">Meta Description</th>
-                            <th scope="col">Meta Keywords</th>
-                            <th scope="col">Canonical Url</th>
+                            <!-- <th scope="col">Meta Title</th> -->
+                            <!-- <th scope="col">Meta Description</th> -->
+                            <!-- <th scope="col">Meta Keywords</th> -->
+                            <!-- <th scope="col">Canonical Url</th> -->
                             <th scope="col">Image</th>
                             <th scope="col">Alt Tag</th>
                             <th scope="col">Status</th>
@@ -100,10 +100,10 @@
                     { data: 'checkbox', name: 'checkbox', orderable: false, searchable: false },
                     { data: 'name', name: 'name' },
                     { data: 'description', name: 'description' },
-                    { data: 'meta_title', name: 'meta_title' },
-                    { data: 'meta_description', name: 'meta_description' },
-                    { data: 'meta_keyword', name: 'meta_keyword' },
-                    { data: 'canonical_url', name: 'canonical_url', orderable: false, searchable: false },
+                    // { data: 'meta_title', name: 'meta_title' },
+                    // { data: 'meta_description', name: 'meta_description' },
+                    // { data: 'meta_keyword', name: 'meta_keyword' },
+                    // { data: 'canonical_url', name: 'canonical_url', orderable: false, searchable: false },
                     { data: 'image', name: 'image', orderable: false, searchable: false },
                     { data: 'alt_tag', name: 'alt_tag' },
                     { data: 'status', name: 'status' },

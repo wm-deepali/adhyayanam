@@ -22,6 +22,7 @@ class VideoController extends Controller
     public function index(Request $request)
     {
         $search = $request->input('search');
+
         // VIDEOS
         $videosQuery = Video::where('type', 'video')
             ->with(['examinationCommission', 'category', 'subCategory', 'subject', 'chapter', 'course']);
@@ -36,7 +37,9 @@ class VideoController extends Controller
             });
         }
 
-        $videos = $videosQuery->latest()->get();
+        $videos = $videosQuery
+            ->latest()
+            ->paginate(10, ['*'], 'videos_page'); // ✅ pagination
 
         // LIVE CLASSES
         $liveQuery = Video::where('type', 'live_class')
@@ -52,9 +55,13 @@ class VideoController extends Controller
             });
         }
 
-        $liveClasses = $liveQuery->latest()->get();
+        $liveClasses = $liveQuery
+            ->latest()
+            ->paginate(10, ['*'], 'live_page'); // ✅ pagination
+
         return view('video.index', compact('videos', 'liveClasses'));
     }
+
 
 
     /**
@@ -437,27 +444,27 @@ class VideoController extends Controller
             if ($request->type === 'video') {
                 $video->content = $request->video_content;
 
-                 // -----------------------------
-            // ASSIGNMENT FILE
-            // -----------------------------
-            if ($request->hasFile('video_assignment_file')) {
-                if ($video->assignment_file && Storage::disk('public')->exists($video->assignment_file)) {
-                    Storage::disk('public')->delete($video->assignment_file);
+                // -----------------------------
+                // ASSIGNMENT FILE
+                // -----------------------------
+                if ($request->hasFile('video_assignment_file')) {
+                    if ($video->assignment_file && Storage::disk('public')->exists($video->assignment_file)) {
+                        Storage::disk('public')->delete($video->assignment_file);
+                    }
+                    $video->assignment_file = $request->file('video_assignment_file')
+                        ->store('videos/assignments', 'public');
                 }
-                $video->assignment_file = $request->file('video_assignment_file')
-                    ->store('videos/assignments', 'public');
-            }
 
-            // -----------------------------
-            // SOLUTION FILE
-            // -----------------------------
-            if ($request->hasFile('video_solution_file')) {
-                if ($video->solution_file && Storage::disk('public')->exists($video->solution_file)) {
-                    Storage::disk('public')->delete($video->solution_file);
+                // -----------------------------
+                // SOLUTION FILE
+                // -----------------------------
+                if ($request->hasFile('video_solution_file')) {
+                    if ($video->solution_file && Storage::disk('public')->exists($video->solution_file)) {
+                        Storage::disk('public')->delete($video->solution_file);
+                    }
+                    $video->solution_file = $request->file('video_solution_file')
+                        ->store('videos/solutions', 'public');
                 }
-                $video->solution_file = $request->file('video_solution_file')
-                    ->store('videos/solutions', 'public');
-            }
             }
 
             if ($request->type === 'live_class') {
@@ -467,27 +474,27 @@ class VideoController extends Controller
                 $video->end_time = date('H:i:s', strtotime($request->end_time));
                 $video->live_link = $request->live_link;
 
-                 // -----------------------------
-            // ASSIGNMENT FILE
-            // -----------------------------
-            if ($request->hasFile('live_assignment_file')) {
-                if ($video->assignment_file && Storage::disk('public')->exists($video->assignment_file)) {
-                    Storage::disk('public')->delete($video->assignment_file);
+                // -----------------------------
+                // ASSIGNMENT FILE
+                // -----------------------------
+                if ($request->hasFile('live_assignment_file')) {
+                    if ($video->assignment_file && Storage::disk('public')->exists($video->assignment_file)) {
+                        Storage::disk('public')->delete($video->assignment_file);
+                    }
+                    $video->assignment_file = $request->file('live_assignment_file')
+                        ->store('videos/assignments', 'public');
                 }
-                $video->assignment_file = $request->file('live_assignment_file')
-                    ->store('videos/assignments', 'public');
-            }
 
-            // -----------------------------
-            // SOLUTION FILE
-            // -----------------------------
-            if ($request->hasFile('live_solution_file')) {
-                if ($video->solution_file && Storage::disk('public')->exists($video->solution_file)) {
-                    Storage::disk('public')->delete($video->solution_file);
+                // -----------------------------
+                // SOLUTION FILE
+                // -----------------------------
+                if ($request->hasFile('live_solution_file')) {
+                    if ($video->solution_file && Storage::disk('public')->exists($video->solution_file)) {
+                        Storage::disk('public')->delete($video->solution_file);
+                    }
+                    $video->solution_file = $request->file('live_solution_file')
+                        ->store('videos/solutions', 'public');
                 }
-                $video->solution_file = $request->file('live_solution_file')
-                    ->store('videos/solutions', 'public');
-            }
             }
 
             $video->save();

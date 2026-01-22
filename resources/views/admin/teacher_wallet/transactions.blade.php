@@ -5,12 +5,19 @@
 @section('content')
     <div class="card">
         <div class="card-header">
-            <h5 class="mb-0">
-                Transactions
-                @if(isset($teacher))
-                    of {{ $teacher->full_name }}
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="mb-0">
+                    Transactions
+                    @if(isset($teacher))
+                        of {{ $teacher->full_name }}
+                    @endif
+                </h5>
+                @if($teacher)
+                    <a href="{{ route('teacher.wallet.index') }}" class="btn btn-secondary">
+                        ← Back
+                    </a>
                 @endif
-            </h5>
+            </div>
         </div>
         <div class="card-body">
 

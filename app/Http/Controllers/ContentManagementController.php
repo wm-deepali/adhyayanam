@@ -551,35 +551,44 @@ class ContentManagementController extends Controller
                 })
                 ->addColumn('action', function ($row) {
 
-                    $actionBtn = '';
+                    $dropdown = '<div class="dropdown">
+        <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+            Actions
+        </button>
+        <ul class="dropdown-menu">';
 
-                    // ✅ EDIT permission
-                    if (\App\Helpers\Helper::canAccess('manage_exam_edit')) {
-                        $editUrl = route('cm.exam.edit', $row->id);
-                        $actionBtn .= '
-            <a href="' . $editUrl . '" class="btn btn-sm btn-primary" title="Edit">
-                <i class="fa fa-file"></i>
+                    // VIEW (no permission required)
+                    $dropdown .= '<li>
+            <a class="dropdown-item" href="' . route('cm.exam.show', $row->id) . '">
+                <i class="fa fa-eye text-info"></i> View
             </a>
-        ';
+        </li>';
+
+                    // EDIT permission
+                    if (\App\Helpers\Helper::canAccess('manage_exam_edit')) {
+                        $dropdown .= '<li>
+                <a class="dropdown-item" href="' . route('cm.exam.edit', $row->id) . '">
+                    <i class="fa fa-edit text-warning"></i> Edit
+                </a>
+            </li>';
                     }
 
-                    // ✅ DELETE permission
+                    // DELETE permission
                     if (\App\Helpers\Helper::canAccess('manage_exam_delete')) {
-                        $actionBtn .= '
-            <form action="' . route('cm.exam.destroy', $row->id) . '" method="POST" style="display:inline">
-                ' . csrf_field() . '
-                ' . method_field("DELETE") . '
-                <button type="submit" class="btn btn-sm btn-danger" title="Delete"
-                    onclick="return confirm(\'Are you sure?\')">
-                    <i class="fa fa-trash"></i>
-                </button>
-            </form>
-        ';
+                        $dropdown .= '<li>
+                <form action="' . route('cm.exam.destroy', $row->id) . '" method="POST" onsubmit="return confirm(\'Are you sure?\')">
+                    ' . csrf_field() . method_field("DELETE") . '
+                    <button type="submit" class="dropdown-item text-danger">
+                        <i class="fa fa-trash" style="color:#dc3545!important"></i> Delete
+                    </button>
+                </form>
+            </li>';
                     }
 
-                    return $actionBtn ?: '-';
-                })
+                    $dropdown .= '</ul></div>';
 
+                    return $dropdown;
+                })
                 ->rawColumns(['checkbox', 'image', 'status', 'meta_title', 'meta_description', 'meta_keyword', 'canonical_url', 'alt_tag', 'created_by', 'action'])
                 ->make(true);
         }
@@ -637,6 +646,13 @@ class ContentManagementController extends Controller
     {
         $data['exam'] = ExaminationCommission::findOrFail($id);
         return view('content-management.ajax.edit-exam-commission', $data);
+    }
+
+    public function examinationShow($id)
+    {
+        $exam = ExaminationCommission::findOrFail($id);
+
+        return view('content-management.exam-commission-show', compact('exam'));
     }
 
     public function examinationUpdate(Request $request)
@@ -732,36 +748,45 @@ class ContentManagementController extends Controller
                 })
                 ->addColumn('action', function ($row) {
 
-                    $buttons = '';
+                    $dropdown = '<div class="dropdown">
+        <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+            Actions
+        </button>
+        <ul class="dropdown-menu">';
+
+                    // VIEW (no permission required)
+                    $dropdown .= '<li>
+            <a class="dropdown-item" href="' . route('cm.category.show', $row->id) . '">
+                <i class="fa fa-eye text-info"></i> View
+            </a>
+        </li>';
 
                     // EDIT permission
                     if (\App\Helpers\Helper::canAccess('manage_category_edit')) {
                         $editUrl = route('cm.category.edit', $row->id);
-                        $buttons .= '
-            <a href="' . $editUrl . '" class="btn btn-sm btn-primary" title="Edit">
-                <i class="fa fa-file"></i>
+                        $dropdown .= '<li>
+           <a class="dropdown-item"  href="' . $editUrl . '">
+               <i class="fa fa-edit text-warning"></i> Edit
             </a>
-        ';
+        </li>';
                     }
 
                     // DELETE permission
                     if (\App\Helpers\Helper::canAccess('manage_category_delete')) {
-                        $buttons .= '
-            <form action="' . route('cm.category.delete', $row->id) . '" method="POST" style="display:inline">
-                ' . csrf_field() . '
-                ' . method_field("DELETE") . '
-                <button type="submit" class="btn btn-sm btn-danger"
-                        title="Delete"
-                        onclick="return confirm(\'Are you sure?\')">
-                    <i class="fa fa-trash"></i>
-                </button>
+                        $dropdown .= '<li>
+           <form action="' . route('cm.category.delete', $row->id) . '" method="POST" onsubmit="return confirm(\'Are you sure?\')">
+                    ' . csrf_field() . method_field("DELETE") . '
+               <button type="submit" class="dropdown-item text-danger">
+                        <i class="fa fa-trash" style="color:#dc3545!important"></i> Delete
+                    </button>
             </form>
-        ';
+       </li>';
                     }
 
-                    return $buttons ?: '-';
-                })
+                    $dropdown .= '</ul></div>';
 
+                    return $dropdown;
+                })
                 ->rawColumns(['checkbox', 'commission', 'status', 'meta_title', 'meta_description', 'meta_keyword', 'canonical_url', 'alt_tag', 'image', 'created_by', 'action'])
                 ->make(true);
         }
@@ -773,6 +798,50 @@ class ContentManagementController extends Controller
     {
         $data['examinationCommissions'] = ExaminationCommission::all();
         return view('content-management.ajax.create-category', $data);
+    }
+
+    public function categoryStore(Request $request)
+    {
+        $request->validate([
+            'exam_com_id' => 'nullable|integer',
+            'name' => 'required|string|max:255',
+            'meta_title' => 'nullable|string|max:255',
+            'meta_keyword' => 'nullable|string|max:255',
+            'meta_description' => 'nullable|string',
+            'canonical_url' => 'nullable|string|max:255',
+            'image' => 'nullable|image|max:2048', // Assuming the image is optional and its maximum size is 2MB
+            'alt_tag' => 'nullable|string|max:255',
+            'status' => 'required|boolean',
+        ]);
+
+        // Handle image upload
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('exam_commission_images', 'public');
+        } else {
+            $imagePath = null;
+        }
+
+        // Create a new instance of ExaminationCommission model
+        $examCommission = new Category();
+        $examCommission->exam_com_id = $request->exam_com_id;
+        $examCommission->name = $request->name;
+        $examCommission->meta_title = $request->meta_title;
+        $examCommission->meta_keyword = $request->meta_keyword;
+        $examCommission->meta_description = $request->meta_description;
+        $examCommission->canonical_url = $request->canonical_url;
+        $examCommission->image = $imagePath;
+        $examCommission->alt_tag = $request->alt_tag;
+        $examCommission->status = $request->status;
+        $examCommission->created_by = auth()->id();
+
+        // Save the ExaminationCommission instance to the database
+        $examCommission->save();
+        return redirect()->back()->with('success', 'Category added successfully.');
+    }
+    public function categoryShow($id)
+    {
+        $category = Category::findOrFail($id);
+        return view('content-management.ajax.view-category', compact('category'));
     }
 
     public function categoryEdit($id)
@@ -814,44 +883,6 @@ class ContentManagementController extends Controller
         return redirect()->route('cm.category')->with('success', 'Category updated successfully!');
     }
 
-    public function categoryStore(Request $request)
-    {
-        $request->validate([
-            'exam_com_id' => 'nullable|integer',
-            'name' => 'required|string|max:255',
-            'meta_title' => 'nullable|string|max:255',
-            'meta_keyword' => 'nullable|string|max:255',
-            'meta_description' => 'nullable|string',
-            'canonical_url' => 'nullable|string|max:255',
-            'image' => 'nullable|image|max:2048', // Assuming the image is optional and its maximum size is 2MB
-            'alt_tag' => 'nullable|string|max:255',
-            'status' => 'required|boolean',
-        ]);
-
-        // Handle image upload
-        if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('exam_commission_images', 'public');
-        } else {
-            $imagePath = null;
-        }
-
-        // Create a new instance of ExaminationCommission model
-        $examCommission = new Category();
-        $examCommission->exam_com_id = $request->exam_com_id;
-        $examCommission->name = $request->name;
-        $examCommission->meta_title = $request->meta_title;
-        $examCommission->meta_keyword = $request->meta_keyword;
-        $examCommission->meta_description = $request->meta_description;
-        $examCommission->canonical_url = $request->canonical_url;
-        $examCommission->image = $imagePath;
-        $examCommission->alt_tag = $request->alt_tag;
-        $examCommission->status = $request->status;
-        $examCommission->created_by = auth()->id();
-
-        // Save the ExaminationCommission instance to the database
-        $examCommission->save();
-        return redirect()->back()->with('success', 'Category added successfully.');
-    }
     public function categoryDelete($id)
     {
         // Find all test series associated with the category ID
@@ -956,7 +987,7 @@ class ContentManagementController extends Controller
                     ' . csrf_field() . method_field('DELETE') . '
                     <button type="submit"
                             class="dropdown-item text-danger">
-                        <i class="fa fa-trash me-2"></i> Delete
+                        <i class="fa fa-trash me-2" style="color:#dc3545!important"></i> Delete
                     </button>
                 </form>
             </li>';
@@ -1195,7 +1226,7 @@ class ContentManagementController extends Controller
                         class="btn btn-sm btn-danger"
                         title="Delete"
                         onclick="return confirm(\'Are you sure?\')">
-                    <i class="fa fa-trash"></i>
+                    <i class="fa fa-trash" style="color:#dc3545!important"></i>
                 </button>
             </form>
         ';
@@ -1278,6 +1309,7 @@ class ContentManagementController extends Controller
         $subject->delete();
         return redirect()->back()->with('success', 'Subject deleted successfully!');
     }
+
     public function chapterIndex(Request $request)
     {
         if ($request->ajax()) {
@@ -1308,43 +1340,79 @@ class ContentManagementController extends Controller
                 })
                 ->addColumn('action', function ($row) {
 
-                    $buttons = '';
+                    $items = '';
 
-                    // EDIT permission
-                    if (\App\Helpers\Helper::canAccess('manage_chapter_edit')) {
-                        $editUrl = route('cm.chapter.edit', $row->id);
-                        $buttons .= '
-            <a href="' . $editUrl . '" class="btn btn-sm btn-primary" title="Edit">
-                <i class="fa fa-file"></i>
-            </a>
-        ';
+                    // ✅ SHOW
+                    if (\App\Helpers\Helper::canAccess('manage_subcategory')) {
+                        $items .= '
+            <li>
+                <a class="dropdown-item"
+                   href="' . route('cm.chapter.view', $row->id) . '">
+                    <i class="fa fa-eye me-2 text-info"></i> View
+                </a>
+            </li>';
                     }
 
-                    // DELETE permission
-                    if (\App\Helpers\Helper::canAccess('manage_chapter_delete')) {
-                        $buttons .= '
-            <form action="' . route('cm.chapter.delete', $row->id) . '" method="POST" style="display:inline">
-                ' . csrf_field() . '
-                ' . method_field("DELETE") . '
-                <button type="submit"
-                        class="btn btn-sm btn-danger"
-                        title="Delete"
-                        onclick="return confirm(\'Are you sure?\')">
-                    <i class="fa fa-trash"></i>
-                </button>
-            </form>
-        ';
+                    // ✅ EDIT
+                    if (\App\Helpers\Helper::canAccess('manage_subcategory_edit')) {
+                        $items .= '
+            <li>
+                <a class="dropdown-item"
+                   href="' . route('cm.chapter.edit', $row->id) . '">
+                    <i class="fa fa-edit me-2 text-primary"></i> Edit
+                </a>
+            </li>';
                     }
 
-                    return $buttons ?: '-';
+                    // ✅ DELETE
+                    if (\App\Helpers\Helper::canAccess('manage_subcategory_delete')) {
+                        $items .= '
+            <li>
+                <form method="POST"
+                      action="' . route('cm.chapter.delete', $row->id) . '"
+                      onsubmit="return confirm(\'Are you sure?\')">
+                    ' . csrf_field() . method_field('DELETE') . '
+                    <button type="submit"
+                            class="dropdown-item text-danger">
+                        <i class="fa fa-trash me-2" style="color:#dc3545!important"></i> Delete
+                    </button>
+                </form>
+            </li>';
+                    }
+
+                    // ❌ If no permission at all
+                    if ($items === '') {
+                        return '-';
+                    }
+
+                    // ✅ FINAL DROPDOWN
+                    return '
+        <div class="dropdown">
+            <button class="btn btn-sm btn-secondary dropdown-toggle"
+                    type="button"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false">
+                Action
+            </button>
+            <ul class="dropdown-menu">
+                ' . $items . '
+            </ul>
+        </div>';
                 })
-
                 ->rawColumns(['checkbox', 'subject', 'status', 'action', 'created_by'])
                 ->make(true);
         }
         return view('content-management.chapter');
 
     }
+
+    public function chapterView($id)
+    {
+        $chapter = Chapter::with(['subject', 'creator'])->findOrFail($id);
+
+        return view('content-management.ajax.view-chapter', compact('chapter'));
+    }
+
     public function chapterCreate()
     {
         $data['commissions'] = ExaminationCommission::all();
@@ -1575,6 +1643,129 @@ class ContentManagementController extends Controller
         return view('content-management.ajax.create-course', $data);
     }
 
+    public function courseStore(Request $request)
+    {
+        $request->validate([
+            'examination_commission_id' => 'required|exists:examination_commission,id',
+            'category_id' => 'nullable|exists:category,id',
+            'sub_category_id' => 'nullable|exists:sub_category,id',
+
+            'name' => 'required|string|max:255',
+            'duration' => 'required|string|max:255',
+            'course_fee' => 'required|numeric|min:0',
+
+            // 🔥 Discount is PERCENTAGE
+            'discount' => 'required|numeric|min:0|max:100',
+
+            'num_classes' => 'required|integer|min:0',
+            'num_topics' => 'required|integer|min:0',
+
+            // Multi-selects
+            'subject_id' => 'required|array|min:1',
+            'subject_id.*' => 'exists:subject,id',
+
+            'chapter_id' => 'nullable|array',
+            'chapter_id.*' => 'exists:chapter,id',
+
+            'topic_id' => 'nullable|array',
+            'topic_id.*' => 'exists:topic,id',
+
+            'language_of_teaching' => 'required|array|min:1',
+            'language_of_teaching.*' => 'string',
+
+            'based_on' => 'nullable|string|max:255',
+
+            'course_heading' => 'required|string|max:255',
+            'short_description' => 'required|string',
+            'course_overview' => 'required|string',
+            'detail_content' => 'required|string',
+
+            'thumbnail_image' => 'required|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
+            'banner_image' => 'required|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
+
+            'youtube_url' => 'nullable|url',
+            'meta_title' => 'nullable|string|max:255',
+            'meta_keyword' => 'nullable|string|max:255',
+            'meta_description' => 'nullable|string|max:255',
+            'image_alt_tag' => 'nullable|string|max:255',
+
+            'course_mode' => 'required|in:Online,Video Learning',
+            'feature' => 'nullable',
+        ]);
+
+        /* ------------------------------------
+         | File Uploads
+         |------------------------------------*/
+        $thumbnailImagePath = $request->file('thumbnail_image')
+            ->store('courses/thumbnails', 'public');
+
+        $bannerImagePath = $request->file('banner_image')
+            ->store('courses/banners', 'public');
+
+        /* ------------------------------------
+         | Secure Price Calculation (BACKEND)
+         |------------------------------------*/
+        $courseFee = $request->course_fee;
+        $discountPercent = $request->discount;
+
+        $discountAmount = ($courseFee * $discountPercent) / 100;
+        $offeredPrice = max($courseFee - $discountAmount, 0);
+
+        /* ------------------------------------
+         | Save Course
+         |------------------------------------*/
+        $course = new Course();
+
+        $course->examination_commission_id = $request->examination_commission_id;
+        $course->category_id = $request->category_id;
+        $course->sub_category_id = $request->sub_category_id;
+
+        $course->name = $request->name;
+        $course->duration = $request->duration;
+        $course->course_fee = $courseFee;
+        $course->discount = $discountPercent;
+        $course->offered_price = round($offeredPrice);
+
+        $course->num_classes = $request->num_classes;
+        $course->num_topics = $request->num_topics;
+
+        // 🔥 Store arrays (assumes JSON columns or casts)
+        $course->subject_id = $request->subject_id;
+        $course->chapter_id = $request->chapter_id ?? [];
+        $course->topic_id = $request->topic_id ?? [];
+
+        // Languages (stored as comma-separated)
+        $course->language_of_teaching = implode(',', $request->language_of_teaching);
+
+        $course->based_on = $request->based_on ?? 'general';
+
+        $course->course_heading = $request->course_heading;
+        $course->short_description = $request->short_description;
+        $course->course_overview = $request->course_overview;
+        $course->detail_content = $request->detail_content;
+
+        $course->thumbnail_image = $thumbnailImagePath;
+        $course->banner_image = $bannerImagePath;
+
+        $course->youtube_url = $request->youtube_url;
+        $course->meta_title = $request->meta_title;
+        $course->meta_keyword = $request->meta_keyword;
+        $course->meta_description = $request->meta_description;
+        $course->image_alt_tag = $request->image_alt_tag;
+
+        $course->course_mode = $request->course_mode;
+
+        // Feature toggle
+        $course->feature = $request->has('feature') ? 'on' : 'off';
+
+        $course->created_by = auth()->id();
+        $course->save();
+
+        return redirect()
+            ->route('courses.course.index')
+            ->with('success', 'Course created successfully');
+    }
+
     public function courseEdit($id)
     {
         $data['examinationCommissions'] = ExaminationCommission::all();
@@ -1602,141 +1793,123 @@ class ContentManagementController extends Controller
     {
         $course = Course::findOrFail($id);
 
-        $course->examination_commission_id = $request->examination_commission_id;
-        $course->category_id = $request->category_id;
-        $course->sub_category_id = $request->sub_category_id;
-        $course->name = $request->name;
-        $course->duration = $request->duration;
-        $course->course_fee = $request->course_fee;
-        $course->feature = $request->feature ?? 'off';
-        $course->discount = $request->discount;
-        $course->offered_price = $request->offered_price;
-        $course->num_classes = $request->num_classes;
-        $course->num_topics = $request->num_topics;
-        $course->language_of_teaching = implode(',', $request->language_of_teaching);
-        $course->course_heading = $request->course_heading;
-        $course->short_description = $request->short_description;
-        $course->course_overview = $request->course_overview;
-        $course->detail_content = $request->detail_content;
-        $course->youtube_url = $request->youtube_url;
-        $course->meta_title = $request->meta_title;
-        $course->meta_keyword = $request->meta_keyword;
-        $course->meta_description = $request->meta_description;
-        $course->image_alt_tag = $request->image_alt_tag;
-        $course->subject_id = $request->subject_id ?? [];
-        $course->chapter_id = $request->chapter_id ?? [];
-        $course->topic_id = $request->topic_id ?? [];
-        // ✅ Course Type Logic (Based On)
-        $basedOn = $request->based_on ?? 'general';
-        $course->based_on = $basedOn;
-        $course->course_mode = $request->course_mode;
-
-        if ($request->hasFile('thumbnail_image')) {
-            $thumbnailPath = $request->file('thumbnail_image')->store('thumbnails', 'public');
-            $course->thumbnail_image = $thumbnailPath;
-        }
-
-        if ($request->hasFile('banner_image')) {
-            $bannerPath = $request->file('banner_image')->store('banners', 'public');
-            $course->banner_image = $bannerPath;
-        }
-
-        $course->save();
-
-        return redirect()->route('courses.course.index')->with('success', 'Course updated successfully');
-    }
-
-    public function courseStore(Request $request)
-    {
         $request->validate([
             'examination_commission_id' => 'required|exists:examination_commission,id',
             'category_id' => 'nullable|exists:category,id',
             'sub_category_id' => 'nullable|exists:sub_category,id',
+
             'name' => 'required|string|max:255',
             'duration' => 'required|string|max:255',
-            'course_fee' => 'required|numeric',
-            'discount' => 'required|integer',
-            'offered_price' => 'required|numeric',
-            'num_classes' => 'required|integer',
-            'num_topics' => 'required|integer',
+            'course_fee' => 'required|numeric|min:0',
 
-            'subject_id' => 'required|array',
-            'subject_id.*' => 'integer',
+            // 🔥 Discount is PERCENTAGE
+            'discount' => 'required|numeric|min:0|max:100',
+
+            'num_classes' => 'required|integer|min:0',
+            'num_topics' => 'required|integer|min:0',
+
+            'subject_id' => 'required|array|min:1',
+            'subject_id.*' => 'exists:subject,id',
 
             'chapter_id' => 'nullable|array',
-            'chapter_id.*' => 'integer',
+            'chapter_id.*' => 'exists:chapter,id',
 
             'topic_id' => 'nullable|array',
-            'topic_id.*' => 'integer',
+            'topic_id.*' => 'exists:topic,id',
 
-            'language_of_teaching' => 'required|array',
-            'language_of_teaching.*' => 'required|string',
+            'language_of_teaching' => 'required|array|min:1',
+            'language_of_teaching.*' => 'string',
 
-            'based_on' => 'nullable|string|max:255', // 👈 new field
+            'based_on' => 'nullable|string|max:255',
 
             'course_heading' => 'required|string|max:255',
             'short_description' => 'required|string',
             'course_overview' => 'required|string',
             'detail_content' => 'required|string',
 
-            'thumbnail_image' => 'required|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
-            'banner_image' => 'required|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
+            // Images optional on update
+            'thumbnail_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
+            'banner_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
 
             'youtube_url' => 'nullable|url',
             'meta_title' => 'nullable|string|max:255',
             'meta_keyword' => 'nullable|string|max:255',
             'meta_description' => 'nullable|string|max:255',
             'image_alt_tag' => 'nullable|string|max:255',
+
+            'course_mode' => 'required|in:Online,Video Learning',
             'feature' => 'nullable',
-            'course_mode' => 'required|in:Online,Video Learning', // ✅ validate
         ]);
 
-        // ✅ Handle file uploads
-        $thumbnailImagePath = $request->file('thumbnail_image')->store('thumbnails', 'public');
-        $bannerImagePath = $request->file('banner_image')->store('banners', 'public');
+        /* ------------------------------------
+         | Secure Price Calculation (BACKEND)
+         |------------------------------------*/
+        $courseFee = $request->course_fee;
+        $discountPercent = $request->discount;
 
-        // ✅ Create new course
-        $course = new Course();
+        $discountAmount = ($courseFee * $discountPercent) / 100;
+        $offeredPrice = max($courseFee - $discountAmount, 0);
+
+        /* ------------------------------------
+         | Update Course Fields
+         |------------------------------------*/
         $course->examination_commission_id = $request->examination_commission_id;
         $course->category_id = $request->category_id;
         $course->sub_category_id = $request->sub_category_id;
+
         $course->name = $request->name;
-        $course->feature = $request->feature ?? 'off';
         $course->duration = $request->duration;
-        $course->course_fee = $request->course_fee;
-        $course->discount = $request->discount;
-        $course->offered_price = $request->offered_price;
+        $course->course_fee = $courseFee;
+        $course->discount = $discountPercent;
+        $course->offered_price = round($offeredPrice);
+
         $course->num_classes = $request->num_classes;
         $course->num_topics = $request->num_topics;
 
-        // ✅ Store multi-select arrays as comma-separated strings
-        $course->subject_id = $request->subject_id ?? [];
+        // Arrays (assumes JSON columns or casts)
+        $course->subject_id = $request->subject_id;
         $course->chapter_id = $request->chapter_id ?? [];
         $course->topic_id = $request->topic_id ?? [];
+
         $course->language_of_teaching = implode(',', $request->language_of_teaching);
 
-        // ✅ Course Type Logic (Based On)
-        $basedOn = $request->based_on ?? 'general';
-        $course->based_on = $basedOn;
+        $course->based_on = $request->based_on ?? 'general';
 
         $course->course_heading = $request->course_heading;
         $course->short_description = $request->short_description;
         $course->course_overview = $request->course_overview;
         $course->detail_content = $request->detail_content;
-        $course->thumbnail_image = $thumbnailImagePath;
-        $course->banner_image = $bannerImagePath;
+
         $course->youtube_url = $request->youtube_url;
         $course->meta_title = $request->meta_title;
         $course->meta_keyword = $request->meta_keyword;
         $course->meta_description = $request->meta_description;
         $course->image_alt_tag = $request->image_alt_tag;
+
         $course->course_mode = $request->course_mode;
-        $course->created_by = auth()->id();
+
+        // Feature checkbox
+        $course->feature = $request->has('feature') ? 'on' : 'off';
+
+        /* ------------------------------------
+         | Optional File Uploads
+         |------------------------------------*/
+        if ($request->hasFile('thumbnail_image')) {
+            $course->thumbnail_image = $request->file('thumbnail_image')
+                ->store('courses/thumbnails', 'public');
+        }
+
+        if ($request->hasFile('banner_image')) {
+            $course->banner_image = $request->file('banner_image')
+                ->store('courses/banners', 'public');
+        }
+
         $course->save();
 
-        return redirect()->route('courses.course.index')->with('success', 'Course created successfully');
+        return redirect()
+            ->route('courses.course.index')
+            ->with('success', 'Course updated successfully');
     }
-
 
     public function courseDelete($id)
     {
@@ -2029,130 +2202,149 @@ class ContentManagementController extends Controller
     public function studyMaterialIndex(Request $request)
     {
         if ($request->ajax()) {
-            $data = StudyMaterial::with('creator')->orderBy('created_at', 'DESC')->get();
-            return Datatables::of($data)
+
+            $query = StudyMaterial::with([
+                'creator',
+                'commission',
+                'category',
+                'subCategory'
+            ])
+                ->orderByDesc('created_at');
+
+            // 🔥 Filter Free / Paid
+            // type = 1 → Paid
+            // type = 0 → Free
+            if ($request->has('type')) {
+                $query->where('IsPaid', (int) $request->type);
+            }
+
+            return DataTables::of($query)
+
                 ->addIndexColumn()
+
                 ->addColumn('checkbox', function ($row) {
-                    return '<input type="checkbox" class="column_checkbox career_checkbox" id="' . $row->id . '" name="career_checkbox[]" />';
+                    return '<input type="checkbox"
+                            class="column_checkbox career_checkbox"
+                            id="' . $row->id . '"
+                            name="career_checkbox[]">';
                 })
+
                 ->addColumn('created_at', function ($row) {
-                    return $row->created_at ? $row->created_at->format('d-m-Y H:i') : 'N/A';
+                    return optional($row->created_at)->format('d-m-Y H:i') ?? 'N/A';
                 })
 
-                // ✅ Title with Topic (BR tag)
+                // ✅ Title + Topic
                 ->addColumn('title', function ($row) {
-                    $topicName = $row->topic?->name ?? '';
-                    return $row->title . ($topicName ? '<br><span>' . e($topicName) . '</span>' : '');
+                    $topic = $row->topic?->name;
+                    return e($row->title) . ($topic ? '<br><small>' . e($topic) . '</small>' : '');
                 })
 
-                // ✅ Examination Detail (Commission, Category, Sub Category with BR tag)
+                // ✅ Examination Details
                 ->addColumn('examination_detail', function ($row) {
-                    $commission = $row->commission->name ?? 'N/A';
-                    $category = $row->category->name ?? 'N/A';
-                    $subCat = $row->subCategory->name ?? 'N/A';
-
-                    return $commission . '<br>' . $category . '<br>' . $subCat;
+                    return
+                        ($row->commission->name ?? 'N/A') . '<br>' .
+                        ($row->category->name ?? 'N/A') . '<br>' .
+                        ($row->subCategory->name ?? 'N/A');
                 })
 
-                // ✅ Payment Type (Free / Paid)
+                // ✅ Payment Type
                 ->addColumn('payment_type', function ($row) {
-                    return $row->IsPaid == 1
-                        ? '<span class="badge badge-warning">Paid</span>'
-                        : '<span class="badge badge-success">Free</span>';
+                    return $row->IsPaid
+                        ? '<span class="badge bg-warning">Paid</span>'
+                        : '<span class="badge bg-success">Free</span>';
                 })
 
-                // ✅ Package Type (material_type logic already there)
+                // ✅ Package Type
                 ->addColumn('package_type', function ($row) {
                     return match ($row->material_type) {
                         'topic_based' => 'Topic Based',
                         'chapter_based' => 'Chapter Based',
                         'subject_based' => 'Subject Based',
                         'general' => 'General',
-                        default => ucfirst(str_replace('_', ' ', $row->material_type)),
+                        default => ucwords(str_replace('_', ' ', $row->material_type)),
                     };
                 })
 
                 // ✅ Status
                 ->addColumn('status', function ($row) {
-                    return $row->status == 'Active'
-                        ? '<span class="badge badge-success">Active</span>'
-                        : '<span class="badge badge-secondary">Inactive</span>';
+                    return $row->status === 'Active'
+                        ? '<span class="badge bg-success">Active</span>'
+                        : '<span class="badge bg-secondary">Inactive</span>';
                 })
+
                 ->addColumn('created_by', function ($row) {
                     return $row->creator
-                        ? $row->creator->name
+                        ? e($row->creator->name)
                         : '<span class="text-muted">N/A</span>';
                 })
+
+                // ✅ Actions
                 ->addColumn('action', function ($row) {
 
-                    $items = '';
+                    $actions = '';
 
-                    // VIEW
                     if (\App\Helpers\Helper::canAccess('manage_study_material')) {
-                        $items .= '
-            <li>
-                <a class="dropdown-item text-primary" href="' . route('study.material.show', $row->id) . '">
-                    <i class="fa fa-eye"></i> View Details
-                </a>
-            </li>';
+                        $actions .= '
+                        <li>
+                            <a class="dropdown-item text-primary"
+                               href="' . route('study.material.show', $row->id) . '">
+                                <i class="fa fa-eye"></i> View
+                            </a>
+                        </li>';
                     }
 
-                    // EDIT
                     if (\App\Helpers\Helper::canAccess('manage_study_material_edit')) {
-                        $items .= '
-            <li>
-                <a class="dropdown-item text-secondary" href="' . route('study.material.edit', $row->id) . '">
-                    <i class="fas fa-edit me-2"></i> Edit
-                </a>
-            </li>';
+                        $actions .= '
+                        <li>
+                            <a class="dropdown-item text-secondary"
+                               href="' . route('study.material.edit', $row->id) . '">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                        </li>';
                     }
 
-                    // DOWNLOAD
                     if (\App\Helpers\Helper::canAccess('manage_study_material')) {
-                        $items .= '
-            <li>
-                <a class="dropdown-item text-info" href="' . route('study.material.download', $row->id) . '">
-                    <i class="fa fa-download"></i> Download PDF
-                </a>
-            </li>';
+                        $actions .= '
+                        <li>
+                            <a class="dropdown-item text-info"
+                               href="' . route('study.material.download', $row->id) . '">
+                                <i class="fa fa-download"></i> Download
+                            </a>
+                        </li>';
                     }
 
-                    // DELETE
                     if (\App\Helpers\Helper::canAccess('manage_study_material_delete')) {
-                        $items .= '
-            <li>
-                <form action="' . route('study.material.delete', $row->id) . '" method="POST"
-                      onsubmit="return confirm(\'Are you sure?\')">
-                    ' . csrf_field() . '
-                    ' . method_field("DELETE") . '
-                    <button type="submit" class="dropdown-item text-danger">
-                        <i class="fas fa-trash me-2" style="color:red!important;"></i> Delete
-                    </button>
-                </form>
-            </li>';
+                        $actions .= '
+                        <li>
+                            <form method="POST"
+                                  action="' . route('study.material.delete', $row->id) . '"
+                                  onsubmit="return confirm(\'Are you sure?\')">
+                                ' . csrf_field() . method_field('DELETE') . '
+                                <button class="dropdown-item text-danger">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            </form>
+                        </li>';
                     }
 
-                    // No permission → no actions
-                    if ($items === '') {
+                    if ($actions === '') {
                         return '-';
                     }
 
                     return '
-        <div class="dropdown">
-            <button class="btn btn-sm btn-secondary dropdown-toggle" type="button"
-                data-bs-toggle="dropdown" aria-expanded="false">
-                Actions
-            </button>
-            <ul class="dropdown-menu">
-                ' . $items . '
-            </ul>
-        </div>';
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-secondary dropdown-toggle"
+                                data-bs-toggle="dropdown">
+                            Actions
+                        </button>
+                        <ul class="dropdown-menu">
+                            ' . $actions . '
+                        </ul>
+                    </div>';
                 })
-
 
                 ->rawColumns([
                     'checkbox',
-                    'created_at',
                     'title',
                     'examination_detail',
                     'payment_type',
@@ -2162,11 +2354,11 @@ class ContentManagementController extends Controller
                 ])
 
                 ->make(true);
-
         }
 
         return view('study-material.index');
     }
+
 
     public function studyMaterialShow($id)
     {

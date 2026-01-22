@@ -31,7 +31,7 @@
                             <th scope="col" width="15%">Subject</th>
                             <th scope="col">Name</th>
                             <th scope="col">Chapter Number</th>
-                            <th scope="col">Description</th>
+                            <!-- <th scope="col">Description</th> -->
                             <th scope="col">Status</th>
                              <th scope="col">Added By</th>
                             <th scope="col">Actions</th>
@@ -95,7 +95,7 @@
                     { data: 'subject', name: 'subject' },
                     { data: 'name', name: 'name' },
                     { data: 'chapter_number', name: 'chapter_number' },
-                    { data: 'description', name: 'description' },
+                    // { data: 'description', name: 'description' },
                     { data: 'status', name: 'status' },
                     { data: 'created_by', name: 'created_by' },
                     { data: 'action', name: 'action', orderable: false, searchable: false },

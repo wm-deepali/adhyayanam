@@ -84,7 +84,7 @@
                                 <td>{{ $team->designation ?? "--" }}</td>
                                 <td>{{ $team->experience ?? "--" }}</td>
                                 <td>{{ $team->education ?? "--" }}</td>
-                                <td>{{ $team->creator ? $team->creator->name : 'N/A'  }}</td>
+                                <td>{{ $team->creator ? $team->creator->name : 'Super Admin'  }}</td>
                                 <td>
                                     @if(
                                             \App\Helpers\Helper::canAccess('manage_team_edit') ||

@@ -42,7 +42,7 @@
 
                             <td>{{ $p->status }}</td>
 
-                            <td>{{ $p->creator ? $p->creator->name : 'N/A'  }}</td>
+                            <td>{{ $p->creator ? $p->creator->name : 'Super Admin'  }}</td>
 
                             <td>
                                 {{-- EDIT --}}

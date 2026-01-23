@@ -44,7 +44,7 @@
                                 <th scope="col">Thumbnail</th>
                                 <th scope="col">Banner</th>
                                 <th scope="col">Alt Tag</th>
-                                 <th>Added By</th>
+                                <th>Added By</th>
                                 <th scope="col">Action</th>
                             </tr>
                         </thead>
@@ -65,7 +65,7 @@
                                             class="img-thumbnail" style="max-width: 60px; max-height: 60px;">
                                     </td>
                                     <td>{{ $affair->image_alt_tag }}</td>
-                                    <td>{{ $affair->creator ? $affair->creator->name : 'N/A'  }}</td>
+                                    <td>{{ $affair->creator ? $affair->creator->name : 'Super Admin'  }}</td>
                                     <td>
                                         @if(
                                                 \App\Helpers\Helper::canAccess('manage_ca_edit') ||
@@ -121,6 +121,11 @@
                             @endforeach
                         </tbody>
                     </table>
+                    {{-- Pagination --}}
+                    <div class="d-flex justify-content-center mt-3">
+                        {{ $currentAffairs->links() }}
+                    </div>
+
                 </div>
 
             </div>

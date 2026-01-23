@@ -63,7 +63,7 @@ Marquee Setting
                         <th scope="row">{{ Carbon\Carbon::parse($data->created_at)->format('d M Y'); }}</th>
                         <td>{{$data->title}}</td>
                         <td>{{$data->link}}</td>
-                        <td>{{ $data->creator ? $data->creator->name : 'N/A'  }}</td>
+                        <td>{{ $data->creator ? $data->creator->name : 'Super Admin'  }}</td>
                         <td>
     @if(\App\Helpers\Helper::canAccess('manage_marquee_edit'))
         <a href="{{ route('settings.marquee.edit', $data->id) }}"

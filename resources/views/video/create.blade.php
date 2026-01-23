@@ -7,11 +7,15 @@
 @section('content')
     <div class="bg-light rounded p-2">
         <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="card-title">Create</h5>
+                    <small class="text-muted">Create live class or video learning content here.</small>
+                </div>
+                <a href="{{ route('video.index') }}" class="btn btn-secondary">← Back</a>
+            </div>
             <div class="card-body">
-                <h5 class="card-title">Create</h5>
-                <h6 class="card-subtitle mb-2 text-muted">
-                    Create live class or video learning content here.
-                </h6>
+
                 <div class="mt-2">
                     @include('layouts.includes.messages')
                 </div>

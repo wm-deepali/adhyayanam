@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>{{ ucwords($paper->name ?? '') }}</title>
+
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -52,14 +53,73 @@
         .question strong {
             display: block;
         }
+
+        /* ========================= */
+        /* 🔹 ADDED (Watermark) */
+        /* ========================= */
+        .watermark {
+            position: fixed;
+            top: 40%;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 60px;
+            color: rgba(0, 0, 0, 0.08);
+            transform: rotate(-30deg);
+            z-index: -1;
+        }
+
+        /* ========================= */
+        /* 🔹 ADDED (Footer) */
+        /* ========================= */
+        .pdf-footer {
+            position: fixed;
+            bottom: 10px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 10px;
+            color: #555;
+        }
+
+        /* ========================= */
+        /* 🔹 ADDED (Header Logo) */
+        /* ========================= */
+        .pdf-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .pdf-header img {
+            height: 45px;
+        }
+        .site-name {
+            font-size: 16px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
     </style>
 </head>
+
 <body>
 
-    <!-- 🟩 Header -->
+    <!-- ========================= -->
+    <!-- 🔹 ADDED: WATERMARK ONLY -->
+    <!-- ========================= -->
+    <div class="watermark">{{ config('app.name') }}</div>
+
+    <!-- ========================= -->
+    <!-- 🔹 ADDED: LOGO + WEBSITE NAME -->
+    <!-- ========================= -->
+    <div class="pdf-header">
+        <img src="{{ public_path('images/Neti-logo.png') }}" alt="Logo">
+        <div class="site-name">{{ config('app.name') }}</div>
+    </div>
+
+    <!-- 🟩 EXISTING HEADER (UNCHANGED) -->
     <h2>{{ ucwords($paper->name ?? '') }} ({{ $paper->test_code ?? '' }})</h2>
 
-    <!-- 🟨 Paper Summary -->
+    <!-- 🟨 EXISTING PAPER SUMMARY (UNCHANGED) -->
     <div class="paper-summary">
         <table>
             <tr><td><strong>Language</strong></td><td>{{ $paper->language == '1' ? 'Hindi' : 'English' }}</td></tr>
@@ -167,6 +227,13 @@
     @else
         <p class="text-center">No questions found for this test paper.</p>
     @endif
+
+    <!-- ========================= -->
+    <!-- 🔹 ADDED: FOOTER ONLY -->
+    <!-- ========================= -->
+    <div class="pdf-footer">
+        © {{ date('Y') }} {{ config('app.name') }} | All Rights Reserved
+    </div>
 
 </body>
 </html>

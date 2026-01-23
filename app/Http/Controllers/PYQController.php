@@ -18,93 +18,90 @@ class PYQController extends Controller
      */
     public function index()
     {
-        $data['test'] = Test::with('subject', 'topic', 'commission', 'category', 'testDetails')->where('paper_type', 1)->get();
-        $data['commissions'] = ExaminationCommission::get();
-        return view('pyq.index', $data);
-    }
+        $test = Test::with([
+            'subject',
+            'topic',
+            'commission',
+            'category',
+            'subcategory',
+            'testDetails',
+            'creator:id,name'
+        ])
+            ->where('paper_type', 1)
+            ->latest()
+            ->get();
 
+        $commissions = ExaminationCommission::get();
+
+        return view('pyq.index', compact('test', 'commissions'));
+    }
 
     public function filter(Request $request)
     {
-        $query = Test::with(['subject', 'topic', 'commission', 'category', 'testDetails'])
+        $query = Test::with([
+            'subject',
+            'topic',
+            'commission',
+            'category',
+            'subcategory',
+            'testDetails',
+            'creator:id,name'
+        ])
             ->where('paper_type', 1)
             ->latest();
 
-        if ($request->commission_id) {
+        if ($request->filled('commission_id')) {
             $query->where('competitive_commission_id', $request->commission_id);
         }
 
-        if ($request->category_id) {
+        if ($request->filled('category_id')) {
             $query->where('exam_category_id', $request->category_id);
         }
 
-        if ($request->sub_category_id) {
+        if ($request->filled('sub_category_id')) {
             $query->where('exam_subcategory_id', $request->sub_category_id);
         }
 
-        if ($request->test_type !== null && $request->test_type !== '') {
+        if ($request->filled('test_type')) {
             switch ($request->test_type) {
-                case '0': // Full / Combined
-                    $query->whereNull('topic_id')
-                        ->whereNull('subject_id')
-                        ->whereNull('chapter_id')
-                        ->where('paper_type', 0);
+                case '0':
+                    $query->whereNull(['subject_id', 'topic_id', 'chapter_id']);
                     break;
-
-                case '1': // Subject Wise
+                case '1':
                     $query->whereNotNull('subject_id')
-                        ->whereNull('topic_id')
-                        ->whereNull('chapter_id')
-                        ->where('paper_type', 0);
+                        ->whereNull(['topic_id', 'chapter_id']);
                     break;
-
-                case '2': // Chapter Wise
+                case '2':
                     $query->whereNotNull('chapter_id')
-                        ->whereNull('topic_id')
-                        ->where('paper_type', 0);
+                        ->whereNull('topic_id');
                     break;
-
-                case '3': // Topic Wise
-                    $query->whereNotNull('topic_id')
-                        ->where('paper_type', 0);
+                case '3':
+                    $query->whereNotNull('topic_id');
                     break;
             }
         }
 
-        if ($request->search) {
+        if ($request->filled('search')) {
             $search = $request->search;
-
             $query->where(function ($q) use ($search) {
-                $q->where('name', 'LIKE', "%{$search}%")
-                    ->orWhere('test_code', 'LIKE', "%{$search}%")
-                    ->orWhereHas('commission', function ($sub) use ($search) {
-                        $sub->where('name', 'LIKE', "%{$search}%");
-                    })
-                    ->orWhereHas('category', function ($sub) use ($search) {
-                        $sub->where('name', 'LIKE', "%{$search}%");
-                    })
-                    ->orWhereHas('subcategory', function ($sub) use ($search) {
-                        $sub->where('name', 'LIKE', "%{$search}%");
-                    })
-                    ->orWhereHas('subject', function ($sub) use ($search) {
-                        $sub->where('name', 'LIKE', "%{$search}%");
-                    })
-                    ->orWhereHas('chapter', function ($sub) use ($search) {
-                        $sub->where('name', 'LIKE', "%{$search}%");
-                    })
-                    ->orWhereHas('topic', function ($sub) use ($search) {
-                        $sub->where('name', 'LIKE', "%{$search}%");
-                    });
+                $q->where('name', 'like', "%$search%")
+                    ->orWhere('test_code', 'like', "%$search%")
+                    ->orWhereHas('commission', fn($s) => $s->where('name', 'like', "%$search%"))
+                    ->orWhereHas('category', fn($s) => $s->where('name', 'like', "%$search%"))
+                    ->orWhereHas('subcategory', fn($s) => $s->where('name', 'like', "%$search%"))
+                    ->orWhereHas('subject', fn($s) => $s->where('name', 'like', "%$search%"))
+                    ->orWhereHas('chapter', fn($s) => $s->where('name', 'like', "%$search%"))
+                    ->orWhereHas('topic', fn($s) => $s->where('name', 'like', "%$search%"));
             });
         }
 
+        $test = $query->get();
 
-        $test = $query->paginate(10);
-
-        $html = view('pyq.table-rows', compact('test'))->render();
-
-        return response()->json(['html' => $html]);
+        return response()->json([
+            'html' => view('pyq.table-rows', compact('test'))->render()
+        ]);
     }
+
 
     /**
      * Show the form for creating a new resource.

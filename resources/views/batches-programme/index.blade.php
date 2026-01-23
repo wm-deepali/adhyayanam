@@ -62,7 +62,7 @@
                                 <td>{{$data->discount}}</td>
                                 <td>{{$data->offered_price}}</td>
                                 <td>{{$data->duration ?? "0"}} Days</td>
-                                <td>{{ $data->creator ? $data->creator->name : 'N/A'  }}</td>
+                                <td>{{ $data->creator ? $data->creator->name : 'Super Admin'  }}</td>
                                 <td>
                                     @if(
                                             \App\Helpers\Helper::canAccess('manage_batches') ||

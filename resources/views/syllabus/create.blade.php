@@ -26,16 +26,16 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <div class="bg-light rounded">
         <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="card-title">Create</h5>
+                    <h6 class="card-subtitle mb-2 text-muted"> Add Syllabus here.</h6>
+                </div>
+                <a href="{{route('syllabus.index')}}" class="btn btn-secondary btn-sm">
+                    ⬅ Back
+                </a>
+            </div>
             <div class="card-body">
-                <div class="d-flex">
-                    <div class="col">
-                        <h5 class="card-title">Create</h5>
-                        <h6 class="card-subtitle mb-2 text-muted"> Add Syllabus here.</h6>
-                    </div>
-                </div>
-                <div class="mt-2">
-                    @include('layouts.includes.messages')
-                </div>
                 <form method="POST" action="{{ route('syllabus.store') }}" enctype="multipart/form-data">
                     @csrf
                     <div class="mb-3">
@@ -66,7 +66,7 @@
                         </select>
 
                     </div>
-        
+
 
                     <div class="mb-3">
                         <label for="subject_id" class="form-label">Subject</label>
@@ -119,7 +119,6 @@
                     </div>
 
                     <button type="submit" class="btn btn-primary">Save</button>
-                    <a href="{{route('syllabus.index')}}" class="btn">Back</a>
                 </form>
 
             </div>
@@ -138,10 +137,10 @@
     <script src="https://cdn.ckeditor.com/4.16.2/full/ckeditor.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-         CKEDITOR.replace('detail_content', {
-    filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
-    filebrowserUploadMethod: 'form'
-});
+            CKEDITOR.replace('detail_content', {
+                filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
+                filebrowserUploadMethod: 'form'
+            });
         });
 
         $(document).ready(function () {

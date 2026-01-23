@@ -38,7 +38,7 @@
                                 <td>{{ $pyqContent->category->name ?? '—' }}</td>
                                 <td>{{ $pyqContent->subCategory->name ?? '—' }}</td>
                                 <td>{{ $pyqContent->heading ?? '—' }}</td>
-                                <td>{{ $pyqContent->creator ? $pyqContent->creator->name : 'N/A'  }}</td>
+                                <td>{{ $pyqContent->creator ? $pyqContent->creator->name : 'Super Admin'  }}</td>
                                 <td class="text-center">
                                     <div class="dropdown">
                                         <button class="btn btn-sm btn-secondary dropdown-toggle" type="button"
@@ -90,7 +90,7 @@
                         @endforeach
                     </tbody>
                 </table>
-
+                
             </div>
         </div>
     </div>

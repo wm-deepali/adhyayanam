@@ -64,7 +64,7 @@
                                     <td>{{ $faq->question }}</td>
                                     <td>{{ $faq->answer }}</td>
                                     <td>{{ $faq->type ?? "--" }}</td>
-                                     <td>{{ $faq->creator ? $faq->creator->name : 'N/A'  }}</td>
+                                     <td>{{ $faq->creator ? $faq->creator->name : 'Super Admin'  }}</td>
                                     <td>
                                         <div class="dropdown">
                                             <button class="btn btn-secondary dropdown-toggle btn-sm" type="button"

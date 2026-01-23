@@ -44,7 +44,7 @@
                                 <td>{{$seo->description}}</td>
                                 <td>{{$seo->keywords}}</td>
                                 <td>{{$seo->canonical}}</td>
-                                <td>{{ $seo->creator ? $seo->creator->name : 'N/A'  }}</td>
+                                <td>{{ $seo->creator ? $seo->creator->name : 'Super Admin'  }}</td>
                                 <td></td>
                             </tr>
                         @endforeach

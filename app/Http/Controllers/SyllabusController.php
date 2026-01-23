@@ -84,7 +84,7 @@ class SyllabusController extends Controller
 
                 // Added By
                 ->addColumn('created_by', function ($res) {
-                    return $res->creator ? $res->creator->name : 'N/A';
+                    return $res->creator ? $res->creator->name : 'Super Admin';
                 })
 
                 // Action (same dropdown you already use)

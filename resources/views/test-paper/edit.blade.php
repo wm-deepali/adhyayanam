@@ -134,7 +134,10 @@
                         <h6 class="card-subtitle mb-2 text-muted">Edit Question section here.</h6>
                     </div>
                     <div class="justify-content-end">
-                        <!--<a href='{{route('question.bank.create')}}' class="btn btn-primary">&#43; Add</a>-->
+                         {{-- BACK BUTTON --}}
+                <a href="{{ url()->previous() }}" class="btn btn-secondary">
+                    ⬅ Back
+                </a>
                     </div>
                 </div>
                 <div class="mt-2">

@@ -21,7 +21,7 @@
 
         </td>
         <td>Active</td>
-        <td>{{ $res->creator ? $res->creator->name : 'N/A'  }}</td>
+        <td>{{ $res->creator ? $res->creator->name : 'Super Admin'  }}</td>
 
         <td>
             <div class="dropdown">

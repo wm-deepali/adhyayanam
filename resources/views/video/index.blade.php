@@ -107,7 +107,7 @@
                                                     @endfor
                                                 </td>
                                                 <td>{{ $video->status ? 'Active' : 'Inactive' }}</td>
-                                                <td>{{ $video->creator ? $video->creator->name : 'N/A'  }}</td>
+                                                <td>{{ $video->creator ? $video->creator->name : 'Super Admin'  }}</td>
                                                 <td>
                                                     @php
                                                         $canView = \App\Helpers\Helper::canAccess('manage_video');
@@ -207,7 +207,7 @@
                                                 <td>{{ $class->start_time }}</td>
                                                 <td>{{ $class->end_time }}</td>
                                                 <td>{{ $class->status ? 'Active' : 'Inactive' }}</td>
-                                                <td>{{ $class->creator ? $class->creator->name : 'N/A'  }}</td>
+                                                <td>{{ $class->creator ? $class->creator->name : 'Super Admin'  }}</td>
 
                                                 <td>
                                                     @php

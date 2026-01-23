@@ -16,21 +16,42 @@ class AdminHomeworkController extends Controller
             'teacher:id,full_name'
         ])->latest();
 
-        // 🔍 Status filter
+        // Status filter
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
 
-        $submissions = $query->paginate(20);
+        // Search by video title OR teacher name (added by)
+        if ($request->filled('search')) {
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('video', function ($v) use ($search) {
+                    $v->where('title', 'like', "%{$search}%");
+                })->orWhereHas('teacher', function ($t) use ($search) {
+                    $t->where('full_name', 'like', "%{$search}%");
+                })->orWhereHas('student', function ($t) use ($search) {
+                    $t->where('first_name', 'like', "%{$search}%");
+                    $t->orwhere('last_name', 'like', "%{$search}%");
+                });
+            });
+        }
+
+        $submissions = $query
+            ->paginate(10)
+            ->withQueryString(); // keep filters on pagination
 
         return view('admin.homework.index', compact('submissions'));
     }
 
 
+
     public function edit($id)
     {
         $submission = StudentHomeworkSubmission::with([
-            'student','teacher','video'
+            'student',
+            'teacher',
+            'video'
         ])->findOrFail($id);
 
         return view('admin.homework.edit', compact('submission'));

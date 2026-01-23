@@ -69,7 +69,7 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+    'timezone' => 'Asia/Kolkata',
 
     /*
     |--------------------------------------------------------------------------
@@ -221,7 +221,7 @@ return [
 
     'aliases' => Facade::defaultAliases()->merge([
         // 'ExampleClass' => App\Example\ExampleClass::class,
-        'Helper'=> App\Helpers\Helper::class,
+        'Helper' => App\Helpers\Helper::class,
         'LogActivity' => App\Helpers\LogActivity::class,
         'PDF' => Barryvdh\DomPDF\Facade::class,
     ])->toArray(),
@@ -229,6 +229,6 @@ return [
     // Bilas newly included
     'Debugbar' => Barryvdh\Debugbar\Facades\Debugbar::class,
     'DataTables' => Yajra\DataTables\Facades\DataTables::class,
-    
+
 
 ];

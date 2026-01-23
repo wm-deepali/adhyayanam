@@ -36,7 +36,7 @@
                             <td>{{ $user->email }}</td>
                             <td>{{ $user->mobile ?? '-' }}</td>
                             <td>{{ $user->roleGroup->name ?? '-' }}</td>
-                            <td>{{ $user->creator ? $user->creator->name : 'N/A'  }}</td>
+                            <td>{{ $user->creator ? $user->creator->name : 'Super Admin'  }}</td>
                             <td>
                                 <div class="dropdown">
                                     <button class="btn btn-sm btn-secondary dropdown-toggle" type="button"

@@ -2005,7 +2005,7 @@ class ContentManagementController extends Controller
 
     public function topicIndex()
     {
-        $data['topics'] = Topic::latest()->get();
+        $data['topics'] = Topic::latest()->paginate(10);
         return view('current-affairs.topic', $data);
     }
 
@@ -2062,7 +2062,7 @@ class ContentManagementController extends Controller
                 });
         }
 
-        $currentAffairs = $query->orderBy('publishing_date', 'DESC')->get();
+        $currentAffairs = $query->orderBy('publishing_date', 'DESC')->paginate(10);
 
         return view('current-affairs.index', compact('currentAffairs'));
     }

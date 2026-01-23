@@ -18,14 +18,16 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <div class="bg-light rounded">
         <div class="card">
-            <div class="card-body">
-                <div class="d-flex">
-                    <div class="col">
-                        <h5 class="card-title">Edit Syllabus</h5>
+             <div class="card-header d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="card-title">Edit Syllabus</h5>
                         <h6 class="card-subtitle mb-2 text-muted">Update syllabus details below.</h6>
-                    </div>
                 </div>
-
+                <a href="{{route('syllabus.index')}}" class="btn btn-secondary btn-sm">
+                    ⬅ Back
+                </a>
+            </div>
+            <div class="card-body">
                 <div class="mt-2">@include('layouts.includes.messages')</div>
 
                 <form method="POST" action="{{ route('syllabus.update', $syllabus->id) }}" enctype="multipart/form-data">
@@ -128,7 +130,6 @@
                     </div>
 
                     <button type="submit" class="btn btn-primary">Update</button>
-                    <a href="{{ route('syllabus.index') }}" class="btn btn-secondary">Back</a>
                 </form>
             </div>
         </div>

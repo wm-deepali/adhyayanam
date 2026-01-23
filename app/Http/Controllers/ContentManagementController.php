@@ -547,7 +547,7 @@ class ContentManagementController extends Controller
                 ->addColumn('created_by', function ($row) {
                     return $row->creator
                         ? $row->creator->name
-                        : '<span class="text-muted">N/A</span>';
+                        : 'Super Admin';
                 })
                 ->addColumn('action', function ($row) {
 
@@ -736,7 +736,7 @@ class ContentManagementController extends Controller
                 ->addColumn('created_by', function ($row) {
                     return $row->creator
                         ? $row->creator->name
-                        : '<span class="text-muted">N/A</span>';
+                        : 'Super Admin';
                 })
                 ->addColumn('status', function ($row) {
                     if ($row->status == 1) {
@@ -1200,7 +1200,7 @@ class ContentManagementController extends Controller
                 ->addColumn('created_by', function ($row) {
                     return $row->creator
                         ? $row->creator->name
-                        : '<span class="text-muted">N/A</span>';
+                        : 'Super Admin';
                 })
                 ->addColumn('action', function ($row) {
 
@@ -1336,7 +1336,7 @@ class ContentManagementController extends Controller
                 ->addColumn('created_by', function ($row) {
                     return $row->creator
                         ? $row->creator->name
-                        : '<span class="text-muted">N/A</span>';
+                        : 'Super Admin';
                 })
                 ->addColumn('action', function ($row) {
 
@@ -1556,7 +1556,7 @@ class ContentManagementController extends Controller
                 ->addColumn('created_by', function ($row) {
                     return $row->creator
                         ? $row->creator->name
-                        : '<span class="text-muted">N/A</span>';
+                        : 'Super Admin';
                 })
                 ->addColumn('action', function ($row) {
 
@@ -2275,7 +2275,7 @@ class ContentManagementController extends Controller
                 ->addColumn('created_by', function ($row) {
                     return $row->creator
                         ? e($row->creator->name)
-                        : '<span class="text-muted">N/A</span>';
+                        : 'Super Admin';
                 })
 
                 // ✅ Actions
@@ -2729,88 +2729,112 @@ class ContentManagementController extends Controller
     public function dailyBoostIndex(Request $request)
     {
         if ($request->ajax()) {
-            $data = DailyBooster::orderBy('created_at', 'DESC')->get();
-            return Datatables::of($data)
+
+            $query = DailyBooster::with('creator')
+                ->orderBy('created_at', 'DESC');
+
+            return Datatables::of($query)
+
+                ->filter(function ($q) use ($request) {
+                    if (!empty($request->search['value'])) {
+                        $search = $request->search['value'];
+
+                        $q->where('title', 'like', "%{$search}%")
+                            ->orWhereHas('creator', function ($q2) use ($search) {
+                                $q2->where('name', 'like', "%{$search}%");
+                            });
+                    }
+                })
+
                 ->addIndexColumn()
+
                 ->addColumn('checkbox', function ($row) {
-                    return '<input type="checkbox" class="column_checkbox career_checkbox" id="' . $row->id . '" name="career_checkbox[]" />';
+                    return '<input type="checkbox" class="column_checkbox career_checkbox"
+                        id="' . $row->id . '" name="career_checkbox[]" />';
                 })
+
                 ->addColumn('created_at', function ($row) {
-                    return $row->created_at->format('d M Y, h:i A');
+                    return $row->created_at
+                        ? $row->created_at->format('d M Y, h:i A')
+                        : '--';
                 })
+
                 ->addColumn('image', function ($row) {
                     if ($row->thumbnail) {
-                        $linkUrl = asset("storage/" . $row->thumbnail);
-                        return '<img src="' . $linkUrl . '" alt="Image" class="rounded shadow-sm" width="50" height="50" style="object-fit:cover;">';
+                        $linkUrl = asset('storage/' . $row->thumbnail);
+                        return '<img src="' . $linkUrl . '"
+                             class="rounded shadow-sm"
+                             width="50" height="50"
+                             style="object-fit:cover;">';
                     }
                     return '--';
                 })
+
                 ->addColumn('created_by', function ($row) {
-                    return $row->creator
-                        ? $row->creator->name
-                        : '<span class="text-muted">N/A</span>';
+                    return $row->creator->name ?? 'Super Admin';
                 })
+
                 ->addColumn('action', function ($row) {
 
                     $buttons = '';
 
-                    // VIEW
                     if (\App\Helpers\Helper::canAccess('manage_daily_booster')) {
                         $buttons .= '
-            <li>
-                <a class="dropdown-item text-primary" href="' . route('daily.boost.show', $row->id) . '">
-                    <i class="fa fa-eye me-2"></i> View
-                </a>
-            </li>';
+                        <li>
+                            <a class="dropdown-item text-primary"
+                               href="' . route('daily.boost.show', $row->id) . '">
+                                <i class="fa fa-eye me-2"></i> View
+                            </a>
+                        </li>';
                     }
 
-                    // EDIT
                     if (\App\Helpers\Helper::canAccess('manage_daily_booster_edit')) {
                         $buttons .= '
-            <li>
-                <a class="dropdown-item text-info" href="' . route('daily.boost.edit', $row->id) . '">
-                    <i class="fa fa-edit me-2"></i> Edit
-                </a>
-            </li>';
+                        <li>
+                            <a class="dropdown-item text-info"
+                               href="' . route('daily.boost.edit', $row->id) . '">
+                                <i class="fa fa-edit me-2"></i> Edit
+                            </a>
+                        </li>';
                     }
 
-                    // DELETE
                     if (\App\Helpers\Helper::canAccess('manage_daily_booster_delete')) {
                         $buttons .= '
-            <li>
-                <form action="' . route('daily.boost.delete', $row->id) . '" method="POST"
-                      onsubmit="return confirm(\'Are you sure?\')" style="display:inline;">
-                    ' . csrf_field() . method_field('DELETE') . '
-                    <button type="submit" class="dropdown-item text-danger">
-                        <i class="fa fa-trash me-2" style="color:#dc3545!important"></i> Delete
-                    </button>
-                </form>
-            </li>';
+                        <li>
+                            <form action="' . route('daily.boost.delete', $row->id) . '"
+                                  method="POST"
+                                  onsubmit="return confirm(\'Are you sure?\')">
+                                ' . csrf_field() . method_field('DELETE') . '
+                                <button class="dropdown-item text-danger">
+                                    <i class="fa fa-trash me-2"></i> Delete
+                                </button>
+                            </form>
+                        </li>';
                     }
 
-                    // If user has no permissions at all
                     if ($buttons === '') {
                         return '<span class="text-muted">No Actions</span>';
                     }
 
                     return '
-        <div class="dropdown">
-            <button class="btn btn-sm btn-secondary dropdown-toggle" type="button"
-                    data-bs-toggle="dropdown" aria-expanded="false">
-                Actions
-            </button>
-            <ul class="dropdown-menu dropdown-menu-end shadow">
-                ' . $buttons . '
-            </ul>
-        </div>';
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-secondary dropdown-toggle"
+                                data-bs-toggle="dropdown">
+                            Actions
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            ' . $buttons . '
+                        </ul>
+                    </div>';
                 })
 
-                ->rawColumns(['checkbox', 'created_at', 'image', 'action', 'created_by'])
+                ->rawColumns(['checkbox', 'image', 'action'])
                 ->make(true);
         }
 
         return view('daily-booster.index');
     }
+
 
     public function dailyBoostShow($id)
     {
@@ -2926,7 +2950,7 @@ class ContentManagementController extends Controller
                 ->addColumn('created_by', function ($row) {
                     return $row->creator
                         ? $row->creator->name
-                        : '<span class="text-muted">N/A</span>';
+                        : 'Super Admin';
                 })
                 ->addColumn('action', function ($row) {
 
@@ -3455,91 +3479,107 @@ class ContentManagementController extends Controller
     public function upcomingExamIndex(Request $request)
     {
         if ($request->ajax()) {
-            $data = UpcomingExam::with('exam_commission')->get();
 
-            return Datatables::of($data)
+            $query = UpcomingExam::with(['exam_commission', 'creator'])
+                ->orderBy('created_at', 'DESC');
+
+            return Datatables::of($query)
+
+                // SEARCH BY EXAM NAME + ADDED BY
+                ->filter(function ($q) use ($request) {
+                    if (!empty($request->search['value'])) {
+                        $search = $request->search['value'];
+
+                        $q->where('examination_name', 'like', "%{$search}%")
+                            ->orWhereHas('creator', function ($q2) use ($search) {
+                                $q2->where('name', 'like', "%{$search}%");
+                            });
+                    }
+                })
+
                 ->addIndexColumn()
+
                 ->addColumn('checkbox', function ($row) {
-                    return '<input type="checkbox" class="column_checkbox career_checkbox" id="' . $row->id . '" name="career_checkbox[]" />';
+                    return '<input type="checkbox"
+                            class="column_checkbox career_checkbox"
+                            id="' . $row->id . '" />';
                 })
+
                 ->addColumn('created_at', function ($row) {
-                    return $row->created_at;
+                    return $row->created_at
+                        ? $row->created_at->format('d M Y, h:i A')
+                        : '--';
                 })
+
                 ->addColumn('commission', function ($row) {
-                    return $row->exam_commission->name;
+                    return $row->exam_commission->name ?? 'N/A';
                 })
-                ->addColumn('status', function ($row) {
-                    return $row->status == 1
-                        ? '<span class="badge badge-success">Active</span>'
-                        : '<span class="badge badge-secondary">Inactive</span>';
-                })
+
                 ->addColumn('created_by', function ($row) {
-                    return $row->creator
-                        ? $row->creator->name
-                        : '<span class="text-muted">N/A</span>';
+                    return $row->creator->name ?? 'Super Admin';
                 })
+
                 ->addColumn('action', function ($row) {
 
                     $actions = '';
 
-                    // VIEW
                     if (\App\Helpers\Helper::canAccess('manage_upcoming_exams')) {
                         $actions .= '
-            <li>
-                <a class="dropdown-item" href="' . route('upcoming.exam.show', $row->id) . '">
-                    <i class="fa fa-eye me-2"></i> View
-                </a>
-            </li>';
+                        <li>
+                            <a class="dropdown-item"
+                               href="' . route('upcoming.exam.show', $row->id) . '">
+                                <i class="fa fa-eye me-2"></i> View
+                            </a>
+                        </li>';
                     }
 
-                    // EDIT
                     if (\App\Helpers\Helper::canAccess('manage_upcoming_exams_edit')) {
                         $actions .= '
-            <li>
-                <a class="dropdown-item" href="' . route('upcoming.exam.edit', $row->id) . '">
-                    <i class="fa fa-edit me-2"></i> Edit
-                </a>
-            </li>';
+                        <li>
+                            <a class="dropdown-item"
+                               href="' . route('upcoming.exam.edit', $row->id) . '">
+                                <i class="fa fa-edit me-2"></i> Edit
+                            </a>
+                        </li>';
                     }
 
-                    // DELETE
                     if (\App\Helpers\Helper::canAccess('manage_upcoming_exams_delete')) {
                         $actions .= '
-            <li>
-                <form action="' . route('upcoming.exam.delete', $row->id) . '" method="POST"
-                      onsubmit="return confirm(\'Are you sure you want to delete this?\');">
-                    ' . csrf_field() . '
-                    ' . method_field('DELETE') . '
-                    <button type="submit" class="dropdown-item text-danger">
-                        <i class="fa fa-trash me-2" style="color:#dc3545!important"></i> Delete
-                    </button>
-                </form>
-            </li>';
+                        <li>
+                            <form action="' . route('upcoming.exam.delete', $row->id) . '"
+                                  method="POST"
+                                  onsubmit="return confirm(\'Are you sure?\')">
+                                ' . csrf_field() . method_field('DELETE') . '
+                                <button class="dropdown-item text-danger">
+                                    <i class="fa fa-trash me-2"></i> Delete
+                                </button>
+                            </form>
+                        </li>';
                     }
 
-                    // No permission at all
                     if ($actions === '') {
                         return '<span class="text-muted">No Actions</span>';
                     }
 
                     return '
-        <div class="dropdown">
-            <button class="btn btn-sm btn-primary dropdown-toggle" type="button"
-                    id="actionMenu' . $row->id . '" data-bs-toggle="dropdown" aria-expanded="false">
-                Actions
-            </button>
-            <ul class="dropdown-menu" aria-labelledby="actionMenu' . $row->id . '">
-                ' . $actions . '
-            </ul>
-        </div>';
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-primary dropdown-toggle"
+                                data-bs-toggle="dropdown">
+                            Actions
+                        </button>
+                        <ul class="dropdown-menu">
+                            ' . $actions . '
+                        </ul>
+                    </div>';
                 })
 
-                ->rawColumns(['checkbox', 'created_at', 'commission', 'status', 'action', 'created_by'])
+                ->rawColumns(['checkbox', 'action'])
                 ->make(true);
         }
 
         return view('upcoming-exams.index');
     }
+
 
     public function upcomingExamShow($id)
     {
@@ -4894,17 +4934,20 @@ class ContentManagementController extends Controller
     {
         $query = BatchProgramme::query();
 
+        // SEARCH BY TITLE ONLY
         if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where('name', 'like', "%{$search}%")
-                ->orWhere('batch_heading', 'like', "%{$search}%")
-                ->orWhere('short_description', 'like', "%{$search}%");
+            $query->where('batch_heading', 'like', '%' . $request->search . '%');
         }
 
-        $batches = $query->orderBy('start_date', 'DESC')->get();
+        // PAGINATION (10 per page)
+        $batches = $query
+            ->orderBy('start_date', 'DESC')
+            ->paginate(10)
+            ->withQueryString(); // keeps search while paging
 
         return view('batches-programme.index', compact('batches'));
     }
+
 
     public function batchesProgrammeCreate()
     {
@@ -4918,8 +4961,8 @@ class ContentManagementController extends Controller
             'duration' => 'required|string|max:255',
             'start_date' => 'required|date',
             'mrp' => 'required|numeric',
-            'discount' => 'nullable|integer',
-            'offered_price' => 'required|numeric',
+            'discount' => 'nullable|numeric',
+            // offered_price REMOVED from validation
             'batch_heading' => 'required|string|max:255',
             'short_description' => 'required|string',
             'batch_overview' => 'required|string',
@@ -4933,23 +4976,41 @@ class ContentManagementController extends Controller
             'image_alt_tag' => 'nullable|string|max:255',
         ]);
 
-        // Handle file uploads
+        /* -------------------------
+           AUTO PRICE CALCULATION
+           ------------------------- */
+        $mrp = $validatedData['mrp'];
+        $discount = $validatedData['discount'] ?? 0;
+
+        $validatedData['offered_price'] = $mrp - $discount;
+
+        // Optional safety (no negative price)
+        if ($validatedData['offered_price'] < 0) {
+            $validatedData['offered_price'] = 0;
+        }
+
+        /* -------------------------
+           FILE UPLOADS
+           ------------------------- */
         if ($request->hasFile('thumbnail_image')) {
-            $thumbnailPath = $request->file('thumbnail_image')->store('uploads/thumbnails', 'public');
-            $validatedData['thumbnail_image'] = $thumbnailPath;
+            $validatedData['thumbnail_image'] =
+                $request->file('thumbnail_image')
+                    ->store('uploads/thumbnails', 'public');
         }
 
         if ($request->hasFile('banner_image')) {
-            $bannerPath = $request->file('banner_image')->store('uploads/banners', 'public');
-            $validatedData['banner_image'] = $bannerPath;
+            $validatedData['banner_image'] =
+                $request->file('banner_image')
+                    ->store('uploads/banners', 'public');
         }
 
         $validatedData['created_by'] = auth()->id();
-        // Create a new BatchAndProgramme instance and save the data
+
         BatchProgramme::create($validatedData);
 
-        // Redirect back with a success message
-        return redirect()->route('batches-programme.index')->with('success', 'Batch and Programme created successfully!');
+        return redirect()
+            ->route('batches-programme.index')
+            ->with('success', 'Batch and Programme created successfully!');
     }
 
     public function batchesProgrammeEdit($id)
@@ -4967,8 +5028,8 @@ class ContentManagementController extends Controller
             'duration' => 'required|string|max:255',
             'start_date' => 'required|date',
             'mrp' => 'required|numeric',
-            'discount' => 'nullable|integer',
-            'offered_price' => 'required|numeric',
+            'discount' => 'nullable|numeric',
+            // 'offered_price' => 'required|numeric',
             'batch_heading' => 'required|string|max:255',
             'short_description' => 'required|string',
             'batch_overview' => 'required|string',
@@ -4982,6 +5043,22 @@ class ContentManagementController extends Controller
             'image_alt_tag' => 'nullable|string|max:255',
         ]);
 
+        /* -------------------------
+         AUTO PRICE CALCULATION
+         ------------------------- */
+        $mrp = $validatedData['mrp'];
+        $discount = $validatedData['discount'] ?? 0;
+
+        $validatedData['offered_price'] = $mrp - $discount;
+
+        // Optional safety (no negative price)
+        if ($validatedData['offered_price'] < 0) {
+            $validatedData['offered_price'] = 0;
+        }
+
+        /* -------------------------
+           FILE UPLOADS
+           ------------------------- */
         // Handle file uploads (only if new file is uploaded)
         if ($request->hasFile('thumbnail_image')) {
             $thumbnailPath = $request->file('thumbnail_image')->store('uploads/thumbnails', 'public');

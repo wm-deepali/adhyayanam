@@ -7,101 +7,144 @@ Upcoming Exams | Edit
 @section('content')
 <div class="bg-light rounded">
     <div class="card">
-        <div class="card-body">
-            <div class="d-flex">
-                <div class="col">
-                    <h5 class="card-title">Edit</h5>
-                    <h6 class="card-subtitle mb-2 text-muted"> Edit Upcoming Exam here.</h6>
-                </div>
+
+        {{-- HEADER --}}
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <div>
+                <h5 class="card-title mb-0">Edit</h5>
+                <h6 class="card-subtitle text-muted">
+                    Edit Upcoming Exam here.
+                </h6>
             </div>
+
+            <div>
+                <a href="{{ route('upcoming.exam.index') }}" class="btn btn-secondary">
+                    ← Back
+                </a>
+            </div>
+        </div>
+
+        {{-- BODY --}}
+        <div class="card-body">
+
             <div class="mt-2">
                 @include('layouts.includes.messages')
             </div>
-            <form method="POST" action="{{ route('upcoming.exam.update', $exam->id) }}" enctype="multipart/form-data">
+
+            <form method="POST"
+                  action="{{ route('upcoming.exam.update', $exam->id) }}"
+                  enctype="multipart/form-data">
                 @csrf
-            
-                <!-- Commission -->
+                @method('PUT') {{-- IMPORTANT --}}
+
+                <!-- COMMISSION -->
                 <div class="mb-3">
-                    <label for="commission_id" class="form-label">Select Examination Commission</label>
-                    <select class="form-control" name="commission_id" required>
+                    <label class="form-label">Select Examination Commission</label>
+                    <select class="form-control"
+                            name="commission_id"
+                            id="commission_id"
+                            required>
                         <option value="">Select Examination Commission</option>
                         @foreach($commissions as $commission)
-                            <option value="{{ $commission->id }}" {{ $commission->id == $exam->commission_id ? 'selected' : '' }}>{{ $commission->name }}</option>
+                            <option value="{{ $commission->id }}"
+                                {{ $commission->id == $exam->commission_id ? 'selected' : '' }}>
+                                {{ $commission->name }}
+                            </option>
                         @endforeach
                     </select>
-                    @if ($errors->has('commission_id'))
-                        <span class="text-danger text-left">{{ $errors->first('commission_id') }}</span>
-                    @endif
+                    @error('commission_id')
+                        <span class="text-danger">{{ $message }}</span>
+                    @enderror
                 </div>
-            
-                <!-- Examination Name -->
+
+                <!-- EXAMINATION NAME (AUTO + EDITABLE) -->
                 <div class="mb-3">
-                    <label for="examination_name" class="form-label">Enter Examination Name</label>
-                    <input type="text" class="form-control" name="examination_name" value="{{ $exam->examination_name }}" required>
-                    @if ($errors->has('examination_name'))
-                        <span class="text-danger text-left">{{ $errors->first('examination_name') }}</span>
-                    @endif
+                    <label class="form-label">Examination Name</label>
+                    <input type="text"
+                           class="form-control"
+                           name="examination_name"
+                           id="examination_name"
+                           value="{{ old('examination_name', $exam->examination_name) }}"
+                           required>
+                    @error('examination_name')
+                        <span class="text-danger">{{ $message }}</span>
+                    @enderror
                 </div>
-            
-                <!-- Advertisement Date -->
+
+                <!-- ADVERTISEMENT DATE -->
                 <div class="mb-3">
-                    <label for="advertisement_date" class="form-label">Select Date of Advertisement</label>
-                    <input type="date" class="form-control" name="advertisement_date" value="{{ $exam->advertisement_date }}" required>
-                    @if ($errors->has('advertisement_date'))
-                        <span class="text-danger text-left">{{ $errors->first('advertisement_date') }}</span>
-                    @endif
+                    <label class="form-label">Date of Advertisement</label>
+                    <input type="date" class="form-control"
+                           name="advertisement_date"
+                           value="{{ $exam->advertisement_date }}" required>
                 </div>
-            
-                <!-- Form Distribution Date -->
+
+                <!-- FORM DISTRIBUTION DATE -->
                 <div class="mb-3">
-                    <label for="form_distribution_date" class="form-label">Select Form Distribution Date</label>
-                    <input type="date" class="form-control" name="form_distribution_date" value="{{ $exam->form_distribution_date }}" required>
-                    @if ($errors->has('form_distribution_date'))
-                        <span class="text-danger text-left">{{ $errors->first('form_distribution_date') }}</span>
-                    @endif
+                    <label class="form-label">Form Distribution Date</label>
+                    <input type="date" class="form-control"
+                           name="form_distribution_date"
+                           value="{{ $exam->form_distribution_date }}" required>
                 </div>
-            
-                <!-- Last Date for Submission -->
+
+                <!-- LAST DATE -->
                 <div class="mb-3">
-                    <label for="submission_last_date" class="form-label">Select Last Date for Submission</label>
-                    <input type="date" class="form-control" name="submission_last_date" value="{{ $exam->submission_last_date }}" required>
-                    @if ($errors->has('submission_last_date'))
-                        <span class="text-danger text-left">{{ $errors->first('submission_last_date') }}</span>
-                    @endif
+                    <label class="form-label">Last Date for Submission</label>
+                    <input type="date" class="form-control"
+                           name="submission_last_date"
+                           value="{{ $exam->submission_last_date }}" required>
                 </div>
-            
-                <!-- Examination Date -->
+
+                <!-- EXAM DATE -->
                 <div class="mb-3">
-                    <label for="examination_date" class="form-label">Examination Date</label>
-                    <input type="date" class="form-control" name="examination_date" value="{{ $exam->examination_date }}" required>
-                    @if ($errors->has('examination_date'))
-                        <span class="text-danger text-left">{{ $errors->first('examination_date') }}</span>
-                    @endif
+                    <label class="form-label">Examination Date</label>
+                    <input type="date" class="form-control"
+                           name="examination_date"
+                           value="{{ $exam->examination_date }}" required>
                 </div>
-            
-                <!-- Link -->
+
+                <!-- LINK -->
                 <div class="mb-3">
-                    <label for="link" class="form-label">Enter Link</label>
-                    <input type="url" class="form-control" name="link" value="{{ $exam->link }}" placeholder="Link">
-                    @if ($errors->has('link'))
-                        <span class="text-danger text-left">{{ $errors->first('link') }}</span>
-                    @endif
+                    <label class="form-label">Link</label>
+                    <input type="url"
+                           class="form-control"
+                           name="link"
+                           value="{{ $exam->link }}"
+                           placeholder="Enter link">
                 </div>
-            
+
                 <!-- PDF -->
                 <div class="mb-3">
-                    <label for="pdf" class="form-label">Upload PDF (If any)</label>
-                    <input type="file" class="form-control" name="pdf" accept="application/pdf">
-                    @if ($errors->has('pdf'))
-                        <span class="text-danger text-left">{{ $errors->first('pdf') }}</span>
-                    @endif
+                    <label class="form-label">Upload PDF (If any)</label>
+                    <input type="file"
+                           class="form-control"
+                           name="pdf"
+                           accept="application/pdf">
                 </div>
-            
-                <!-- Submit Button -->
-                <button type="submit" class="btn btn-primary">Save</button>
-                <a href="{{ route('upcoming.exam.index') }}" class="btn">Back</a>
-            </form>            
+
+                <!-- ACTION -->
+                <button type="submit" class="btn btn-primary">
+                    Update
+                </button>
+
+            </form>
         </div>
     </div>
 </div>
+
+{{-- AUTO-FILL SCRIPT (LIKE CREATE PAGE) --}}
+<script>
+document.getElementById('commission_id').addEventListener('change', function () {
+
+    const commissionName =
+        this.options[this.selectedIndex]?.text || '';
+
+    const examNameInput = document.getElementById('examination_name');
+
+    // Only auto-fill if user has not typed anything manually
+    if (commissionName && examNameInput.value.trim() === '') {
+        examNameInput.value = commissionName + ' Examination';
+    }
+});
+</script>
 @endsection

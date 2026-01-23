@@ -7,18 +7,18 @@
 @section('content')
     <div class="bg-light rounded">
         <div class="card">
-            <div class="card-body">
-                <div class="d-flex">
-                    <div class="col">
-                        <h5 class="card-title">Test Planner</h5>
-                        <h6 class="card-subtitle mb-2 text-muted"> Manage your Test Plan section here.</h6>
-                    </div>
-                    @if(\App\Helpers\Helper::canAccess('manage_test_planner_add'))
-                        <div class="justify-content-end">
-                            <a href='{{route('test.planner.create')}}' class="btn btn-primary">&#43; Add</a>
-                        </div>
-                    @endif
+            <div class="card-header d-flex">
+                <div class="col">
+                    <h5 class="card-title">Test Planner</h5>
+                    <h6 class="card-subtitle mb-2 text-muted"> Manage your Test Plan section here.</h6>
                 </div>
+                @if(\App\Helpers\Helper::canAccess('manage_test_planner_add'))
+                    <div class="justify-content-end">
+                        <a href='{{route('test.planner.create')}}' class="btn btn-primary">&#43; Add</a>
+                    </div>
+                @endif
+            </div>
+            <div class="card-body">
                 <div class="mt-2">
                     @include('layouts.includes.messages')
                 </div>

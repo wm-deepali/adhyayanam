@@ -7,23 +7,23 @@
 @section('content')
     <div class="bg-light rounded">
         <div class="card">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <div>
-                        <h5 class="card-title">View</h5>
-                        <h6 class="card-subtitle mb-2 text-muted">View Daily Booster details here.</h6>
-                    </div>
-                    <div>
-                        @if(\App\Helpers\Helper::canAccess('manage_daily_booster_edit'))
-                            <a href="{{ route('daily.boost.edit', $dailyBooster->id) }}" class="btn btn-sm btn-primary me-2">
-                                <i class="fa fa-edit me-1"></i>Edit
-                            </a>
-                        @endif
-                        <a href="{{ route('daily.boost.index') }}" class="btn btn-sm btn-secondary">
-                            <i class="fa fa-arrow-left me-1"></i>Back
-                        </a>
-                    </div>
+            <div class="card-header d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <h5 class="card-title">View</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">View Daily Booster details here.</h6>
                 </div>
+                <div>
+                    @if(\App\Helpers\Helper::canAccess('manage_daily_booster_edit'))
+                        <a href="{{ route('daily.boost.edit', $dailyBooster->id) }}" class="btn btn-sm btn-primary me-2">
+                            <i class="fa fa-edit me-1"></i>Edit
+                        </a>
+                    @endif
+                    <a href="{{ route('daily.boost.index') }}" class="btn btn-sm btn-secondary">
+                        <i class="fa fa-arrow-left me-1"></i>Back
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
 
                 <div class="mt-2">
                     @include('layouts.includes.messages')

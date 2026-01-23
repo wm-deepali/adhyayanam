@@ -7,10 +7,19 @@
 @section('content')
     <div class="bg-light rounded">
         <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">Create</h5>
-                <h6 class="card-subtitle mb-2 text-muted"> Create Test Planner here.</h6>
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="card-title">Create</h5>
+                    <h6 class="card-subtitle mb-2 text-muted"> Create Test Planner here.</h6>
+                </div>
 
+                <div>
+                    <a href="{{ route('test.planner.index') }}" class="btn btn-secondary">
+                        ← Back
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
                 <div class="mt-2">
                     @include('layouts.includes.messages')
                 </div>
@@ -75,7 +84,6 @@
 
                     <!-- Submit Button -->
                     <button type="submit" class="btn btn-primary">Save</button>
-                    <a href="{{ route('test.planner.index') }}" class="btn">Back</a>
                 </form>
 
             </div>

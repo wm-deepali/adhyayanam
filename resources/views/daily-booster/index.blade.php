@@ -5,140 +5,139 @@
 @endsection
 
 @section('content')
-    <div class="bg-light rounded">
-        <div class="card">
-            <div class="card-body">
-                <div class="d-flex">
-                    <div class="col">
-                        <h5 class="card-title">Daily Booster</h5>
-                        <h6 class="card-subtitle mb-2 text-muted"> Manage Daily booster section here.</h6>
-                    </div>
-                    @if(\App\Helpers\Helper::canAccess('manage_daily_booster_add'))
-                        <div class="justify-content-end">
-                            <a href='{{route('daily.boost.create')}}' class="btn btn-primary">&#43; Add</a>
-                        </div>
-                    @endif
+<div class="bg-light rounded">
+    <div class="card">
 
-                </div>
-                <div class="mt-2">
-                    @include('layouts.includes.messages')
-                </div>
-                <table class="table table-striped mt-5 data-table" id="boosterTable">
-                    <thead>
-                        <tr>
-                            <th class="text-center">
-                                <input type="checkbox" class="group_check checkbox">
-                            </th>
-                            <th scope="col" width="15%">Date & Time</th>
-                            <th scope="col">Thumbnail</th>
-                            <th scope="col">Video Title</th>
-                            <th scope="col">Short Description</th>
-                            <th>Added By</th>
-                            <th scope="col">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+        {{-- HEADER --}}
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <div>
+                <h5 class="card-title mb-0">Daily Booster</h5>
+                <h6 class="card-subtitle text-muted">
+                    Manage Daily booster section here.
+                </h6>
+            </div>
 
-                    </tbody>
-                </table>
+            <div class="d-flex gap-2">
+                <a href="{{ url()->previous() }}" class="btn btn-secondary">
+                    ← Back
+                </a>
+
+                @if(\App\Helpers\Helper::canAccess('manage_daily_booster_add'))
+                    <a href="{{ route('daily.boost.create') }}" class="btn btn-primary">
+                        + Add
+                    </a>
+                @endif
             </div>
         </div>
+
+        {{-- BODY --}}
+        <div class="card-body">
+            <div class="mt-2">
+                @include('layouts.includes.messages')
+            </div>
+
+            <table class="table table-striped mt-4 data-table" id="boosterTable">
+                <thead>
+                    <tr>
+                        <th class="text-center">
+                            <input type="checkbox" class="group_check checkbox">
+                        </th>
+                        <th width="15%">Date & Time</th>
+                        <th>Thumbnail</th>
+                        <th>Video Title</th>
+                        <th>Short Description</th>
+                        <th>Added By</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
     </div>
+</div>
 @endsection
+
 @push('after-scripts')
-    <script type="text/javascript">
-        $(function () {
-            gb_DataTable = $("#boosterTable").DataTable({
-                autoWidth: false,
-                order: [0, "ASC"],
-                processing: true,
-                serverSide: true,
-                searchDelay: 2000,
-                paging: true,
-                ajax: "{{ route('daily.boost.index') }}",
-                iDisplayLength: "10",
-                dom: '<"row margin-bottom-12"<"col-sm-12"<"pull-left"l><"pull-right"fr><"pull-right margin-left-10 "B>>>tip',
-                buttons: {
-                    buttons: [
-                        @if(\App\Helpers\Helper::canAccess('manage_daily_booster_delete'))
-                                                {
-                                className: 'btn bg-red color-palette btn-flat hidden delete_btn pull-left',
-                                text: 'Bulk Delete',
-                                action: function (e, dt, node, config) {
-                                    multi_delete();
-                                }
-                            },
-                        @endif
+<script>
+$(function () {
 
-                        { extend: 'copy', className: 'btn bg-teal color-palette btn-flat', footer: true, exportOptions: { columns: [1, 2, 3, 4, 5, 6] } },
-                        { extend: 'excel', className: 'btn bg-teal color-palette btn-flat', footer: true, exportOptions: { columns: [1, 2, 3, 4, 5, 6] } },
-                        { extend: 'pdf', className: 'btn bg-teal color-palette btn-flat', footer: true, exportOptions: { columns: [1, 2, 3, 4, 5, 6] } },
-                        { extend: 'print', className: 'btn bg-teal color-palette btn-flat', footer: true, exportOptions: { columns: [1, 2, 3, 4, 5, 6] } },
-                        { extend: 'csv', className: 'btn bg-teal color-palette btn-flat', footer: true, exportOptions: { columns: [1, 2, 3, 4, 5, 6] } },
-                        { extend: 'colvis', className: 'btn bg-teal color-palette btn-flat', footer: true, text: 'Columns' },
+    // DATATABLE INIT
+    gb_DataTable = $("#boosterTable").DataTable({
+        autoWidth: false,
+        processing: true,
+        serverSide: true,
+        paging: true,
+        ajax: "{{ route('daily.boost.index') }}",
+        iDisplayLength: 10,
+        order: [[1, "DESC"]],
+        dom: '<"row mb-3"<"col-sm-6"l><"col-sm-6 text-end"f>>tip',
+        columns: [
+            { data: 'checkbox', orderable: false, searchable: false },
+            { data: 'created_at', name: 'created_at' },
+            { data: 'image', orderable: false, searchable: false },
+            { data: 'title', name: 'title' },
+            { data: 'short_description', name: 'short_description' },
+            { data: 'created_by', name: 'created_by' },
+            { data: 'action', orderable: false, searchable: false },
+        ],
+        lengthMenu: [10, 50, 100],
+    });
 
-                    ]
-                },
-                columnDefs: [
-                    {
-                        'targets': 0,
-                        'checkboxes': {
-                            'selectRow': true
-                        }
-                    }
-                ],
-                select: {
-                    'style': 'multi'
-                },
-                columns: [
-                    { data: 'checkbox', name: 'checkbox', orderable: false, searchable: false },
-                    { data: 'created_at', name: 'created_at' },
-                    { data: 'image', name: 'image', orderable: false, searchable: false },
-                    { data: 'title', name: 'title' },
-                    { data: 'short_description', name: 'short_description' },
-                    { data: 'created_by', name: 'created_by' },
-                    { data: 'action', name: 'action', orderable: false, searchable: false },
-                ],
-                lengthMenu: [10, 50, 100],
+    /* -------------------------------
+       DATATABLE SEARCH BUTTON LOGIC
+       ------------------------------- */
+
+    // Remove auto-search
+    $('#boosterTable_filter input')
+        .off()
+        .on('keyup', function (e) {
+            if (e.keyCode === 13) {
+                gb_DataTable.search(this.value).draw();
+            }
+        });
+
+    // Add Search Button
+    $('#boosterTable_filter').append(
+        '<button id="dtSearchBtn" class="btn btn-sm btn-primary ms-2">Search</button>'
+    );
+
+    // Button triggers search
+    $('#dtSearchBtn').on('click', function () {
+        let value = $('#boosterTable_filter input').val();
+        gb_DataTable.search(value).draw();
+    });
+
+});
+
+/* -------------------------------
+   BULK DELETE
+   ------------------------------- */
+function multi_delete() {
+    let id = [];
+    if (confirm("Are you sure you want to Delete this data?")) {
+        $('.career_checkbox:checked').each(function () {
+            id.push($(this).attr('id'));
+        });
+
+        if (id.length > 0) {
+            $.ajax({
+                url: "{{ route('booster.bulk-delete') }}",
+                method: "get",
+                data: { id: id },
+                success: function (data) {
+                    alert(data);
+                    $('#boosterTable').DataTable().ajax.reload();
+                }
             });
-        });
-
-
-        function multi_delete() {
-            var id = [];
-            if (confirm("Are you sure you want to Delete this data?")) {
-                $('.career_checkbox:checked').each(function () {
-                    id.push($(this).attr('id'));
-                });
-                if (id.length > 0) {
-                    $.ajax({
-                        url: "{{ route('booster.bulk-delete')}}",
-                        method: "get",
-                        data: { id: id },
-                        success: function (data) {
-                            alert(data);
-                            $('#boosterTable').DataTable().ajax.reload();
-                        }
-                    });
-                }
-                else {
-                    alert("Please select atleast one checkbox");
-                }
-            }
+        } else {
+            alert("Please select at least one checkbox");
         }
-    </script>
+    }
+}
 
-
-    <script type="text/javascript">
-
-        $('.group_check').on('change', function (event) {
-            if (event.target.checked) {
-                $(".column_checkbox").prop("checked", true);
-            }
-            else {
-                $(".column_checkbox").prop("checked", false);
-            }
-        });
-
-    </script>
+// SELECT ALL
+$('.group_check').on('change', function (event) {
+    $(".column_checkbox").prop("checked", event.target.checked);
+});
+</script>
 @endpush

@@ -7,19 +7,19 @@
 @section('content')
     <div class="bg-light rounded">
         <div class="card">
-            <div class="card-body">
-                <div class="d-flex justify-content-between mb-3">
-                    <div>
-                        <h5 class="card-title">Upcoming Exam Details</h5>
-                        <h6 class="card-subtitle text-muted">View information for this exam.</h6>
-                    </div>
-                    <div>
-                        <a href="{{ route('upcoming.exam.index') }}" class="btn btn-secondary">Back</a>
-                        @if(\App\Helpers\Helper::canAccess('manage_upcoming_exams_edit'))
-                            <a href="{{ route('upcoming.exam.edit', $exam->id) }}" class="btn btn-primary">Edit</a>
-                        @endif
-                    </div>
+            <div class="card-header d-flex justify-content-between mb-3">
+                <div>
+                    <h5 class="card-title">Upcoming Exam Details</h5>
+                    <h6 class="card-subtitle text-muted">View information for this exam.</h6>
                 </div>
+                <div>
+                    <a href="{{ route('upcoming.exam.index') }}" class="btn btn-secondary">Back</a>
+                    @if(\App\Helpers\Helper::canAccess('manage_upcoming_exams_edit'))
+                        <a href="{{ route('upcoming.exam.edit', $exam->id) }}" class="btn btn-primary">Edit</a>
+                    @endif
+                </div>
+            </div>
+            <div class="card-body">
 
                 <table class="table table-bordered">
                     <tbody>

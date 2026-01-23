@@ -7,26 +7,25 @@
 @section('content')
     <div class="bg-light rounded">
         <div class="card">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h5 class="card-title">View Test Planner</h5>
-                        <h6 class="card-subtitle mb-2 text-muted">Detailed information about this Test Planner.</h6>
-                    </div>
-                    <div>
-                        <a href="{{ route('test.planner.index') }}" class="btn btn-secondary btn-sm">
-                            <i class="fa fa-arrow-left"></i> Back
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="card-title">View Test Planner</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">Detailed information about this Test Planner.</h6>
+                </div>
+                <div>
+                    <a href="{{ route('test.planner.index') }}" class="btn btn-secondary btn-sm">
+                        <i class="fa fa-arrow-left"></i> Back
+                    </a>
+
+                    @if(\App\Helpers\Helper::canAccess('manage_test_planner_edit'))
+                        <a href="{{ route('test.planner.edit', $testPlanner->id) }}" class="btn btn-primary btn-sm">
+                            <i class="fa fa-edit"></i> Edit
                         </a>
-
-                        @if(\App\Helpers\Helper::canAccess('manage_test_planner_edit'))
-                            <a href="{{ route('test.planner.edit', $testPlanner->id) }}" class="btn btn-primary btn-sm">
-                                <i class="fa fa-edit"></i> Edit
-                            </a>
-                        @endif
-                    </div>
-
+                    @endif
                 </div>
 
+            </div>
+            <div class="card-body">
                 <div class="mt-3">@include('layouts.includes.messages')</div>
 
                 <div class="row mt-3">
@@ -86,18 +85,6 @@
                     </div>
                 </div>
 
-                @if(\App\Helpers\Helper::canAccess('manage_test_planner_delete'))
-                    <div class="mt-4">
-                        <form action="{{ route('test.planner.delete', $testPlanner->id) }}" method="POST"
-                            onsubmit="return confirm('Are you sure you want to delete this test planner?');" class="d-inline">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-danger btn-sm">
-                                <i class="fa fa-trash"></i> Delete
-                            </button>
-                        </form>
-                    </div>
-                @endif
             </div>
         </div>
     </div>

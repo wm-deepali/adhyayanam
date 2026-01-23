@@ -8,12 +8,21 @@
     <div class="bg-light rounded">
         <div class="card">
             <div class="card-body">
-                <div class="d-flex">
-                    <div class="col">
-                        <h5 class="card-title">Edit</h5>
-                        <h6 class="card-subtitle mb-2 text-muted">Update Batches and Online Programme here.</h6>
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title mb-0">Edit</h5>
+                        <h6 class="card-subtitle text-muted">
+                            Update Batches and Online Programme here.
+                        </h6>
+                    </div>
+
+                    <div>
+                        <a href="{{ route('batches-programme.index') }}" class="btn btn-secondary">
+                            ← Back
+                        </a>
                     </div>
                 </div>
+
                 <div class="mt-2">
                     @include('layouts.includes.messages')
                 </div>
@@ -62,8 +71,8 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="mrp" class="form-label">MRP</label>
-                                <input type="number" class="form-control" name="mrp" value="{{ old('mrp', $batch->mrp) }}"
-                                    required>
+                                <input type="number" class="form-control" name="mrp" id="mrp"
+                                    value="{{ old('mrp', $batch->mrp) }}" required>
                                 @error('mrp')<span class="text-danger">{{ $message }}</span>@enderror
                             </div>
                         </div>
@@ -73,7 +82,7 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="discount" class="form-label">Discount</label>
-                                <input type="number" class="form-control" name="discount"
+                                <input type="number" class="form-control" name="discount" id="discount"
                                     value="{{ old('discount', $batch->discount) }}">
                                 @error('discount')<span class="text-danger">{{ $message }}</span>@enderror
                             </div>
@@ -81,8 +90,8 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="offered_price" class="form-label">Offered Price</label>
-                                <input type="number" class="form-control" name="offered_price"
-                                    value="{{ old('offered_price', $batch->offered_price) }}" required>
+                                <input type="number" class="form-control" name="offered_price" id="offered_price"
+                                    value="{{ old('offered_price', $batch->offered_price) }}" readonly>
                                 @error('offered_price')<span class="text-danger">{{ $message }}</span>@enderror
                             </div>
                         </div>
@@ -107,18 +116,20 @@
                     </div>
 
                     <!-- Batch Overview -->
-<div class="mb-3">
-    <label for="course_overview" class="form-label">Batch Overview*</label>
-    <textarea name="batch_overview" id="course_overview">{!! old('batch_overview', $batch->batch_overview) !!}</textarea>
-    @error('batch_overview')<span class="text-danger">{{ $message }}</span>@enderror
-</div>
+                    <div class="mb-3">
+                        <label for="course_overview" class="form-label">Batch Overview*</label>
+                        <textarea name="batch_overview"
+                            id="course_overview">{!! old('batch_overview', $batch->batch_overview) !!}</textarea>
+                        @error('batch_overview')<span class="text-danger">{{ $message }}</span>@enderror
+                    </div>
 
-<!-- Batch Detail -->
-<div class="mb-3">
-    <label for="detail_content" class="form-label">Batch Detail*</label>
-    <textarea name="detail_content" id="detail_content">{!! old('detail_content', $batch->detail_content) !!}</textarea>
-    @error('detail_content')<span class="text-danger">{{ $message }}</span>@enderror
-</div>
+                    <!-- Batch Detail -->
+                    <div class="mb-3">
+                        <label for="detail_content" class="form-label">Batch Detail*</label>
+                        <textarea name="detail_content"
+                            id="detail_content">{!! old('detail_content', $batch->detail_content) !!}</textarea>
+                        @error('detail_content')<span class="text-danger">{{ $message }}</span>@enderror
+                    </div>
 
                     <!-- Banner -->
                     <div class="mb-3">
@@ -172,31 +183,43 @@
                     </div>
 
                     <button type="submit" class="btn btn-primary">Update</button>
-                    <a href="{{ route('batches-programme.index') }}" class="btn btn-secondary">Back</a>
                 </form>
             </div>
         </div>
     </div>
-   <script src="https://cdn.ckeditor.com/4.16.2/full/ckeditor.js"></script>
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        CKEDITOR.replace('course_overview', {
-            filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
-            filebrowserUploadMethod: 'form'
-        });
+    <script src="https://cdn.ckeditor.com/4.16.2/full/ckeditor.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            CKEDITOR.replace('course_overview', {
+                filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
+                filebrowserUploadMethod: 'form'
+            });
 
-        CKEDITOR.replace('detail_content', {
-            filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
-            filebrowserUploadMethod: 'form'
-        });
+            CKEDITOR.replace('detail_content', {
+                filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
+                filebrowserUploadMethod: 'form'
+            });
 
-        const form = document.getElementById('batch-form');
-        form.addEventListener('submit', function () {
-            for (instance in CKEDITOR.instances) {
-                CKEDITOR.instances[instance].updateElement();
+            const form = document.getElementById('batch-form');
+            form.addEventListener('submit', function () {
+                for (instance in CKEDITOR.instances) {
+                    CKEDITOR.instances[instance].updateElement();
+                }
+            });
+
+            const mrp = document.getElementById('mrp');
+            const discount = document.getElementById('discount');
+            const offered = document.getElementById('offered_price');
+
+            function calculatePrice() {
+                offered.value = (parseFloat(mrp.value) || 0) - (parseFloat(discount.value) || 0);
             }
+
+            mrp.addEventListener('input', calculatePrice);
+            discount.addEventListener('input', calculatePrice);
+
+
         });
-    });
-</script>
+    </script>
 
 @endsection

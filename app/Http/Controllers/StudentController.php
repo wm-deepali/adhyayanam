@@ -48,40 +48,75 @@ class StudentController extends Controller
         return back()->with('success', "Password Changed Successfully");
     }
 
-    public function studentTestSummery()
+    public function studentTestSummery(Request $request)
     {
-        $students = User::where('type', 'student')->withCount(['testSeriesOrder', 'testSeriesOrderAttempt', 'testSeriesOrderPending'])->get();
-        if (isset($students) && count($students) > 0) {
-            $students = $students->map(function ($row, $key) {
-                $lastOrder = Helper::getStuedntTestSeriesData($row->id);
-                $lastOrderCode = $lastOrder['lastOrderCode'] ?? '--';
-                $row->last_order = $lastOrderCode;
-                return $row;
+        $query = User::where('type', 'student')
+            ->withCount([
+                'testSeriesOrder',
+                'testSeriesOrderAttempt',
+                'testSeriesOrderPending'
+            ]);
+
+        // SEARCH
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('mobile', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
             });
         }
-        $data['students'] = $students;
-        return view('students.student-test-series-summary', $data);
+
+        // PAGINATION
+        $students = $query->paginate(10)->withQueryString();
+
+        // LAST ORDER CODE
+        $students->getCollection()->transform(function ($row) {
+            $lastOrder = Helper::getStuedntTestSeriesData($row->id);
+            $row->last_order = $lastOrder['lastOrderCode'] ?? '--';
+            return $row;
+        });
+
+        return view('students.student-test-series-summary', compact('students'));
     }
 
-    public function studentCourseSummery()
+    public function studentCourseSummery(Request $request)
     {
-        $students = User::where('type', 'student')->withCount(['courseOrder', 'courseOrderAttempt', 'courseOrderPending'])->get();
-        if (isset($students) && count($students) > 0) {
-            $students = $students->map(function ($row, $key) {
+        $query = User::where('type', 'student')
+            ->withCount([
+                'courseOrder',
+                'courseOrderAttempt',
+                'courseOrderPending'
+            ]);
 
-                $lastOrder = Helper::getStuedntCourseData($row->id);
-                $lastOrderCode = $lastOrder['lastOrderCode'] ?? '--';
-                $row->last_order = $lastOrderCode;
-                return $row;
+        // SEARCH
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('mobile', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
             });
         }
-        $data['students'] = $students;
-        return view('students.student-course-summary', $data);
+
+        // PAGINATION
+        $students = $query->paginate(10)->withQueryString();
+
+        // LAST COURSE ORDER
+        $students->getCollection()->transform(function ($row) {
+            $lastOrder = Helper::getStuedntCourseData($row->id);
+            $row->last_order = $lastOrder['lastOrderCode'] ?? '--';
+            return $row;
+        });
+
+        return view('students.student-course-summary', compact('students'));
     }
 
     public function RegisterStudentList(Request $request)
     {
-        $query = User::where('type', 'student')->withSum('transactions', 'paid_amount')->withCount(['orders']);
+        $query = User::where('type', 'student')
+            ->withSum('transactions', 'paid_amount')
+            ->withCount('orders');
 
         if ($request->filled('search')) {
             $search = $request->search;
@@ -95,18 +130,19 @@ class StudentController extends Controller
             });
         }
 
-        $students = $query->get();
+        // ✅ PAGINATION
+        $students = $query->orderBy('created_at', 'DESC')
+            ->paginate(10)
+            ->withQueryString();
 
-        if ($students->count() > 0) {
-            $students = $students->map(function ($row) {
-                $row->last_order = Helper::getStuedntlastOrderID($row->id);
-                return $row;
-            });
-        }
+        // keep last order logic
+        $students->getCollection()->transform(function ($row) {
+            $row->last_order = Helper::getStuedntlastOrderID($row->id);
+            return $row;
+        });
 
         return view('students.registered-student-list', compact('students'));
     }
-
 
     public function changeStatus(Request $request)
     {

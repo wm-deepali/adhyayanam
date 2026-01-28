@@ -8,9 +8,18 @@
     <div class="bg-light rounded p-2">
         <div class="card">
             <div class="card-body">
-                <h5 class="card-title">Contact Us Inquiries</h5>
-                <h6 class="card-subtitle mb-2 text-muted"> Manage Contact Us Inquiries here.</h6>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <h5 class="card-title mb-0">Contact Us Inquiries</h5>
+                        <h6 class="card-subtitle text-muted">
+                            Manage Contact Us Inquiries here.
+                        </h6>
+                    </div>
 
+                    <a href="{{ url()->previous() }}" class="btn btn-secondary btn-sm">
+                        ← Back
+                    </a>
+                </div>
                 <div class="mt-2">
                     @include('layouts.includes.messages')
                 </div>
@@ -21,9 +30,10 @@
                                 <th class="text-center">
                                     <input type="checkbox" class="group_check checkbox">
                                 </th>
+                                <th scope="col">Date & Time</th>
                                 <th scope="col">Full Name</th>
                                 <th scope="col">Email</th>
-                                <th scope="col">Subject</th>
+                                <th scope="col">Website</th>
                                 <th scope="col">Message</th>
                                 <th scope="col">Action</th>
                             </tr>
@@ -54,7 +64,7 @@
                 buttons: {
                     buttons: [
                         @if(\App\Helpers\Helper::canAccess('manage_contact_inquiries_delete'))
-                             {
+                                     {
                                 className: 'btn bg-red color-palette btn-flat hidden delete_btn pull-left',
                                 text: 'Bulk Delete',
                                 action: function (e, dt, node, config) {

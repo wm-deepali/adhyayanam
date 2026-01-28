@@ -8,9 +8,16 @@
     <div class="bg-light rounded">
         <div class="card">
             <div class="card-body">
-                <h5 class="card-title">Privacy Policy</h5>
-                <h6 class="card-subtitle mb-2 text-muted"> Manage your privacy policy section here.</h6>
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title">Privacy Policy</h5>
+                        <h6 class="card-subtitle mb-2 text-muted"> Manage your privacy policy section here.</h6>
+                    </div>
 
+                    <a href="{{ url()->previous() }}" class="btn btn-secondary btn-sm">
+                        ← Back
+                    </a>
+                </div>
                 <div class="mt-2">
                     @include('layouts.includes.messages')
                 </div>
@@ -40,7 +47,7 @@
                             <button type="submit" class="btn btn-primary">Save Page</button>
                         @endif
                         @if($privacy->updated_at)
-                            <div class="mt-3 text-muted">
+                            <div class="text-muted">
                                 <small>
                                     Last updated
                                     @if($privacy->updater)

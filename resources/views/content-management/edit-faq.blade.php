@@ -8,8 +8,16 @@ Edit FAQ
 <div class="bg-light rounded">
     <div class="card">
         <div class="card-body">
-            <h5 class="card-title">Edit FAQ</h5>
-            <h6 class="card-subtitle mb-2 text-muted">Update your FAQ here.</h6>
+             <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <h5 class="card-title">Edit FAQ</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">Update your FAQ here.</h6>
+                    </div>
+
+                    <a href="{{ url()->previous() }}" class="btn btn-secondary btn-sm">
+                        ← Back
+                    </a>
+                </div>
 
             <div class="mt-2">
                 @include('layouts.includes.messages')

@@ -8,59 +8,32 @@
     <div class="bg-light rounded">
         <div class="card">
             <div class="card-body">
-                <h5 class="card-title">Our Team</h5>
-                <h6 class="card-subtitle mb-2 text-muted"> Manage your our team section here.</h6>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div>
+                        <h5 class="card-title mb-0">Our Team</h5>
+                        <h6 class="card-subtitle text-muted">
+                            Manage your our team section here.
+                        </h6>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        {{-- Add Team --}}
+                        @if(\App\Helpers\Helper::canAccess('manage_team_add'))
+                            <a href="{{ route('cm.our.team.create') }}" class="btn btn-primary btn-sm">
+                                <i class="fa fa-plus"></i> Add Team
+                            </a>
+                        @endif
 
+                        {{-- Back --}}
+                        <a href="{{ url()->previous() }}" class="btn btn-secondary btn-sm">
+                            ← Back
+                        </a>
+
+                    </div>
+                </div>
                 <div class="mt-2">
                     @include('layouts.includes.messages')
                 </div>
-                @if(\App\Helpers\Helper::canAccess('manage_team_add'))
-                    <form method="POST" action="{{ url('content-management/our-team/store') }}" enctype="multipart/form-data">
-                        @csrf
-                        <div class="mb-3">
-                            <label for="name" class="form-label">Name</label>
-                            <input type="text" class="form-control" name="name" placeholder="Name" required>
-                            @if ($errors->has('name'))
-                                <span class="text-danger text-left">{{ $errors->first('name') }}</span>
-                            @endif
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="designation" class="form-label">Designation</label>
-                            <input type="text" class="form-control" name="designation" placeholder="Designation" required>
-                            @if ($errors->has('designation'))
-                                <span class="text-danger text-left">{{ $errors->first('designation') }}</span>
-                            @endif
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="experience" class="form-label">Experience</label>
-                            <input type="text" class="form-control" name="experience" placeholder="Experience">
-                            @if ($errors->has('experience'))
-                                <span class="text-danger text-left">{{ $errors->first('experience') }}</span>
-                            @endif
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="education" class="form-label">Education</label>
-                            <input type="text" class="form-control" name="education" placeholder="Education">
-                            @if ($errors->has('education'))
-                                <span class="text-danger text-left">{{ $errors->first('education') }}</span>
-                            @endif
-                        </div>
-                        <div class="mb-3">
-                            <label for="profile_image" class="form-label">Upload Image</label>
-                            <input type="file" class="form-control" name="profile_image" id="profile_image" accept="image/*">
-
-                            @if ($errors->has('profile_image'))
-                                <span class="text-danger text-left">{{ $errors->first('profile_image') }}</span>
-                            @endif
-                        </div>
-                        <button type="submit" class="btn btn-primary">Save</button>
-                    </form>
-                @endif
-
-                <table class="table table-striped mt-5">
+                <table class="table table-striped mt-4">
                     <thead>
                         <tr>
                             <th scope="col" width="1%">#</th>
@@ -90,36 +63,50 @@
                                             \App\Helpers\Helper::canAccess('manage_team_edit') ||
                                             \App\Helpers\Helper::canAccess('manage_team_delete')
                                         )
+                                        <div class="dropdown">
+                                            <button class="btn btn-sm btn-secondary dropdown-toggle" type="button"
+                                                id="actionDropdown{{ $team->id }}" data-bs-toggle="dropdown" aria-expanded="false">
+                                                Actions
+                                            </button>
 
-                                        {{-- EDIT --}}
-                                        @if(\App\Helpers\Helper::canAccess('manage_team_edit'))
-                                            <a href="{{ route('cm.our.team.edit', $team->id) }}" class="btn btn-sm btn-primary">
-                                                Edit
-                                            </a>
-                                        @endif
+                                            <ul class="dropdown-menu" aria-labelledby="actionDropdown{{ $team->id }}">
 
-                                        {{-- DELETE --}}
-                                        @if(\App\Helpers\Helper::canAccess('manage_team_delete'))
-                                            <form action="{{ route('cm.our.team.delete', $team->id) }}" method="POST"
-                                                style="display:inline;"
-                                                onsubmit="return confirm('Are you sure you want to delete this team member?');">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-sm btn-danger">
-                                                    Delete
-                                                </button>
-                                            </form>
-                                        @endif
+                                                {{-- EDIT --}}
+                                                @if(\App\Helpers\Helper::canAccess('manage_team_edit'))
+                                                    <li>
+                                                        <a class="dropdown-item" href="{{ route('cm.our.team.edit', $team->id) }}">
+                                                            <i class="fa fa-edit me-1"></i> Edit
+                                                        </a>
+                                                    </li>
+                                                @endif
 
+
+                                                {{-- DELETE --}}
+                                                @if(\App\Helpers\Helper::canAccess('manage_blog_delete'))
+                                                    <li>
+                                                        <form action="{{ route('cm.our.team.delete', $team->id) }}" method="POST"
+                                                            onsubmit="return confirm('Are you sure you want to delete this team member?');">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button type="submit" class="dropdown-item text-danger">
+                                                                <i class="fa fa-trash me-1" style="color:#dc3545!important"></i> Delete
+                                                            </button>
+                                                        </form>
+                                                    </li>
+                                                @endif
+                                            </ul>
+                                        </div>
                                     @else
                                         <span class="text-muted">No Action</span>
                                     @endif
                                 </td>
-
                             </tr>
                         @endforeach
                     </tbody>
                 </table>
+                <div class="d-flex justify-content-end mt-3">
+                    {{ $teams->links() }}
+                </div>
             </div>
         </div>
     </div>

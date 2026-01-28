@@ -3,10 +3,13 @@
 @section('content')
 
 <div class="card">
-    <div class="card-header">
-        <h5>Edit Role Group</h5>
-    </div>
+ <div class="card-header d-flex justify-content-between">
+            <h5>Edit Role Group</h5>
 
+            <a href="{{ route('role-groups.index') }}" class="btn btn-secondary btn-sm">
+                ← Back
+            </a>
+        </div>
     <form action="{{ route('role-groups.update', $group->id) }}" method="POST">
         @csrf
         @method('POST')

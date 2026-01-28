@@ -8,71 +8,39 @@
     <div class="bg-light rounded">
         <div class="card">
             <div class="card-body">
-                <h5 class="card-title">Blogs & Articles</h5>
-                <h6 class="card-subtitle mb-2 text-muted"> Manage your blog & articles section here.</h6>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <h5 class="card-title mb-0">Blogs & Articles</h5>
+                        <h6 class="card-subtitle text-muted">
+                            Manage your blog & articles section here.
+                        </h6>
+                    </div>
+
+                    <div class="d-flex align-items-center gap-2">
+
+                        {{-- Search --}}
+                        <input type="text" id="blogSearch" class="form-control form-control-sm"
+                            placeholder="Search blogs..." style="width: 200px;">
+
+                        {{-- Add Blog --}}
+                        @if(\App\Helpers\Helper::canAccess('manage_blog_add'))
+                            <a href="{{ route('blog.create') }}" class="btn btn-primary btn-sm">
+                                <i class="fa fa-plus"></i> Add Blog
+                            </a>
+                        @endif
+
+                        {{-- Back --}}
+                        <a href="{{ url()->previous() }}" class="btn btn-secondary btn-sm">
+                            ← Back
+                        </a>
+
+                    </div>
+                </div>
                 <div class="mt-2">
                     @include('layouts.includes.messages')
                 </div>
                 <div class="container mt-4">
-                    @if(\App\Helpers\Helper::canAccess('manage_blog_add'))
-                        <form method="POST" action="{{ route('blog.store') }}" id="blog-form" enctype="multipart/form-data">
-                            @csrf
-                            <div class="mb-3">
-                                <label for="heading" class="form-label">Heading</label>
-                                <input type="text" class="form-control" name="heading" placeholder="Heading" required>
-                                @if ($errors->has('heading'))
-                                    <span class="text-danger text-left">{{ $errors->first('heading') }}</span>
-                                @endif
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="short_description" class="form-label">Short Description</label>
-                                <input type="text" class="form-control" name="short_description"
-                                    placeholder="Short Description">
-                                @if ($errors->has('short_description'))
-                                    <span class="text-danger text-left">{{ $errors->first('short_description') }}</span>
-                                @endif
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="description" class="form-label">Description</label>
-                                <textarea id="editor" name="description" style="height: 200px;"></textarea>
-                                @if ($errors->has('description'))
-                                    <span class="text-danger text-left">{{ $errors->first('description') }}</span>
-                                @endif
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="type" class="form-label">Type</label>
-                                <input type="text" class="form-control" name="type" placeholder="Type">
-                                @if ($errors->has('type'))
-                                    <span class="text-danger text-left">{{ $errors->first('type') }}</span>
-                                @endif
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="image" class="form-label">Image</label>
-                                <input type="file" class="form-control" name="image" accept="image/*" required>
-                                @if ($errors->has('image'))
-                                    <span class="text-danger text-left">{{ $errors->first('image') }}</span>
-                                @endif
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="thumbnail" class="form-label">Thumbnail</label>
-                                <input type="file" class="form-control" name="thumbnail" accept="image/*">
-                                @if ($errors->has('thumbnail'))
-                                    <span class="text-danger text-left">{{ $errors->first('thumbnail') }}</span>
-                                @endif
-                            </div>
-
-                            <button type="submit" class="btn btn-primary">Save Blog</button>
-                        </form>
-                    @else
-                        <div class="alert alert-warning">You don’t have permission to add blogs.</div>
-                    @endif
-
-                    <table class="table table-striped mt-5">
+                    <table class="table table-striped">
                         <thead>
                             <tr>
                                 <th scope="col" width="1%">#</th>
@@ -89,10 +57,12 @@
                         <tbody>
                             @foreach($blogs as $blog)
                                 <tr>
-                                    <th scope="row">{{ $loop->iteration }}</th>
+                                    <th scope="row">
+                                        {{ ($blogs->currentPage() - 1) * $blogs->perPage() + $loop->iteration }}
+                                    </th>
                                     <td>{{ $blog->heading }}</td>
                                     <td>{{ $blog->short_description ?? '--' }}</td>
-                                    <td>{{ Str::limit($blog->description, 50) }}</td>
+                                    <td>{{ Str::limit(strip_tags($blog->description), 50) }}</td>
                                     <td>{{ $blog->type }}</td>
                                     <td><img src="{{ asset('storage/' . $blog->image) }}" alt="Image" width="50"></td>
                                     <td><img src="{{ asset('storage/' . $blog->thumbnail) }}" alt="Thumbnail" width="50"></td>
@@ -110,6 +80,13 @@
                                                 </button>
 
                                                 <ul class="dropdown-menu" aria-labelledby="actionDropdown{{ $blog->id }}">
+
+                                                    {{-- VIEW --}}
+                                                    <li>
+                                                        <a class="dropdown-item" href="{{ route('blog.show', $blog->id) }}">
+                                                            <i class="fa fa-eye me-1"></i> View
+                                                        </a>
+                                                    </li>
 
                                                     {{-- EDIT --}}
                                                     @if(\App\Helpers\Helper::canAccess('manage_blog_edit'))
@@ -141,22 +118,22 @@
                                             <span class="text-muted">No Action</span>
                                         @endif
                                     </td>
-
-
                                 </tr>
                             @endforeach
                         </tbody>
                     </table>
+                    <div class="d-flex justify-content-end mt-3">
+                        {{ $blogs->links() }}
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-    <script src="https://cdn.ckeditor.com/4.16.2/full/ckeditor.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            CKEDITOR.replace('editor', {
-                filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
-                filebrowserUploadMethod: 'form'
+        document.getElementById('blogSearch').addEventListener('keyup', function () {
+            let value = this.value.toLowerCase();
+            document.querySelectorAll("table tbody tr").forEach(function (row) {
+                row.style.display = row.textContent.toLowerCase().includes(value) ? "" : "none";
             });
         });
     </script>

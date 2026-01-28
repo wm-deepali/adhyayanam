@@ -8,9 +8,16 @@
     <div class="bg-light rounded p-2">
         <div class="card">
             <div class="card-body">
-                <h5 class="card-title">About</h5>
-                <h6 class="card-subtitle mb-2 text-muted"> Manage your about section here.</h6>
-
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title mb-0">About</h5>
+                        <h6 class="card-subtitle text-muted">Manage your about section here.</h6>
+                    </div>
+    
+                    <a href="{{ url()->previous() }}" class="btn btn-secondary btn-sm">
+                        ← Back
+                    </a>
+                </div>
                 <div class="mt-2">
                     @include('layouts.includes.messages')
                 </div>
@@ -69,7 +76,7 @@
                             <button type="submit" class="btn btn-primary">Save Page</button>
                         @endif
                         @if($about->updated_at)
-                            <div class="mt-3 text-muted">
+                            <div class="text-muted">
                                 <small>
                                     Last updated
                                     @if($about->updater)
@@ -89,7 +96,7 @@
     <script src="https://cdn.ckeditor.com/4.16.2/full/ckeditor.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-             CKEDITOR.replace('editor', {
+            CKEDITOR.replace('editor', {
                 filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
                 filebrowserUploadMethod: 'form'
             });

@@ -16,7 +16,7 @@ class SubAdminController extends Controller
         $users = User::where('type', 'admin')
             ->whereNotNull('role_group_id')
             ->latest()
-            ->paginate(20);
+            ->paginate(10);
 
         return view('admin.sub-admins.index', compact('users'));
     }
@@ -60,6 +60,15 @@ class SubAdminController extends Controller
         return redirect()
             ->route('sub-admins.index')
             ->with('success', 'Sub Admin created successfully.');
+    }
+
+    public function show($id)
+    {
+        $user = User::with(['roleGroup', 'creator'])
+            ->where('type', 'admin')
+            ->findOrFail($id);
+
+        return view('admin.sub-admins.show', compact('user'));
     }
 
     /** Edit */

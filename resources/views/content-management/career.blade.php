@@ -7,10 +7,16 @@
     <div class="bg-light rounded">
         <div class="card">
             <div class="card-body">
-                <h5 class="card-title">Career</h5>
-                <h6 class="card-subtitle mb-2 text-muted"> Manage your career section here.</h6>
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title mb-0">Career</h5>
+                        <h6 class="card-subtitle text-muted">Manage your career section here.</h6>
+                    </div>
 
-
+                    <a href="{{ url()->previous() }}" class="btn btn-secondary btn-sm">
+                        ← Back
+                    </a>
+                </div>
                 <div class="mt-2">
                     @include('layouts.includes.messages')
 
@@ -28,8 +34,7 @@
                             <th scope="col">DOB</th>
                             <th scope="col">Experience</th>
                             <th scope="col">Qualification</th>
-                            <th scope="col">Details</th>
-                            <th scope="col">CV/Resume</th>
+                            <!-- <th scope="col">Details</th> -->
                             <th scope="col">Actions</th>
                         </tr>
                     </thead>
@@ -57,7 +62,7 @@
                 buttons: {
                     buttons: [
                         @if(\App\Helpers\Helper::canAccess('manage_career_delete'))
-                            {
+                                    {
                                 className: 'btn bg-red color-palette btn-flat hidden delete_btn pull-left',
                                 text: 'Bulk Delete',
                                 action: function (e, dt, node, config) {
@@ -94,8 +99,8 @@
                     { data: 'dob', name: 'dob' },
                     { data: 'experience', name: 'experience' },
                     { data: 'qualification', name: 'qualification' },
-                    { data: 'message', name: 'message' },
-                    { data: 'cv', name: 'cv' },
+                    // { data: 'message', name: 'message' },
+                    // { data: 'cv', name: 'cv' },
                     { data: 'action', name: 'action', orderable: false, searchable: false },
                 ],
                 lengthMenu: [10, 50, 100],

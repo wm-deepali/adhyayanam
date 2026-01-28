@@ -5,13 +5,18 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\RoleGroup;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class RoleGroupController extends Controller
 {
     /** List all role groups */
     public function index()
     {
-        $groups = RoleGroup::latest()->paginate(20);
+        $groups = RoleGroup::with(['creator', 'approver'])
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
+
+
         return view('admin.role-groups.index', compact('groups'));
     }
 
@@ -21,21 +26,34 @@ class RoleGroupController extends Controller
         return view('admin.role-groups.create');
     }
 
-    /** Store new role group */
+    /**
+     * STORE ROLE GROUP (SUB-ADMIN → PENDING APPROVAL)
+     */
     public function store(Request $request)
     {
         $request->validate([
             'name' => 'required|string|max:255',
+            'permissions' => 'required|array',
         ]);
+
 
         RoleGroup::create([
             'name' => $request->name,
-            'type' => $request->type,
-            'permissions' => $request->permissions ?? [],
-            'created_by' => auth()->id(),
+            'permissions' => $request->permissions,
+            'type' => 'custom',
+            'created_by' => Auth::id(),
+
+
+            // 🔴 IMPORTANT
+            'status' => Auth::user()->type === 'admin'
+                ? 'published'
+                : 'pending_approval',
         ]);
 
-        return redirect()->route('role-groups.index')->with('success', 'Role Group created successfully.');
+
+        return redirect()
+            ->route('role-groups.index')
+            ->with('success', 'Role group created successfully.');
     }
 
     /** Edit role group */
@@ -64,5 +82,37 @@ class RoleGroupController extends Controller
         RoleGroup::findOrFail($id)->delete();
 
         return redirect()->route('role-groups.index')->with('success', 'Role Group deleted successfully.');
+    }
+
+    /**
+     * VIEW ROLE GROUP
+     */
+    public function show($id)
+    {
+        $roleGroup = RoleGroup::findOrFail($id);
+        return view('admin.role-groups.show', compact('roleGroup'));
+    }
+
+
+    /**
+     * ADMIN → APPROVE & PUBLISH
+     */
+    public function approve(RoleGroup $roleGroup)
+    {
+        // Only admin
+        if (Auth::user()->type !== 'admin') {
+            abort(403);
+        }
+
+
+        $roleGroup->update([
+            'status' => 'published',
+            'approved_by' => Auth::id(),
+        ]);
+
+
+        return redirect()
+            ->back()
+            ->with('success', 'Role group approved & published.');
     }
 }

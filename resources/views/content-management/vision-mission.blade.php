@@ -8,9 +8,17 @@
     <div class="bg-light rounded">
         <div class="card">
             <div class="card-body">
-                <h5 class="card-title">Our Vision & Mission</h5>
-                <h6 class="card-subtitle mb-2 text-muted"> Manage your vision and mission section here.</h6>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div>
+                        <h5 class="card-title">Our Vision & Mission</h5>
+                        <h6 class="card-subtitle mb-2 text-muted"> Manage your vision and mission section here.</h6>
+                    </div>
 
+                    {{-- Back --}}
+                    <a href="{{ url()->previous() }}" class="btn btn-secondary btn-sm">
+                        ← Back
+                    </a>
+                </div>
                 <div class="mt-2">
                     @include('layouts.includes.messages')
                 </div>
@@ -98,7 +106,7 @@
                         <button type="submit" class="btn btn-primary">Save Page</button>
                     @endif
                     @if($vision->updated_at)
-                        <div class="mt-3 text-muted">
+                        <div class="text-muted">
                             <small>
                                 Last updated
                                 @if($vision->updater)

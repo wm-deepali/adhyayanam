@@ -22,50 +22,155 @@ class OrderController extends Controller
     //
     public function AllOrder(Request $request)
     {
-        $query = Order::query();
+        $query = Order::with('student')->latest();
 
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where('order_code', 'like', "%{$search}%")
-                ->orWhere('package_name', 'like', "%{$search}%")
-                ->orWhere('order_type', 'like', "%{$search}%")
-                ->orWhere('payment_status', 'like', "%{$search}%")
-                ->orWhereHas('student', function ($q) use ($search) {
-                    $q->where('name', 'like', "%{$search}%");
-                });
+
+            $query->where(function ($q) use ($search) {
+                $q->where('order_code', 'like', "%{$search}%")
+                    ->orWhere('package_name', 'like', "%{$search}%")
+                    ->orWhere('order_type', 'like', "%{$search}%")
+                    ->orWhere('transaction_id', 'like', "%{$search}%")
+                    ->orWhereHas('student', function ($q2) use ($search) {
+                        $q2->where('name', 'like', "%{$search}%")
+                            ->orWhere('mobile', 'like', "%{$search}%");
+                    });
+            });
         }
 
-        $orders = $query->orderBy('created_at', 'DESC')->get();
+        $orders = $query->paginate(10)->withQueryString();
 
         return view('order-subscriptions.student-all-orders', compact('orders'));
     }
 
-    public function allTestSeriesOrder()
+    public function allTestSeriesOrder(Request $request)
     {
-        $data['orders'] = Order::with('student', 'transaction')->where('order_type', 'Test Series')->get();
-        return view('order-subscriptions.test-series-orders', $data);
+        $query = Order::with(['student', 'transaction'])
+            ->where('order_type', 'Test Series')
+            ->latest();
+
+        // 🔍 Server-side search
+        if ($request->filled('search')) {
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+                $q->where('order_code', 'like', "%{$search}%")
+                    ->orWhere('billed_amount', 'like', "%{$search}%")
+                    ->orWhereHas('student', function ($q2) use ($search) {
+                        $q2->where('name', 'like', "%{$search}%")
+                            ->orWhere('mobile', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        $orders = $query->paginate(10)->withQueryString();
+
+        return view('order-subscriptions.test-series-orders', compact('orders'));
     }
 
-    public function allCourseOrder()
+    public function allCourseOrder(Request $request)
     {
-        $data['orders'] = Order::with('student', 'transaction')->where('order_type', 'Course')->get();
-        return view('order-subscriptions.course-orders', $data);
+        $query = Order::with(['student', 'transaction'])
+            ->where('order_type', 'Course')
+            ->latest();
+
+        // 🔍 Server-side search
+        if ($request->filled('search')) {
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+                $q->where('order_code', 'like', "%{$search}%")
+                    ->orWhere('billed_amount', 'like', "%{$search}%")
+                    ->orWhere('payment_status', 'like', "%{$search}%")
+                    ->orWhereHas('student', function ($q2) use ($search) {
+                        $q2->where('name', 'like', "%{$search}%")
+                            ->orWhere('mobile', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        $orders = $query->paginate(10)->withQueryString();
+
+        return view('order-subscriptions.course-orders', compact('orders'));
     }
 
-    public function allStudyMaterialOrder()
+    public function allStudyMaterialOrder(Request $request)
     {
-        $data['orders'] = Order::with('student', 'transaction')->where('order_type', 'Study Material')->get();
-        return view('order-subscriptions.study-material-orders', $data);
+        $query = Order::with(['student', 'transaction'])
+            ->where('order_type', 'Study Material')
+            ->latest();
+
+        // 🔍 Server-side search
+        if ($request->filled('search')) {
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+                $q->where('order_code', 'like', "%{$search}%")
+                    ->orWhere('billed_amount', 'like', "%{$search}%")
+                    ->orWhere('payment_status', 'like', "%{$search}%")
+                    ->orWhereHas('student', function ($q2) use ($search) {
+                        $q2->where('name', 'like', "%{$search}%")
+                            ->orWhere('mobile', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        $orders = $query->paginate(10)->withQueryString();
+
+        return view('order-subscriptions.study-material-orders', compact('orders'));
     }
-    public function allTransactions()
+
+    public function allTransactions(Request $request)
     {
-        $data['transactions'] = Transaction::all();
-        return view('order-subscriptions.student-transactions-list', $data);
+        $query = Transaction::with(['student', 'order'])
+            ->latest();
+        // 🔍 Server-side search
+        if ($request->filled('search')) {
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+                $q->where('payment_method', 'like', "%{$search}%")
+                    ->orWhere('payment_status', 'like', "%{$search}%")
+                    ->orWhere('paid_amount', 'like', "%{$search}%")
+                    ->orWhereHas('order', function ($q2) use ($search) {
+                        $q2->where('order_code', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('student', function ($q3) use ($search) {
+                        $q3->where('name', 'like', "%{$search}%")
+                            ->orWhere('mobile', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        $transactions = $query->paginate(10)->withQueryString();
+
+        return view('order-subscriptions.student-transactions-list', compact('transactions'));
     }
-    public function allFailedTransactions()
+
+    public function allFailedTransactions(Request $request)
     {
-        $data['transactions'] = Order::with('student', 'order')->where('payment_status', 'failed')->get();
-        return view('order-subscriptions.student-failed-transactions', $data);
+        $query = Order::with('student')
+            ->where('payment_status', 'failed')
+            ->latest();
+
+        // 🔍 Server-side search
+        if ($request->filled('search')) {
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+                $q->where('order_code', 'like', "%{$search}%")
+                    ->orWhere('billed_amount', 'like', "%{$search}%")
+                    ->orWhereHas('student', function ($q2) use ($search) {
+                        $q2->where('name', 'like', "%{$search}%")
+                            ->orWhere('mobile', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        $transactions = $query->paginate(10)->withQueryString();
+
+        return view('order-subscriptions.student-failed-transactions', compact('transactions'));
     }
 
     public function studentOrderDetails($id)

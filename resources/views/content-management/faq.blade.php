@@ -8,72 +8,86 @@
     <div class="bg-light rounded">
         <div class="card">
             <div class="card-body">
-                <h5 class="card-title">FAQ</h5>
-                <h6 class="card-subtitle mb-2 text-muted"> Manage your faq section here.</h6>
 
-                <div class="mt-2">
+                {{-- HEADER --}}
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <h5 class="card-title mb-0">FAQ</h5>
+                        <h6 class="card-subtitle text-muted">
+                            Manage your FAQ section here.
+                        </h6>
+                    </div>
+
+                    <div class="d-flex align-items-center gap-2">
+                        @if(\App\Helpers\Helper::canAccess('manage_faq_add'))
+                            <a href="{{ route('faq.create') }}" class="btn btn-primary btn-sm">
+                                <i class="fa fa-plus"></i> Add FAQ
+                            </a>
+                        @endif
+
+                        <a href="{{ url()->previous() }}" class="btn btn-secondary btn-sm">
+                            ← Back
+                        </a>
+                    </div>
+                </div>
+
+                {{-- SEARCH BAR --}}
+                <div class="mb-3">
+                    <form method="GET" action="{{ route('cm.faq') }}" class="d-flex align-items-center gap-2">
+                        <input type="text" name="search" value="{{ request('search') }}"
+                            class="form-control form-control-sm" placeholder="Search FAQ..." style="width: 260px;">
+
+                        <button type="submit" class="btn btn-primary btn-sm">
+                            Search
+                        </button>
+
+                        <a href="{{ route('cm.faq') }}" class="btn btn-outline-secondary btn-sm">
+                            Clear
+                        </a>
+                    </form>
+                </div>
+
+                {{-- Messages --}}
+                <div class="mb-2">
                     @include('layouts.includes.messages')
                 </div>
-                <div class="container mt-4">
-                    @if(\App\Helpers\Helper::canAccess('manage_faq_add'))
-                        <form method="POST" action="{{ route('faq.store') }}" enctype="multipart/form-data">
-                            @csrf
-                            <div class="mb-3">
-                                <label for="question" class="form-label">Question</label>
-                                <input type="text" class="form-control" name="question" placeholder="Question" required>
-                                @if ($errors->has('question'))
-                                    <span class="text-danger text-left">{{ $errors->first('question') }}</span>
-                                @endif
-                            </div>
 
-                            <div class="mb-3">
-                                <label for="answer" class="form-label">Answer</label>
-                                <textarea class="form-control" name="answer" placeholder="Answer" required></textarea>
-                                @if ($errors->has('answer'))
-                                    <span class="text-danger text-left">{{ $errors->first('answer') }}</span>
-                                @endif
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="type" class="form-label">Type</label>
-                                <input type="text" class="form-control" name="type" placeholder="Type">
-                                @if ($errors->has('type'))
-                                    <span class="text-danger text-left">{{ $errors->first('type') }}</span>
-                                @endif
-                            </div>
-
-                            <button type="submit" class="btn btn-primary">Save FAQ</button>
-                        </form>
-                    @endif
-
-                    <table class="table table-striped mt-5">
+                {{-- TABLE --}}
+                <div class="table-responsive">
+                    <table class="table table-striped align-middle">
                         <thead>
                             <tr>
-                                <th scope="col" width="1%">#</th>
-                                <th scope="col" width="15%">Question</th>
-                                <th scope="col">Answer</th>
-                                <th scope="col" width="10%">Type</th>
+                                <th width="1%">#</th>
+                                <th width="25%">Question</th>
+                                <th>Answer</th>
+                                <th width="12%">Category</th>
                                 <th>Added By</th>
-                                <th scope="col" width="10%">Actions</th>
+                                <th width="10%">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($faqs as $faq)
+                            @forelse($faqs as $faq)
                                 <tr>
-                                    <th scope="row">{{ $loop->iteration }}</th>
+                                    <td>
+                                        {{ ($faqs->currentPage() - 1) * $faqs->perPage() + $loop->iteration }}
+                                    </td>
                                     <td>{{ $faq->question }}</td>
                                     <td>{{ $faq->answer }}</td>
-                                    <td>{{ $faq->type ?? "--" }}</td>
-                                     <td>{{ $faq->creator ? $faq->creator->name : 'Super Admin'  }}</td>
+                                    <td>
+                                        <span class="badge bg-info text-dark">
+                                            {{ ucfirst(str_replace('_', ' ', $faq->type ?? 'general')) }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {{ $faq->creator ? $faq->creator->name : 'Super Admin' }}
+                                    </td>
                                     <td>
                                         <div class="dropdown">
-                                            <button class="btn btn-secondary dropdown-toggle btn-sm" type="button"
-                                                id="actionDropdown{{ $faq->id }}" data-bs-toggle="dropdown"
-                                                aria-expanded="false">
+                                            <button class="btn btn-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown">
                                                 Actions
                                             </button>
-                                            <ul class="dropdown-menu" aria-labelledby="actionDropdown{{ $faq->id }}">
 
+                                            <ul class="dropdown-menu">
                                                 @if(\App\Helpers\Helper::canAccess('manage_faq_edit'))
                                                     <li>
                                                         <a class="dropdown-item" href="{{ route('faq.edit', $faq->id) }}">
@@ -88,24 +102,34 @@
                                                             onsubmit="return confirm('Are you sure you want to delete this FAQ?');">
                                                             @csrf
                                                             @method('DELETE')
-                                                            <button class="dropdown-item text-danger" type="submit">
+                                                            <button type="submit" class="dropdown-item text-danger">
                                                                 Delete
                                                             </button>
                                                         </form>
                                                     </li>
                                                 @endif
-
                                             </ul>
                                         </div>
                                     </td>
-
                                 </tr>
-                            @endforeach
+                            @empty
+                                <tr>
+                                    <td colspan="6" class="text-center text-muted">
+                                        No FAQs found.
+                                    </td>
+                                </tr>
+                            @endforelse
                         </tbody>
                     </table>
-
                 </div>
+
+                {{-- PAGINATION --}}
+                <div class="d-flex justify-content-end mt-3">
+                    {{ $faqs->links() }}
+                </div>
+
             </div>
         </div>
     </div>
+
 @endsection

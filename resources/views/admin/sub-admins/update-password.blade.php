@@ -7,8 +7,8 @@
     <div class="card-header d-flex justify-content-between align-items-center">
         <h5 class="mb-0">Update Password</h5>
 
-        <a href="{{ route('sub-admins.index') }}" class="btn btn-sm btn-secondary">
-            Back
+        <a href="{{ route('sub-admins.index') }}" class="btn btn-secondary btn-sm">
+            ← Back
         </a>
     </div>
 
@@ -36,26 +36,19 @@
 
                 <div class="col-md-6 mb-3">
                     <label class="form-label">Sub Admin Name</label>
-                    <input type="text"
-                           class="form-control"
-                           value="{{ $user->first_name }} {{ $user->last_name }}"
-                           disabled>
+                    <input type="text" class="form-control" value="{{ $user->first_name }} {{ $user->last_name }}"
+                        disabled>
                 </div>
 
                 <div class="col-md-6 mb-3">
                     <label class="form-label">Email</label>
-                    <input type="text"
-                           class="form-control"
-                           value="{{ $user->email }}"
-                           disabled>
+                    <input type="text" class="form-control" value="{{ $user->email }}" disabled>
                 </div>
 
                 <div class="col-md-6 mb-3">
                     <label class="form-label">New Password <span class="text-danger">*</span></label>
-                    <input type="password"
-                           name="password"
-                           class="form-control @error('password') is-invalid @enderror"
-                           required>
+                    <input type="password" name="password" class="form-control @error('password') is-invalid @enderror"
+                        required>
 
                     @error('password')
                         <div class="invalid-feedback">{{ $message }}</div>
@@ -64,10 +57,7 @@
 
                 <div class="col-md-6 mb-3">
                     <label class="form-label">Confirm Password <span class="text-danger">*</span></label>
-                    <input type="password"
-                           name="password_confirmation"
-                           class="form-control"
-                           required>
+                    <input type="password" name="password_confirmation" class="form-control" required>
                 </div>
 
             </div>

@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title')
-    Edit|Our Team Management
+    Add|Our Team Management
 @endsection
 
 @section('content')
@@ -10,8 +10,8 @@
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center mb-2">
                     <div>
-                        <h5 class="card-title">Edit</h5>
-                        <h6 class="card-subtitle mb-2 text-muted"> Edit your our team section here.</h6>
+                        <h5 class="card-title">Add</h5>
+                        <h6 class="card-subtitle mb-2 text-muted"> Add your our team section here.</h6>
                     </div>
 
                     {{-- Back --}}
@@ -22,21 +22,19 @@
                 <div class="mt-2">
                     @include('layouts.includes.messages')
                 </div>
-                <form method="POST" action="{{ route('cm.our.team.update') }}" enctype="multipart/form-data">
+                <form method="POST" action="{{ url('content-management/our-team/store') }}" enctype="multipart/form-data">
                     @csrf
                     <div class="mb-3">
                         <label for="name" class="form-label">Name</label>
-                        <input type="text" class="form-control" name="name" placeholder="Name" value="{{$team->name ?? ""}}"
-                            required>
+                        <input type="text" class="form-control" name="name" placeholder="Name" required>
                         @if ($errors->has('name'))
                             <span class="text-danger text-left">{{ $errors->first('name') }}</span>
                         @endif
                     </div>
-                    <input type="text" style="display:none;" name="id" value="{{$team->id}}">
+
                     <div class="mb-3">
                         <label for="designation" class="form-label">Designation</label>
-                        <input type="text" class="form-control" name="designation" placeholder="Designation"
-                            value="{{$team->designation ?? ""}}" required>
+                        <input type="text" class="form-control" name="designation" placeholder="Designation" required>
                         @if ($errors->has('designation'))
                             <span class="text-danger text-left">{{ $errors->first('designation') }}</span>
                         @endif
@@ -44,8 +42,7 @@
 
                     <div class="mb-3">
                         <label for="experience" class="form-label">Experience</label>
-                        <input type="text" class="form-control" name="experience" placeholder="Experience"
-                            value="{{$team->experience ?? ""}}">
+                        <input type="text" class="form-control" name="experience" placeholder="Experience">
                         @if ($errors->has('experience'))
                             <span class="text-danger text-left">{{ $errors->first('experience') }}</span>
                         @endif
@@ -53,17 +50,15 @@
 
                     <div class="mb-3">
                         <label for="education" class="form-label">Education</label>
-                        <input type="text" class="form-control" name="education" placeholder="Education"
-                            value="{{$team->education ?? ""}}">
+                        <input type="text" class="form-control" name="education" placeholder="Education">
                         @if ($errors->has('education'))
                             <span class="text-danger text-left">{{ $errors->first('education') }}</span>
                         @endif
                     </div>
                     <div class="mb-3">
                         <label for="profile_image" class="form-label">Upload Image</label>
-                        <input type="file" class="form-control" name="profile_image" id="profile_image" accept="image/*"
-                            value="{{$team->profile_image ?? ""}}">
-                        <img src="asset($team->profile_image)" alt="" style="max-width:60px">
+                        <input type="file" class="form-control" name="profile_image" id="profile_image" accept="image/*">
+
                         @if ($errors->has('profile_image'))
                             <span class="text-danger text-left">{{ $errors->first('profile_image') }}</span>
                         @endif

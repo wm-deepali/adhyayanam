@@ -1,55 +1,113 @@
 @extends('layouts.app')
 
-@section('title')
-Test Series Summary
-@endsection
+@section('title','Test Series Summary')
 
 @section('content')
 <div class="bg-light rounded p-2">
     <div class="card">
         <div class="card-body">
-            <h5 class="card-title">Test Series Summary</h5>
-            <h6 class="card-subtitle mb-2 text-muted">Manage Test Series Summary here.</h6>
 
-            <div class="mt-2">
-                @include('layouts.includes.messages')
+            {{-- HEADER --}}
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <h5 class="mb-0">Test Series Summary</h5>
+                    <small class="text-muted">Manage Test Series Summary here</small>
+                </div>
+
+                {{-- BACK BUTTON --}}
+                <a href="{{ url()->previous() }}" class="btn btn-secondary btn-sm">
+                    ← Back
+                </a>
             </div>
 
-            <div class="container mt-4">
-                 <table class="table table-striped mt-5">
-        <thead>
-            <tr>
-                <th>Date &amp; Time</th>
-                <th>Student Name</th>
-                <th>Mobile Number</th>
-                <th>Order Id</th>
-                <th>Total Test </th>
-                 <th>Attempted</th>
-                 <th>Pending</th>
-                 <th> Status</th>
-                <th>Action Button</th>
-            </tr>
-        </thead>
-        <tbody>
-        @foreach($students as $res)
+            @include('layouts.includes.messages')
+
+            {{-- SEARCH + CLEAR --}}
+            <form method="GET"
+                  action="{{ route('students.student-test-series-summary') }}"
+                  class="d-flex gap-2 mb-3">
+                <input type="text"
+                       name="search"
+                       class="form-control"
+                       placeholder="Search by name, email, mobile"
+                       value="{{ request('search') }}">
+
+                <button class="btn btn-success">Search</button>
+
+                @if(request()->filled('search'))
+                    <a href="{{ route('students.student-test-series-summary') }}"
+                       class="btn btn-secondary">
+                        Clear
+                    </a>
+                @endif
+            </form>
+
+            {{-- TABLE --}}
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered align-middle">
+                    <thead>
                         <tr>
-                <td>{{$res->created_at}}</td>
-                <td>{{$res->name}}</td>
-                <td>{{$res->mobile}}</td>
-                <td>{{$res->last_order}}</td>
-                <td>{{$res->test_series_order_count}}</td>
-                <td>{{$res->test_series_order_attempt_count}}</td>
-                <td>{{$res->test_series_order_pending_count}}</td>
-                <td>Active</td>
-                <td>
-                    <a href="#"><i class="fa fa-award"></i></a>
-                    <a href="#"><i class="fa fa-user-graduate"></i></a>
-                    <a href="#"><i class="fa fa-eye"></i></a>
-                </td>
-            </tr>
-        @endforeach
+                            <th width="1%">#</th>
+                            <th>Date & Time</th>
+                            <th>Student Name</th>
+                            <th>Mobile</th>
+                            <th>Order ID</th>
+                            <th>Total Tests</th>
+                            <th>Attempted</th>
+                            <th>Pending</th>
+                            <th>Status</th>
+                            <th width="12%">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($students as $res)
+                            <tr>
+                                {{-- INDEXING WITH PAGINATION --}}
+                                <td>
+                                    {{ ($students->currentPage() - 1) * $students->perPage() + $loop->iteration }}
+                                </td>
+
+                                <td>{{ $res->created_at->format('d M Y, h:i A') }}</td>
+                                <td>{{ $res->name }}</td>
+                                <td>{{ $res->mobile }}</td>
+                                <td>{{ $res->last_order }}</td>
+                                <td>{{ $res->test_series_order_count }}</td>
+                                <td>{{ $res->test_series_order_attempt_count }}</td>
+                                <td>{{ $res->test_series_order_pending_count }}</td>
+                                <td>
+                                    <span class="badge bg-success">Active</span>
+                                </td>
+
+                                {{-- ACTIONS --}}
+                                <td>
+                                    <div class="d-flex gap-2">
+                                        <a href="#" title="View Tests">
+                                            <i class="fa fa-award"></i>
+                                        </a>
+                                        <a href="{{ route('students.student-profile-detail', $res->id) }}"
+                                           title="View Student">
+                                            <i class="fa fa-user-graduate"></i>
+                                        </a>
+                                        <a href="#" title="View Details">
+                                            <i class="fa fa-eye"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="10" class="text-center text-muted">
+                                    No records found
+                                </td>
+                            </tr>
+                        @endforelse
                     </tbody>
-    </table>
+                </table>
+            </div>
+
+            {{-- PAGINATION --}}
+            <div class="d-flex justify-content-end mt-3">
+                {{ $students->links() }}
             </div>
 
         </div>

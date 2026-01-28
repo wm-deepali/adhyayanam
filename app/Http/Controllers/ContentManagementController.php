@@ -19,7 +19,6 @@ use App\Models\Career;
 use App\Models\Category;
 use App\Models\Chapter;
 use App\Models\PyqContent;
-use App\Models\FeedTestimonial;
 use App\Models\ContactUs;
 use App\Models\Course;
 use App\Models\CurrentAffair;
@@ -192,30 +191,52 @@ class ContentManagementController extends Controller
                 ->addColumn('created_at', function ($row) {
                     return $row->created_at;
                 })
-                ->addColumn('cv', function ($row) {
-                    $linkUrl = asset("storage/" . $row->cv);
-                    $link = '<a href="' . $linkUrl . '" class="btn btn-primary" download>Download</a>';
-                    return $link;
-                })
                 ->addColumn('action', function ($row) {
 
-                    if (!\App\Helpers\Helper::canAccess('manage_career_delete')) {
-                        return '<span class="text-muted">No Action</span>';
+                    $viewUrl = route('cm.career.view', $row->id);
+                    $downloadUrl = asset("storage/" . $row->cv);
+                    $deleteUrl = route('cm.career.delete', $row->id);
+
+                    $dropdown = '
+        <div class="dropdown">
+            <button class="btn btn-sm btn-secondary dropdown-toggle" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false">
+                Actions
+            </button>
+            <ul class="dropdown-menu">
+                <li>
+                    <a class="dropdown-item" href="' . $viewUrl . '">
+                        <i class="fa fa-eye me-2"></i> View
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item" href="' . $downloadUrl . '" download>
+                        <i class="fa fa-download me-2"></i> Download Resume
+                    </a>
+                </li>';
+
+                    if (\App\Helpers\Helper::canAccess('manage_career_delete')) {
+                        $dropdown .= '
+                <li><hr class="dropdown-divider"></li>
+                <li>
+                    <form action="' . $deleteUrl . '" method="POST"
+                          onsubmit="return confirm(\'Are you sure you want to delete this?\');">
+                        ' . csrf_field() . '
+                        ' . method_field('DELETE') . '
+                        <button type="submit" class="dropdown-item text-danger">
+                            <i class="fa fa-trash me-2"></i> Delete
+                        </button>
+                    </form>
+                </li>';
                     }
 
-                    return '
-        <form action="' . route('cm.career.delete', $row->id) . '" method="POST"
-              style="display:inline"
-              onsubmit="return confirm(\'Are you sure you want to delete this?\');">
-            ' . csrf_field() . '
-            ' . method_field('DELETE') . '
-            <button type="submit" class="btn btn-sm btn-danger">
-                <i class="fa fa-trash"></i>
-            </button>
-        </form>
+                    $dropdown .= '
+            </ul>
+        </div>
     ';
-                })
 
+                    return $dropdown;
+                })
                 ->rawColumns(['checkbox', 'created_at', 'cv', 'action'])
                 ->make(true);
         }
@@ -224,6 +245,13 @@ class ContentManagementController extends Controller
         //$data['careers'] = Career::orderBy('created_at','DESC')->get();
         //return view('content-management.career',$data);
     }
+
+    public function careerView($id)
+    {
+        $career = Career::findOrFail($id);
+        return view('content-management.career-view', compact('career'));
+    }
+
     public function careerDelete($id)
     {
         $career = Career::findOrFail($id);
@@ -233,8 +261,23 @@ class ContentManagementController extends Controller
 
     public function blogArticles()
     {
-        $data['blogs'] = Blog::latest()->get();
-        return view('content-management.blog-articles', $data);
+        $blogs = Blog::with('user')
+            ->latest()
+            ->paginate(10); // change per-page count if needed
+
+
+        return view('content-management.blog-articles', compact('blogs'));
+    }
+
+    public function blogShow($id)
+    {
+        $blog = Blog::findOrFail($id);
+        return view('content-management.blog-articles-show', compact('blog'));
+    }
+
+    public function blogCreate()
+    {
+        return view('content-management.blog-articles-add');
     }
 
     public function blogStore(Request $request)
@@ -324,8 +367,13 @@ class ContentManagementController extends Controller
 
     public function ourTeam()
     {
-        $data['teams'] = Team::orderBy('created_at', 'DESC')->get();
+        $data['teams'] = Team::orderBy('created_at', 'DESC')->paginate(10);
         return view('content-management.our-team', $data);
+    }
+
+    public function ourTeamCreate()
+    {
+        return view('content-management.ajax.add-team');
     }
 
     public function ourTeamStore(Request $request)
@@ -426,10 +474,30 @@ class ContentManagementController extends Controller
     }
 
     // Existing methods
-    public function faq()
+    public function faq(Request $request)
     {
-        $data['faqs'] = Faq::latest()->get();
-        return view('content-management.faq', $data);
+        $query = Faq::with('creator')->latest();
+
+        // 🔍 Server-side search
+        if ($request->filled('search')) {
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+                $q->where('question', 'like', "%{$search}%")
+                    ->orWhere('answer', 'like', "%{$search}%")
+                    ->orWhere('type', 'like', "%{$search}%");
+            });
+        }
+
+        // Pagination
+        $faqs = $query->paginate(10)->withQueryString();
+
+        return view('content-management.faq', compact('faqs'));
+    }
+
+    public function createFaq()
+    {
+        return view('content-management.add-faq');
     }
 
     public function storeFaq(Request $request)
@@ -1925,10 +1993,19 @@ class ContentManagementController extends Controller
         return redirect()->back()->with('success', 'Current Affair deleted successfully!');
     }
 
-    public function directEnquiriesIndex()
+    public function directEnquiriesIndex(Request $request)
     {
-        $data['enquiries'] = DirectEnquiry::orderBy('created_at', 'DESC')->get();
-        return view('enquiries.direct-enquiries', $data);
+        $enquiries = DirectEnquiry::orderBy('created_at', 'DESC')
+            ->paginate(10);
+
+
+        return view('enquiries.direct-enquiries', compact('enquiries'));
+    }
+
+    public function directEnquiriesShow($id)
+    {
+        $enquiry = DirectEnquiry::findOrFail($id);
+        return view('enquiries.direct-view', compact('enquiry'));
     }
 
     public function directEnquiriesDelete($id)
@@ -1951,20 +2028,37 @@ class ContentManagementController extends Controller
                 ->addColumn('created_at', function ($row) {
                     return $row->created_at;
                 })
+                ->addColumn('message', function ($row) {
+                    return Str::limit(strip_tags($row->message), 50);
+                })
                 ->addColumn('action', function ($row) {
 
+                    $viewBtn = '
+        <a href="' . route('enquiries.contact.show', $row->id) . '"
+           class="dropdown-item">
+            <i class="fa fa-eye me-2"></i> View
+        </a>
+    ';
+
                     if (!\App\Helpers\Helper::canAccess('manage_contact_inquiries_delete')) {
-                        return '-';
+                        return '
+            <div class="dropdown">
+                <button class="btn btn-sm btn-secondary dropdown-toggle" data-bs-toggle="dropdown">
+                    Actions
+                </button>
+                <ul class="dropdown-menu">' . $viewBtn . '</ul>
+            </div>';
                     }
 
                     return '
         <div class="dropdown">
-            <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+            <button class="btn btn-sm btn-secondary dropdown-toggle" data-bs-toggle="dropdown">
                 Actions
             </button>
             <ul class="dropdown-menu">
+                <li>' . $viewBtn . '</li>
                 <li>
-                    <form action="' . route('enquiries.contact.delete', $row->id) . '" 
+                    <form action="' . route('enquiries.contact.delete', $row->id) . '"
                           method="POST"
                           onsubmit="return confirm(\'Are you sure?\')">
                         ' . csrf_field() . method_field("DELETE") . '
@@ -1977,11 +2071,17 @@ class ContentManagementController extends Controller
         </div>
     ';
                 })
-                ->rawColumns(['checkbox', 'created_at', 'action'])
+                ->rawColumns(['checkbox', 'created_at', 'action', 'message'])
                 ->make(true);
         }
         return view('enquiries.contact-us');
 
+    }
+
+    public function contactShow($id)
+    {
+        $enquiry = ContactUs::findOrFail($id);
+        return view('enquiries.contact-view', compact('enquiry'));
     }
 
     public function contactUsDelete($id)
@@ -1993,9 +2093,17 @@ class ContentManagementController extends Controller
 
     public function callRequestIndex()
     {
-        $data['callbacks'] = CallBack::orderBy('created_at', 'DESC')->get();
-        return view('enquiries.call-back-request', $data);
+        $callbacks = CallBack::orderBy('created_at', 'DESC')->paginate(10);
+        return view('enquiries.call-back-request', compact('callbacks'));
     }
+
+    public function callRequestShow($id)
+    {
+        $callback = CallBack::findOrFail($id);
+
+        return view('enquiries.call-back-show', compact('callback'));
+    }
+
     public function callRequestDelete($id)
     {
         $callback = CallBack::findOrFail($id);
@@ -5144,49 +5252,6 @@ class ContentManagementController extends Controller
         SocialMedia::updateOrCreate(['id' => 1], $validatedData);
 
         return redirect()->back()->with('success', 'Social media settings updated successfully!');
-    }
-
-    public function feedIndex()
-    {
-        $data['feeds'] = FeedTestimonial::where('type', 1)->get();
-        return view('enquiries.feedback', $data);
-    }
-
-    public function testimonialsIndex()
-    {
-        $data['feeds'] = FeedTestimonial::where('type', 2)->get();
-        return view('enquiries.testimonial', $data);
-    }
-
-    public function testimonialView($id)
-    {
-        $data['testimonial'] = FeedTestimonial::where('type', 2)->where('id', $id)->first();
-        return view('enquiries.testimonial-view', $data);
-    }
-
-    public function feedDelete($id)
-    {
-        $feeds = FeedTestimonial::find($id);
-        $feeds->delete();
-        return redirect()->back()->with('success', 'Record deleted successfully!');
-    }
-
-    public function updateFeedStatus(Request $request, $id)
-    {
-        $feed = FeedTestimonial::findOrFail($id);
-        $feed->status = $request->input('status');
-        $feed->save();
-
-        return redirect()->back()->with('success', 'Status updated successfully');
-    }
-
-    public function updateapproveStatus(Request $request, $id)
-    {
-        $feed = FeedTestimonial::findOrFail($id);
-        $feed->is_approved = 1;
-        $feed->save();
-
-        return redirect()->back()->with('success', 'Approved successfully');
     }
 
     public function bannerSettingsIndex()

@@ -46,10 +46,11 @@ class Course extends Model
     protected $casts = [
         'subject_id' => 'array',
         'chapter_id' => 'array',
-        'topic_id' => 'array',
+        'topic_id'   => 'array',
     ];
 
-    // 🔹 Relationships
+    /* ===================== RELATIONSHIPS ===================== */
+
     public function examinationCommission()
     {
         return $this->belongsTo(ExaminationCommission::class, 'examination_commission_id');
@@ -65,26 +66,36 @@ class Course extends Model
         return $this->belongsTo(SubCategory::class, 'sub_category_id');
     }
 
-    // 🔹 Relationship for Subjects (if IDs stored as array)
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    /**
+     * ✅ COURSE VIDEOS (LIVE + LMS)
+     */
+    public function videos()
+    {
+        return $this->hasMany(Video::class, 'course_id');
+    }
+
+    /* ===================== NON-ELOQUENT HELPERS ===================== */
+
+    // Subjects (stored as array)
     public function subjects()
     {
         return Subject::whereIn('id', $this->subject_id ?? [])->get();
     }
 
-    // 🔹 Relationship for Chapters
+    // Chapters
     public function chapters()
     {
         return Chapter::whereIn('id', $this->chapter_id ?? [])->get();
     }
 
-    // 🔹 Relationship for Topics
+    // Topics
     public function topics()
     {
         return CourseTopic::whereIn('id', $this->topic_id ?? [])->get();
-    }
-
-    public function creator()
-    {
-        return $this->belongsTo(User::class, 'created_by');
     }
 }

@@ -22,7 +22,7 @@ class Helper
         return $subcategories;
     }
 
-    public static function getStuedntCourseData($id)
+    public static function getStudentCourseData($id)
     {
         $course = array();
         $totalOrder = Order::where('student_id', $id)->where('order_type', 'Course')->count();
@@ -37,27 +37,37 @@ class Helper
         $course['totalBilledAmount'] = $totalBilledAmount;
         $course['lastOrderCode'] = $lastOrder->order_code ?? '';
         $course['lastOrderDate'] = $lastOrder->created_at ?? '';
+        $course['course_id'] = $lastOrder->package_id ?? null;
         return $course;
     }
 
-    public static function getStuedntTestSeriesData($id)
+    public static function getStudentTestSeriesData($id)
     {
-        $testSeries = array();
-        $totalOrder = Order::where('student_id', $id)->where('order_type', 'Test Series')->count();
+        $testSeries = [];
+
+        $totalOrder = Order::where('student_id', $id)
+            ->where('order_type', 'Test Series')
+            ->count();
+
         $totalBilledAmount = Order::where('student_id', $id)
             ->where('order_type', 'Test Series')
-            ->SUM('billed_amount');
+            ->sum('billed_amount');
 
-        $lastOrder = Order::where('student_id', $id)->where('order_type', 'Test Series')->orderBy('id', 'DESC')->first();
+        $lastOrder = Order::where('student_id', $id)
+            ->where('order_type', 'Test Series')
+            ->orderBy('id', 'DESC')
+            ->first();
 
         $testSeries['totalOrder'] = $totalOrder;
         $testSeries['totalBilledAmount'] = $totalBilledAmount;
-        $testSeries['lastOrderCode'] = $lastOrder->order_code ?? '';
-        $testSeries['lastOrderDate'] = $lastOrder->created_at ?? '';
+        $testSeries['lastOrderCode'] = $lastOrder->order_code ?? '--';
+        $testSeries['lastOrderDate'] = $lastOrder->created_at ?? null;
+        $testSeries['test_series_id'] = $lastOrder->package_id ?? null;
+
         return $testSeries;
     }
 
-    public static function getStuedntStudyMaterialData($id)
+    public static function getStudentStudyMaterialData($id)
     {
         $studyMaterial = array();
         $totalOrder = Order::where('student_id', $id)->where('order_type', 'Study Material')->count();
@@ -74,7 +84,7 @@ class Helper
         return $studyMaterial;
     }
 
-    public static function getStuedntlastOrderID($id)
+    public static function getStudentlastOrderID($id)
     {
         $lastOrder = Order::where('student_id', $id)->orderBy('id', 'DESC')->first();
         return $lastOrder->order_code ?? '-';

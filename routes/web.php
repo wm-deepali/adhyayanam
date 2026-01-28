@@ -678,31 +678,18 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
         Route::get('students/change-status', [StudentController::class, 'changeStatus'])->name('students.change-status')->middleware('custom.permission:manage_students_status');
         Route::get('students/change-password/{id}', [StudentController::class, 'studentChangePassword'])->name('students.change-password')->middleware('custom.permission:students.view-all-orders');
         Route::post('students/update-password/{id}', [StudentController::class, 'studentUpdatePassword'])->name('students.update-password')->middleware('custom.permission:manage_students_edit');
-
-        // STUDENT PROFILE DETAIL
         Route::get('students/student-profile-detail/{id}', [StudentController::class, 'studentProfile'])->name('students.student-profile-detail')->middleware('custom.permission:manage_students');
         // TEST SERIES SUMMARY
         Route::get('students/student-test-series-summary', [StudentController::class, 'studentTestSummery'])->name('students.student-test-series-summary')->middleware('custom.permission:manage_student_test_summary');
-        
+        Route::get('test-series-summary/{student}/{testSeries}', [StudentController::class, 'studentTestDetail'])->name('test-series.detail');
         // COURSE SUMMARY
         Route::get('students/student-course-summary', [StudentController::class, 'studentCourseSummery'])->name('students.student-course-summary')->middleware('custom.permission:manage_student_course_summary');
-        // ALL VIDEOS LIST (STATIC VIEW)
-        Route::get('students/student-videos-list', function () {
-            return view('students.student-videos-list');
-        })->name('students.student-videos-list')
-            ->middleware('custom.permission:manage_student_videos');
-        // TEST RESULT DETAIL (STATIC VIEW)
-        Route::get('students/student-test-result-detail', function () {
-            return view('students.student-test-result-detail');
-        })->name('students.student-test-result-detail')
-            ->middleware('custom.permission:manage_student_tests');
-        // WATCHED VIDEO LIST (STATIC VIEW)
-        Route::get('students/student-watched-video-list', function () {
-            return view('students.student-watched-video-list');
-        })->name('students.student-watched-video-list')
-            ->middleware('custom.permission:manage_student_videos');
-
-
+        Route::get('student-course-detail/{studentId}/{courseId}', [StudentController::class, 'studentCourseDetail'])->name('students.student-course-detail');
+        // STUDY MATERIAL SUMMARY
+        Route::get('students/student-study-material-detail/{studentId}/{materialId}', [StudentController::class, 'studentStudyMaterialDetail'])->name('students.student-study-material-detail');
+        // ALL VIDEOS SUMMARY
+        Route::get('students/student-videos-list', [StudentController::class, 'videoSummary'])->name('students.student-videos-list')->middleware('custom.permission:manage_student_videos');
+        Route::get('students/student-video-detail/{videoId}',[StudentController::class, 'videoDetail'])->name('students.student-video-detail')->middleware('custom.permission:manage_student_videos');
 
         // Batches & Programme
         Route::prefix('batches-and-programme')->name('batches-programme.')->group(function () {

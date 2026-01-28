@@ -94,12 +94,12 @@
                   <td>
                     <div class="d-flex gap-2">
 
-                    
-                    @if(\App\Helpers\Helper::canAccess('manage_students_edit'))
-                      <a href="{{ route('students.change-password', $res->id) }}" title="Change Password">
-                        <i class="fa fa-user-lock"></i>
-                      </a>
-                    @endif
+
+                      @if(\App\Helpers\Helper::canAccess('manage_students_edit'))
+                        <a href="{{ route('students.change-password', $res->id) }}" title="Change Password">
+                          <i class="fa fa-user-lock"></i>
+                        </a>
+                      @endif
                       {{-- View Details --}}
                       <a href="{{ route('students.student-profile-detail', $res->id) }}" title="View Details">
                         <i class="fa fa-user"></i>
@@ -108,16 +108,6 @@
                       {{-- View Orders --}}
                       <a href="{{ route('students.view-all-orders', $res->id) }}" title="View Orders">
                         <i class="fa fa-shopping-cart"></i>
-                      </a>
-
-                      {{-- View Tests --}}
-                      <a href="{{ route('students.student-test-result-detail') }}" title="View Tests">
-                        <i class="fa fa-award"></i>
-                      </a>
-
-                      {{-- View Videos --}}
-                      <a href="{{ route('students.student-videos-list') }}" title="View Videos">
-                        <i class="fa fa-video"></i>
                       </a>
 
                     </div>

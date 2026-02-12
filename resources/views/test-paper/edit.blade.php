@@ -719,14 +719,14 @@
             toggleInputBox1(existingReAttemptAllowed)
         });
 
-       CKEDITOR.replace('test_instruction', {
-        filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
-        filebrowserUploadMethod: 'form'
-    });
 
-    </script>
+    var testInstructionEditor = CKEDITOR.replace('test_instruction', {
+    filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
+    filebrowserUploadMethod: 'form'
+});
 
-    <script>
+
+  
         $(document).on('change', '#subject', function (event) {
             $('#question_generated_by').val("").trigger('change');
             $('#chapter_id').val("").trigger('change');

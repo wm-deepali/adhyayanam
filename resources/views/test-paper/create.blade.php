@@ -552,10 +552,10 @@
   <script src="https://cdn.ckeditor.com/4.16.2/full/ckeditor.js"></script>
     <script>
 
-    CKEDITOR.replace('test_instruction', {
-        filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
-        filebrowserUploadMethod: 'form'
-    });
+var testInstructionEditor = CKEDITOR.replace('test_instruction', {
+    filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
+    filebrowserUploadMethod: 'form'
+});
 
         function togglePriceSection() {
             const paperType = $('#paper_type').val();

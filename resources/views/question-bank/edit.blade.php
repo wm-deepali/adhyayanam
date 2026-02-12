@@ -1,34 +1,28 @@
 @extends('layouts.app')
 
-@section('title')
-    Question Bank | Create
-@endsection
+@section('title', 'Question Bank | Edit')
 
 @section('content')
-    <div class="bg-light rounded">
-        <div class="card">
-            <div class="card-body">
-                <div class="d-flex">
-                    <div class="col">
-                        <h5 class="card-title">Create</h5>
-                        <h6 class="card-subtitle mb-2 text-muted">Create Question section here.</h6>
-                    </div>
-                    <div class="justify-content-end">
-                        <a href='{{route('question.bank.create')}}' class="btn btn-primary">&#43; Add</a>
-                    </div>
-                </div>
-                <div class="mt-2">
-                    @include('layouts.includes.messages')
-                </div>
+<div class="bg-light rounded">
+    <div class="card">
+        <div class="card-body">
 
-                <form id="form-question" action="{{ route('question.bank.update', $question->id) }}" method="POST"
-                    enctype="multipart/form-data">
-                    @csrf
+            <div class="d-flex justify-content-between mb-3">
+                <div>
+                    <h5 class="card-title">Edit Question</h5>
+                    <h6 class="card-subtitle text-muted">Edit question details here</h6>
+                </div>
+                <a href="{{ route('question.bank.create') }}" class="btn btn-primary">+ Add</a>
+            </div>
 
-                    <div id="questions-container">
-                        <div class="question-block">
-                            <div class="row">
-                                <div class="col-md-6">
+            @include('layouts.includes.messages')
+
+            <form action="{{ route('question.bank.update', $question->id) }}" method="POST">
+                @csrf
+
+                <div class="row">
+                    {{-- LEFT PANEL --}}
+                    <div class="col-md-6">
                                     <div class="form-group">
                                         <label>Select Language</label>
                                         <select class="form-control" name="language">
@@ -63,7 +57,8 @@
                                                 Affair</option>
                                         </select>
                                     </div>
-                                    <div class="form-group previous-year-group" id="previous-year" style="display: none;">
+                                        <div class="form-group previous-year-group" id="previous-year" style="display: none;">
+
                                         <label>Previous Year</label>
                                         <input type="number" class="form-control" name="previous_year"
                                             placeholder="Ex. 2014">
@@ -159,242 +154,408 @@
                                         <label for="show_on_pyq">Show on PYQ</label>
                                     </div>
                                 </div>
-                                @if($question->question_type == "MCQ")
-                                    <div class="col-md-6" id="question_form">
-                                        <div class="question-count" class="form-group">
-                                            <h4>Question 1</h4>
-                                        </div>
-                                        <div class="form-group">
-                                            <label>Enter Question</label>
-                                            <textarea class="form-control ckeditor"
-                                                name="question[]">{{$question->question}}</textarea>
-                                        </div>
-                                        <div class="form-group">
-                                            <label>Answer</label>
-                                            <input type="text" class="form-control" name="answer[]" placeholder="Ex. a"
-                                                value="{{$question->answer}}">
-                                        </div>
-                                        <div class="form-group">
-                                            <label>Option A</label>
-                                            <textarea class="form-control quill-editor2 ckeditor"
-                                                name="option_a[]">{{$question->option_a}}</textarea>
-                                        </div>
-                                        <div class="form-group">
-                                            <label>Option B</label>
-                                            <textarea class="form-control quill-editor3 ckeditor"
-                                                name="option_b[]">{{$question->option_b}}</textarea>
-                                        </div>
-                                        <div class="form-group">
-                                            <label>Option C</label>
-                                            <textarea class="form-control quill-editor4 ckeditor"
-                                                name="option_c[]">{{$question->option_c}}</textarea>
-                                        </div>
-                                        <div class="form-group">
-                                            <label>Option D</label>
-                                            <textarea class="form-control quill-editor5 ckeditor"
-                                                name="option_d[]">{{$question->option_d}}</textarea>
-                                        </div>
-                                        <div class="form-group option-e-group" @if($question->has_option_e == 0)
-                                        style="display: none;" @endif>
-                                            <label>Option E</label>
-                                            <textarea class="form-control quill-editor6 ckeditor"
-                                                name="option_e[]">{{$question->option_e}}</textarea>
-                                        </div>
-                                        <div class="form-group solution-group" @if($question->has_solution != 'yes')
-                                        style="display: none;" @endif>
-                                            <label>Solution</label>
-                                            <textarea class="form-control ckeditor"
-                                                name="solution[]">{!! $question->solution !!}</textarea>
-                                        </div>
-                                    </div>
-                                @elseif($question->question_type == "Subjective")
-                                    <div class="col-md-6" id="question_form">
-                                        <div class="question-count" class="form-group">
-                                            <h4>Question 1</h4>
-                                        </div>
-                                        <div class="form-group">
-                                            <label>Enter Question</label>
-                                            <textarea class="form-control ckeditor"
-                                                name="question[]">{{$question->question}}</textarea>
-                                        </div>
-                                        <div class="form-group">
-                                            <label>Answer Type</label>
-                                            <select class="form-control" name="answer_format[]">
-                                                <option value="">Select</option>
-                                                <option value="audio" @if($question->answer_format == 'audio') selected @endif>
-                                                    Audio</option>
-                                                <option value="video" @if($question->answer_format == 'video') selected @endif>
-                                                    Video</option>
-                                                <option value="image" @if($question->answer_format == 'image') selected @endif>
-                                                    Image</option>
-                                                <option value="document" @if($question->answer_format == 'document') selected
-                                                @endif>Document</option>
-                                                <option value="text input" @if($question->answer_format == 'text input') selected
-                                                @endif>Text Input</option>
-                                            </select>
-                                        </div>
-                                        <div class="form-group solution-group" @if($question->has_solution != 'yes')
-                                        style="display: none;" @endif>
-                                            <label>Solution</label>
-                                            <textarea class="form-control ckeditor"
-                                                name="solution[]">{!! $question->solution !!}</textarea>
-                                        </div>
-                                    </div>
-                                @elseif($question->question_type == "Story Based")
-                                    <div class="col-md-6" id="story_question_form">
 
-                                        <div class="question-count form-group">
-                                            <h4>Question 1</h4>
-                                        </div>
+                    {{-- RIGHT PANEL --}}
+                    <div class="col-md-6">
 
-                                        {{-- MAIN PASSAGE --}}
-                                        <div class="form-group">
-                                            <label>Enter Story / Passage</label>
-                                            <textarea class="form-control ckeditor"
-                                                name="question[]">{!! $question->question !!}</textarea>
-                                        </div>
+                        {{-- ================= MCQ ================= --}}
+                        @if($question->question_type === 'MCQ')
 
-                                        <hr>
+    <div class="form-group">
+        <label>Question</label>
+        <textarea id="q_main" class="form-control editor"
+            name="question[]">{!! $question->question !!}</textarea>
+    </div>
 
-                                        <h5>Sub Questions</h5>
+    <div class="form-group">
+        <label>Correct Answer</label>
+        <input type="text" class="form-control"
+               name="answer[]" value="{{ $question->answer }}">
+    </div>
 
-                                        <div id="story-sub-questions">
+    <div class="form-group">
+        <label>Option A</label>
+        <textarea class="form-control editor"
+            name="option_a[]">{!! $question->option_a !!}</textarea>
+    </div>
 
-                                            @forelse($question->questionDeatils as $detail)
-                                                <div class="sub-question-block border p-3 mb-3">
+    <div class="form-group">
+        <label>Option B</label>
+        <textarea class="form-control editor"
+            name="option_b[]">{!! $question->option_b !!}</textarea>
+    </div>
 
-                                                    {{-- ✅ SUB QUESTION ID --}}
-                                                    <input type="hidden" name="sub_question_id[]" value="{{ $detail->id }}">
+    <div class="form-group">
+        <label>Option C</label>
+        <textarea class="form-control editor"
+            name="option_c[]">{!! $question->option_c !!}</textarea>
+    </div>
 
-                                                    {{-- SUB QUESTION TYPE --}}
-                                                    <div class="form-group">
-                                                        <label>Sub Question Type</label>
-                                                        <select class="form-control sub-question-type" name="sub_question_type[]">
-                                                            <option value="mcq" {{ $detail->type === 'mcq' ? 'selected' : '' }}>MCQ
-                                                            </option>
-                                                            <option value="reasoning" {{ $detail->type === 'reasoning' ? 'selected' : '' }}>
-                                                                Reasoning / Subjective
-                                                            </option>
-                                                        </select>
-                                                    </div>
+    <div class="form-group">
+        <label>Option D</label>
+        <textarea class="form-control editor"
+            name="option_d[]">{!! $question->option_d !!}</textarea>
+    </div>
 
-                                                    {{-- QUESTION --}}
-                                                    <div class="form-group">
-                                                        <label>Question</label>
-                                                        <textarea class="form-control ckeditor"
-                                                            name="sub_question[]">{!! $detail->question !!}</textarea>
-                                                    </div>
+    <div class="form-group option-e-group"
+         style="{{ $question->has_option_e ? '' : 'display:none;' }}">
+        <label>Option E</label>
+        <textarea class="form-control editor"
+            name="option_e[]">{!! $question->option_e !!}</textarea>
+    </div>
 
-                                                    {{-- MCQ FIELDS --}}
-                                                    <div class="mcq-fields"
-                                                        style="{{ $detail->type === 'mcq' ? '' : 'display:none;' }}">
+    <div class="form-group solution-group"
+         style="{{ $question->has_solution === 'yes' ? '' : 'display:none;' }}">
+        <label>Solution</label>
+        <textarea class="form-control editor"
+            name="solution[]">{!! $question->solution !!}</textarea>
+    </div>
 
-                                                        <div class="form-group">
-                                                            <label>Option A</label>
-                                                            <textarea class="form-control ckeditor"
-                                                                name="option_a[]">{!! $detail->option_a !!}</textarea>
-                                                        </div>
+                        {{-- ================= SUBJECTIVE ================= --}}
+                        @elseif($question->question_type === 'Subjective')
 
-                                                        <div class="form-group">
-                                                            <label>Option B</label>
-                                                            <textarea class="form-control ckeditor"
-                                                                name="option_b[]">{!! $detail->option_b !!}</textarea>
-                                                        </div>
-
-                                                        <div class="form-group">
-                                                            <label>Option C</label>
-                                                            <textarea class="form-control ckeditor"
-                                                                name="option_c[]">{!! $detail->option_c !!}</textarea>
-                                                        </div>
-
-                                                        <div class="form-group">
-                                                            <label>Option D</label>
-                                                            <textarea class="form-control ckeditor"
-                                                                name="option_d[]">{!! $detail->option_d !!}</textarea>
-                                                        </div>
-
-                                                        <div class="form-group">
-                                                            <label>Correct Answer</label>
-                                                            <select class="form-control" name="answer[]">
-                                                                <option value="A" {{ $detail->answer === 'A' ? 'selected' : '' }}>
-                                                                    Option A</option>
-                                                                <option value="B" {{ $detail->answer === 'B' ? 'selected' : '' }}>
-                                                                    Option B</option>
-                                                                <option value="C" {{ $detail->answer === 'C' ? 'selected' : '' }}>
-                                                                    Option C</option>
-                                                                <option value="D" {{ $detail->answer === 'D' ? 'selected' : '' }}>
-                                                                    Option D</option>
-                                                            </select>
-                                                        </div>
-
-                                                    </div>
-
-                                                    {{-- REASONING / SUBJECTIVE --}}
-                                                    <div class="reasoning-fields"
-                                                        style="{{ $detail->type === 'reasoning' ? '' : 'display:none;' }}">
-
-                                                        <div class="form-group">
-                                                            <label>Answer Format</label>
-                                                            <select class="form-control" name="answer_format[]">
-                                                                <option value="">Select</option>
-                                                                <option value="text" {{ $detail->answer_format === 'text' ? 'selected' : '' }}>Text</option>
-                                                                <option value="audio" {{ $detail->answer_format === 'audio' ? 'selected' : '' }}>Audio</option>
-                                                                <option value="video" {{ $detail->answer_format === 'video' ? 'selected' : '' }}>Video</option>
-                                                                <option value="image" {{ $detail->answer_format === 'image' ? 'selected' : '' }}>Image</option>
-                                                                <option value="document" {{ $detail->answer_format === 'document' ? 'selected' : '' }}>Document</option>
-                                                            </select>
-                                                        </div>
-
-                                                    </div>
-
-                                                    {{-- SOLUTION --}}
-                                                    <div class="form-group solution-group"
-                                                        style="{{ empty($detail->solution) ? 'display:none;' : '' }}">
-                                                        <label>Solution</label>
-                                                        <textarea class="form-control ckeditor"
-                                                            name="solution[]">{!! $detail->solution !!}</textarea>
-                                                    </div>
-
-                                                    <div class="text-end">
-                                                        <button type="button" class="btn btn-danger remove-sub-question">
-                                                            Remove Sub Question
-                                                        </button>
-                                                    </div>
-
-                                                </div>
-                                            @empty
-                                                {{-- EMPTY DEFAULT BLOCK --}}
-                                                <div class="sub-question-block border p-3 mb-3">
-                                                    <input type="hidden" name="sub_question_type[]" value="mcq">
-                                                </div>
-                                            @endforelse
-
-                                        </div>
-
-
-
-                                        <button type="button" id="add-sub-question" class="btn btn-primary mt-2">
-                                            + Add Sub Question
-                                        </button>
-
-                                    </div>
-                                @endif
-                                <div id="question-clone"></div>
+                            <div class="form-group">
+                                <label>Question</label>
+                                <textarea id="subj_q" class="form-control editor"
+                                    name="question[]">{!! $question->question !!}</textarea>
                             </div>
-                            <hr>
-                        </div>
-                    </div>
-                    <button type="submit" class="btn btn-primary mb-3">Submit</button>
-                </form>
+
+                            <div class="form-group">
+                                <label>Answer Format</label>
+                                <select class="form-control" name="answer_format[]">
+                                    <option value="text" @selected($question->answer_format === 'text')>Text</option>
+                                    <option value="audio" @selected($question->answer_format === 'audio')>Audio</option>
+                                    <option value="video" @selected($question->answer_format === 'video')>Video</option>
+                                    <option value="image" @selected($question->answer_format === 'image')>Image</option>
+                                    <option value="document" @selected($question->answer_format === 'document')>Document</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group solution-group"
+     style="{{ $question->has_solution === 'yes' ? '' : 'display:none;' }}">
+    <label>Solution</label>
+    <textarea id="subj_sol" class="form-control editor"
+        name="solution[]">{!! $question->solution !!}</textarea>
+</div>
+
+
+                        {{-- ================= STORY BASED ================= --}}
+         {{-- ================= STORY BASED ================= --}}
+@elseif($question->question_type === "Story Based")
+
+<div id="story_question_form">
+
+    <div class="question-count form-group">
+        <h4>Question 1</h4>
+    </div>
+
+    {{-- MAIN STORY (single → id allowed) --}}
+    <div class="form-group">
+        <label>Enter Story / Passage</label>
+        <textarea id="story_q"
+                  class="form-control editor"
+                  name="question[]">{!! $question->question !!}</textarea>
+    </div>
+
+    <hr>
+    <h5>Sub Questions</h5>
+
+    <div id="story-sub-questions">
+
+        @foreach($question->questionDeatils as $detail)
+        <div class="sub-question-block border p-3 mb-3">
+
+            <input type="hidden" name="sub_question_id[]" value="{{ $detail->id }}">
+
+            {{-- TYPE --}}
+            <div class="form-group">
+                <label>Sub Question Type</label>
+                <select class="form-control sub-question-type"
+                        name="sub_question_type[]">
+                    <option value="mcq" {{ $detail->type === 'mcq' ? 'selected' : '' }}>MCQ</option>
+                    <option value="reasoning" {{ $detail->type === 'reasoning' ? 'selected' : '' }}>
+                        Reasoning / Subjective
+                    </option>
+                </select>
             </div>
+
+            {{-- QUESTION (loop → no id) --}}
+            <div class="form-group">
+                <label>Question</label>
+                <textarea class="form-control editor"
+                          name="sub_question[]">{!! $detail->question !!}</textarea>
+            </div>
+
+            {{-- MCQ OPTIONS (loop → NO IDs) --}}
+            <div class="mcq-fields" style="{{ $detail->type === 'mcq' ? '' : 'display:none;' }}">
+
+                <div class="form-group">
+                    <label>Option A</label>
+                    <textarea class="form-control editor"
+                              name="option_a[]">{!! $detail->option_a !!}</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Option B</label>
+                    <textarea class="form-control editor"
+                              name="option_b[]">{!! $detail->option_b !!}</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Option C</label>
+                    <textarea class="form-control editor"
+                              name="option_c[]">{!! $detail->option_c !!}</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Option D</label>
+                    <textarea class="form-control editor"
+                              name="option_d[]">{!! $detail->option_d !!}</textarea>
+                </div>
+
+                <div class="form-group option-e-group"
+     style="{{ $question->has_option_e ? '' : 'display:none;' }}">
+    <label>Option E</label>
+    <textarea class="form-control editor"
+              name="option_e[]">{!! $detail->option_e ?? '' !!}</textarea>
+</div>
+
+                <div class="form-group">
+                    <label>Correct Answer</label>
+                    <select class="form-control" name="answer[]">
+                        <option value="A" {{ $detail->answer === 'A' ? 'selected' : '' }}>A</option>
+                        <option value="B" {{ $detail->answer === 'B' ? 'selected' : '' }}>B</option>
+                        <option value="C" {{ $detail->answer === 'C' ? 'selected' : '' }}>C</option>
+                        <option value="D" {{ $detail->answer === 'D' ? 'selected' : '' }}>D</option>
+                         <option value="E" {{ $detail->answer === 'E' ? 'selected' : '' }}>E</option>
+                    </select>
+                </div>
+            </div>
+
+            {{-- REASONING --}}
+            <div class="reasoning-fields" style="{{ $detail->type === 'reasoning' ? '' : 'display:none;' }}">
+                <div class="form-group">
+                    <label>Answer Format</label>
+                    <select class="form-control" name="answer_format[]">
+                        <option value="text" {{ $detail->answer_format === 'text' ? 'selected' : '' }}>Text</option>
+                        <option value="audio" {{ $detail->answer_format === 'audio' ? 'selected' : '' }}>Audio</option>
+                        <option value="video" {{ $detail->answer_format === 'video' ? 'selected' : '' }}>Video</option>
+                        <option value="image" {{ $detail->answer_format === 'image' ? 'selected' : '' }}>Image</option>
+                        <option value="document" {{ $detail->answer_format === 'document' ? 'selected' : '' }}>Document</option>
+                    </select>
+                </div>
+            </div>
+
+            {{-- SOLUTION (loop → no id) --}}
+            <div class="form-group solution-group"
+                 style="{{ empty($detail->solution) ? 'display:none;' : '' }}">
+                <label>Solution</label>
+                <textarea class="form-control editor"
+                          name="solution[]">{!! $detail->solution !!}</textarea>
+            </div>
+
+            <div class="text-end">
+                <button type="button" class="btn btn-danger remove-sub-question">
+                    Remove Sub Question
+                </button>
+            </div>
+
+        </div>
+        @endforeach
+
+    </div>
+
+    <button type="button" id="add-sub-question" class="btn btn-primary mt-2">
+        + Add Sub Question
+    </button>
+
+</div>
+@endif
+
+
+
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-success mt-3">Update</button>
+            </form>
         </div>
     </div>
-    <script src="https://cdn.ckeditor.com/4.16.2/full/ckeditor.js"></script>
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
-        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
-        crossorigin="anonymous"></script>
+</div>
 
-    <script>
+{{-- ================= CKEDITOR ================= --}}
+<script src="https://cdn.ckeditor.com/4.16.2/full/ckeditor.js"></script>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+
+    document.querySelectorAll('textarea.editor').forEach(function (el) {
+        if (!el.id) el.id = 'ck_' + Math.random().toString(36).substr(2, 9);
+    if (CKEDITOR.instances[el.id]) return;
+
+        CKEDITOR.replace(el.id, {
+            filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
+            filebrowserUploadMethod: 'form',
+            allowedContent: true
+        });
+    });
+
+});
+
+
+ function toggleInstruction(checkbox) {
+    const form = checkbox.closest('form');
+    const instructionGroup = form.querySelector('.instruction-group');
+
+    if (!instructionGroup) return;
+
+    instructionGroup.style.display = checkbox.checked ? 'block' : 'none';
+
+    if (checkbox.checked) {
+        instructionGroup.querySelectorAll('textarea.editor').forEach(initEditor);
+    }
+}
+
+
+function toggleSolution(checkbox) {
+
+    const form = checkbox.closest('form');
+    const solutionGroups = form.querySelectorAll('.solution-group');
+
+    solutionGroups.forEach(group => {
+
+        if (checkbox.checked) {
+
+            group.style.display = 'block';
+            group.querySelectorAll('textarea.editor').forEach(initEditor);
+
+        } else {
+
+            group.querySelectorAll('textarea.editor').forEach(el => {
+                if (el.id && CKEDITOR.instances[el.id]) {
+                    CKEDITOR.instances[el.id].destroy(true);
+                }
+            });
+
+            group.style.display = 'none';
+        }
+    });
+}
+
+function toggleOptionE(checkbox) {
+
+    const form = checkbox.closest('form');
+    const optionEGroups = form.querySelectorAll('.option-e-group');
+
+    optionEGroups.forEach(group => {
+
+        if (checkbox.checked) {
+
+            group.style.display = 'block';
+            group.querySelectorAll('textarea.editor').forEach(initEditor);
+
+        } else {
+
+            group.querySelectorAll('textarea.editor').forEach(el => {
+                if (el.id && CKEDITOR.instances[el.id]) {
+                    CKEDITOR.instances[el.id].destroy(true);
+                }
+            });
+
+            group.style.display = 'none';
+        }
+    });
+}
+
+function initEditor(el) {
+
+    if (!el.id) {
+        el.id = 'ck_' + Math.random().toString(36).substr(2, 9);
+    }
+
+    if (CKEDITOR.instances[el.id]) return;
+
+    CKEDITOR.replace(el.id, {
+        filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
+        filebrowserUploadMethod: 'form',
+        allowedContent: true
+    });
+}
+
+
+/* =====================================================
+   SUB QUESTION TYPE CHANGE (MCQ / REASONING)
+===================================================== */
+document.addEventListener('change', function (e) {
+
+    if (!e.target.classList.contains('sub-question-type')) return;
+
+    const block = e.target.closest('.sub-question-block');
+    const isMcq = e.target.value === 'mcq';
+
+    block.querySelector('.mcq-fields').style.display = isMcq ? 'block' : 'none';
+    block.querySelector('.reasoning-fields').style.display = isMcq ? 'none' : 'block';
+});
+
+
+/* =====================================================
+   ADD SUB QUESTION (STORY)
+===================================================== */
+document.getElementById('add-sub-question')?.addEventListener('click', function () {
+
+    const container = document.getElementById('story-sub-questions');
+    const last = container.querySelector('.sub-question-block:last-child');
+    const clone = last.cloneNode(true);
+
+    /* CLEAR VALUES */
+    clone.querySelectorAll('textarea').forEach(el => el.value = '');
+    clone.querySelectorAll('select').forEach(el => el.selectedIndex = 0);
+
+    /* RESET ID */
+    const idInput = clone.querySelector('input[name="sub_question_id[]"]');
+    if (idInput) idInput.value = '';
+
+    /* DESTROY OLD CKEDITOR INSTANCES */
+    clone.querySelectorAll('textarea.editor').forEach(el => {
+        if (el.id && CKEDITOR.instances[el.id]) {
+            CKEDITOR.instances[el.id].destroy(true);
+        }
+        el.removeAttribute('id');
+    });
+
+    container.appendChild(clone);
+    clone.querySelectorAll('textarea.editor').forEach(initEditor);
+});
+
+
+/* =====================================================
+   REMOVE SUB QUESTION
+===================================================== */
+document.addEventListener('click', function (e) {
+
+    if (!e.target.classList.contains('remove-sub-question')) return;
+
+    const blocks = document.querySelectorAll('.sub-question-block');
+    if (blocks.length <= 1) {
+        alert('At least one sub question is required');
+        return;
+    }
+
+    const block = e.target.closest('.sub-question-block');
+
+    block.querySelectorAll('textarea.editor').forEach(el => {
+        if (el.id && CKEDITOR.instances[el.id]) {
+            CKEDITOR.instances[el.id].destroy(true);
+        }
+    });
+
+    block.remove();
+});
+</script>
+
+<script>
         $(document).ready(function () {
             $(document).on('change', '#exam_com_id', function (event) {
                 $('#category_id').html("");
@@ -534,180 +695,6 @@
 
             });
         });
-
-    </script>
-
-    <script>
-
-
-        /* =========================================================
-           SUB QUESTION TYPE CHANGE (MCQ / REASONING)
-        ========================================================= */
-        document.addEventListener('change', function (e) {
-            if (!e.target.classList.contains('sub-question-type')) return;
-
-            const block = e.target.closest('.sub-question-block');
-            const isMcq = e.target.value === 'mcq';
-
-            block.querySelector('.mcq-fields').style.display = isMcq ? 'block' : 'none';
-            block.querySelector('.reasoning-fields').style.display = isMcq ? 'none' : 'block';
-
-            // Re-init editors safely
-            setTimeout(() => {
-                destroyEditorsIn(block);
-                initEditorsIn(block);
-            }, 50);
-
-        });
-
-
-        /* =========================================================
-           ADD SUB QUESTION
-        ========================================================= */
-
-        document.getElementById('add-sub-question')?.addEventListener('click', function () {
-
-            const container = document.getElementById('story-sub-questions');
-
-            // Clone last sub-question block
-            const lastBlock = container.querySelector('.sub-question-block:last-child');
-            const clone = lastBlock.cloneNode(true);
-
-            /* ===============================
-               RESET VALUES (EXCEPT TYPE)
-            =============================== */
-            clone.querySelectorAll('textarea').forEach(el => el.value = '');
-
-            clone.querySelectorAll('select').forEach(el => {
-                if (!el.classList.contains('sub-question-type')) {
-                    el.selectedIndex = 0;
-                }
-            });
-
-            /* ===============================
-               🔑 RESET sub_question_id
-            =============================== */
-            let idInput = clone.querySelector('input[name="sub_question_id[]"]');
-
-            if (!idInput) {
-                idInput = document.createElement('input');
-                idInput.type = 'hidden';
-                idInput.name = 'sub_question_id[]';
-                clone.prepend(idInput);
-            }
-
-            idInput.value = ''; // new sub question
-
-            container.appendChild(clone);
-
-            /* ===============================
-               SHOW / HIDE FIELDS BASED ON TYPE
-            =============================== */
-            const typeSelect = clone.querySelector('.sub-question-type');
-            const isMcq = typeSelect && typeSelect.value === 'mcq';
-
-            clone.querySelector('.mcq-fields').style.display = isMcq ? 'block' : 'none';
-            clone.querySelector('.reasoning-fields').style.display = isMcq ? 'none' : 'block';
-
-            /* ===============================
-               CKEDITOR SAFE RE-INIT
-            =============================== */
-            setTimeout(() => {
-                destroyEditorsIn(clone);
-                initEditorsIn(clone);
-            }, 50);
-        });
-
-
-        /* =========================================================
-           REMOVE SUB QUESTION
-        ========================================================= */
-        document.addEventListener('click', function (e) {
-            if (!e.target.classList.contains('remove-sub-question')) return;
-
-            const blocks = document.querySelectorAll('.sub-question-block');
-
-            // Prevent removing last one
-            if (blocks.length <= 1) {
-                alert('At least one sub question is required');
-                return;
-            }
-
-            const block = e.target.closest('.sub-question-block');
-
-            // Destroy CKEditor safely
-            block.querySelectorAll('textarea').forEach(el => {
-                if (el.id && CKEDITOR.instances[el.id]) {
-                    CKEDITOR.instances[el.id].destroy(true);
-                }
-            });
-
-            block.remove();
-        });
-
-        function toggleSolution(chk) {
-            const block = chk.closest('.question-block');
-            block.querySelectorAll('.solution-group').forEach(group => {
-                if (chk.checked) {
-                    group.style.display = 'block';
-                    destroyEditorsIn(group);
-                    initEditorsIn(group);
-                } else {
-                    destroyEditorsIn(group);
-                    group.style.display = 'none';
-                }
-            });
-        }
-
-        function destroyEditorsIn(container) {
-            if (!container || !window.CKEDITOR) return;
-
-            container.querySelectorAll('textarea').forEach(el => {
-                if (el.id && CKEDITOR.instances[el.id]) {
-                    CKEDITOR.instances[el.id].destroy(true);
-                }
-                el.removeAttribute('id');
-            });
-
-            container.querySelectorAll('.cke').forEach(e => e.remove());
-        }
-
-        function initEditorsIn(container) {
-            if (!container || !window.CKEDITOR) return;
-
-            container.querySelectorAll('textarea.ckeditor, textarea.quesckeditor')
-                .forEach(el => {
-                    if (!el.id) {
-                        el.id = 'ck_' + Math.random().toString(36).slice(2, 9);
-                    }
-                    if (!CKEDITOR.instances[el.id]) {
-                         CKEDITOR.replace(el.id, {
-                        filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
-                        filebrowserUploadMethod: 'form'
-                    });
-                    }
-                });
-        }
-
-        document.getElementById('question-category').addEventListener('change', function () {
-            var previousYearGroup = document.getElementById('previous-year');
-            if (this.value == '1') {
-                previousYearGroup.style.display = 'block';
-            } else {
-                previousYearGroup.style.display = 'none';
-            }
-        });
-
-
-        function toggleInstruction(checkbox) {
-            const instructionGroup = checkbox.closest('.question-block').querySelector('.instruction-group');
-            instructionGroup.style.display = checkbox.checked ? 'block' : 'none';
-        }
-
-        function toggleOptionE(checkbox) {
-            const optionEGroup = checkbox.closest('.question-block').querySelector('.option-e-group');
-            optionEGroup.style.display = checkbox.checked ? 'block' : 'none';
-        }
 
     </script>
 @endsection

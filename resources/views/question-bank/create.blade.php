@@ -40,7 +40,8 @@
                                     <div class="form-group">
                                         <label>Question Type</label>
                                         <select id="question-type" class="form-control" name="question_type" required>
-                                            <option selected value="MCQ">MCQ</option>
+                                            <option value="">Select</option>
+                                            <option value="MCQ">MCQ</option>
                                             <option value="Subjective">Subjective</option>
                                             <option value="Story Based">Story Based</option>
                                         </select>
@@ -137,72 +138,78 @@
                                         <label for="show_on_pyq">Show on PYQ</label>
                                     </div>
                                 </div>
-                                <div class="col-md-6" id="mcq_question_form">
-                                    <div class="question-count" class="form-group">
+                                <div class="col-md-6" id="mcq_question_form" style="display:none;">
+
+                                    <div class="question-count form-group">
                                         <h4>Question 1</h4>
                                     </div>
+
                                     <div class="form-group">
                                         <label>Enter Question</label>
-                                        <textarea class="form-control ckeditor quesckeditor" name="question[]"></textarea>
+                                        <textarea class="form-control editor" name="question[]"></textarea>
                                     </div>
+
                                     <div class="form-group">
-                                        <label>Answer</label>
-                                        <input type="text" class="form-control" name="answer[]" placeholder="Ex. a">
+                                        <label>Correct Answer</label>
+                                        <input type="text" class="form-control" name="answer[]" placeholder="Ex. A">
                                     </div>
+
                                     <div class="form-group">
                                         <label>Option A</label>
-                                        <textarea class="form-control quill-editor2 ckeditor" name="option_a[]"
-                                            id="option_a_1"></textarea>
+                                        <textarea class="form-control editor" name="option_a[]"></textarea>
                                     </div>
+
                                     <div class="form-group">
                                         <label>Option B</label>
-                                        <textarea class="form-control quill-editor3 ckeditor" name="option_b[]"
-                                            id="option_b_1"></textarea>
+                                        <textarea class="form-control editor" name="option_b[]"></textarea>
                                     </div>
+
                                     <div class="form-group">
                                         <label>Option C</label>
-                                        <textarea class="form-control quill-editor4 ckeditor" name="option_c[]"
-                                            id="option_c_1"></textarea>
+                                        <textarea class="form-control editor" name="option_c[]"></textarea>
                                     </div>
+
                                     <div class="form-group">
                                         <label>Option D</label>
-                                        <textarea class="form-control quill-editor5 ckeditor" name="option_d[]"
-                                            id="option_d_1"></textarea>
+                                        <textarea class="form-control editor" name="option_d[]"></textarea>
                                     </div>
-                                    <div class="form-group option-e-group" style="display: none;">
+
+                                    <div class="form-group option-e-group" style="display:none;">
                                         <label>Option E</label>
-                                        <textarea class="form-control quill-editor6 ckeditor" name="option_e[]"
-                                            id="option_e_1"></textarea>
+                                        <textarea class="form-control editor" name="option_e[]"></textarea>
                                     </div>
-                                    <div class="form-group solution-group" style="display: none;">
+
+                                    <div class="form-group solution-group" style="display:none;">
                                         <label>Solution</label>
-                                        <textarea class="form-control ckeditor" name="solution[]"
-                                            id="mcq_solution_1"></textarea>
+                                        <textarea class="form-control editor" name="solution[]"></textarea>
                                     </div>
+
                                 </div>
                                 <div class="col-md-6" id="subjective_question_form" style="display:none;">
-                                    <div class="question-count" class="form-group">
+
+                                    <div class="question-count form-group">
                                         <h4>Question 1</h4>
                                     </div>
+
                                     <div class="form-group">
                                         <label>Enter Question</label>
-                                        <textarea class="form-control ckeditor quesckeditor" name="question[]"></textarea>
+                                        <textarea class="form-control editor" name="question[]"></textarea>
                                     </div>
+
                                     <div class="form-group">
-                                        <label>Answer Type</label>
+                                        <label>Answer Format</label>
                                         <select class="form-control" name="answer_format[]">
-                                            <!-- <option value="">Select</option> -->
-                                            <option value="text input" selected>Text Input</option>
+                                            <option value="text" selected>Text</option>
                                             <option value="audio">Audio</option>
                                             <option value="video">Video</option>
                                             <option value="image">Image</option>
                                             <option value="document">Document</option>
                                         </select>
                                     </div>
-                                    <div class="form-group solution-group" style="display: none;">
+
+                                    <div class="form-group solution-group" style="display:none;">
                                         <label>Solution</label>
-                                        <textarea class="form-control ckeditor" name="solution[]"
-                                            id="subjective_solution_1"></textarea>
+                                        <textarea class="form-control editor" name="solution[]"></textarea>
                                     </div>
 
                                 </div>
@@ -210,10 +217,9 @@
 
                                     <h4 class="mb-3">Story / Passage</h4>
 
-                                    {{-- Main Passage --}}
                                     <div class="form-group">
                                         <label>Enter Story / Passage</label>
-                                        <textarea class="form-control ckeditor quesckeditor" name="question[]"></textarea>
+                                        <textarea class="form-control editor" name="question[]"></textarea>
                                     </div>
 
                                     <hr>
@@ -222,7 +228,6 @@
 
                                     <div id="story-sub-questions">
 
-                                        {{-- Sub Question Block --}}
                                         <div class="sub-question-block border p-3 mb-3">
 
                                             <div class="form-group">
@@ -235,8 +240,7 @@
 
                                             <div class="form-group">
                                                 <label>Question</label>
-                                                <textarea class="form-control quesckeditor"
-                                                    name="sub_question[]"></textarea>
+                                                <textarea class="form-control editor" name="sub_question[]"></textarea>
                                             </div>
 
                                             {{-- MCQ Fields --}}
@@ -244,57 +248,60 @@
 
                                                 <div class="form-group">
                                                     <label>Option A</label>
-                                                    <textarea class="form-control ckeditor" name="option_a[]"></textarea>
+                                                    <textarea class="form-control editor" name="option_a[]"></textarea>
                                                 </div>
 
                                                 <div class="form-group">
                                                     <label>Option B</label>
-                                                    <textarea class="form-control ckeditor" name="option_b[]"></textarea>
+                                                    <textarea class="form-control editor" name="option_b[]"></textarea>
                                                 </div>
 
                                                 <div class="form-group">
                                                     <label>Option C</label>
-                                                    <textarea class="form-control ckeditor" name="option_c[]"></textarea>
+                                                    <textarea class="form-control editor" name="option_c[]"></textarea>
                                                 </div>
 
                                                 <div class="form-group">
                                                     <label>Option D</label>
-                                                    <textarea class="form-control ckeditor" name="option_d[]"></textarea>
+                                                    <textarea class="form-control editor" name="option_d[]"></textarea>
+                                                </div>
+
+                                                <div class="form-group option-e-group" style="display:none;">
+                                                    <label>Option E</label>
+                                                    <textarea class="form-control editor" name="option_e[]"></textarea>
                                                 </div>
 
                                                 <div class="form-group">
                                                     <label>Correct Answer</label>
                                                     <select class="form-control" name="answer[]">
-                                                        <option value="A">Option A</option>
-                                                        <option value="B">Option B</option>
-                                                        <option value="C">Option C</option>
-                                                        <option value="D">Option D</option>
+                                                        <option value="A">A</option>
+                                                        <option value="B">B</option>
+                                                        <option value="C">C</option>
+                                                        <option value="D">D</option>
+                                                        <option value="E">E</option>
                                                     </select>
                                                 </div>
 
                                             </div>
 
-                                            {{-- Reasoning Fields --}}
+                                            {{-- Reasoning --}}
                                             <div class="reasoning-fields" style="display:none;">
-
                                                 <div class="form-group">
                                                     <label>Answer Format</label>
                                                     <select class="form-control" name="answer_format[]">
-                                                        <!-- <option value="">Select</option> -->
-                                                        <option value="text" selected>Text</option>
+                                                        <option value="text">Text</option>
                                                         <option value="audio">Audio</option>
                                                         <option value="video">Video</option>
                                                         <option value="image">Image</option>
                                                         <option value="document">Document</option>
                                                     </select>
                                                 </div>
-
                                             </div>
 
                                             {{-- Solution --}}
                                             <div class="form-group solution-group" style="display:none;">
                                                 <label>Solution</label>
-                                                <textarea class="form-control ckeditor" name="solution[]"></textarea>
+                                                <textarea class="form-control editor" name="solution[]"></textarea>
                                             </div>
 
                                             <div class="text-end">
@@ -311,10 +318,9 @@
                                     </button>
 
                                 </div>
-
                                 <div id="question-clone"></div>
                                 <div class="col-md-12 d-flex justify-content-end mt-2" id="add-more-btn-dv">
-                                    <button type="button" id="add-more" class="btn btn-secondary mb-3">Add More</button>
+                                    <button type="button" id="add-more" class="btn btn-secondary mb-3" style="display:none;">Add More</button>
                                 </div>
                             </div>
                             <hr>
@@ -325,10 +331,9 @@
             </div>
         </div>
     </div>
-  <script src="https://cdn.ckeditor.com/4.16.2/full/ckeditor.js"></script>
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
-        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
-        crossorigin="anonymous"></script>
+    <script src="https://cdn.ckeditor.com/4.16.2/full/ckeditor.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 
     <script>
         $(document).ready(function () {
@@ -472,298 +477,273 @@
     </script>
 
     <script>
-        /* =========================================================
-           GLOBAL HELPERS
-        ========================================================= */
+        document.addEventListener('DOMContentLoaded', function () {
 
-        function setFormInputsEnabled(section, isEnabled) {
-            if (!section) return;
-            section.querySelectorAll('input, select, textarea, button')
-                .forEach(el => el.disabled = !isEnabled);
-        }
+            /* =========================================================
+               CKEDITOR CORE (SAME AS EDIT PAGE)
+            ========================================================= */
 
-        function destroyEditorsIn(container) {
-            if (!container || typeof CKEDITOR === 'undefined') return;
-
-            container.querySelectorAll('textarea.ckeditor, textarea.quesckeditor')
-                .forEach(el => {
-                    if (el.id && CKEDITOR.instances[el.id]) {
-                        try {
-                            CKEDITOR.instances[el.id].updateElement();
-                            CKEDITOR.instances[el.id].destroy(true);
-                        } catch (e) { }
-                    }
-                    el.removeAttribute('style');
-                    el.removeAttribute('aria-hidden');
-                });
-
-            container.querySelectorAll('.cke').forEach(e => e.remove());
-        }
-
-        function initEditorsIn(container) {
-            if (!container || typeof CKEDITOR === 'undefined') return;
-
-            container.querySelectorAll('textarea').forEach(el => {
-
-                // 🔥 THIS IS THE KEY
-                if (!el.classList.contains('ckeditor') &&
-                    !el.classList.contains('quesckeditor')) {
-                    return;
-                }
+            function initEditor(el) {
 
                 if (!el.id) {
-                    el.id = 'ckeditor_' + Math.random().toString(36).substr(2, 9);
+                    el.id = 'ck_' + Math.random().toString(36).substr(2, 9);
                 }
 
-                if (!CKEDITOR.instances[el.id]) {
-                    CKEDITOR.replace(el.id, {
-                        filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
-                        filebrowserUploadMethod: 'form'
-                    });
+                if (CKEDITOR.instances[el.id]) {
+                    CKEDITOR.instances[el.id].destroy(true);
                 }
+
+                CKEDITOR.replace(el.id, {
+                    filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
+                    filebrowserUploadMethod: 'form',
+                    allowedContent: true
+                });
+            }
+
+            function initEditorsIn(container) {
+                if (!container) return;
+                container.querySelectorAll('textarea.editor').forEach(initEditor);
+            }
+
+            function destroyEditorsIn(container) {
+                if (!container) return;
+                container.querySelectorAll('textarea.editor').forEach(el => {
+                    if (el.id && CKEDITOR.instances[el.id]) {
+                        CKEDITOR.instances[el.id].destroy(true);
+                    }
+                });
+            }
+
+            function setFormInputsEnabled(section, isEnabled) {
+                if (!section) return;
+                section.querySelectorAll('input, select, textarea, button')
+                    .forEach(el => el.disabled = !isEnabled);
+            }
+
+            /* =========================================================
+               QUESTION TYPE SWITCH
+            ========================================================= */
+
+            document.getElementById('question-type').addEventListener('change', function () {
+
+                const mcq = document.getElementById('mcq_question_form');
+                const sub = document.getElementById('subjective_question_form');
+                const story = document.getElementById('story_question_form');
+                const addMore = document.getElementById('add-more');
+
+                [mcq, sub, story].forEach(section => {
+                    destroyEditorsIn(section);
+                    section.style.display = 'none';
+                    setFormInputsEnabled(section, false);
+                });
+
+                if (this.value === 'MCQ') {
+                    mcq.style.display = 'block';
+                    addMore.style.display = 'block';
+                    setFormInputsEnabled(mcq, true);
+                    initEditorsIn(mcq);
+                }
+
+                if (this.value === 'Subjective') {
+                    sub.style.display = 'block';
+                    addMore.style.display = 'block';
+                    setFormInputsEnabled(sub, true);
+                    initEditorsIn(sub);
+                }
+
+                if (this.value === 'Story Based') {
+                    story.style.display = 'block';
+                    addMore.style.display = 'none';
+                    setFormInputsEnabled(story, true);
+                    story.offsetHeight; // force reflow
+                    setTimeout(() => initEditorsIn(story), 100);
+                }
+
+                const chk = document.querySelector('.has-solution');
+                if (chk) toggleSolution(chk);
             });
-        }
 
-        /* =========================================================
-           TOGGLES
-        ========================================================= */
+            /* =========================================================
+               TOGGLES
+            ========================================================= */
 
-        function toggleInstruction(chk) {
-            chk.closest('.question-block')
-                .querySelector('.instruction-group').style.display = chk.checked ? 'block' : 'none';
-        }
+            window.toggleInstruction = function (checkbox) {
 
-        function toggleOptionE(chk) {
-            chk.closest('.question-block')
-                .querySelector('.option-e-group').style.display = chk.checked ? 'block' : 'none';
-        }
+                const form = checkbox.closest('form');
+                const group = form.querySelector('.instruction-group');
 
-        function toggleSolution(chk) {
-            const block = chk.closest('.question-block');
-            block.querySelectorAll('.solution-group').forEach(group => {
-                if (chk.checked) {
+                if (!group) return;
+
+                if (checkbox.checked) {
                     group.style.display = 'block';
                     initEditorsIn(group);
                 } else {
                     destroyEditorsIn(group);
                     group.style.display = 'none';
                 }
-            });
-        }
+            };
 
-        /* =========================================================
-           QUESTION TYPE SWITCH (SINGLE SOURCE OF TRUTH)
-        ========================================================= */
+            window.toggleOptionE = function (checkbox) {
 
-        document.getElementById('question-type').addEventListener('change', function () {
+                const form = checkbox.closest('form');
+                const groups = form.querySelectorAll('.option-e-group');
 
-            const mcq = document.getElementById('mcq_question_form');
-            const sub = document.getElementById('subjective_question_form');
-            const story = document.getElementById('story_question_form');
-            const addMore = document.getElementById('add-more-btn-dv');
+                groups.forEach(group => {
+                    if (checkbox.checked) {
+                        group.style.display = 'block';
+                        initEditorsIn(group);
+                    } else {
+                        destroyEditorsIn(group);
+                        group.style.display = 'none';
+                    }
+                });
+            };
 
-            // Destroy everything first
-            destroyEditorsIn(mcq);
-            destroyEditorsIn(sub);
+            window.toggleSolution = function (checkbox) {
 
-            mcq.style.display = 'none';
-            sub.style.display = 'none';
-            story.style.display = 'none';
+                const form = checkbox.closest('form');
+                const groups = form.querySelectorAll('.solution-group');
 
-            setFormInputsEnabled(mcq, false);
-            setFormInputsEnabled(sub, false);
-            setFormInputsEnabled(story, false);
+                groups.forEach(group => {
+                    if (checkbox.checked) {
+                        group.style.display = 'block';
+                        initEditorsIn(group);
+                    } else {
+                        destroyEditorsIn(group);
+                        group.style.display = 'none';
+                    }
+                });
+            };
 
-            /* ===============================
-               MCQ
-            =============================== */
-            if (this.value === 'MCQ') {
-                mcq.style.display = 'block';
-                addMore.style.display = 'block';
-                setFormInputsEnabled(mcq, true);
+            /* =========================================================
+               SUB QUESTION TYPE SWITCH
+            ========================================================= */
 
-                setTimeout(() => {
-                    initEditorsIn(mcq);
-                }, 0);
-            }
+            document.addEventListener('change', function (e) {
 
-            /* ===============================
-               SUBJECTIVE
-            =============================== */
-            if (this.value === 'Subjective') {
-                sub.style.display = 'block';
-                addMore.style.display = 'block';
-                setFormInputsEnabled(sub, true);
+                if (!e.target.classList.contains('sub-question-type')) return;
 
-                setTimeout(() => {
-                    initEditorsIn(sub);
-                }, 0);
-            }
+                const block = e.target.closest('.sub-question-block');
+                const isMcq = e.target.value === 'mcq';
 
-            /* ===============================
-               STORY BASED  ✅ FIX HERE
-            =============================== */
-            if (this.value === 'Story Based') {
-                story.style.display = 'block';
-                addMore.style.display = 'none';
-                setFormInputsEnabled(story, true);
+                block.querySelector('.mcq-fields').style.display = isMcq ? 'block' : 'none';
+                block.querySelector('.reasoning-fields').style.display = isMcq ? 'none' : 'block';
 
-                // 🔥 CRITICAL: force reflow so browser "sees" elements
-                story.offsetHeight;
+                setTimeout(() => initEditorsIn(block), 50);
 
-                // 🔥 INIT AFTER VISIBILITY
-                setTimeout(() => {
-                    initEditorsIn(story);
-                }, 100);
-            }
-
-
-
-            const chk = document.querySelector('.has-solution');
-            if (chk) toggleSolution(chk);
-        });
-
-        /* =========================================================
-           SUB QUESTION TYPE (MCQ / REASONING)
-        ========================================================= */
-
-        document.addEventListener('change', function (e) {
-            if (!e.target.classList.contains('sub-question-type')) return;
-
-            const block = e.target.closest('.sub-question-block');
-            const isMcq = e.target.value === 'mcq';
-
-            block.querySelector('.mcq-fields').style.display = isMcq ? 'block' : 'none';
-            block.querySelector('.reasoning-fields').style.display = isMcq ? 'none' : 'block';
-
-            // 🔥 IMPORTANT FIX
-            setTimeout(() => {
-                initEditorsIn(block);
-            }, 50);
-
-            const chk = block.closest('.question-block').querySelector('.has-solution');
-            if (chk) toggleSolution(chk);
-        });
-
-
-        /* =========================================================
-           ADD / REMOVE STORY SUB QUESTIONS
-        ========================================================= */
-
-        document.getElementById('add-sub-question').addEventListener('click', function () {
-            const container = document.getElementById('story-sub-questions');
-            const clone = container.children[0].cloneNode(true);
-
-            // 1️⃣ Reset values
-            clone.querySelectorAll('textarea, input').forEach(el => el.value = '');
-            clone.querySelectorAll('select').forEach(select => {
-                select.selectedIndex = 0; // default first option
+                const chk = document.querySelector('.has-solution');
+                if (chk) toggleSolution(chk);
             });
 
-            // 2️⃣ FORCE DEFAULT SUB QUESTION TYPE = MCQ
-            const typeSelect = clone.querySelector('.sub-question-type');
-            typeSelect.value = 'mcq';
+            /* =========================================================
+               ADD STORY SUB QUESTION
+            ========================================================= */
 
-            // 3️⃣ FORCE VISIBILITY
-            clone.querySelector('.mcq-fields').style.display = 'block';
-            clone.querySelector('.reasoning-fields').style.display = 'none';
+            document.getElementById('add-sub-question')?.addEventListener('click', function () {
 
-            // 4️⃣ CLEAN OLD CKEDITOR
-            clone.querySelectorAll('.cke').forEach(e => e.remove());
-            clone.querySelectorAll('textarea').forEach(t => t.removeAttribute('id'));
+                const container = document.getElementById('story-sub-questions');
+                const clone = container.children[0].cloneNode(true);
 
-            container.appendChild(clone);
+                clone.querySelectorAll('textarea, input').forEach(el => el.value = '');
+                clone.querySelectorAll('select').forEach(el => el.selectedIndex = 0);
 
-            // 5️⃣ INIT CKEDITOR AFTER DOM INSERT
-            setTimeout(() => {
-                initEditorsIn(clone);
-            }, 50);
-        });
+                clone.querySelectorAll('textarea.editor').forEach(el => {
+                    if (el.id && CKEDITOR.instances[el.id]) {
+                        CKEDITOR.instances[el.id].destroy(true);
+                    }
+                    el.removeAttribute('id');
+                });
 
+                container.appendChild(clone);
+                setTimeout(() => initEditorsIn(clone), 50);
+            });
 
-        document.addEventListener('click', function (e) {
-            if (e.target.classList.contains('remove-sub-question')) {
+            document.addEventListener('click', function (e) {
+
+                if (!e.target.classList.contains('remove-sub-question')) return;
+
                 const blocks = document.querySelectorAll('.sub-question-block');
-                if (blocks.length > 1) {
-                    destroyEditorsIn(e.target.closest('.sub-question-block'));
-                    e.target.closest('.sub-question-block').remove();
+                if (blocks.length <= 1) {
+                    alert('At least one sub question is required');
+                    return;
                 }
+
+                const block = e.target.closest('.sub-question-block');
+                destroyEditorsIn(block);
+                block.remove();
+            });
+
+            /* =========================================================
+               ADD MORE QUESTIONS (MULTI)
+            ========================================================= */
+
+            let questionIndex = 1;
+
+            document.getElementById('add-more')?.addEventListener('click', function () {
+
+                questionIndex++;
+
+                const qType = document.getElementById('question-type').value;
+
+                const source =
+                    qType === 'MCQ' ? document.getElementById('mcq_question_form') :
+                        qType === 'Subjective' ? document.getElementById('subjective_question_form') :
+                            document.getElementById('story_question_form');
+
+                const clone = source.cloneNode(true);
+                clone.classList.add('question-block');
+
+                /* 🔥 DO NOT DESTROY INSTANCES HERE */
+
+                // 1️⃣ Remove CKEditor wrapper inside clone only
+                clone.querySelectorAll('.cke').forEach(wrapper => wrapper.remove());
+
+                // 2️⃣ Remove duplicated IDs from clone
+                clone.querySelectorAll('textarea').forEach(el => {
+                    el.removeAttribute('id');
+                    el.value = '';
+                });
+
+                clone.querySelectorAll('input').forEach(el => el.value = '');
+
+                clone.querySelector('.question-count').innerHTML =
+                    `<h4 class="mt-4">Question ${questionIndex}</h4>`;
+
+                const removeBtn = document.createElement('button');
+                removeBtn.type = 'button';
+                removeBtn.className = 'btn btn-danger mt-2';
+                removeBtn.innerText = 'Remove Question';
+
+                removeBtn.addEventListener('click', function () {
+                    destroyEditorsIn(clone);
+                    clone.remove();
+                    updateQuestionNumbers();
+                });
+
+                clone.appendChild(removeBtn);
+                document.getElementById('question-clone').appendChild(clone);
+
+                // 3️⃣ Initialize fresh editors ONLY for clone
+                setTimeout(() => initEditorsIn(clone), 50);
+            });
+
+
+            function updateQuestionNumbers() {
+                const blocks = document.querySelectorAll(
+                    '#questions-container .question-block, #question-clone .question-block'
+                );
+
+                blocks.forEach((block, index) => {
+                    const count = block.querySelector('.question-count');
+                    if (count) {
+                        count.innerHTML = `<h4 class="mt-4">Question ${index + 1}</h4>`;
+                    }
+                });
+
+                questionIndex = blocks.length;
             }
+
         });
-
-        /* =========================================================
-           ADD MORE QUESTIONS
-        ========================================================= */
-
-        let questionIndex = 1;
-
-        document.getElementById('add-more').addEventListener('click', function () {
-            questionIndex++;
-
-            const qType = document.getElementById('question-type').value;
-            const source =
-                qType === 'MCQ' ? document.getElementById('mcq_question_form') :
-                    qType === 'Subjective' ? document.getElementById('subjective_question_form') :
-                        document.getElementById('story_question_form');
-
-            const clone = source.cloneNode(true);
-            clone.classList.add('question-block');
-
-            // Clear values
-            clone.querySelectorAll('textarea, input').forEach(el => el.value = '');
-            clone.querySelectorAll('.cke').forEach(e => e.remove());
-            clone.querySelectorAll('textarea').forEach(t => t.removeAttribute('id'));
-
-            // Update question count
-            clone.querySelector('.question-count').innerHTML =
-                `<h4 class="mt-4">Question ${questionIndex}</h4>`;
-
-            /* ---------- ADD REMOVE BUTTON ---------- */
-            const removeDiv = document.createElement('div');
-            removeDiv.className = 'col-md-12 d-flex justify-content-end mt-2';
-
-            const removeBtn = document.createElement('button');
-            removeBtn.type = 'button';
-            removeBtn.className = 'btn btn-danger remove-question';
-            removeBtn.innerText = 'Remove Question';
-
-            removeBtn.addEventListener('click', function () {
-                destroyEditorsIn(clone);
-                clone.remove();
-                updateQuestionNumbers();
-            });
-
-            removeDiv.appendChild(removeBtn);
-            clone.appendChild(removeDiv);
-            /* -------------------------------------- */
-
-            document.getElementById('question-clone').appendChild(clone);
-            initEditorsIn(clone);
-        });
-
-
-        /* =========================================================
-           RE-NUMBER QUESTIONS AFTER REMOVE
-        ========================================================= */
-
-        function updateQuestionNumbers() {
-            const blocks = document.querySelectorAll(
-                '#questions-container .question-block, #question-clone .question-block'
-            );
-
-            blocks.forEach((block, index) => {
-                const count = block.querySelector('.question-count');
-                if (count) {
-                    count.innerHTML = `<h4 class="mt-4">Question ${index + 1}</h4>`;
-                }
-            });
-
-            questionIndex = blocks.length;
-        }
-
-
-
     </script>
-
 
 @endsection

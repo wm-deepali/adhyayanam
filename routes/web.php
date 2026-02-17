@@ -132,6 +132,7 @@ Route::get('/daily-booster/detail/{id}', [FrontController::class, 'dailyBoostDet
 Route::get('user/test-planner', [FrontController::class, 'testPlannerIndex'])->name('test.planner.front');
 Route::get('user/test-planner/details/{id}', [FrontController::class, 'testPlannerDetails'])->name('test.planner.details');
 Route::get('user/study-material/details/{id}', [FrontController::class, 'studyMaterialDetails'])->name('study.material.details');
+Route::get('study-material/{id}/download', [ContentManagementController::class, 'downloadPdf'])->name('study.material.download');
 Route::get('user/study-material/{examid?}/{catid?}/{subcat?}', [FrontController::class, 'studyMaterialIndex'])->name('study.material.front');
 Route::post('user/study-material/filter', [FrontController::class, 'studyMaterialFilter'])->name('study.material.filter');
 Route::post('user/study-material/search', [FrontController::class, 'studyMaterialSearch'])->name('study.material.search');
@@ -452,7 +453,6 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
             Route::delete('/delete/{id}', [ContentManagementController::class, 'studyMaterialDelete'])->name('study.material.delete')->middleware('custom.permission:manage_study_material_delete');
             Route::get('/bulk-delete', [ContentManagementController::class, 'studyMaterialBulkDelete'])->name('study.material.bulk-delete')->middleware('custom.permission:manage_study_material_delete');
             Route::get('/show/{id}', [ContentManagementController::class, 'studyMaterialShow'])->name('study.material.show');
-            Route::get('/{id}/download', [ContentManagementController::class, 'downloadPdf'])->name('study.material.download');
         });
 
         // Daily Booster

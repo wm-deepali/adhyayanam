@@ -17,7 +17,7 @@ use App\Models\CourseTopic;
 use App\Models\CallBack;
 use App\Models\Career;
 use App\Models\Category;
-use App\Models\Chapter;
+use App\Models\Chapter;s
 use App\Models\PyqContent;
 use App\Models\ContactUs;
 use App\Models\Course;
@@ -500,18 +500,25 @@ class ContentManagementController extends Controller
         return view('content-management.add-faq');
     }
 
-    public function storeFaq(Request $request)
+     public function storeFaq(Request $request)
     {
-        $request->validate([
+        $data = $request->validate([
             'question' => 'required|string|max:500',
             'answer' => 'required|string',
             'type' => 'nullable|string',
         ]);
-        $data = $request->all();
+
+        // checkbox handling
+        $data['show_on_home'] = $request->has('show_on_home');
+
+        // creator
         $data['created_by'] = auth()->id();
+
         Faq::create($data);
 
-        return redirect()->route('cm.faq')->with('success', 'FAQ added successfully!');
+        return redirect()
+            ->route('cm.faq')
+            ->with('success', 'FAQ added successfully!');
     }
 
     // Edit method
@@ -524,17 +531,24 @@ class ContentManagementController extends Controller
     // Update method
     public function updateFaq(Request $request, $id)
     {
-        $request->validate([
+        $faq = Faq::findOrFail($id);
+
+        $data = $request->validate([
             'question' => 'required|string|max:500',
             'answer' => 'required|string',
             'type' => 'nullable|string',
         ]);
 
-        $faq = Faq::findOrFail($id);
-        $faq->update($request->all());
+        // checkbox handling
+        $data['show_on_home'] = $request->has('show_on_home');
 
-        return redirect()->route('cm.faq')->with('success', 'FAQ updated successfully!');
+        $faq->update($data);
+
+        return redirect()
+            ->route('cm.faq')
+            ->with('success', 'FAQ updated successfully!');
     }
+
 
     // Delete method
     public function destroyFaq($id)

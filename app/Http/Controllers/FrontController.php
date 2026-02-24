@@ -2,46 +2,97 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\BatchProgramme;
+use Validator;
+use App\Models\SEO;
+use App\Models\Faq;
+use App\Models\Page;
 use App\Models\Blog;
-use App\Models\Chapter;
-use App\Models\Syllabus;
 use App\Models\Test;
-use App\Models\CallBack;
-use App\Models\Category;
-use App\Models\TestSeries;
-use App\Models\UserMobiileVerification;
 use App\Models\User;
+use App\Models\Team;
+use App\Models\Topic;
+use App\Models\PopUp;
+use App\Models\Course;
 use App\Models\Career;
-use App\Models\StudyMaterialCategory;
+use App\Models\Subject;
+use App\Models\Chapter;
+use App\Models\CallBack;
+use App\Models\Syllabus;
 use App\Models\MainTopic;
 use App\Models\ContactUs;
-use App\Models\Course;
-use App\Models\CurrentAffair;
-use App\Models\DailyBooster;
+use App\Models\HomeSlider;
+use App\Models\TestSeries;
 use App\Models\PyqContent;
-use App\Models\DirectEnquiry;
-use App\Models\Faq;
-use App\Models\HeaderSetting;
-use App\Models\SubCategory;
-use App\Models\FeedTestimonial;
-use App\Models\Page;
-use App\Models\SEO;
-use App\Models\StudyMaterial;
-use App\Models\Subject;
 use App\Models\SocialMedia;
-use App\Models\Team;
+use App\Models\CurrentNews;
+use App\Models\NoticeBoard;
+use App\Models\HomeEnquiry;
 use App\Models\TestPlanner;
-use App\Models\Topic;
 use App\Models\CourseTopic;
+use App\Models\SubCategory;
 use App\Models\UpcomingExam;
+use App\Models\DailyBooster;
 use Illuminate\Http\Request;
-use Validator;
-use Illuminate\Support\Facades\Auth;
 use App\Helpers\LogActivity;
-
+use App\Models\DirectEnquiry;
+use App\Models\CurrentAffair;
+use App\Models\StudyMaterial;
+use App\Models\HeaderSetting;
+use App\Models\BatchProgramme;
+use App\Models\FeedTestimonial;
+use App\Models\InstituteFeature;
+use Illuminate\Support\Facades\Auth;
+use App\Models\StudyMaterialCategory;
+use App\Models\ExaminationCommission;
+use App\Models\UserMobiileVerification;
 class FrontController extends Controller
 {
+    public function index()
+    {
+        $data['commissions'] = ExaminationCommission::with('categories')->where('status', 1)->latest()->get();
+        $data['courses'] = Course::with('examinationCommission')->where('feature', 'on')->orderBy('created_at', 'DESC')->get();
+        $data['topics'] = Topic::with('currentAffair')->get();
+        $data['testSeries'] = TestSeries::with('commission')->get();
+        $data['dailyBoosts'] = DailyBooster::all();
+        $data['teams'] = Team::all();
+        $data['upcomingExams'] = UpcomingExam::with('exam_commission')->orderBy('created_at', 'DESC')->limit('5')->get();
+        $data['blogs'] = Blog::with('user')->get();
+        $data['testimonials'] = FeedTestimonial::where('type', 2)->where('status', 2)->orderBy('created_at', 'DESC')->limit(10)->get();
+        $data['notices'] = NoticeBoard::where('status', 1)->latest()->take(10)->get();
+        $data['current_news'] = CurrentNews::where('status', 1)->latest()->take(10)->get();
+        $data['features'] = InstituteFeature::where('status', 1)->get();
+        $data['sliders'] = HomeSlider::where('status', 1)->get();
+        $data['faqs'] = Faq::where('show_on_home', 1)->get();
+        $data['studyMaterial'] = StudyMaterial::with('commission')
+            ->where('status', 'Active')
+            ->get()
+            ->groupBy('commission_id');
+
+        // Check if the popup has been shown in this session
+        if (!session()->has('popup_shown')) {
+            $data['popup'] = PopUp::first();
+            session(['popup_shown' => true]);
+        } else {
+            $data['popup'] = null;
+        }
+
+        return view('front.user.index', $data);
+    }
+
+    public function noticeShow($id)
+    {
+        $notice = NoticeBoard::where('status', 1)->findOrFail($id);
+
+        return view('front.user.notice_detail', compact('notice'));
+    }
+
+    public function newsShow($id)
+    {
+        $news = CurrentNews::where('status', 1)->findOrFail($id);
+
+        return view('front.user.news_detail', compact('news'));
+    }
+
     public function aboutIndex()
     {
         $data['about'] = Page::first();
@@ -178,15 +229,51 @@ class FrontController extends Controller
         return redirect()->route('career')->with('success', 'Application submitted successfully!');
     }
 
-    public function courseIndex()
+    public function courseIndex(Request $request)
     {
-        $data['courses'] = Course::with('examinationCommission', 'category', 'subCategory')->get();
+        $search = $request->query('search');
+
+        $subjectQuery = Subject::with(['chapters']);
+        $data['subjects'] = $subjectQuery->get();
+        $chapterQuery = Chapter::with(['subject']);
+        $data['chapters'] = $chapterQuery->get();
+
+        $topicQuery = CourseTopic::with(['subject', 'chapter']);
+        $data['topics'] = $topicQuery->get();
+
+        $courseQuery = Course::with(['examinationCommission', 'category', 'subCategory']);
+
+        // ---- FILTERS BASED ON MULTIPLE IDs ----
+        if (!empty($subject_id)) {
+            $courseQuery->whereJsonContains('subject_id', (string) $subject_id);
+        }
+
+        if (!empty($chapter_id)) {
+            $courseQuery->whereJsonContains('chapter_id', (string) $chapter_id);
+        }
+
+        if (!empty($topic_id)) {
+            $courseQuery->whereJsonContains('topic_id', (string) $topic_id);
+        }
+
+        // ---- SAFE SEARCH ----
+        if ($search) {
+            $courseQuery->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orwhere('course_heading', 'like', "%{$search}%")
+                    ->orWhere('short_description', 'like', "%{$search}%");
+            });
+        }
+
+        $data['courses'] = $courseQuery->paginate(10)->withQueryString();
+
         return view('front.user.courses', $data);
     }
 
     public function courseDetails($id)
     {
         $data['course'] = Course::findOrFail($id);
+
         // dd($data['course']->toArray());
         return view('front.user.course-detail', $data);
     }
@@ -579,13 +666,18 @@ class FrontController extends Controller
         $validatedData = $request->validate([
             'type' => 'required|integer',
             'username' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255',
+            'designation' => 'required|string|max:100',
+            'email' => 'required|email|max:255',
             'number' => 'required|string|max:20',
             'message' => 'nullable|string',
+
+            // ⭐ rating required only for testimonial
+            'rating' => 'required_if:type,2|nullable|integer|min:1|max:5',
+
             'photo' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
 
-        // Handle the photo upload
+        // Upload photo
         if ($request->hasFile('photo')) {
             $file = $request->file('photo');
             $filename = time() . '_' . $file->getClientOriginalName();
@@ -593,9 +685,10 @@ class FrontController extends Controller
             $validatedData['photo'] = $filename;
         }
 
-        // Create a new Feedback instance and save the data
+        // save data
         FeedTestimonial::create($validatedData);
-        return redirect()->back()->with('success', 'Feedback & Testimonial submitted successfully!');
+
+        return back()->with('success', 'Feedback & Testimonial submitted successfully!');
     }
 
     public function batchesIndex()
@@ -612,6 +705,60 @@ class FrontController extends Controller
         $data['pyq_content'] = PyqContent::where('commission_id', $examid)->where('category_id', $catid)->where('sub_category_id', $subcat)->first();
         // dd($data['papers']->toArray());
         return view('front.pyq-papers', $data);
+    }
+
+    public function testseriesIndex(Request $request)
+    {
+
+        $search = $request->query('search');
+
+        $subjectQuery = Subject::with(['chapters']);
+        $data['subjects'] = $subjectQuery->get();
+        $chapterQuery = Chapter::with(['subject']);
+        $data['chapters'] = $chapterQuery->get();
+
+        $topicQuery = CourseTopic::with(['subject', 'chapter']);
+        $data['topics'] = $topicQuery->get();
+
+        // Base query (menu-level filters)
+        $query = TestSeries::with('testseries');
+
+        /* ================= SEARCH ================= */
+        if ($request->filled('search')) {
+            $query->where('title', 'like', '%' . $request->search . '%');
+            $data['search'] = $request->search;
+        }
+
+        /* ================= SUBJECT FILTER ================= */
+        if ($request->filled('subject_id')) {
+            $subjectId = (int) $request->subject_id;
+
+            $query->whereHas('testseries', function ($q) use ($subjectId) {
+                $q->whereJsonContains('subject_ids', $subjectId);
+            });
+        }
+
+        /* ================= CHAPTER FILTER ================= */
+        if ($request->filled('chapter_id')) {
+            $chapterId = (int) $request->chapter_id;
+
+            $query->whereHas('testseries', function ($q) use ($chapterId) {
+                $q->whereJsonContains('chapter_ids', $chapterId);
+            });
+        }
+
+        /* ================= TOPIC FILTER ================= */
+        if ($request->filled('topic_id')) {
+            $topicId = (int) $request->topic_id;
+
+            $query->whereHas('testseries', function ($q) use ($topicId) {
+                $q->whereJsonContains('topic_ids', $topicId);
+            });
+        }
+
+        $data['testPackages'] = $query->paginate(10)->withQueryString();
+
+        return view('front.test-series', $data);
     }
 
     public function testseries(Request $request, $examid, $catid, $subcat)
@@ -771,6 +918,40 @@ class FrontController extends Controller
         }
 
 
+    }
+
+    public function storeHomeEnquiry(Request $request)
+    {
+        $request->validate([
+            'full_name' => 'required|string|max:255',
+            'email_address' => 'nullable|email',
+            'mobile_number' => 'required|digits_between:8,15',
+            'message' => 'nullable|string',
+        ]);
+
+        // // Verify reCAPTCHA
+        // $response = Http::asForm()->post(
+        //     'https://www.google.com/recaptcha/api/siteverify',
+        //     [
+        //         'secret' => config('services.recaptcha.secret'),
+        //         'response' => $request->input('g-recaptcha-response'),
+        //         'remoteip' => $request->ip(),
+        //     ]
+        // );
+
+        // if (!data_get($response->json(), 'success')) {
+        //     return back()->withErrors(['captcha' => 'Captcha verification failed'])->withInput();
+        // }
+
+        HomeEnquiry::create([
+            'full_name' => $request->full_name,
+            'email_address' => $request->email_address,
+            'country_code' => $request->country_code,
+            'mobile_number' => $request->mobile_number,
+            'message' => $request->message,
+        ]);
+
+        return back()->with('success', 'Enquiry submitted successfully!');
     }
 
 

@@ -27,12 +27,21 @@
           <!-- ================= SIDEBAR ================= -->
           <div class="sidebar-column col-lg-3 col-md-8 col-sm-12">
 
-            <form method="GET" action="{{ route('test-series', [
-    request()->route('examid'),
-    request()->route('catid'),
-    request()->route('subcat')
-  ]) }}">
+            @php
+              $examId = request()->route('examid');
+              $catId = request()->route('catid');
+              $subcat = request()->route('subcat');
 
+              $routeName = ($examId && $catId && $subcat)
+                ? 'test-series'
+                : 'test-series-list';
+
+              $routeParams = ($routeName === 'test-series')
+                ? [$examId, $catId, $subcat]
+                : [];
+            @endphp
+
+            <form method="GET" action="{{ route($routeName, $routeParams) }}">
               <!-- 🔍 SEARCH -->
               <div class="sidebar-widget search-box">
                 <div class="widget-content">
@@ -86,13 +95,9 @@
                   <button class="btn btn-primary w-100">Apply Filters</button>
 
                   @if(request()->hasAny(['search', 'subject_id', 'chapter_id', 'topic_id']))
-                                  <a href="{{ route('test-series', [
-                      request()->route('examid'),
-                      request()->route('catid'),
-                      request()->route('subcat')
-                    ]) }}" class="btn btn-light w-100 mt-2">
-                                    Clear Filters
-                                  </a>
+                    <a href="{{ route($routeName, $routeParams) }}" class="btn btn-light w-100 mt-2">
+                      Clear Filters
+                    </a>
                   @endif
 
                 </div>
@@ -113,16 +118,16 @@
                 </div>
                 <!-- Right Box -->
                 <!--div class="right-box d-flex align-items-center">
-                    <div class="form-group">
-                      <select name="currency" class="">
-                        <option>Recently Added</option>
-                        <option>Added 01</option>
-                        <option>Added 02</option>
-                        <option>Added 03</option>
-                        <option>Added 04</option>
-                      </select>
-                    </div>
-                  </div-->
+                        <div class="form-group">
+                          <select name="currency" class="">
+                            <option>Recently Added</option>
+                            <option>Added 01</option>
+                            <option>Added 02</option>
+                            <option>Added 03</option>
+                            <option>Added 04</option>
+                          </select>
+                        </div>
+                      </div-->
               </div>
             </div>
             <!-- End Filter Box -->

@@ -67,6 +67,14 @@
                             @enderror
                         </div>
 
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="showOnHome" name="show_on_home" value="1">
+
+                            <label class="form-check-label" for="showOnHome">
+                                Also show this FAQ on Home Page
+                            </label>
+                        </div>
+
                         <button type="submit" class="btn btn-primary">
                             Save FAQ
                         </button>

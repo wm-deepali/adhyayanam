@@ -13,7 +13,13 @@ class Faq extends Model
         'question',
         'answer',
         'type',
-        'created_by'
+        'created_by',
+        'show_on_home'
+    ];
+
+    protected $cast =
+    [
+        'show_on_home' => 'boolean'
     ];
 
      public function creator()

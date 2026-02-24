@@ -19,9 +19,15 @@
                     </div>
 
                     {{-- BACK BUTTON --}}
-                    <a href="{{ url()->previous() }}" class="btn btn-secondary btn-sm">
-                        ← Back
-                    </a>
+                    <div class="d-flex gap-2">
+                        <a href="{{ route('feed.create') }}" class="btn btn-primary btn-sm">
+                            + Add Testimonial
+                        </a>
+
+                        <a href="{{ url()->previous() }}" class="btn btn-secondary btn-sm">
+                            ← Back
+                        </a>
+                    </div>
                 </div>
 
                 {{-- MESSAGES --}}
@@ -33,13 +39,11 @@
                         <thead>
                             <tr>
                                 <th>#</th>
-                                <th>Image</th>
-                                <th>Full Name</th>
-                                <th>Email</th>
-                                <th>Mobile</th>
+                                <th>User</th>
+                                <th>Rating</th>
                                 <th>Message</th>
                                 <th>Status</th>
-                                <th>Created At</th>
+                                <th>Created</th>
                                 <th width="12%">Actions</th>
                             </tr>
                         </thead>
@@ -50,16 +54,34 @@
                                     <td>{{ $loop->iteration }}</td>
 
                                     {{-- IMAGE --}}
-                                    <td>
-                                        <a href="{{ url('uploads/feed-photos/' . $feed->photo) }}" target="_blank">
-                                            <img src="{{ url('uploads/feed-photos/' . $feed->photo) }}" class="img-thumbnail"
-                                                style="max-width:70px;border-radius:8px;">
-                                        </a>
-                                    </td>
+                                  <td>
+    <div class="d-flex align-items-center gap-2">
 
-                                    <td>{{ $feed->username }}</td>
-                                    <td>{{ $feed->email }}</td>
-                                    <td>{{ $feed->number }}</td>
+        <img src="{{ url('uploads/feed-photos/'.$feed->photo) }}"
+             style="width:50px;height:50px;border-radius:50%;object-fit:cover;">
+
+        <div>
+            <strong>{{ $feed->username }}</strong><br>
+            <small class="text-muted">
+                {{ $feed->designation ?? 'Student' }}
+            </small>
+        </div>
+
+    </div>
+</td>
+
+                                    <td>
+                                        @if($feed->rating)
+                                            <span style="color:#FFC107;font-size:16px;">
+                                                {!! str_repeat('★', $feed->rating) !!}
+                                            </span>
+                                            <span class="text-muted">
+                                                {!! str_repeat('☆', 5 - $feed->rating) !!}
+                                            </span>
+                                        @else
+                                            <span class="text-muted">—</span>
+                                        @endif
+                                    </td>
                                     <td>{{ \Str::limit($feed->message, 40) }}</td>
 
                                     {{-- STATUS --}}

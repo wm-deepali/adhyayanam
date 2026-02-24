@@ -26,6 +26,46 @@ class FeedbackController extends Controller
         return view('enquiries.testimonial', compact('feeds'));
     }
 
+    public function create()
+    {
+        return view('enquiries.testimonial-create');
+    }
+
+    /**
+     * Store testimonial (admin)
+     */
+    public function store(Request $request)
+    {
+        $data = $request->validate([
+            'type' => 'required|integer',
+            'username' => 'required|string|max:255',
+            'designation' => 'nullable|string|max:100',
+            'email' => 'nullable|email|max:255',
+            'number' => 'nullable|string|max:20',
+            'message' => 'nullable|string',
+            'rating' => 'required|integer|min:1|max:5',
+            'photo' => 'required|image|mimes:jpeg,png,jpg,webp|max:2048',
+        ]);
+
+        // upload photo
+        if ($request->hasFile('photo')) {
+            $file = $request->file('photo');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('uploads/feed-photos'), $filename);
+            $data['photo'] = $filename;
+        }
+
+        // default values
+        $data['status'] = 1; // active
+        $data['designation'] = $data['designation'] ?? 'Student';
+
+        FeedTestimonial::create($data);
+
+        return redirect()
+            ->route('testimonials.index')
+            ->with('success', 'Testimonial added successfully');
+    }
+
     /* VIEW */
     public function show($id)
     {

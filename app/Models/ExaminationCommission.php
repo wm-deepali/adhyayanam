@@ -33,6 +33,11 @@ class ExaminationCommission extends Model
         return $this->hasMany(Course::class);
     }
 
+    public function subjects()
+    {
+        return $this->hasMany(Subject::class, 'exam_com_id');
+    }
+
     public function creator()
     {
         return $this->belongsTo(User::class, 'created_by');

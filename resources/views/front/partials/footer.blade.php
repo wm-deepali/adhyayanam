@@ -6,6 +6,48 @@
 #hiddenInput{
     margin-bottom:30px;
 }
+.wd-social-icons {
+	position: fixed;
+	top: 30%;
+	z-index: 98;
+	display: flex;
+	flex-direction: column;
+	transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1) 1s;
+	left: 0;
+}
+.wd-social-icons {
+	position: fixed;
+	top: 30%;
+	/* z-index: 390; */
+	/* display: flex; */
+	flex-direction: column;
+	/* transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1) 1s; */
+	/* right: 0; */
+	display: flex;
+	left: 0;
+}
+.wd-social-icons {
+	position: fixed;
+	top: 30%;
+	/* z-index: 390; */
+	/* display: flex; */
+	flex-direction: column;
+	/* transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1) 1s; */
+
+	display: flex;
+	left: 0;
+	
+
+	align-items: flex-end;
+}
+.main-footer .footer-bottom{
+    width:100% !important;
+    display:flex !important ;
+    justify-content:space-between !important;
+    padding:0px 50px !important;
+    align-items:center !important;
+    margin:auto !important;
+}
 </style>
 <footer class="main-footer">
 	<!--Waves end-->
@@ -92,18 +134,9 @@
 
 	<!-- Footer Bottom -->
 	<div class="footer-bottom">
-		<div class="auto-container">
-			<div class="row clearfix">
-				<!-- Column -->
-				<div class="column col-lg-6 col-md-12 col-sm-12">
-					<div class="copyright">Copyright© 2024 All Rights Reserved</div>
-				</div>
-				<!-- Column -->
-				<div class="column col-lg-6 col-md-12 col-sm-12">
-					<div class="text">Design and Developed by WebMingo</div>
-				</div>
-			</div>
-		</div>
+	    <div class="text m-0" style="margin:0px;">Design and Developed by WebMingo</div>
+		
+			<div class="copyright">Copyright© 2024 All Rights Reserved</div>
 	</div>
 
 </footer>
@@ -162,29 +195,35 @@ $socialMediaSettings = App\Models\SocialMedia::first();
 @endphp
 <div class="wd-social-icons wd-sticky-social ">
 	<a rel="noopener noreferrer nofollow" href="{{$socialMediaSettings->youtube}}" target="_blank" class=" wd-social-icon social-youtube" aria-label="Facebook social link">
+	    	<span class="wd-icon-name y">Youtube</span>
 						<span class="fa fa-youtube"></span>
-													<span class="wd-icon-name y">Youtube</span>
+												
 											</a>
 				
 									<a rel="noopener noreferrer nofollow" href="{{$socialMediaSettings->facebook}}" target="_blank" class=" wd-social-icon social-facebook" aria-label="Facebook social link">
-						<span class="fa fa-facebook"></span>
+						
 													<span class="wd-icon-name f">Facebook</span>
+													<span class="fa fa-facebook"></span>
 											</a>
 											<a rel="noopener noreferrer nofollow" href="{{$socialMediaSettings->instagram}}" target="_blank" class=" wd-social-icon social-instagram" aria-label="Facebook social link">
-						<span class="fa fa-instagram"></span>
+						
 													<span class="wd-icon-name i">Instagram</span>
+													<span class="fa fa-instagram"></span>
 											</a>
 												<a rel="noopener noreferrer nofollow" href="{{$socialMediaSettings->linkdin}}" target="_blank" class=" wd-social-icon social-linkedin" aria-label="Facebook social link">
-						<span class="fa fa-linkedin"></span>
+						
 													<span class="wd-icon-name l">LinkedIn</span>
+													<span class="fa fa-linkedin"></span>
 											</a>
 												<a rel="noopener noreferrer nofollow" href="{{$socialMediaSettings->twitter}}" target="_blank" class=" wd-social-icon social-twitter" aria-label="Facebook social link">
-						<span class="fa fa-twitter"></span>
+
 													<span class="wd-icon-name t">Twitter</span>
+																			<span class="fa fa-twitter"></span>
 											</a>
 												<a rel="noopener noreferrer nofollow" href="{{$socialMediaSettings->whatsapp}}" target="_blank" class=" wd-social-icon social-whatsapp" aria-label="Facebook social link">
-						<span class="fa fa-whatsapp"></span>
+						
 													<span class="wd-icon-name w">WhatsApp</span>
+													<span class="fa fa-whatsapp"></span>
 											</a>
 										
 			</div>

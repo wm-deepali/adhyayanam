@@ -1,18 +1,5 @@
 <?php
 
-use App\Models\Blog;
-use App\Models\Course;
-use App\Models\PopUp;
-use App\Models\Team;
-use App\Models\Banner;
-use App\Models\Topic;
-use App\Models\Feature;
-use App\Models\TestSeries;
-use App\Models\UpcomingExam;
-use App\Models\DailyBooster;
-use App\Models\FeedTestimonial;
-use App\Models\ProgrammeFeature;
-use App\Models\StudyMaterialCategory;
 use App\Http\Controllers\TestController;
 use App\Http\Controllers\VideoController;
 use App\Http\Controllers\PYQController;
@@ -38,6 +25,13 @@ use App\Http\Controllers\Admin\AdminHomeworkController;
 use \App\Http\Controllers\Teacher\TeacherHomeworkController;
 use App\Http\Controllers\CKEditorController;
 use App\Http\Controllers\FeedbackController;
+use App\Http\Controllers\CMS\HomeIntroController;
+use App\Http\Controllers\CMS\HomeSliderController;
+use App\Http\Controllers\CMS\CurrentNewsController;
+use App\Http\Controllers\CMS\NoticeBoardController;
+use App\Http\Controllers\CMS\InstituteFeatureController;
+use App\Http\Controllers\CMS\InstituteHighlightController;
+use App\Http\Controllers\CMS\HomeSectionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -58,36 +52,18 @@ Route::get('clear-cache', function () {
     return '<h1>Clear Config cleared</h1>';
 });
 
-Route::get('/', function () {
-    $data['courses'] = Course::with('examinationCommission', 'category', 'subCategory')->where('feature', 'on')->orderBy('created_at', 'DESC')->get();
-    $data['topics'] = Topic::with('currentAffair')->get();
-    $data['testSeries'] = TestSeries::all();
-    $data['dailyBoosts'] = DailyBooster::all();
-    $data['teams'] = Team::all();
-    $data['banners'] = Banner::all();
-    $data['studyCategories'] = StudyMaterialCategory::all();
-    $data['programmeFeautre'] = ProgrammeFeature::first();
-    $data['feature'] = Feature::first();
-    $data['upcomingExams'] = UpcomingExam::with('exam_commission')->orderBy('created_at', 'DESC')->limit('5')->get();
-    $data['blogs'] = Blog::with('user')->get();
-    $data['testimonials'] = FeedTestimonial::where('type', 2)->orderBy('created_at', 'DESC')->limit(10)->get();
+Route::get('/', [FrontController::class, 'index']);
 
-    // Check if the popup has been shown in this session
-    if (!session()->has('popup_shown')) {
-        $data['popup'] = PopUp::first();
-        session(['popup_shown' => true]);
-    } else {
-        $data['popup'] = null;
-    }
-
-    return view('front.user.index', $data);
-});
+Route::get('/notice/{id}', [FrontController::class, 'noticeShow'])->name('notice.show');
+Route::get('/news/{id}', [FrontController::class, 'newsShow'])->name('news.show');
+Route::post('/home-enquiry', [FrontController::class, 'storeHomeEnquiry'])->name('home.enquiry');
 
 Route::get('/about', function () {
     return view('about');
 });
 
 Route::get('pyq-papers/{examid}/{catid}/{subcat}', [FrontController::class, 'pyqPapers'])->name('pyq-papers');
+Route::get('test-series-list', [FrontController::class, 'testseriesIndex'])->name('test-series-list');
 Route::get('test-series/{examid}/{catid}/{subcat}', [FrontController::class, 'testseries'])->name('test-series');
 Route::get('test-series-detail/{slug}', [FrontController::class, 'testseriesDetail'])->name('test-series-detail');
 
@@ -335,6 +311,48 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
             Route::get('faq/edit/{id}', [ContentManagementController::class, 'editFaq'])->name('faq.edit')->middleware('custom.permission:manage_faq_edit');
             Route::put('faq/update/{id}', [ContentManagementController::class, 'updateFaq'])->name('faq.update')->middleware('custom.permission:manage_faq_edit');
             Route::delete('faq/destroy/{id}', [ContentManagementController::class, 'destroyFaq'])->name('faq.destroy')->middleware('custom.permission:manage_faq_delete');
+
+            Route::prefix('cms')->group(function () {
+
+                // Introduction Route
+                Route::get('home-introduction', [HomeIntroController::class, 'index'])->name('cm.home.intro');
+                Route::post('home-introduction', [HomeIntroController::class, 'update'])->name('cm.home.intro.update');
+
+                // Sliders Route
+                Route::get('home-sliders', [HomeSliderController::class, 'index'])->name('cm.home.slider');
+                Route::post('home-sliders', [HomeSliderController::class, 'store'])->name('cm.home.slider.store');
+                Route::post('home-sliders/{id}', [HomeSliderController::class, 'update'])->name('cm.home.slider.update');
+                Route::delete('home-sliders/{id}', [HomeSliderController::class, 'destroy'])->name('cm.home.slider.delete');
+
+                // Current News Route
+                Route::get('current-news', [CurrentNewsController::class, 'index'])->name('cm.current.news');
+                Route::get('current-news/create', [CurrentNewsController::class, 'create'])->name('cm.current.news.create');
+                Route::post('current-news', [CurrentNewsController::class, 'store'])->name('cm.current.news.store');
+                Route::get('current-news/{id}/edit', [CurrentNewsController::class, 'edit'])->name('cm.current.news.edit');
+                Route::put('current-news/{id}', [CurrentNewsController::class, 'update'])->name('cm.current.news.update');
+                Route::delete('current-news/{id}', [CurrentNewsController::class, 'destroy'])->name('cm.current.news.delete');
+
+                // Notice Board Route
+                Route::get('notice-board', [NoticeBoardController::class, 'index'])->name('cm.notice.board');
+                Route::get('notice-board/create', [NoticeBoardController::class, 'create'])->name('cm.notice.board.create');
+                Route::post('notice-board', [NoticeBoardController::class, 'store'])->name('cm.notice.board.store');
+                Route::get('notice-board/{id}/edit', [NoticeBoardController::class, 'edit'])->name('cm.notice.board.edit');
+                Route::put('notice-board/{id}', [NoticeBoardController::class, 'update'])->name('cm.notice.board.update');
+                Route::delete('notice-board/{id}', [NoticeBoardController::class, 'destroy'])->name('cm.notice.board.delete');
+
+                // Institute Features
+                Route::get('institute-features', [InstituteFeatureController::class, 'index'])->name('cm.institute.features');
+                Route::post('institute-features/store', [InstituteFeatureController::class, 'store'])->name('cm.institute.features.store');
+                Route::post('institute-features/update/{id}', [InstituteFeatureController::class, 'update']);
+                Route::delete('institute-features/{id}', [InstituteFeatureController::class, 'destroy'])->name('cm.institute.features.delete');
+
+                Route::get('institute-highlights', [InstituteHighlightController::class, 'index'])->name('cm.institute.highlights');
+                Route::post('institute-highlights', [InstituteHighlightController::class, 'update']);
+
+                Route::get('/cm/home-sections', [HomeSectionController::class, 'index'])->name('cm.home.sections');
+                Route::post('/cm/home-sections', [HomeSectionController::class, 'update'])->name('cm.home.sections.update');
+
+            });
         });
 
         // examination commission route
@@ -441,7 +459,8 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
             Route::delete('/delete/{id}', [FeedbackController::class, 'delete'])->name('feed.delete')->middleware('custom.permission:manage_feedback_delete');
         });
         Route::get('testimonials', [FeedbackController::class, 'testimonialsIndex'])->name('testimonials.index')->middleware('custom.permission:manage_testimonials');
-
+        Route::get('/testimonials/create', [FeedbackController::class, 'create'])->name('feed.create');
+        Route::post('/testimonials/store', [FeedbackController::class, 'store'])->name('feed.store');
 
         // ---------------- STUDY MATERIAL ----------------
         Route::prefix('study-material')->group(function () {
@@ -689,7 +708,7 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
         Route::get('students/student-study-material-detail/{studentId}/{materialId}', [StudentController::class, 'studentStudyMaterialDetail'])->name('students.student-study-material-detail');
         // ALL VIDEOS SUMMARY
         Route::get('students/student-videos-list', [StudentController::class, 'videoSummary'])->name('students.student-videos-list')->middleware('custom.permission:manage_student_videos');
-        Route::get('students/student-video-detail/{videoId}',[StudentController::class, 'videoDetail'])->name('students.student-video-detail')->middleware('custom.permission:manage_student_videos');
+        Route::get('students/student-video-detail/{videoId}', [StudentController::class, 'videoDetail'])->name('students.student-video-detail')->middleware('custom.permission:manage_student_videos');
 
         // Batches & Programme
         Route::prefix('batches-and-programme')->name('batches-programme.')->group(function () {

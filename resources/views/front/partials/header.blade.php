@@ -23,7 +23,7 @@
     display: none;
     position: fixed;
     left: 0;
-    top:107px !important;
+    top: var(--header-height, 107px);   /* fallback 107px */
     width: 100vw;
     background: #fff;
     z-index: 1000;
@@ -116,6 +116,16 @@
 .mega-menu-panel.active {
     opacity: 1;
 }
+.main-header .main-menu .navigation > li {
+  position: relative;
+  float: left;
+  transition: all 500ms ease;
+  -moz-transition: all 500ms ease;
+  -webkit-transition: all 500ms ease;
+  -ms-transition: all 500ms ease;
+  -o-transition: all 500ms ease;
+  margin-right: 25px;
+}
 </style>
 <link href="{{url('assets/css/bootstrap.css')}}" rel="stylesheet">
 <link href="{{url('assets/css/style.css')}}" rel="stylesheet">
@@ -134,7 +144,11 @@
 <!-- Responsive -->
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-
+<style>
+    .container{
+        max-width:100%;
+    }
+</style>
 
 <!-- Main Header -->
 <header class="main-header">
@@ -438,15 +452,16 @@
 
 
     <!-- Sticky Header -->
-    <div class="sticky-header">
+    <div class="sticky-header" style="padding:0px 30px;">
         <div class="container d-flex justify-content-between align-items-center flex-wrap">
             <div class="logo">
-                <a href="{{url('/')}}" title=""><img src="{{url('images/Neti-logo.png')}}" style="width:150px;" alt="Adhyayanam Logo" title=""></a>
+                <a href="{{url('/')}}" title=""><img src="{{url('images/Neti-logo.png')}}" style="width:120px;" alt="Adhyayanam Logo" title=""></a>
             </div>
             <nav class="main-menu"></nav>
             <div class="mobile-nav-toggler"><span class="icon flaticon-menu"></span></div>
         </div>
-    </div><!-- End Sticky Menu -->
+    </div>
+    <!-- End Sticky Menu -->
 
 
     <!-- Mobile Menu -->
@@ -463,25 +478,7 @@
 
 
 <!-- Bottom header -->
-@php
-    $marquees = App\Models\Marquee::all();
-@endphp
-<div class="bottom-header">
-    <div class="container">
-        <div class="maq-container">
-            <div class="latest-head">
-                <span>LATEST NEWS :</span>
-            </div>
-            <div class="marq-info">
-                <marquee class="mar" width="90%" direction="left" onmouseover="this.stop();" onmouseout="this.start();">
-                    @foreach($marquees as $key=>$data)
-                    <a style="text-decoration:none;color:white;" href="{{$data->link}}">{{$data->title}},</a>
-                    @endforeach
-                </marquee>
-            </div>
-        </div>
-    </div>
-</div>
+
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
@@ -560,5 +557,31 @@ document.addEventListener('DOMContentLoaded', function () {
     // Initialize mega menus for both main header and sticky header
     initMegaMenu('.header-lower');
     initMegaMenu('.sticky-header');
+});
+</script>
+<script>
+    // Dynamically update mega menu top position
+function updateMegaMenuPosition() {
+    const header = document.querySelector('.header-lower, .sticky-header');
+    if (!header) return;
+
+    const headerHeight = header.offsetHeight;
+    document.documentElement.style.setProperty('--header-height', `${headerHeight}px`);
+}
+
+// Run initially
+updateMegaMenuPosition();
+
+// Run on resize (header height may change)
+window.addEventListener('resize', updateMegaMenuPosition);
+
+// Run when sticky header activates (most themes add/remove class)
+const observer = new MutationObserver(updateMegaMenuPosition);
+observer.observe(document.body, { attributes: true, subtree: true });
+
+// Also trigger on scroll (sticky usually changes on scroll)
+window.addEventListener('scroll', () => {
+    // Debounce if needed, but simple version:
+    requestAnimationFrame(updateMegaMenuPosition);
 });
 </script>

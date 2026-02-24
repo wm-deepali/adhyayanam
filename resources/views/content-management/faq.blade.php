@@ -77,6 +77,10 @@
                                         <span class="badge bg-info text-dark">
                                             {{ ucfirst(str_replace('_', ' ', $faq->type ?? 'general')) }}
                                         </span>
+
+                                        @if($faq->show_on_home)
+                                            <span class="badge bg-success ms-1">Home</span>
+                                        @endif
                                     </td>
                                     <td>
                                         {{ $faq->creator ? $faq->creator->name : 'Super Admin' }}

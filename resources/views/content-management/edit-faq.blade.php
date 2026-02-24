@@ -53,18 +53,36 @@ Edit FAQ
                         @endif
                     </div>
             
-                    <div class="mb-3">
-                        <label for="type" class="form-label">Type</label>
-                        <input
-                               type="text" 
-                               class="form-control" 
-                               name="type" 
-                               placeholder="Type"
-                               value="{{ old('type', $faq->type) }}">
-                        @if ($errors->has('type'))
-                            <span class="text-danger text-left">{{ $errors->first('type') }}</span>
-                        @endif
-                    </div>
+                   <div class="mb-3">
+    <label class="form-label">FAQ Related To</label>
+
+    <select class="form-control" name="type">
+        <option value="">Select Category</option>
+        <option value="course" {{ old('type',$faq->type)=='course' ? 'selected' : '' }}>Course</option>
+        <option value="test_series" {{ old('type',$faq->type)=='test_series' ? 'selected' : '' }}>Test Series</option>
+        <option value="study_material" {{ old('type',$faq->type)=='study_material' ? 'selected' : '' }}>Study Material</option>
+        <option value="batches" {{ old('type',$faq->type)=='batches' ? 'selected' : '' }}>Batches</option>
+        <option value="online_programme" {{ old('type',$faq->type)=='online_programme' ? 'selected' : '' }}>Online Programme</option>
+        <option value="general" {{ old('type',$faq->type)=='general' ? 'selected' : '' }}>General</option>
+    </select>
+
+    <small class="text-muted">
+        This FAQ will be shown under the selected section.
+    </small>
+</div>
+
+                    <div class="mb-3 form-check">
+    <input type="checkbox"
+           class="form-check-input"
+           id="showOnHome"
+           name="show_on_home"
+           value="1"
+           {{ old('show_on_home', $faq->show_on_home) ? 'checked' : '' }}>
+
+    <label class="form-check-label" for="showOnHome">
+        Also show this FAQ on Home Page
+    </label>
+</div>
             
                     <button type="submit" class="btn btn-primary">Update FAQ</button>
                     <a href="{{ route('cm.faq') }}" class="btn btn-secondary">Cancel</a>

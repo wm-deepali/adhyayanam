@@ -13,7 +13,9 @@ class FeedTestimonial extends Model
 
     protected $fillable = [
         'type',
+        'rating',
         'username',
+        'designation',
         'email',
         'number',
         'message',

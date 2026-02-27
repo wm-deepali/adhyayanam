@@ -17,7 +17,7 @@ use App\Models\CourseTopic;
 use App\Models\CallBack;
 use App\Models\Career;
 use App\Models\Category;
-use App\Models\Chapter;s
+use App\Models\Chapter;
 use App\Models\PyqContent;
 use App\Models\ContactUs;
 use App\Models\Course;

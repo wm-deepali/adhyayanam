@@ -19,7 +19,9 @@
             <tr id="row-{{ $data->id }}">
                 <th scope="row">{{ $loop->iteration }}</th>
                 <td>{{ $data->created_at }}</td>
-                <td>{!! $data->question !!}</td>
+                <td>{{ Helper::limitTextChars(strip_tags($data->question), 80) }}
+                    <br /><span class="badge badge-success">{{$data->question_type ?? ""}}</span>
+                </td>
                 <td>{{ $data->topics->name ?? "_" }}</td>
                 <td>{{ $data->subject->name ?? "-" }}</td>
                 <td>{{ $data->instruction }}</td>

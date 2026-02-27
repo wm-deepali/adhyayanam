@@ -1854,7 +1854,7 @@
 				@endphp
 				<!-- LEFT COL (4) -->
 				<div class="intro-left-card">
-					@if($intro->image)
+					@if(isset($intro->image))
 						<img src="{{ asset('storage/' . $intro->image) }}" alt="Intro Image">
 					@endif
 				</div>
@@ -1866,7 +1866,7 @@
 					<div class="right-content">
 						<h3>{{ $intro->heading }}</h3>
 
-						<p class="text">{!! $intro->description !!}</p>
+						<p class="text">{!!  $intro->description !!}</p>
 
 						<div class="cta-btn-group1">
 							<a href="#" class="cta-btn1 buyer">Get Started</a>
@@ -1878,13 +1878,13 @@
 					<!-- INNER RIGHT (BULLET POINTS) -->
 					<div class="right-points">
 						<ul class="bullet-points">
-
-							@foreach($intro->highlights as $point)
-								<li class="point-card">
-									{{ $point->text }}
-								</li>
-							@endforeach
-
+							@if(isset($intro->highlights))
+								@foreach($intro->highlights as $point)
+									<li class="point-card">
+										{{ $point->text }}
+									</li>
+								@endforeach
+							@endif
 						</ul>
 					</div>
 				</div>
@@ -1950,10 +1950,10 @@
 
 										<a href="{{ route('courses.detail', $course->id) }}" class="edu-btn edu-btn-outline"
 											style="width: 100%;
-																																																																																																											display: flex;
-																																																																																																											justify-content: center;
-																																																																																																											text-align: center;
-																																																																																																										">
+																																																																																																													display: flex;
+																																																																																																													justify-content: center;
+																																																																																																													text-align: center;
+																																																																																																												">
 											View Details
 											<span class="arrow-icon flaticon-arrow-pointing-to-right"></span>
 										</a>
@@ -2206,9 +2206,9 @@
 									<div
 										class="newtestseries-test-count d-flex justify-content-between align-items-center mb-2 ">
 										<span class="newtestseries-count-left fw-medium text-primary">
-											{{ $data->total_chapter + $data->total_affairs + $data->total_subjects + $data->free_tests }}
-											Test
-											<span class="newtestseries-free text-success ms-1">| {{ $data->free_tests }}
+											{{ count($data->testseries)}} Test
+											<span class="newtestseries-free text-success ms-1">| @if($data->fee_type == 'paid')
+											Premium @else Free @endif
 												Free</span>
 										</span>
 										<span class="newtestseries-count-right small text-muted">
@@ -2221,16 +2221,16 @@
 										<div
 											class="newtestseries-feature-row d-flex justify-content-between py-2 border-bottom">
 											<span class="newtestseries-label">Chapter Test</span>
-											<span class="newtestseries-value fw-medium">{{ $data->total_chapter }} 12</span>
+											<span class="newtestseries-value fw-medium">{{$data->testseries->where('type_name', 'Chapter Test')->count()}}</span>
 										</div>
 										<div
 											class="newtestseries-feature-row d-flex justify-content-between py-2 border-bottom">
 											<span class="newtestseries-label">Current Affairs</span>
-											<span class="newtestseries-value fw-medium">{{ $data->total_affairs }} 28</span>
+											<span class="newtestseries-value fw-medium">{{$data->testseries->where('type_name', 'Current Affairs')->count()}}</span>
 										</div>
 										<div class="newtestseries-feature-row d-flex justify-content-between py-2">
 											<span class="newtestseries-label">Subject Test</span>
-											<span class="newtestseries-value fw-medium">{{ $data->total_subjects }} 06</span>
+											<span class="newtestseries-value fw-medium">{{$data->testseries->where('type_name', 'Subject Wise')->count()}}</span>
 										</div>
 									</div>
 
@@ -2250,7 +2250,8 @@
 
 				<!-- View All Button -->
 				<div class="text-center mt-5">
-					<a href="{{ route('test-series-list') }}" class="newtestseries-all-btn btn btn-outline-primary btn-lg px-5 py-3 rounded-pill">
+					<a href="{{ route('test-series-list') }}"
+						class="newtestseries-all-btn btn btn-outline-primary btn-lg px-5 py-3 rounded-pill">
 						View All Test Series
 					</a>
 				</div>
@@ -2593,101 +2594,106 @@
 		<!-- End Testimonial Section -->
 
 		<!-- start institute highlight Section -->
-		<section class="newprog-section py-5 bg-white">
-			<div class="auto-container">
-				<div class="row g-5 align-items-center">
-					@php
-						$institute_highlight = App\Models\InstituteHighlight::with('points')->first();
-					@endphp
-					<!-- Left: Image Column with White Frame -->
-					<div class="col-lg-6 col-md-12">
-						<div class="newprog-image-wrapper text-center text-lg-start">
-							<div
-								class="newprog-image-frame rounded-4 overflow-hidden shadow-lg bg-white p-3 border border-light">
-								<img src="{{ asset('storage/' . $institute_highlight->image) }}"
-									alt="{{ $institute_highlight->title }}" class="img-fluid rounded-3 w-100"
-									style="min-height: 380px; object-fit: cover;" />
+		@php
+			$institute_highlight = App\Models\InstituteHighlight::with('points')->first();
+		@endphp
+
+		@if($institute_highlight)
+			<section class="newprog-section py-5 bg-white">
+				<div class="auto-container">
+					<div class="row g-5 align-items-center">
+
+						<!-- Left: Image Column -->
+						<div class="col-lg-6 col-md-12">
+							<div class="newprog-image-wrapper text-center text-lg-start">
+								<div
+									class="newprog-image-frame rounded-4 overflow-hidden shadow-lg bg-white p-3 border border-light">
+									<img src="{{ $institute_highlight->image
+				? asset('storage/' . $institute_highlight->image)
+				: asset('images/default.jpg') }}" alt="{{ $institute_highlight->title }}"
+										class="img-fluid rounded-3 w-100" style="min-height: 380px; object-fit: cover;" />
+								</div>
 							</div>
 						</div>
-					</div>
 
-					<!-- Right: Content Column -->
-					<div class="col-lg-6 col-md-12">
-						<div class="newprog-content">
-							<!-- Small subtitle -->
-							<div class="newprog-subtitle text-primary fw-medium mb-2">
-								{{ $institute_highlight->sub_title }}
-							</div>
+						<!-- Right: Content Column -->
+						<div class="col-lg-6 col-md-12">
+							<div class="newprog-content">
 
-							<!-- Main Title -->
-							<h2 class="newprog-title fw-bold mb-4">
-								{{ $institute_highlight->main_heading }}
-							</h2>
+								<div class="newprog-subtitle text-primary fw-medium mb-2">
+									{{ $institute_highlight->sub_title }}
+								</div>
 
-							<!-- Short Description -->
-							<p class="newprog-description text-muted mb-4 lh-lg">
-								{!! $institute_highlight->short_description !!}
-							</p>
+								<h2 class="newprog-title fw-bold mb-4">
+									{{ $institute_highlight->main_heading }}
+								</h2>
 
-							<!-- Bold Feature Text -->
-							@if($institute_highlight->sub_sub_title)
-								<p class="newprog-feature fw-bold text-dark mb-4">
-									<strong>{{ $institute_highlight->sub_sub_title }}</strong>
+								<p class="newprog-description text-muted mb-4 lh-lg">
+									{!! $institute_highlight->short_description !!}
 								</p>
-							@endif
 
-							<!-- Numbered Button Cards (no icon, only number) -->
-							<div class="row g-3 mb-5">
-								@php
-									$bgColors = ['#e6f0ff', '#eaffea', '#f3e6ff', '#fff3e6', '#e6fff9'];
-									$circleColors = ['bg-success', 'bg-warning', 'bg-info', 'bg-primary', 'bg-danger'];
-								@endphp
-								@foreach($institute_highlight->points as $index => $point)
+								@if($institute_highlight->sub_sub_title)
+									<p class="newprog-feature fw-bold text-dark mb-4">
+										<strong>{{ $institute_highlight->sub_sub_title }}</strong>
+									</p>
+								@endif
 
-									<div class="col-md-12">
-										<div class="newprog-number-card rounded-3 p-3 text-center hover-lift shadow-sm"
-											style="background: {{ $bgColors[$index % count($bgColors)] }};">
+								<div class="row g-3 mb-5">
+									@php
+										$bgColors = ['#e6f0ff', '#eaffea', '#f3e6ff', '#fff3e6', '#e6fff9'];
+										$circleColors = ['bg-success', 'bg-warning', 'bg-info', 'bg-primary', 'bg-danger'];
+									@endphp
 
-											<div class="newprog-number-circle {{ $circleColors[$index % count($circleColors)] }} text-white
-																																																																																													rounded-circle d-flex align-items-center justify-content-center"
-												style="width:40px;height:40px;font-size:1.2rem;font-weight:bold;">
-												{{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}
+									@if($institute_highlight->points && $institute_highlight->points->count())
+										@foreach($institute_highlight->points as $index => $point)
+
+											<div class="col-md-12">
+												<div class="newprog-number-card rounded-3 p-3 text-center hover-lift shadow-sm"
+													style="background: {{ $bgColors[$index % count($bgColors)] }};">
+
+													<div class="newprog-number-circle {{ $circleColors[$index % count($circleColors)] }} text-white
+															rounded-circle d-flex align-items-center justify-content-center"
+														style="width:40px;height:40px;font-size:1.2rem;font-weight:bold;">
+														{{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}
+													</div>
+
+													<p class="mb-0 fw-medium text-dark fs-5">
+														{{ $point->comment }}
+													</p>
+												</div>
 											</div>
 
-											<p class="mb-0 fw-medium text-dark fs-5">
-												{{ $point->comment }}
-											</p>
-										</div>
-									</div>
+										@endforeach
+									@endif
 
-								@endforeach
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- CTA -->
+					<div class="newprog-cta-box mt-2">
+						<div class="newprog-cta-wrapper rounded-4 overflow-hidden shadow-lg">
+							<div class="d-flex align-items-center justify-content-between px-5 py-4 flex-wrap gap-4">
+
+								<h4 class="fw-bold text-black mb-0 lh-base" style="font-size: 1.6rem;">
+									Let's find the perfect service for your goals
+								</h4>
+
+								<a href="#"
+									class="newprog-cta-pill btn rounded-pill px-5 py-3 fw-medium d-flex align-items-center gap-2 shadow"
+									style="background: linear-gradient(90deg, #10b981, #34d399); color: white; border: none;">
+									Book Your Free Consultation
+									<i class="bi bi-arrow-right fs-5"></i>
+								</a>
 
 							</div>
 						</div>
 					</div>
-				</div>
-				<!-- Full-width CTA Button (replaces your previous Explore Now button) -->
-				<div class="newprog-cta-box mt-2">
-					<div class="newprog-cta-wrapper rounded-4 overflow-hidden shadow-lg" style="">
 
-						<div class="d-flex align-items-center justify-content-between px-5 py-4 flex-wrap gap-4">
-							<!-- Left: Main Text -->
-							<h4 class="fw-bold text-black mb-0 lh-base" style="font-size: 1.6rem;">
-								Let's find the perfect service for your goals
-							</h4>
-
-							<!-- Right: Pill Button -->
-							<a href="#"
-								class="newprog-cta-pill btn rounded-pill px-5 py-3 fw-medium d-flex align-items-center gap-2 shadow"
-								style="background: linear-gradient(90deg, #10b981, #34d399); color: white; border: none;">
-								Book Your Free Consultation
-								<i class="bi bi-arrow-right fs-5"></i>
-							</a>
-						</div>
-					</div>
 				</div>
-			</div>
-		</section>
+			</section>
+		@endif
 		<!-- End institute highlight Section -->
 
 		<!-- start blog Section -->
@@ -2974,23 +2980,37 @@
 				const section = wrapper.closest('section');
 				const cards = section.querySelectorAll('[data-commission]');
 
+				function showLimitedCards(commission) {
+					let count = 0;
+
+					cards.forEach(card => {
+
+						const matches =
+							commission === 'all' ||
+							card.dataset.commission === commission;
+
+						if (matches && count < 8) {
+							card.style.display = "";
+							count++;
+						} else {
+							card.style.display = "none";
+						}
+
+					});
+				}
+
+				// 🔹 default load (show first 8 of ALL)
+				showLimitedCards('all');
+
 				tabs.forEach(tab => {
 					tab.addEventListener('click', () => {
 
-						// active tab styling
 						tabs.forEach(t => t.classList.remove('active'));
 						tab.classList.add('active');
 
 						const commission = tab.dataset.tab;
 
-						cards.forEach(card => {
-							if (commission === 'all' || card.dataset.commission === commission) {
-								card.style.display = "";
-							} else {
-								card.style.display = "none";
-							}
-						});
-
+						showLimitedCards(commission);
 					});
 				});
 

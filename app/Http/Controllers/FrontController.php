@@ -49,7 +49,7 @@ class FrontController extends Controller
 {
     public function index()
     {
-        $data['commissions'] = ExaminationCommission::with('categories')->where('status', 1)->latest()->get();
+        $data['commissions'] = ExaminationCommission::with('categories')->where('status', 1)->get();
         $data['courses'] = Course::with('examinationCommission')->where('feature', 'on')->orderBy('created_at', 'DESC')->get();
         $data['topics'] = Topic::with('currentAffair')->get();
         $data['testSeries'] = TestSeries::with('commission')->get();
@@ -671,7 +671,7 @@ class FrontController extends Controller
             'number' => 'required|string|max:20',
             'message' => 'nullable|string',
 
-            // ⭐ rating required only for testimonial
+            // тнР rating required only for testimonial
             'rating' => 'required_if:type,2|nullable|integer|min:1|max:5',
 
             'photo' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',

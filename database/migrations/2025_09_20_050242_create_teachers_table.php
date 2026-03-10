@@ -12,8 +12,8 @@ return new class extends Migration {
 
             // 🔹 Personal Profile
             $table->string('full_name');
-            $table->string('email')->unique();
-            $table->string('mobile_number')->unique();
+            $table->string('email',191)->unique();
+            $table->string('mobile_number',191)->unique();
             $table->string('whatsapp_number')->nullable();
             $table->enum('gender', ['Male', 'Female', 'Other'])->nullable();
             $table->date('dob')->nullable();

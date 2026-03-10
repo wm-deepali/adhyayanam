@@ -671,7 +671,7 @@ class FrontController extends Controller
             'number' => 'required|string|max:20',
             'message' => 'nullable|string',
 
-            // тнР rating required only for testimonial
+            // ⭐ rating required only for testimonial
             'rating' => 'required_if:type,2|nullable|integer|min:1|max:5',
 
             'photo' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',

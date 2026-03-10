@@ -9,11 +9,9 @@ return new class extends Migration
     public function up()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->foreignId('role_group_id')
+            $table->unsignedBigInteger('role_group_id')
                   ->nullable()
-                  ->after('type')
-                  ->constrained('role_groups')
-                  ->nullOnDelete();
+                  ->after('type');
         });
     }
 

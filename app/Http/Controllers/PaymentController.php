@@ -81,11 +81,12 @@ class PaymentController extends Controller
           );
           $tags = array('package_type' => "$package", 'package_id' => $id, 'discount' => "$discount", 'discount_amt' => "$discountAmt", 'amount' => "$fee");
 
-          $data = json_encode([
-               'order_id' => 'ORDER_' . rand(111111, 999999),
-               'order_amount' => $payAmount,
-               "order_currency" => "INR",
-               "order_note" => $order_note,
+ $data = json_encode([
+    'order_id' => 'ORDER_'. rand(111111, 999999),
+    'order_amount' => number_format($payAmount, 2, '.', ''),
+    "order_currency" => "INR",
+    "order_note" => $order_note,
+        
                'order_tags' => $tags,
                "customer_details" => [
                     "customer_id" => 'CUST_' . rand(111111, 999999),
@@ -115,10 +116,10 @@ class PaymentController extends Controller
           }
 
           curl_close($curl);
-          //dd($resp);
           if (isset($error_msg)) {
                dd($error_msg);
           }
+         
           return redirect()->to(json_decode($resp)->payment_link);
      }
 

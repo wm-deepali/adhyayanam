@@ -260,7 +260,7 @@
   -webkit-transition: all 500ms ease;
   -ms-transition: all 500ms ease;
   -o-transition: all 500ms ease;
-  margin-right: var(--margin-right-40);
+  margin-right: 25px;
 }
 
 .main-header .main-menu .navigation > li.dropdown > a {

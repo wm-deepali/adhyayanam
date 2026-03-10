@@ -28,9 +28,11 @@ class TeacherLoginController extends Controller
             'email' => ['required', 'email'],
             'password' => ['required']
         ]);
+        
 
         if (Auth::guard('teacher')->attempt($credentials, $request->filled('remember'))) {
             $request->session()->regenerate();
+      
 
             return redirect()->intended(route('teacher.dashboard'));
         }

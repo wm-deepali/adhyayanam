@@ -229,182 +229,75 @@
     /* subtle lift on hover */
   }
 
-  .edu-course-card {
-    margin-bottom: 2rem;
-    perspective: 1000px;
-    /* subtle 3D feel on hover */
+  .newtestseries-card {
+    transition: all 0.35s ease;
+    border-radius: 16px !important;
   }
 
-  .edu-card {
-    background: white;
-    border-radius: 1rem;
-    /* 16px */
-    overflow: hidden;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-    transition: all 0.35s cubic-bezier(0.165, 0.84, 0.44, 1);
-    border: 1px solid #f1f5f9;
+  .newtestseries-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08) !important;
   }
 
-  .edu-card:hover {
-    transform: translateY(-10px) rotateX(2deg) rotateY(2deg);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.14);
-  }
-
-  .edu-card-image {
-    position: relative;
-  }
-
-  .edu-thumbnail {
+  .newtestseries-logo-frame {
     width: 100%;
-    height: 220px;
-    border: 5px solid #ffffff;
-    border-radius: 20px;
-    overflow: hidden;
-    object-fit: cover;
-    display: block;
-    transition: transform 0.4s ease;
+    height: 200px !important;
+    padding: 8px;
+    background: white;
+    /*box-shadow: 0 4px 12px rgba(0,0,0,0.1);*/
   }
 
-  .edu-card:hover .edu-thumbnail {
-    transform: scale(1.06);
+  .newtestseries-title {
+    font-size: 1.4rem !important;
+    min-height: 50px;
   }
 
-  .edu-tag {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    background: #045279;
-    color: white;
-    padding: 0.4rem 1rem;
-    border-radius: 2rem;
-    font-size: 10px;
-    font-weight: 600;
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-    z-index: 10;
+  .newtestseries-divider {
+    border-top: 2px solid #dee2e6 !important;
   }
 
-  .edu-card-body {
-    padding: 15px;
+  .newtestseries-test-count {
+    font-size: 1.1rem !important;
   }
 
-  .edu-meta {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-    font-size: 0.95rem;
-    color: #64748b;
+  .newtestseries-free {
+    font-weight: 600 !important;
   }
 
-  .edu-duration .icon {
-    margin-right: 0.4rem;
-    font-size: 1.1rem;
+  .newtestseries-features .newtestseries-feature-row {
+    font-size: 1.05rem !important;
   }
 
-  .edu-price {
-    font-weight: 700;
-    font-size: 1.35rem;
-    color: #ec4899;
-    /* vibrant price color – change to your brand */
+  .newtestseries-label {
+    color: #555 !important;
+    flex: 0 0 60% !important;
   }
 
-  .edu-title {
-    height: 55px;
-    font-size: 1.4rem;
-    line-height: 1.35;
-    margin: 0 0 0.75rem;
-    font-weight: 700;
-    color: #1e293b;
+  .newtestseries-value {
+    color: #222 !important;
+    font-weight: 600 !important;
+    text-align: right !important;
   }
 
-  .edu-title a {
-    color: inherit;
-    text-decoration: none;
-    transition: color 0.2s;
+  .newtestseries-view-btn {
+    background: linear-gradient(90deg, #0d6efd, #0056b3) !important;
+    color: white !important;
+    border: none !important;
+    font-size: 1.1rem !important;
+    transition: all 0.3s !important;
   }
 
-  .edu-title a:hover {
-    color: #3b82f6;
+  .newtestseries-view-btn:hover {
+    background: linear-gradient(90deg, #0056b3, #004085) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 20px rgba(13, 110, 253, 0.25) !important;
   }
 
-  .edu-description {
-    height: 52px;
-    color: #64748b;
-    font-size: 0.975rem;
-    line-height: 1.6;
-    margin: 0 0 1.5rem;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+  .newtestseries-all-btn {
+    font-size: 1.2rem !important;
+    padding: 14px 40px !important;
   }
 
-  .edu-actions {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    gap: 1rem;
-    flex-wrap: nowrap;
-  }
-
-  .edu-btn {
-    padding: 0.5rem .8rem;
-    border-radius: 9px;
-    font-weight: 600;
-    font-size: 0.95rem;
-    transition: all 0.3s ease;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    text-decoration: none;
-  }
-
-  .edu-btn-primary {
-    background: #045279;
-    color: white;
-    box-shadow: 0 4px 14px rgba(59, 130, 246, 0.25);
-  }
-
-  .edu-btn-primary:hover {
-    background: #ffffff;
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(59, 130, 246, 0.35);
-    border: 2px solid #045279;
-  }
-
-  .edu-btn-outline {
-    background: transparent;
-    border: 2px solid #045279;
-    color: #045279;
-  }
-
-  .edu-btn-outline:hover {
-    background: #045279;
-    color: white;
-    transform: translateY(-2px);
-  }
-
-  /* Responsive adjustments */
-  @media (max-width: 640px) {
-    .edu-thumbnail {
-      height: 180px;
-    }
-
-    .edu-title {
-      font-size: 1.25rem;
-    }
-  }
-
-  .commission-name {
-    width: fit-content;
-    font-size: 12px;
-    color: gray;
-    margin: 0px;
-    background: #f8fbff;
-    padding: 3px 10px;
-    border-radius: 3px;
-
-  }
 
   /* Custom Pagination */
 
@@ -437,9 +330,7 @@
     background: #e2e8f0;
     color: #94a3b8;
   }
-  
 </style>
-
 @section('content')
 
   <body class="hidden-bar-wrapper">
@@ -447,16 +338,16 @@
     <section class="page-banner">
       <div class="auto-container">
         <div class="banner-content text-center">
-          <h1 class="banner-heading">Study Materials</h1>
+          <h1 class="banner-heading">Test Series</h1>
           <p class="banner-subtitle">
-            Explore our wide range of thoughtfully designed Study Materials<br>
+            Explore our wide range of thoughtfully designed Test Series<br>
             crafted to help you learn, grow, and achieve your goals with confidence.
           </p>
 
           <!-- Optional: small breadcrumb at bottom -->
           <ul class="bread-crumb clearfix">
             <li><a href="index.html">Home</a></li>
-            <li>Study Materials</li>
+            <li>Test Series</li>
           </ul>
         </div>
       </div>
@@ -495,12 +386,12 @@
                   @foreach($commission->categories->take(3) as $category)
 
                               <li class="mb-2">
-                                <a href="{{ route('study.material.front', [
+                                <a href="{{ route('test-series-list', [
                       'exam_id' => $commission->id,
                       'category_id' => $category->id
                     ]) }}"
                                   class="sub-btn d-block py-2 px-3 rounded-3 text-decoration-none 
-                                                                                                                    {{ request('category_id') == $category->id ? 'active' : '' }}">
+                                                                                    {{ request('category_id') == $category->id ? 'active' : '' }}">
 
                                   {{ $category->name }}
 
@@ -523,7 +414,7 @@
 
             <!-- Toolbar -->
             <div class="toolbar card border-0 shadow-sm rounded-4 mb-4 overflow-hidden" style="background: #f7f7f7">
-              <form method="GET" action="{{ route('study.material.front') }}">
+              <form method="GET" action="{{ route('test-series-list') }}">
 
                 <!-- Keep existing filters -->
                 <input type="hidden" name="exam_id" value="{{ request('exam_id') }}">
@@ -540,7 +431,7 @@
 
                     <input type="search" name="search" value="{{ request('search') }}"
                       class="form-control border-start-0 shadow-none rounded-end-pill"
-                      placeholder="Search study material...">
+                      placeholder="Search test series...">
                   </div>
 
                   <!-- Sort -->
@@ -583,7 +474,7 @@
 
                 @foreach($subcategories->take(3) as $sub)
 
-                          <a href="{{ route('study.material.front', [
+                          <a href="{{ route('test-series-list', [
                     'exam_id' => request('exam_id'),
                     'category_id' => request('category_id'),
                     'sub_category_id' => $sub->id
@@ -604,59 +495,73 @@
 
             </div>
 
-            <!-- study material Grid -->
+            <!-- test seies Grid -->
+            <div class="row g-4 testseries-grid" style="margin-bottom:10px;">
 
-            <div class="row g-4">
+              @if($testPackages->count())
 
-              @if($studyMaterials->count())
-              
-                @foreach($studyMaterials as $material)
-
-                  <div class="edu-course-card col-xl-4 col-lg-6 col-md-6 sm-12" data-commission="{{ $commission->id }}"
-                    data-category="{{ $material->category_id ?? 'all' }}"
-                    data-category-name="{{ addslashes($category->name) }}">
-
-                    <div class="edu-card">
-                      <div class="edu-card-image">
-                        <a href="{{ route('study.material.details', $material->id) }}" class="block">
-                          <img src="{{ url('storage/' . $material->banner) }}" alt="{{ $material->title }}"
-                            class="edu-thumbnail">
-                        </a>
-                      </div>
-
-                      <div class="edu-card-body">
-                        <div class="edu-meta">
-                          <div class="edu-duration">
-                            {{ $material->is_pdf_downloadable ? 'Pdf Available' : ''}}
-                          </div>
-
-                          <div class="edu-price">
-                            {{ $material->IsPaid ? '₹' . $material->price : 'Free' }}
+                @foreach($testPackages as $data)
+                  <div class="col-xl-4 col-lg-6 col-md-6 col-sm-12 testseries-card"
+                    data-commission="{{ strtolower($data->commission->slug ?? $data->commission->id) }}"
+                    data-category="{{ $data->category_id ?? 'all' }}">
+                    <!-- SAME CARD DESIGN AS ORIGINAL -->
+                    <div class="newtestseries-card rounded-4 shadow-sm h-100 overflow-hidden position-relative"
+                      style="background: linear-gradient(135deg, {{ $loop->index % 3 == 0 ? '#e6f0ff' : ($loop->index % 3 == 1 ? '#eaffea' : '#f3e6ff') }}, #ffffff); border: 1px solid #e0e0e0;">
+                      <div class="newtestseries-card-inner p-3 d-flex flex-column h-100">
+                        <!-- Logo -->
+                        <div class="newtestseries-logo-wrapper text-center mb-2">
+                          <div class="newtestseries-logo-frame border-5 border-white mx-auto">
+                            <img src="{{ url('storage/' . $data->logo) }}" alt="{{ $data->title }}"
+                              class="w-100 h-100 object-cover">
                           </div>
                         </div>
-                        <p class="commission-name">
-                          {{$material->subcategory->name}}
-                        </p>
-
-                        <h3 class="edu-title">
-                          <a href="{{ route('study.material.details', $material->id) }}">{{ $material->title }}</a>
-                        </h3>
-
-                        <p class="edu-description">{{ $material->short_description }}
-                        </p>
-
-                        <div class="edu-actions">
-
-                          <a href="{{ route('study.material.details', $material->id) }}" class="edu-btn edu-btn-outline"
-                            style="width: 100%;display: flex;justify-content: center; text-align: center;">
-                            View Details
-                            <span class="arrow-icon flaticon-arrow-pointing-to-right"></span>
+                        <!-- Title -->
+                        <h4 class="newtestseries-title fw-bold text-start mb-1 text-dark">
+                          {{ $data->title }}
+                        </h4>
+                        <!-- Test Count -->
+                        <div class="newtestseries-test-count d-flex justify-content-between align-items-center mb-2">
+                          <span class="newtestseries-count-left fw-medium text-primary">
+                            {{ count($data->testseries) }} Test
+                            <span class="newtestseries-free text-success ms-1">
+                              | {{ $data->fee_type == 'paid' ? 'Premium' : 'Free' }}
+                            </span>
+                          </span>
+                          <span class="newtestseries-count-right small text-muted">Available
+                            Now</span>
+                        </div>
+                        <!-- Features Table -->
+                        <div class="newtestseries-features mb-4 flex-grow-1">
+                          <div class="newtestseries-feature-row d-flex justify-content-between py-2 border-bottom">
+                            <span class="newtestseries-label">Chapter Test</span>
+                            <span class="newtestseries-value fw-medium">
+                              {{ $data->testseries->where('type_name', 'Chapter Test')->count() }}
+                            </span>
+                          </div>
+                          <div class="newtestseries-feature-row d-flex justify-content-between py-2 border-bottom">
+                            <span class="newtestseries-label">Current Affairs</span>
+                            <span class="newtestseries-value fw-medium">
+                              {{ $data->testseries->where('type_name', 'Current Affairs')->count() }}
+                            </span>
+                          </div>
+                          <div class="newtestseries-feature-row d-flex justify-content-between py-2">
+                            <span class="newtestseries-label">Subject Test</span>
+                            <span class="newtestseries-value fw-medium">
+                              {{ $data->testseries->where('type_name', 'Subject Wise')->count() }}
+                            </span>
+                          </div>
+                        </div>
+                        <!-- View Button -->
+                        <div class="mt-auto">
+                          <a href="{{ route('test-series-detail', $data->slug) }}"
+                            class="newtestseries-view-btn btn w-100 py-2 fw-medium d-flex align-items-center justify-content-center gap-2">
+                            <i class="bi bi-arrow-right-circle"></i>
+                            View Test Series
                           </a>
                         </div>
                       </div>
                     </div>
                   </div>
-
                 @endforeach
 
               @else
@@ -668,7 +573,7 @@
 
                     <i class="fas fa-book-open fa-3x text-muted mb-3"></i>
 
-                    <h4 class="fw-bold">No Study Material Found</h4>
+                    <h4 class="fw-bold">No Test Series Found</h4>
 
                     <p class="text-muted">
                       Try adjusting your search or category filters.
@@ -679,10 +584,11 @@
                 </div>
 
               @endif
+
             </div>
 
-            {{ $studyMaterials->links('pagination::bootstrap-5') }}
 
+            {{ $testPackages->links('pagination::bootstrap-5') }}
             <!-- Pagination -->
 
           </div>
@@ -734,7 +640,7 @@
 
       });
 
-      
+
       document.addEventListener("click", function (e) {
 
         if (e.target.closest(".pagination a")) {
@@ -745,7 +651,6 @@
         }
 
       });
-
 
     </script>
 

@@ -5,147 +5,196 @@
   <meta name="description" content="{{ $course->meta_description ?? 'Default Description' }}">
   <meta name="keywords" content="{{ $course->meta_keyword ?? 'default, keywords' }}">
   <link rel="canonical" href="{{ url()->current() }}">
+
   <style>
-      /* breadcrumb */
+    /* breadcrumb */
 
-.ts-breadcrumb{
-display:flex;
-align-items:center;
-flex-wrap:wrap;
-gap:6px;
-margin:10px 0 20px 0;
-font-size:14px;
-}
+    .ts-breadcrumb {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 10px 0 20px 0;
+      font-size: 14px;
+    }
 
-.ts-breadcrumb a{
-color:#045279;
-text-decoration:none;
-font-weight:500;
-}
+    .ts-breadcrumb a {
+      color: #045279;
+      text-decoration: none;
+      font-weight: 500;
+    }
 
-.ts-breadcrumb a:hover{
-text-decoration:underline;
-}
+    .ts-breadcrumb a:hover {
+      text-decoration: underline;
+    }
 
-.arrow{
-color:#888;
-font-size:16px;
-margin:0 3px;
-}
+    .arrow {
+      color: #888;
+      font-size: 16px;
+      margin: 0 3px;
+    }
 
-.current{
-color:#555;
-font-weight:600;
-}
+    .current {
+      color: #555;
+      font-weight: 600;
+    }
 
-.editor-content{
-line-height:1.7;
-font-size:16px;
-color:#444;
-}
+    .editor-content {
+      line-height: 1.7;
+      font-size: 16px;
+      color: #444;
+    }
 
-.editor-content h1,
-.editor-content h2,
-.editor-content h3,
-.editor-content h4,
-.editor-content h5{
-margin-top:20px;
-margin-bottom:10px;
-font-weight:600;
-}
+    .editor-content h1,
+    .editor-content h2,
+    .editor-content h3,
+    .editor-content h4,
+    .editor-content h5 {
+      margin-top: 20px;
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
 
-.editor-content p{
-margin-bottom:12px;
-}
+    .editor-content p {
+      margin-bottom: 12px;
+    }
 
-.editor-content ul{
-padding-left:20px;
-margin-bottom:15px;
-}
+    .editor-content ul {
+      padding-left: 20px;
+      margin-bottom: 15px;
+    }
 
-.editor-content ul li{
-list-style:disc;
-margin-bottom:6px;
-}
+    .editor-content ul li {
+      list-style: disc;
+      margin-bottom: 6px;
+    }
 
-.editor-content ol{
-padding-left:20px;
-margin-bottom:15px;
-}
+    .editor-content ol {
+      padding-left: 20px;
+      margin-bottom: 15px;
+    }
 
-.editor-content img{
-max-width:100%;
-height:auto;
-margin:10px 0;
-border-radius:6px;
-}
+    .editor-content img {
+      max-width: 100%;
+      height: auto;
+      margin: 10px 0;
+      border-radius: 6px;
+    }
 
-.editor-content table{
-width:100%;
-border-collapse:collapse;
-margin:15px 0;
-}
+    .editor-content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 15px 0;
+    }
 
-.editor-content table td,
-.editor-content table th{
-border:1px solid #ddd;
-padding:8px;
-}
-
+    .editor-content table td,
+    .editor-content table th {
+      border: 1px solid #ddd;
+      padding: 8px;
+    }
   </style>
+
 @endsection
 
 @section('content')
 
   <body class="hidden-bar-wrapper">
 
-    <!-- Page Title -->
-    <!--<section class="page-title">-->
-    <!--  <div class="auto-container">-->
-    <!--    <h2>Adhyayanam</h2>-->
-    <!--    <ul class="bread-crumb clearfix">-->
-    <!--      <li><a href="{{ url('/') }}">Home</a></li>-->
-    <!--      <li>Course Detail</li>-->
-    <!--    </ul>-->
-    <!--    @include('front-users.layouts.includes.messages')-->
-    <!--  </div>-->
-    <!--</section>-->
-    <!-- End Page Title -->
-
 
     <!-- Course Page Title -->
     <section class="course-page-title" style="background-image: url(images/background/pattern-10.png)">
       <div class="auto-container">
-          <div class="ts-breadcrumb">
 
-<a href="#">Home</a>
+        <div class="ts-breadcrumb">
 
-<span class="arrow">›</span>
+          <a href="{{ url('/') }}">Home</a>
 
-<a href="#">UPSC</a>
+          @if($course->examinationCommission)
+                  <span class="arrow">›</span>
 
-<span class="arrow">›</span>
+                  <a href="{{ route('courses', [
+              'exam_id' => $course->examinationCommission->id
+            ]) }}">
+                    {{ $course->examinationCommission->name }}
+                  </a>
+          @endif
 
-<a href="#">Prelims</a>
 
-<span class="arrow">›</span>
+          @if($course->category)
+                  <span class="arrow">›</span>
 
-<span class="current">UPSC Prelims 2026 Test Series</span>
+                  <a href="{{ route('courses', [
+              'exam_id' => $course->examinationCommission->id,
+              'category_id' => $course->category->id
+            ]) }}">
+                    {{ $course->category->name }}
+                  </a>
+          @endif
 
-</div>
+
+          @if($course->subCategory)
+                  <span class="arrow">›</span>
+
+                  <a href="{{ route('courses', [
+              'exam_id' => $course->examinationCommission->id,
+              'category_id' => $course->category->id,
+              'sub_category_id' => $course->subCategory->id
+            ]) }}">
+                    {{ $course->subCategory->name }}
+                  </a>
+          @endif
+
+
+          <span class="arrow">›</span>
+
+          <span class="current">
+            {{ $course->course_heading }}
+          </span>
+
+        </div>
 
         <h2>{{$course->course_heading}}</h2>
         <div class="d-flex flex-wrap">
+
           <div class="rating">
-            <span class="fa fa-star"></span>
-            <span class="fa fa-star"></span>
-            <span class="fa fa-star"></span>
-            <span class="fa fa-star"></span>
-            <span class="fa fa-star-o"></span>
-            <i>4.9 (34 reviews)</i>
+
+            @if(($totalReviews ?? 0) > 0)
+
+              @php
+                $rating = $avgRating ?? 0;
+              @endphp
+
+              @for ($i = 1; $i <= 5; $i++)
+                @if($rating >= $i)
+                  <span class="fa fa-star"></span>
+                @elseif($rating >= $i - 0.5)
+                  <span class="fa fa-star-half-o"></span>
+                @else
+                  <span class="fa fa-star-o"></span>
+                @endif
+              @endfor
+
+              <i>{{ $avgRating }} ({{ $totalReviews }} reviews)</i>
+
+            @else
+
+              <span class="fa fa-star-o"></span>
+              <span class="fa fa-star-o"></span>
+              <span class="fa fa-star-o"></span>
+              <span class="fa fa-star-o"></span>
+              <span class="fa fa-star-o"></span>
+              <span class="text-muted">No reviews yet</span>
+
+            @endif
+
           </div>
-          <div class="courses">{{ number_format(8277) }} enrolled on this course</div>
+
+          <div class="courses">
+            <strong>{{ number_format($course->orders_count ?? 0) }}</strong> students enrolled
+          </div>
+
         </div>
+
         <div class="text">{{$course->short_description}}</div>
         @if($course->feature == 'on')
           <span class="badge bg-success">Featured</span>
@@ -176,7 +225,7 @@ padding:8px;
               <div class="inner-box">
                 <span class="icon flaticon-three-o-clock-clock"></span>
                 Weekly study
-                <strong>2 Hours</strong>
+                <strong>{{$course->weekly_study ?? 0}} Hours / Week</strong>
               </div>
             </div>
 
@@ -224,8 +273,8 @@ padding:8px;
 
                   @endif
                 @else
-                   <img src="{{ asset('storage/' . $course->banner_image) }}"
-                      alt="{{ $course->image_alt_tag ?? $course->course_heading }}" loading="lazy" />
+                  <img src="{{ asset('storage/' . $course->banner_image) }}"
+                    alt="{{ $course->image_alt_tag ?? $course->course_heading }}" loading="lazy" />
                 @endif
               </div>
 
@@ -261,7 +310,7 @@ padding:8px;
 
 
               <!-- Course Info Tabs -->
-             
+
 
             </div>
           </div>
@@ -274,7 +323,12 @@ padding:8px;
                   <li>
                     <span class="icon flaticon-price-tag"></span>
                     Course Fee
-                    <strong>RS. {{$course->course_fee}}</strong>
+                    <strong>
+                      ₹{{$course->offered_price}}
+                      <del style="color:#999; font-size:14px; margin-left:6px;">
+                        ₹{{$course->course_fee}}
+                      </del>
+                    </strong>
                   </li>
                   <li>
                     <span class="icon flaticon-agenda"></span>
@@ -315,7 +369,7 @@ padding:8px;
                     <a class="enroll-now theme-btn" href="Javascript:void(0);">Already Enrolled!</a>
                   @endif
                 @else
-                  <a class="enroll-now theme-btn" data-bs-toggle="modal" data-bs-target="#lr">Enroll Now !</a>
+                  <a class="enroll-now theme-btn" href="{{route('student.login')}}">Enroll Now !</a>
                 @endif
 
               </div>
@@ -323,60 +377,83 @@ padding:8px;
           </div>
 
         </div>
-         <div class="course-info-tabs">
-                <div class="course-tabs tabs-box">
-                  <!-- Tab Btns -->
-                  <ul class="tab-btns tab-buttons clearfix cvx">
-                    <li data-tab="#course-overview" class="tab-btn active-btn">Overview</li>
-                    <li data-tab="#course-curriculum" class="tab-btn">Course Detail</li>
-                    <!-- <a href="#">
-                          <li class="tab-btn">Study Material</li>
-                        </a>
-                        <a href="#">
-                          <li class="tab-btn">Test Series</li>
-                        </a>
-                        <a href="#">
-                          <li data-tab="#course-instructor" class="tab-btn">Test Planner</li>
-                        </a> -->
-                    <!-- <li data-tab="#course-reviews" class="tab-btn">Reviews</li> -->
-                  </ul>
+        <div class="course-info-tabs">
+          <div class="course-tabs tabs-box">
+            <!-- Tab Btns -->
+            <ul class="tab-btns tab-buttons clearfix cvx">
+              <li data-tab="#course-overview" class="tab-btn active-btn">Overview</li>
+              <li data-tab="#course-curriculum" class="tab-btn">Course Detail</li>
 
-                  <!-- Tabs Container -->
-<div class="tabs-content">
+              <li data-tab="#course-reviews" class="tab-btn">Reviews</li>
+            </ul>
 
-<!-- Overview -->
-<div class="tab active-tab" id="course-overview">
-<div class="content editor-content">
-{!! $course->course_overview !!}
-</div>
-</div>
+            <!-- Tabs Container -->
+            <div class="tabs-content">
 
-<!-- Course Detail -->
-<div class="tab" id="course-curriculum">
-<div class="content editor-content">
-{!! $course->detail_content !!}
-</div>
-</div>
-
-<!-- Instructor -->
-<div class="tab" id="course-instructor">
-<div class="content editor-content">
-<h4>Instructor</h4>
-<p>It is a long established fact that a reader will be distracted by the readable content of a page...</p>
-</div>
-</div>
-
-<!-- Reviews -->
-<div class="tab" id="course-reviews">
-<div class="content editor-content">
-<p>Reviews section here...</p>
-</div>
-</div>
-
-</div>
-
+              <!-- Overview -->
+              <div class="tab active-tab" id="course-overview">
+                <div class="content editor-content">
+                  {!! $course->course_overview !!}
                 </div>
               </div>
+
+              <!-- Course Detail -->
+              <div class="tab" id="course-curriculum">
+                <div class="content editor-content">
+                  {!! $course->detail_content !!}
+                </div>
+              </div>
+
+              <!-- Reviews -->
+              <div class="tab" id="course-reviews">
+
+                <div class="content editor-content">
+
+                  <h4 class="mb-3">⭐ Student Reviews</h4>
+
+                  {{-- Reviews List --}}
+                  @if($course->reviews->count())
+
+                    @foreach($course->reviews as $review)
+
+                      <div class="border-bottom mb-3 pb-3">
+
+                        <div class="d-flex justify-content-between">
+
+                          <strong>{{ $review->student->name ?? 'Student' }}</strong>
+
+                          <div>
+                            {{ str_repeat('⭐', $review->rating) }}
+                          </div>
+
+                        </div>
+
+                        <small class="text-muted">
+                          {{ $review->created_at->format('d M Y') }}
+                        </small>
+
+                        <p class="mt-1 mb-0">
+                          {{ $review->review }}
+                        </p>
+
+                      </div>
+
+                    @endforeach
+
+                  @else
+
+                    <p class="text-muted">No reviews yet.</p>
+
+                  @endif
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+        </div>
 
       </div>
     </section>

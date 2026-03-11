@@ -17,6 +17,7 @@ class Course extends Model
         'sub_category_id',
         'name',
         'duration',
+        'weekly_study',
         'course_fee',
         'discount',
         'offered_price',
@@ -46,7 +47,7 @@ class Course extends Model
     protected $casts = [
         'subject_id' => 'array',
         'chapter_id' => 'array',
-        'topic_id'   => 'array',
+        'topic_id' => 'array',
     ];
 
     /* ===================== RELATIONSHIPS ===================== */
@@ -97,5 +98,16 @@ class Course extends Model
     public function topics()
     {
         return CourseTopic::whereIn('id', $this->topic_id ?? [])->get();
+    }
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class, 'package_id')
+            ->where('order_type', 'Course');
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(CourseReview::class);
     }
 }

@@ -222,6 +222,17 @@
                                 value="{{$test_series->price}}" readonly>
                             <div class="text-danger validation-err" id="price-err"></div>
                         </div>
+                        <div class="col-md-6">
+    <label for="validity" class="form-label">Validity (Days)</label>
+    <input type="number"
+        class="form-control"
+        id="validity"
+        name="validity"
+        value="{{ $test_series->validity ?? '' }}"
+        placeholder="Enter validity in days">
+
+    <div class="text-danger validation-err" id="validity-err"></div>
+</div>
                         <div class="col-md-12">
                             <label for="description" class="form-label">Short Description</label>
                             <textarea class="form-control editor" id="short_description"
@@ -232,6 +243,45 @@
                             <textarea class="form-control editor" id="content"
                                 name="description">{{$test_series->description}}</textarea>
                         </div>
+                        <div class="col-md-12">
+    <label class="form-label">Overview</label>
+    <textarea class="form-control editor" name="overview">
+        {{ $test_series->overview ?? '' }}
+    </textarea>
+</div>
+<div class="col-md-12">
+    <label class="form-label">Key Features</label>
+
+    <div id="feature-wrapper">
+
+        @if(!empty($test_series->key_features))
+            @foreach(json_decode($test_series->key_features) as $feature)
+                <div class="d-flex mb-2 feature-row">
+                    <input type="text"
+                        name="key_features[]"
+                        class="form-control"
+                        value="{{ $feature }}"
+                        placeholder="Enter Feature">
+
+                    <button type="button"
+                        class="btn btn-danger remove-feature ms-2">-</button>
+                </div>
+            @endforeach
+        @else
+            <div class="d-flex mb-2 feature-row">
+                <input type="text"
+                    name="key_features[]"
+                    class="form-control"
+                    placeholder="Enter Feature">
+
+                <button type="button"
+                    class="btn btn-success add-feature ms-2">+</button>
+            </div>
+        @endif
+
+    </div>
+
+</div>
                     </div>
                     <div class="form-group row question-selection-part master-question-item">
                         <div class="col-sm-12">
@@ -452,6 +502,21 @@
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <script>
+
+        $(document).on('click', '.add-feature', function () {
+
+    $('#feature-wrapper').append(`
+        <div class="d-flex mb-2 feature-row">
+            <input type="text" name="key_features[]" class="form-control" placeholder="Enter Feature">
+            <button type="button" class="btn btn-danger remove-feature ms-2">-</button>
+        </div>
+    `);
+
+});
+
+$(document).on('click', '.remove-feature', function () {
+    $(this).closest('.feature-row').remove();
+});
 
         $(document).ready(function () {
     $('.question-row').each(function () {

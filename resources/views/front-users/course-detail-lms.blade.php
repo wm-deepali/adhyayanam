@@ -37,9 +37,86 @@
                     <div id="assignmentContainer"></div>
 
                     {{-- COURSE DETAIL --}}
+                    {{-- COURSE DETAIL --}}
                     <div class="card mt-3">
                         <div class="card-body">
                             {!! $course->detail_content !!}
+                        </div>
+                    </div>
+
+                    {{-- ================= COURSE REVIEWS ================= --}}
+                    <div class="card mt-3">
+                        <div class="card-body">
+
+                            <h5 class="fw-bold mb-3">⭐ Course Reviews</h5>
+
+                            {{-- REVIEW FORM --}}
+                            <form action="{{ route('student.course.review') }}" method="POST">
+                                @csrf
+                                <input type="hidden" name="course_id" value="{{ $course->id }}">
+
+                                <div class="mb-2">
+                                    <label class="form-label">Rating</label>
+
+                                    <select name="rating" class="form-control" required>
+                                        <option value="">Select Rating</option>
+
+                                        @for($i = 5; $i >= 1; $i--)
+                                            <option value="{{ $i }}" {{ ($review && $review->rating == $i) ? 'selected' : '' }}>
+                                                {{ str_repeat('⭐', $i) }}
+                                            </option>
+                                        @endfor
+                                    </select>
+                                </div>
+
+                                <div class="mb-2">
+                                    <label class="form-label">Review</label>
+
+                                    <textarea name="review" class="form-control" rows="3"
+                                        placeholder="Write your feedback">{{ $review->review ?? '' }}</textarea>
+                                </div>
+
+                                <button class="btn btn-primary btn-sm">
+                                    {{ $review ? 'Update Review' : 'Submit Review' }}
+                                </button>
+
+                            </form>
+
+                            {{-- SHOW OTHER STUDENT REVIEWS --}}
+                            @if($course->reviews->count())
+
+                                <hr>
+
+                                @foreach($course->reviews as $r)
+
+                                    <div class="border-bottom mb-3 pb-2">
+
+                                        <div class="d-flex justify-content-between">
+
+                                            <strong>{{ $r->student->full_name ?? 'Student' }}</strong>
+
+                                            <div>
+                                                {{ str_repeat('⭐', $r->rating) }}
+                                            </div>
+
+                                        </div>
+
+                                        <small class="text-muted">
+                                            {{ $r->created_at->format('d M Y') }}
+                                        </small>
+
+                                        <p class="mb-0 mt-1">
+                                            {{ $r->review }}
+                                        </p>
+
+                                    </div>
+
+                                @endforeach
+
+                            @else
+                                <p class="text-muted mt-3">No reviews yet.</p>
+                            @endif
+
                         </div>
                     </div>
                 </div>
@@ -140,9 +217,9 @@
 
                     if (!data.is_valid) {
                         mainVideoContainer.innerHTML = `
-                        <div class="alert alert-danger py-5">
-                            Validity expired or watch limit reached
-                        </div>`;
+                                <div class="alert alert-danger py-5">
+                                    Validity expired or watch limit reached
+                                </div>`;
                         assignmentContainer.innerHTML = '';
                         mainVideoTitle.textContent = data.title;
                         return;
@@ -152,14 +229,14 @@
                     let videoHtml = '';
                     if (data.video_type === 'YouTube' || data.video_type === 'Vimeo') {
                         videoHtml = `
-                        <iframe width="100%" height="480"
-                            src="${youtubeEmbed(data.video_url)}"
-                            frameborder="0" allowfullscreen></iframe>`;
+                                <iframe width="100%" height="480"
+                                    src="${youtubeEmbed(data.video_url)}"
+                                    frameborder="0" allowfullscreen></iframe>`;
                     } else {
                         videoHtml = `
-                        <video width="100%" height="480" controls>
-                            <source src="${data.video_file}" type="video/mp4">
-                        </video>`;
+                                <video width="100%" height="480" controls>
+                                    <source src="${data.video_file}" type="video/mp4">
+                                </video>`;
                     }
 
                     mainVideoContainer.innerHTML = videoHtml;
@@ -171,89 +248,86 @@
                         let submissionHtml = '';
 
                         if (data.has_submission) {
-    const status = data.submission_status || 'submitted';
-    const badge = statusMap[status] || { label: status, class: 'bg-secondary' };
-    const ext = data.submission_file.split('.').pop().toLowerCase();
+                            const status = data.submission_status || 'submitted';
+                            const badge = statusMap[status] || { label: status, class: 'bg-secondary' };
+                            const ext = data.submission_file.split('.').pop().toLowerCase();
 
-    submissionHtml = `
-        <div class="mt-2">
-            <span class="badge ${badge.class}">${badge.label}</span>
+                            submissionHtml = `
+                <div class="mt-2">
+                    <span class="badge ${badge.class}">${badge.label}</span>
 
-            ${
-                ['jpg','jpeg','png'].includes(ext)
-                ? `<a href="${data.submission_file}" target="_blank">
-                        <img src="${data.submission_file}"
-                             class="img-thumbnail d-block mt-2"
-                             style="max-width:120px;">
-                   </a>`
-                : `<a href="${data.submission_file}" target="_blank"
-                       class="btn btn-outline-secondary btn-sm mt-2">
-                       📄 View Uploaded File
-                   </a>`
-            }
-        </div>
-    `;
+                    ${['jpg', 'jpeg', 'png'].includes(ext)
+                                    ? `<a href="${data.submission_file}" target="_blank">
+                                <img src="${data.submission_file}"
+                                     class="img-thumbnail d-block mt-2"
+                                     style="max-width:120px;">
+                           </a>`
+                                    : `<a href="${data.submission_file}" target="_blank"
+                               class="btn btn-outline-secondary btn-sm mt-2">
+                               📄 View Uploaded File
+                           </a>`
+                                }
+                </div>
+            `;
 
-    // 👇 MARKS & REMARKS
-    if (data.marks !== null || data.teacher_remark) {
-        submissionHtml += `
-            <div class="mt-3 p-3 border rounded bg-light">
+                            // 👇 MARKS & REMARKS
+                            if (data.marks !== null || data.teacher_remark) {
+                                submissionHtml += `
+                    <div class="mt-3 p-3 border rounded bg-light">
 
-                ${
-                    data.marks !== null
-                    ? `<div class="fw-bold text-success mb-1">
-                           🎯 Marks: ${data.marks}
-                       </div>`
-                    : ''
-                }
+                        ${data.marks !== null
+                                        ? `<div class="fw-bold text-success mb-1">
+                                   🎯 Marks: ${data.marks}
+                               </div>`
+                                        : ''
+                                    }
 
-                ${
-                    data.teacher_remark
-                    ? `<div class="text-muted" style="white-space: pre-line;">
-                           📝 <strong>Teacher Remark:</strong><br>
-                           ${data.teacher_remark}
-                       </div>`
-                    : ''
-                }
+                        ${data.teacher_remark
+                                        ? `<div class="text-muted" style="white-space: pre-line;">
+                                   📝 <strong>Teacher Remark:</strong><br>
+                                   ${data.teacher_remark}
+                               </div>`
+                                        : ''
+                                    }
 
-            </div>
-        `;
-    }
-}
+                    </div>
+                `;
+                            }
+                        }
 
                         assignmentContainer.innerHTML = `
-                        <div class="card shadow-sm">
-                            <div class="card-body">
-                                <h6 class="fw-semibold mb-2">📄 Assignment</h6>
+                                <div class="card shadow-sm">
+                                    <div class="card-body">
+                                        <h6 class="fw-semibold mb-2">📄 Assignment</h6>
 
-                                <a href="${data.assignment_file}" target="_blank"
-                                   class="btn btn-outline-primary btn-sm">
-                                   📥 Download Assignment
-                                </a>
+                                        <a href="${data.assignment_file}" target="_blank"
+                                           class="btn btn-outline-primary btn-sm">
+                                           📥 Download Assignment
+                                        </a>
 
-                                ${!data.has_submission ? `
-                                    <form class="mt-2" method="POST"
-                                          action="{{ route('student.homework.upload') }}"
-                                          enctype="multipart/form-data">
-                                        @csrf
-                                        <input type="hidden" name="video_id" value="${data.id}">
-                                        <input type="file" name="assignment_file"
-                                               accept=".pdf,.jpg,.jpeg,.png"
-                                               required
-                                               class="form-control form-control-sm mb-2">
-                                        <button class="btn btn-primary btn-sm">Upload</button>
-                                    </form>
-                                    ` : submissionHtml
+                                        ${!data.has_submission ? `
+                                            <form class="mt-2" method="POST"
+                                                  action="{{ route('student.homework.upload') }}"
+                                                  enctype="multipart/form-data">
+                                                @csrf
+                                                <input type="hidden" name="video_id" value="${data.id}">
+                                                <input type="file" name="assignment_file"
+                                                       accept=".pdf,.jpg,.jpeg,.png"
+                                                       required
+                                                       class="form-control form-control-sm mb-2">
+                                                <button class="btn btn-primary btn-sm">Upload</button>
+                                            </form>
+                                            ` : submissionHtml
                             }
 
-                                ${(data.has_submission && data.solution_file) ? `
-                                    <a href="${data.solution_file}" target="_blank"
-                                       class="btn btn-success btn-sm mt-2">
-                                       👁 View Solution
-                                    </a>` : ''
+                                        ${(data.has_submission && data.solution_file) ? `
+                                            <a href="${data.solution_file}" target="_blank"
+                                               class="btn btn-success btn-sm mt-2">
+                                               👁 View Solution
+                                            </a>` : ''
                             }
-                            </div>
-                        </div>`;
+                                    </div>
+                                </div>`;
                     } else {
                         assignmentContainer.innerHTML = '';
                     }

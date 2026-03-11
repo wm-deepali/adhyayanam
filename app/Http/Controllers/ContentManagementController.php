@@ -500,7 +500,7 @@ class ContentManagementController extends Controller
         return view('content-management.add-faq');
     }
 
-     public function storeFaq(Request $request)
+    public function storeFaq(Request $request)
     {
         $data = $request->validate([
             'question' => 'required|string|max:500',
@@ -1734,6 +1734,7 @@ class ContentManagementController extends Controller
 
             'name' => 'required|string|max:255',
             'duration' => 'required|string|max:255',
+            'weekly_study' => 'required|numeric|max:0',
             'course_fee' => 'required|numeric|min:0',
 
             // 🔥 Discount is PERCENTAGE
@@ -1804,6 +1805,7 @@ class ContentManagementController extends Controller
 
         $course->name = $request->name;
         $course->duration = $request->duration;
+        $course->weekly_study = $request->weekly_study;
         $course->course_fee = $courseFee;
         $course->discount = $discountPercent;
         $course->offered_price = round($offeredPrice);
@@ -1882,6 +1884,7 @@ class ContentManagementController extends Controller
 
             'name' => 'required|string|max:255',
             'duration' => 'required|string|max:255',
+            'weekly_study' => 'required|numeric|max:0',
             'course_fee' => 'required|numeric|min:0',
 
             // 🔥 Discount is PERCENTAGE
@@ -1941,6 +1944,7 @@ class ContentManagementController extends Controller
 
         $course->name = $request->name;
         $course->duration = $request->duration;
+        $course->weekly_study = $request->weekly_study;
         $course->course_fee = $courseFee;
         $course->discount = $discountPercent;
         $course->offered_price = round($offeredPrice);
@@ -3285,6 +3289,9 @@ class ContentManagementController extends Controller
             'mrp' => 'required|numeric',
             'discount' => 'required|numeric',
             'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
+            'validity' => 'nullable|integer|min:1',
+            'overview' => 'nullable|string',
+            'key_features' => 'nullable|array',
         ]);
 
         if ($validator->fails()) {
@@ -3307,6 +3314,11 @@ class ContentManagementController extends Controller
                 'test_generated_by',
                 'total_paper'
             ]);
+
+            // ✅ NEW FIELDS
+            $data['validity'] = $request->validity;
+            $data['overview'] = $request->overview;
+            $data['key_features'] = json_encode($request->key_features ?? []);
 
             if ($request->hasFile('logo')) {
                 $data['logo'] = $request->file('logo')->store('logos', 'public');
@@ -3431,7 +3443,7 @@ class ContentManagementController extends Controller
             }
 
             if ($allChapterIds->isNotEmpty()) {
-                $topics = Topic::whereIn('chapter_id', $allChapterIds)->get();
+                $topics = CourseTopic::whereIn('chapter_id', $allChapterIds)->get();
             }
         }
 
@@ -3468,6 +3480,9 @@ class ContentManagementController extends Controller
             'price' => 'required|numeric',
             'mrp' => 'required|numeric',
             'discount' => 'required|numeric',
+            'validity' => 'nullable|integer|min:1',
+            'overview' => 'nullable|string',
+            'key_features' => 'nullable|array',
         ]);
 
         if ($validator->fails()) {
@@ -3564,6 +3579,9 @@ class ContentManagementController extends Controller
             'sub_category_id' => $data['sub_category_id'],
             'slug' => $data['slug'],
             'short_description' => $data['short_description'],
+            'overview' => $request->overview,
+            'validity' => $request->validity,
+            'key_features' => json_encode($request->key_features ?? []),
             'mrp' => $data['mrp'],
             'discount' => $data['discount'],
             'price' => $data['price'],

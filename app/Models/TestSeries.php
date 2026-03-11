@@ -22,12 +22,19 @@ class TestSeries extends Model
         'slug',
         'short_description',
         'description',
+        'overview',
+        'validity',
+        'key_features',
         'mrp',
         'price',
         'discount',
         'test_generated_by',
         'total_paper',
         'created_by'
+    ];
+
+    protected $casts = [
+        'key_features' => 'array',
     ];
 
     public function category()
@@ -58,5 +65,11 @@ class TestSeries extends Model
     public function creator()
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class, 'package_id')
+            ->where('order_type', 'Test Series');
     }
 }

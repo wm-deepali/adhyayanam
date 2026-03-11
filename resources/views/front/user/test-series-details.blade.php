@@ -6,612 +6,885 @@
 <link rel="stylesheet" href="https://kit.fontawesome.com/your-kit-code.js">
 @section('content')
 
-<style>
-
-/* container */
-
-.ts-container{
-width:90%;
-max-width:1200px;
-margin:auto;
-}
-
-/* ---------------- BANNER ---------------- */
-
-.ts-banner{
-background:linear-gradient(135deg,#eef2ff,#f7f9ff);
-padding:50px 0 90px 0;
-position:relative;
-overflow:visible;
-}
-
-.ts-banner-content{
-max-width:650px;
-}
-
-.ts-banner h1{
-font-size:40px;
-font-weight:700;
-margin-bottom:-15px;
-}
-
-.ts-banner p{
-color:#555;
-line-height:1.6;
-}
-
-/* stats */
-
-.ts-stats{
-display:flex;
-gap:20px;
-margin-top:30px;
-flex-wrap:wrap;
-}
-
-.ts-stat{
-background:white;
-padding:15px 25px;
-border-radius:12px;
-box-shadow:0 6px 18px rgba(0,0,0,0.08);
-font-weight:600;
-}
-
-/* ---------------- PRICE CARD ---------------- */
-
-.price-card{
-    padding:12px;
-position:absolute;
-right:120px;
-top:120px;
-width:320px;
-background:white;
-border-radius:16px;
-box-shadow:0 15px 40px rgba(0,0,0,0.15);
-overflow:hidden;
-}
-
-
-
-.price-card img{
-width:100%;
-height:180px;
-object-fit:cover;
-}
-
-.price-content{
-padding:25px;
-text-align:center;
-}
-
-.price{
-font-size:32px;
-font-weight:700;
-color:#045279;
-}
-
-.old{
-text-decoration:line-through;
-color:#999;
-font-size:16px;
-margin-left:8px;
-}
-
-.discount{
-color:#ff3b3b;
-margin:8px 0;
-}
-
-.buy-btn{
-background:linear-gradient(135deg,#045279,#7a8dff);
-color:white;
-border:none;
-padding:12px 25px;
-border-radius:8px;
-cursor:pointer;
-width:100%;
-margin-top:10px;
-}
-
-/* ---------------- TOPIC BUTTON CARDS ---------------- */
-
-.topics-wrapper{
-background:white;
-padding:35px;
-border-radius:18px;
-box-shadow:0 10px 25px rgba(0,0,0,0.08);
-margin-top:70px;
-}
-
-.topics-wrapper h2{
-margin-bottom:25px;
-}
-
-.topics-grid{
-display:grid;
-grid-template-columns:repeat(2,1fr);
-gap:18px;
-}
-
-.topic-btn{
-display:flex;
-align-items:center;
-gap:15px;
-background:#f7f9ff;
-border:none;
-padding:18px;
-border-radius:12px;
-text-align:left;
-cursor:pointer;
-transition:.3s;
-box-shadow:0 4px 12px rgba(0,0,0,0.06);
-}
-
-.topic-btn:hover{
-transform:translateY(-3px);
-box-shadow:0 8px 18px rgba(0,0,0,0.12);
-}
-
-.topic-icon{
-font-size:28px;
-background:#eef2ff;
-padding:10px;
-border-radius:10px;
-}
-
-.topic-content h4{
-margin:0;
-font-size:17px;
-}
-
-.topic-content p{
-margin:3px 0;
-font-size:13px;
-color:#666;
-}
-
-.topic-content span{
-font-size:12px;
-font-weight:600;
-color:#045279;
-}
-
-/* different colors */
-
-.c1{background:linear-gradient(135deg,#5f7cff,#7fa4ff);}
-.c2{background:linear-gradient(135deg,#ff7c7c,#ff9f9f);}
-.c3{background:linear-gradient(135deg,#2dd4bf,#5eead4);}
-.c4{background:linear-gradient(135deg,#fbbf24,#fcd34d);}
-.c5{background:linear-gradient(135deg,#a78bfa,#c4b5fd);}
-
-/* ---------------- FEATURE CARD ---------------- */
-
-.feature-card{
-margin-top:70px;
-background:white;
-padding:35px;
-border-radius:18px;
-box-shadow:0 10px 25px rgba(0,0,0,0.08);
-}
-
-.feature-grid{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-gap:20px;
-margin-top:20px;
-}
-
-.feature-grid div{
-display:flex;
-align-items:center;
-gap:10px;
-}
-
-.feature-grid i{
-color:#045279;
-}
-
-/* ---------------- NOTES ---------------- */
-
-.notes-card{
-background:white;
-padding:35px;
-border-radius:16px;
-box-shadow:0 10px 25px rgba(0,0,0,0.08);
-margin:50px 0;
-
-}
-
-.notes-card h3{
-margin-bottom:10px;
-}
-
-.notes-card hr{
-border:none;
-height:1px;
-background:#eee;
-margin-bottom:20px;
-}
-
-.notes-list{
-list-style:none;
-padding:0;
-margin:0;
-}
-
-.notes-list li{
-display:flex;
-align-items:flex-start;
-gap:10px;
-margin-bottom:12px;
-color:#444;
-}
-
-.notes-list span{
-color:#045279;
-font-weight:700;
-}
-
-
-/* ---------------- TERMS ---------------- */
-
-.terms{
-margin-top:30px;
-background:white;
-padding:30px;
-border-radius:15px;
-box-shadow:0 8px 20px rgba(0,0,0,0.08);
-}
-
-/* breadcrumb */
-
-.ts-breadcrumb{
-display:flex;
-align-items:center;
-flex-wrap:wrap;
-gap:6px;
-margin:10px 0 20px 0;
-font-size:14px;
-}
-
-.ts-breadcrumb a{
-color:#045279;
-text-decoration:none;
-font-weight:500;
-}
-
-.ts-breadcrumb a:hover{
-text-decoration:underline;
-}
-
-.arrow{
-color:#888;
-font-size:16px;
-margin:0 3px;
-}
-
-.current{
-color:#555;
-font-weight:600;
-}
-
-
-/* details section */
-
-.details-card{
-margin-top:70px;
-background:white;
-padding:35px;
-border-radius:18px;
-box-shadow:0 10px 25px rgba(0,0,0,0.08);
-}
+    <style>
+        /* container */
+
+        .ts-container {
+            width: 90%;
+            max-width: 1200px;
+            margin: auto;
+        }
+
+        /* ---------------- BANNER ---------------- */
+
+        .ts-banner {
+            background: linear-gradient(135deg, #eef2ff, #f7f9ff);
+            padding: 50px 0 90px 0;
+            position: relative;
+            overflow: visible;
+        }
+
+        .ts-banner-content {
+            max-width: 700px;
+        }
+
+        .ts-banner h1 {
+            font-size: 40px;
+            font-weight: 700;
+            margin-bottom: -15px;
+            margin-top: -20px;
+        }
+
+        .ts-banner p {
+            color: #555;
+            line-height: 1.6;
+        }
+
+        /* stats */
+
+        .ts-stats {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .ts-stat {
+            background: white;
+            padding: 15px 25px;
+            border-radius: 12px;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+            font-weight: 600;
+        }
+
+        /* ---------------- PRICE CARD ---------------- */
+
+        .price-card {
+            padding: 12px;
+            position: absolute;
+            right: 120px;
+            top: 50px;
+            width: 360px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+        }
+
+
+
+        .price-card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+
+        .price-content {
+            padding: 12px 0px;
+            text-align: center;
+        }
+
+        .price {
+            font-size: 32px;
+            font-weight: 700;
+            color: #045279;
+        }
+
+        .old {
+            text-decoration: line-through;
+            color: #999;
+            font-size: 16px;
+            margin-left: 8px;
+        }
+
+        .discount {
+            color: #ff3b3b;
+            margin: 8px 0;
+        }
+
+        .buy-btn {
+            background: linear-gradient(135deg, #045279, #7a8dff);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        /* ---------------- TOPIC BUTTON CARDS ---------------- */
+
+        .topics-wrapper {
+            background: white;
+            padding: 35px;
+            border-radius: 18px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+            margin-top: 70px;
+        }
+
+        .topics-wrapper h2 {
+            margin-bottom: 25px;
+        }
+
+        .topics-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 18px;
+        }
+
+        .topic-btn {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: #f7f9ff;
+            border: none;
+            padding: 18px;
+            border-radius: 12px;
+            text-align: left;
+            cursor: pointer;
+            transition: .3s;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+        }
+
+        .topic-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
+        }
+
+        .topic-icon {
+            font-size: 28px;
+            background: #eef2ff;
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        .topic-content h4 {
+            margin: 0;
+            font-size: 17px;
+        }
+
+        .topic-content p {
+            margin: 3px 0;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .topic-content span {
+            font-size: 12px;
+            font-weight: 600;
+            color: #045279;
+        }
+
+        /* different colors */
+
+        .c1 {
+            background: linear-gradient(135deg, #5f7cff, #7fa4ff);
+        }
+
+        .c2 {
+            background: linear-gradient(135deg, #ff7c7c, #ff9f9f);
+        }
+
+        .c3 {
+            background: linear-gradient(135deg, #2dd4bf, #5eead4);
+        }
+
+        .c4 {
+            background: linear-gradient(135deg, #fbbf24, #fcd34d);
+        }
+
+        .c5 {
+            background: linear-gradient(135deg, #a78bfa, #c4b5fd);
+        }
+
+        /* ---------------- FEATURE CARD ---------------- */
+
+        .feature-card {
+            margin-top: 70px;
+            background: white;
+            padding: 35px;
+            border-radius: 18px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .feature-grid div {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .feature-grid i {
+            color: #045279;
+        }
+
+        /* ---------------- NOTES ---------------- */
+
+        .notes-card {
+            background: white;
+            padding: 35px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+            margin: 50px 0;
+
+        }
+
+        .notes-card h3 {
+            margin-bottom: 10px;
+        }
+
+        .notes-card hr {
+            border: none;
+            height: 1px;
+            background: #eee;
+            margin-bottom: 20px;
+        }
+
+        .notes-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .notes-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 12px;
+            color: #444;
+        }
+
+        .notes-list span {
+            color: #045279;
+            font-weight: 700;
+        }
+
+
+        /* ---------------- TERMS ---------------- */
+
+        .terms {
+            margin-top: 30px;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        /* breadcrumb */
+
+        .ts-breadcrumb {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin: 10px 0 0px 0;
+            font-size: 14px;
+        }
+
+        .ts-breadcrumb a {
+            color: #045279;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .ts-breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .arrow {
+            color: #888;
+            font-size: 16px;
+            margin: 0 3px;
+        }
+
+        .current {
+            color: #555;
+            font-weight: 600;
+        }
+
+
+        /* details section */
+
+        .details-card {
+            margin-top: 70px;
+            background: white;
+            padding: 35px;
+            border-radius: 18px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+        }
+
+        .details-desc {
+            margin-top: 10px;
+            color: #555;
+            line-height: 1.6;
+            max-width: 800px;
+        }
+
+        .details-points {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .detail-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border: none;
+            background: #f7f9ff;
+            padding: 14px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: .3s;
+        }
+
+        .detail-btn i {
+            color: #045279;
+        }
+
+        .detail-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .test-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .test-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 22px;
+            border-radius: 10px;
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            transition: all 0.2s ease;
+        }
+
+        .test-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .test-info h3 {
+            margin: 0 0 8px 0;
+            font-size: 1.1rem;
+            color: #222;
+        }
+
+        .test-meta {
+            display: flex;
+            gap: 16px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .unlock-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            background: #6366f1;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .unlock-btn:hover {
+            background: #4f46e5;
+            transform: scale(1.04);
+        }
+
+        .unlock-btn svg {
+            stroke: white;
+        }
+
+        .test-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .test-tab {
+            border: none;
+            background: #f1f5ff;
+            padding: 10px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .test-tab.active {
+            background: #6366f1;
+            color: white;
+        }
+    </style>
+
+
+    <!-- BANNER -->
+
+    <section class="ts-banner">
+
+        <div class="ts-container">
+
+            <div class="ts-banner-content">
+                <div class="ts-breadcrumb">
+
+                    <a href="{{ url('/') }}">Home</a>
+
+                    @if($testseries->commission)
+                        <span class="arrow">›</span>
+                        <a href="#">{{ $testseries->commission->name }}</a>
+                    @endif
+
+                    @if($testseries->category)
+                        <span class="arrow">›</span>
+                        <a href="#">{{ $testseries->category->name }}</a>
+                    @endif
+
+                    <span class="arrow">›</span>
+                    <span class="current">{{ $testseries->title }}</span>
+
+                </div>
+
+                <h1>{{ $testseries->title }}</h1>
+
+                <p>
+                    {!! $testseries->short_description !!}
+                </p>
+
+                <div class="ts-stats">
+
+                    <div class="ts-stat">
+                        {{ $testseries->tests->sum('total_questions') }}+ Questions
+                    </div>
+
+
+                    <div class="ts-stat">
+                        {{ $testseries->testseries->count() }} Mock Tests
+                    </div>
+
+                    <div class="ts-stat">
+                        {{ number_format($testseries->orders_count ?? 0) }} Students
+                    </div>
+
+                    <div class="ts-stat">
+                        {{ $testseries->validity }} Days Validity
+                    </div>
+                </div>
+
+
+            </div>
+
+        </div>
+
+
+        <!-- PRICE CARD -->
+
+        <div class="price-card">
+
+            <img src="{{ asset('storage/' . $testseries->logo) }}">
+
+            <div class="price-content">
+
+                <div class="price">
+
+                {{ $testseries->fee_type == 'paid' ? '₹'.$testseries->price : 'Free' }}
+
+                    @if($testseries->mrp)
+                        <span class="old">₹{{ $testseries->mrp }}</span>
+                    @endif
+
+                </div>
+                @if($testseries->mrp > $testseries->price)
+                    <p class="discount">
+                        {{ round((($testseries->mrp - $testseries->price) / $testseries->mrp) * 100) }}% Limited Offer
+                    </p>
+                @endif
+                @if(auth()->user() && auth()->user()->type == 'student')
+
+                    @php
+                        $user_id = auth()->user()->id;
+                        $package_id = $testseries->id;
+                        $type = 'Test Series';
+                        $checkExist = Helper::GetStudentOrder($type, $package_id, $user_id);
+                    @endphp
+
+                    @if(!$checkExist)
+
+                        <a href="{{route('user.process-order', ['type' => 'test-series', 'id' => $testseries->id])}}">
+                            <button class="buy-btn">Enroll Now</button>
+                        </a>
+
+                    @else
+
+                        <button class="buy-btn" disabled>Already Enrolled</button>
+
+                    @endif
+
+                @else
+                    <a href="{{route('student.login')}}">
+                        <button class="buy-btn">
+                            Enroll Now
+                        </button>
+                    </a>
+                @endif
+
+                <p style="margin-top:10px;font-size:13px;">
+                    Validity : {{ $testseries->validity }} Days
+                </p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- TOPICS -->
+
+    @php
+        $type = $testseries->testseries->first()->type ?? null;
+
+        if ($type == 2) {
+            $heading = "Subjects Covered";
+        } elseif ($type == 3) {
+            $heading = "Chapters Covered";
+        } elseif ($type == 4) {
+            $heading = "Topics Covered";
+        } else {
+            $heading = "Test Coverage";
+        }
+    @endphp
+
+
+
+    <section class="ts-container topic-section">
+
+        <div class="topics-wrapper">
+
+            <h2>{{ $heading }}</h2>
+
+            <div class="topics-grid">
+
+                @foreach($testseries->tests->groupBy(
+                        $type == 2 ? 'subject_id' : ($type == 3 ? 'chapter_id' : 'topic_id')
+                    ) as $key => $tests)
+                        @php
+                            $test = $tests->first();
+
+                            if ($type == 2) {
+                                $name = $test->subject->name ?? 'General';
+                            } elseif ($type == 3) {
+                                $name = $test->chapter->name ?? 'Chapter';
+                            } elseif ($type == 4) {
+                                $name = $test->topic->name ?? 'Topic';
+                            } else {
+                                $name = 'General';
+                            }
+                        @endphp 
+                    <button class="topic-btn">
+
+                        <div class="topic-icon">📘</div>
+
+                        <div class="topic-content">
+
+                            <h4>{{ $name }}</h4>
+
+                            <p>{{ $tests->count() }} Tests</p>
+
+                            <span>{{ $tests->sum('total_questions') }} Questions</span>
+
+                        </div>
+
+                        </button>
+
+                @endforeach
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <section class="ts-container">
+
+        <div class="details-card">
+
+            <h2>Test Series Overview</h2>
+
+            {{-- OVERVIEW --}}
+            <p class="details-desc">
+                {!! $testseries->overview ?? $testseries->description !!}
+            </p>
+            @php
+                $types = $testseries->testseries->groupBy('type');
+
+                $typeNames = [
+                    1 => 'Full Length Tests',
+                    2 => 'Subject Wise Tests',
+                    3 => 'Chapter Wise Tests',
+                    4 => 'Topic Wise Practice',
+                    5 => 'Current Affairs Tests',
+                    6 => 'Previous Year Papers'
+                ];
+
+                $icons = [
+                    1 => 'fa-file-lines',
+                    2 => 'fa-layer-group',
+                    3 => 'fa-book',
+                    4 => 'fa-list',
+                    5 => 'fa-newspaper',
+                    6 => 'fa-history'
+                ];
+            @endphp
+
+            <div class="details-points">
+
+                {{-- DYNAMIC TYPES --}}
+                @foreach($types as $type => $items)
+                    <button class="detail-btn">
+                        <i class="fa-solid {{ $icons[$type] ?? 'fa-file' }}"></i>
+                        <span>
+                            {{ $items->count() }} {{ $typeNames[$type] ?? 'Tests' }}
+                        </span>
+
+                    </button>
+
+                @endforeach
+
+                {{-- VALIDITY --}}
+                <button class="detail-btn">
+                    <i class="fa-solid fa-clock"></i>
+                    <span>{{ $testseries->validity }} Days Validity</span>
+                </button>
+
+                {{-- PERFORMANCE --}}
+                <button class="detail-btn">
+                    <i class="fa-solid fa-chart-line"></i>
+                    <span>Performance Analytics</span>
+                </button>
+
+                {{-- MOBILE --}}
+                <button class="detail-btn">
+                    <i class="fa-solid fa-mobile-screen"></i>
+                    <span>Mobile Friendly</span>
+                </button>
+
+            </div>
+
+        </div>
+
+    </section>
 
-.details-desc{
-margin-top:10px;
-color:#555;
-line-height:1.6;
-max-width:800px;
-}
+    <section class="ts-container">
+        <div class="details-card">
+            <h2 style="margin-bottom:10px">Test Papers</h2>
+            @php
+                $typeNames = [
+                    1 => 'Full Test',
+                    2 => 'Subject Wise',
+                    3 => 'Chapter Wise',
+                    4 => 'Topic Wise',
+                    5 => 'Current Affairs',
+                    6 => 'PYQ'
+                ];
 
-.details-points{
-display:grid;
-grid-template-columns:repeat(3,1fr);
-gap:15px;
-margin-top:25px;
-}
+                $groupedTests = $testseries->testseries->groupBy('type');
+            @endphp
 
-.detail-btn{
-display:flex;
-align-items:center;
-gap:10px;
-border:none;
-background:#f7f9ff;
-padding:14px;
-border-radius:10px;
-cursor:pointer;
-font-weight:600;
-transition:.3s;
-}
+            <div class="test-tabs">
 
-.detail-btn i{
-color:#045279;
-}
+                @foreach($groupedTests as $type => $items)
 
-.detail-btn:hover{
-transform:translateY(-2px);
-box-shadow:0 6px 15px rgba(0,0,0,0.1);
-}
+                    <button class="test-tab {{ $loop->first ? 'active' : '' }}" data-type="type-{{ $type }}">
+                        {{ $typeNames[$type] ?? 'Tests' }}
+                        ({{ $items->count() }})
 
+                    </button>
 
-</style>
+                @endforeach
 
+            </div>
+            <!-- Test papers list -->
+            <div class="test-list">
 
-<!-- BANNER -->
+                @foreach($testseries->testseries as $detail)
+                    @php
+                        $test = $detail->test;
+                    @endphp
+                    <div class="test-item test-card type-{{ $detail->type }}"
+                        style="background: linear-gradient(90deg,#e6f3ff,#f0f9ff);">
 
-<section class="ts-banner">
+                        <div class="test-info">
 
-<div class="ts-container">
+                            <h3>{{ $test->name }}</h3>
 
-<div class="ts-banner-content">
-    <div class="ts-breadcrumb">
+                            <div class="test-meta">
 
-<a href="#">Home</a>
+                                <span>{{ $test->total_questions }} Questions</span>
 
-<span class="arrow">›</span>
+                                <span>{{ $test->total_marks }} Marks</span>
 
-<a href="#">UPSC</a>
+                                <span>{{ $test->duration }} Min</span>
 
-<span class="arrow">›</span>
+                            </div>
 
-<a href="#">Prelims</a>
+                        </div>
 
-<span class="arrow">›</span>
+                        @php
+$student = auth()->user();
+@endphp
 
-<span class="current">UPSC Prelims 2026 Test Series</span>
+@if($test->test_type == 'free')
 
-</div>
+  <a href="{{ route('live-test', base64_encode($test->id)) }}" class="unlock-btn">
+                Attempt Test
+            </a>
 
-<h1>UPSC Prelims 2026 Test Series</h1>
+@else
 
+    @if($student && $student->type == 'student')
 
+        @php
+            $checkExist = Helper::GetStudentOrder('Test Series', $testseries->id, $student->id);
+        @endphp
 
+        @if($checkExist)
 
-<p>
-Practice real exam level mock tests designed by expert faculty.
-Improve accuracy, speed and boost your All India rank with detailed performance analytics.
-</p>
+            <a href="{{ route('live-test', base64_encode($test->id)) }}" class="unlock-btn">
+                Attempt Test
+            </a>
 
-<div class="ts-stats">
+        @else
 
-<div class="ts-stat">120+ Questions</div>
+            <a href="{{ route('user.process-order', ['type' => 'test-series', 'id' => $testseries->id]) }}" class="unlock-btn">
+                <i class="fa fa-lock"></i>
+                Unlock
+            </a>
 
-<div class="ts-stat">15 Mock Tests</div>
+        @endif
 
-<div class="ts-stat">3500+ Students</div>
+    @else
 
-<div class="ts-stat">365 Days Validity</div>
+        <a href="{{ route('student.login') }}" class="unlock-btn">
+            <i class="fa fa-lock"></i>
+            Unlock
+        </a>
 
-</div>
+    @endif
 
-</div>
+@endif
 
-</div>
+                    </div>
 
+                @endforeach
 
-<!-- PRICE CARD -->
+            </div>
+        </div>
+    </section>
 
-<div class="price-card">
 
-<img src="https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8">
 
-<div class="price-content">
 
-<div class="price">
+    <!-- FEATURES -->
 
-₹499 <span class="old">₹999</span>
+    <section class="ts-container">
 
-</div>
+        <div class="feature-card">
 
-<p class="discount">50% Limited Offer</p>
+            <h2>Key Features</h2>
 
-<button class="buy-btn">Enroll Now</button>
+            <div class="feature-grid">
 
-<p style="margin-top:10px;font-size:13px;">
-Validity : 365 Days
-</p>
+                @if(!empty($testseries->key_features))
 
-</div>
+                    @foreach(json_decode($testseries->key_features ?? '[]') as $feature)
+                        <div>
+                            <i class="fa-solid fa-check"></i> {{ $feature }}
+                        </div>
 
-</div>
+                    @endforeach
 
-</section>
+                @else
 
+                    <div>No features available</div>
 
-<!-- TOPICS -->
+                @endif
 
-<section class="ts-container topic-section">
+            </div>
 
-<div class="topics-wrapper">
+        </div>
 
-<h2>Topics Covered</h2>
+    </section>
 
-<div class="topics-grid">
 
-<button class="topic-btn">
-<div class="topic-icon">📘</div>
-<div class="topic-content">
-<h4>Polity</h4>
-<p>Indian Constitution & Governance</p>
-<span>20 Questions</span>
-</div>
-</button>
+    <!-- description -->
 
-<button class="topic-btn">
-<div class="topic-icon">📕</div>
-<div class="topic-content">
-<h4>History</h4>
-<p>Ancient & Modern India</p>
-<span>25 Questions</span>
-</div>
-</button>
+    <section class="ts-container">
 
-<button class="topic-btn">
-<div class="topic-icon">📊</div>
-<div class="topic-content">
-<h4>Economics</h4>
-<p>Indian Economy Concepts</p>
-<span>18 Questions</span>
-</div>
-</button>
+        <div class="notes-card">
 
-<button class="topic-btn">
-<div class="topic-icon">🌿</div>
-<div class="topic-content">
-<h4>Environment</h4>
-<p>Ecology & Biodiversity</p>
-<span>12 Questions</span>
-</div>
-</button>
+            <h2>Test Series Description</h2>
 
-<button class="topic-btn">
-<div class="topic-icon">🔬</div>
-<div class="topic-content">
-<h4>Science</h4>
-<p>General Science</p>
-<span>15 Questions</span>
-</div>
-</button>
+            {{-- OVERVIEW --}}
+            <p class="details-desc">
+                {!! $testseries->description !!}
+            </p>
 
-</div>
 
-</div>
 
-</section>
+        </div>
 
-<section class="ts-container">
+    </section>
 
-<div class="details-card">
 
-<h2>Test Series Details</h2>
+    <script>
 
-<p class="details-desc">
-This test series is specially designed for aspirants preparing for UPSC Prelims examination.
-It includes full length mock tests and topic wise practice papers that simulate the real exam environment.
-</p>
+        document.querySelectorAll(".test-tab").forEach(tab => {
 
-<div class="details-points">
+            tab.addEventListener("click", function () {
 
-<button class="detail-btn">
-<i class="fa-solid fa-file-lines"></i>
-<span>15 Full Length Tests</span>
-</button>
+                document.querySelectorAll(".test-tab").forEach(t => t.classList.remove("active"));
+                this.classList.add("active");
 
-<button class="detail-btn">
-<i class="fa-solid fa-layer-group"></i>
-<span>Topic Wise Practice</span>
-</button>
+                let type = this.dataset.type;
 
-<button class="detail-btn">
-<i class="fa-solid fa-chart-line"></i>
-<span>Performance Analytics</span>
-</button>
+                document.querySelectorAll(".test-card").forEach(card => {
 
-<button class="detail-btn">
-<i class="fa-solid fa-ranking-star"></i>
-<span>All India Rank</span>
-</button>
+                    card.style.display = "none";
 
-<button class="detail-btn">
-<i class="fa-solid fa-clock"></i>
-<span>365 Days Validity</span>
-</button>
+                    if (card.classList.contains(type)) {
+                        card.style.display = "flex";
+                    }
 
-<button class="detail-btn">
-<i class="fa-solid fa-mobile-screen"></i>
-<span>Mobile Friendly</span>
-</button>
+                });
 
-</div>
+            });
 
-</div>
+        });
 
-</section>
+        // show first tab initially
+        document.querySelector(".test-tab.active")?.click();
 
-
-
-
-<!-- FEATURES -->
-
-<section class="ts-container">
-
-<div class="feature-card">
-
-<h2>Key Features</h2>
-
-<div class="feature-grid">
-
-<div><i class="fa-solid fa-check"></i> Full Length Mock Tests</div>
-
-<div><i class="fa-solid fa-check"></i> Topic Wise Practice Tests</div>
-
-<div><i class="fa-solid fa-check"></i> Detailed Solutions</div>
-
-<div><i class="fa-solid fa-check"></i> Performance Analytics</div>
-
-<div><i class="fa-solid fa-check"></i> All India Ranking</div>
-
-<div><i class="fa-solid fa-check"></i> Real Exam Simulation</div>
-
-</div>
-
-</div>
-
-</section>
-
-
-<!-- NOTES -->
-
-<section class="ts-container">
-
-<div class="notes-card">
-
-<h3>Important Notes</h3>
-
-<hr>
-
-<ul class="notes-list">
-
-<li>
-<span>✔</span>
-Tests are designed according to the latest exam pattern.
-</li>
-
-<li>
-<span>✔</span>
-Each question contains detailed explanation.
-</li>
-
-<li>
-<span>✔</span>
-Rank comparison with thousands of students.
-</li>
-
-<li>
-<span>✔</span>
-Attempt tests anytime during validity period.
-</li>
-
-</ul>
-
-</div>
-
-</section>
-
-
-
-<!-- TERMS -->
-
-
+    </script>
 
 
 @endsection

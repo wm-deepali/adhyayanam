@@ -172,14 +172,25 @@
                     </div>
 
                     <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="duration" class="form-label">Duration</label>
-                                <input type="text" class="form-control" name="duration" placeholder="Duration"
-                                    value="{{ $course->duration }}" required>
-                                @error('duration')
-                                    <span class="text-danger">{{ $message }}</span>
-                                @enderror
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="duration" class="form-label">Duration (Weeks)</label>
+                                    <input type="number" class="form-control" name="duration"
+                                        placeholder="Duration in Weeks" value="{{ $course->duration }}" required>
+                                    @error('duration')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="weekly_study" class="form-label">Weekly Study (Hours)</label>
+                                    <input type="number" class="form-control" name="weekly_study"
+                                        placeholder="Hours per Week" value="{{ $course->weekly_study }}" required>
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -640,8 +651,8 @@
                         response.categories.forEach(category => {
                             categorySelect.innerHTML +=
                                 `<option value="${category.id}" ${category.id == selectedCategory ? 'selected' : ''}>
-                    ${category.name}
-                </option>`;
+                        ${category.name}
+                    </option>`;
                         });
 
                     },

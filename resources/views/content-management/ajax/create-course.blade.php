@@ -149,13 +149,24 @@
 
 
                     <div class="row">
+
+
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="duration" class="form-label">Duration</label>
-                                <input type="text" class="form-control" name="duration" placeholder="Duration" required>
+                                <label for="duration" class="form-label">Duration (Weeks)</label>
+                                <input type="number" class="form-control" name="duration" placeholder="Duration in Weeks"
+                                    required>
                                 @error('duration')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="weekly_study" class="form-label">Weekly Study (Hours)</label>
+                                <input type="number" class="form-control" name="weekly_study" placeholder="Hours per Week"
+                                    required>
                             </div>
                         </div>
                         <div class="col-md-6">

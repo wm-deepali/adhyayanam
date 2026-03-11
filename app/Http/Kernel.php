@@ -72,6 +72,8 @@ class Kernel extends HttpKernel
         // Admin Check
         'isAdmin' => \App\Http\Middleware\isAdmin::class,
 
+        'isStudent' => \App\Http\Middleware\isStudent::class,
+
         // ⭐ OUR CUSTOM JSON PERMISSION SYSTEM ⭐
         'custom.permission' => \App\Http\Middleware\CheckPermission::class,
     ];

@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Controllers;
 
+use App\Models\CourseReview;
 use PDF;
 use Carbon\Carbon;
 use App\Models\User;
@@ -196,6 +197,11 @@ class FrontUserController extends Controller
         // ===============================
         // LIVE CLASSES (ONLINE MODE)
         // ===============================
+
+        $review = CourseReview::where('course_id', $course->id)
+            ->where('student_id', auth()->id())
+            ->first();
+
         if (strtolower($course->course_mode) === 'online') {
 
             $liveClasses = Video::with([
@@ -244,7 +250,8 @@ class FrontUserController extends Controller
                 'totalSessions',
                 'firstLiveDate',
                 'lastLiveDate',
-                'teachers'
+                'teachers',
+                'review'
             ));
         }
 
@@ -256,15 +263,15 @@ class FrontUserController extends Controller
             ->orderBy('created_at', 'asc')
             ->get();
 
-            // dd($videoLessons->toArray());
-        return view('front-users.course-detail-lms', compact('course', 'videoLessons'));
+        // dd($videoLessons->toArray());
+        return view('front-users.course-detail-lms', compact('course', 'videoLessons', 'review', 'reviews'));
     }
 
     public function uploadAssignment(Request $request)
     {
         $request->validate([
             'video_id' => 'required|exists:videos,id',
-           'assignment_file' => 'required|file|mimes:pdf,jpg,jpeg,png|max:5120',
+            'assignment_file' => 'required|file|mimes:pdf,jpg,jpeg,png|max:5120',
 
         ]);
 
@@ -299,6 +306,21 @@ class FrontUserController extends Controller
         return back()->with('success', 'Homework submitted successfully.');
     }
 
+    public function storeCourseReview(Request $request)
+    {
+        CourseReview::updateOrCreate(
+            [
+                'student_id' => auth()->id(),
+                'course_id' => $request->course_id
+            ],
+            [
+                'rating' => $request->rating,
+                'review' => $request->review
+            ]
+        );
+
+        return back()->with('success', 'Review submitted successfully');
+    }
     public function watch($id)
     {
         $userId = auth()->id();

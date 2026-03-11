@@ -153,4 +153,9 @@ class User extends Authenticatable implements HasMedia, MustVerifyEmail
         return $this->belongsTo(User::class, 'created_by');
     }
 
+    public function courseReviews()
+    {
+        return $this->hasMany(CourseReview::class, 'student_id');
+    }
+
 }

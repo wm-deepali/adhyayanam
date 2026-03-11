@@ -208,7 +208,12 @@
                             <div class="text-danger validation-err" id="price-err"></div>
 
                         </div>
-
+                        <div class="col-md-6">
+                            <label for="validity" class="form-label">Validity (Days)</label>
+                            <input type="number" class="form-control" name="validity" id="validity"
+                                placeholder="Enter validity in days">
+                            <div class="text-danger validation-err" id="validity-err"></div>
+                        </div>
 
                         <div class="col-md-12">
                             <label for="description" class="form-label">Short Description</label>
@@ -218,6 +223,22 @@
                         <div class="col-md-12">
                             <label for="description" class="form-label">Content</label>
                             <textarea class="form-control editor" id="content" name="description"></textarea>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label">Overview</label>
+                            <textarea class="form-control editor" name="overview"></textarea>
+                        </div>
+
+                        <div class="col-md-12">
+                            <label class="form-label">Key Features</label>
+
+                            <div id="feature-wrapper">
+                                <div class="d-flex mb-2 feature-row">
+                                    <input type="text" name="key_features[]" class="form-control"
+                                        placeholder="Enter Feature">
+                                    <button type="button" class="btn btn-success add-feature ms-2">+</button>
+                                </div>
+                            </div>
 
                         </div>
                     </div>
@@ -464,10 +485,25 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-<script src="https://cdn.ckeditor.com/4.16.2/full/ckeditor.js"></script>
+    <script src="https://cdn.ckeditor.com/4.16.2/full/ckeditor.js"></script>
     <script>
         $(document).ready(function () {
 
+
+            $(document).on('click', '.add-feature', function () {
+
+                $('#feature-wrapper').append(`
+                <div class="d-flex mb-2 feature-row">
+                    <input type="text" name="key_features[]" class="form-control" placeholder="Enter Feature">
+                    <button type="button" class="btn btn-danger remove-feature ms-2">-</button>
+                </div>
+            `);
+
+            });
+
+            $(document).on('click', '.remove-feature', function () {
+                $(this).closest('.feature-row').remove();
+            });
 
             function calculateOfferedPrice() {
                 var mrp = parseFloat($('#mrp').val());
@@ -485,12 +521,12 @@
             $('#mrp, #discount').on('input', calculateOfferedPrice);
         })
         $(document).ready(function () {
-           $('.editor').each(function () {
-    CKEDITOR.replace(this, {
-        filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
-        filebrowserUploadMethod: 'form'
-    });
-});
+            $('.editor').each(function () {
+                CKEDITOR.replace(this, {
+                    filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
+                    filebrowserUploadMethod: 'form'
+                });
+            });
 
             $(document).on('click', '.question', function (event) {
                 if ($(this).is(":checked")) {
@@ -502,7 +538,7 @@
         });
 
         function initSelect2(container = document) {
-            $(container).find('.subject_ids, .chapter_ids, .topic_ids').each(function() {
+            $(container).find('.subject_ids, .chapter_ids, .topic_ids').each(function () {
                 const $select = $(this);
                 // Destroy existing Select2 instance if it exists
                 if ($select.hasClass('select2-hidden-accessible')) {
@@ -513,35 +549,35 @@
                     placeholder: 'Select options',
                     width: '100%'
                 });
-                
+
                 // Explicitly bind change event after Select2 initialization
                 if ($select.hasClass('subject_ids')) {
-                    $select.off('change.select2Handler').on('change.select2Handler', function() {
+                    $select.off('change.select2Handler').on('change.select2Handler', function () {
                         handleSubjectChange(this);
                     });
                     // Also bind Select2 specific events
                     $select.off('select2:select.select2Handler select2:unselect.select2Handler select2:clear.select2Handler')
-                           .on('select2:select.select2Handler select2:unselect.select2Handler select2:clear.select2Handler', function(e) {
-                        // Use setTimeout to ensure the value is updated before handling
-                        setTimeout(function() {
-                            handleSubjectChange($select[0]);
-                        }, 10);
-                    });
+                        .on('select2:select.select2Handler select2:unselect.select2Handler select2:clear.select2Handler', function (e) {
+                            // Use setTimeout to ensure the value is updated before handling
+                            setTimeout(function () {
+                                handleSubjectChange($select[0]);
+                            }, 10);
+                        });
                 }
-                
+
                 // Bind change event for chapter_ids
                 if ($select.hasClass('chapter_ids')) {
-                    $select.off('change.select2Handler').on('change.select2Handler', function() {
+                    $select.off('change.select2Handler').on('change.select2Handler', function () {
                         handleChapterChange(this);
                     });
                     // Also bind Select2 specific events
                     $select.off('select2:select.select2Handler select2:unselect.select2Handler select2:clear.select2Handler')
-                           .on('select2:select.select2Handler select2:unselect.select2Handler select2:clear.select2Handler', function(e) {
-                        // Use setTimeout to ensure the value is updated before handling
-                        setTimeout(function() {
-                            handleChapterChange($select[0]);
-                        }, 10);
-                    });
+                        .on('select2:select.select2Handler select2:unselect.select2Handler select2:clear.select2Handler', function (e) {
+                            // Use setTimeout to ensure the value is updated before handling
+                            setTimeout(function () {
+                                handleChapterChange($select[0]);
+                            }, 10);
+                        });
                 }
             });
         }
@@ -1059,7 +1095,7 @@
                         //toastr.error('error encountered ' + result.msgText);
                     }
                 },
-                error: function(xhr, status, error) {
+                error: function (xhr, status, error) {
                     console.error('AJAX error loading subjects:', error);
                     console.error('Response:', xhr.responseText);
                 }
@@ -1092,7 +1128,7 @@
                             toastr.error('error encountered ' + result.msgText);
                         }
                     },
-                    error: function(xhr, status, error) {
+                    error: function (xhr, status, error) {
                         console.error('AJAX error fetching chapters:', error);
                         console.error('Response:', xhr.responseText);
                     }
@@ -1111,7 +1147,7 @@
         $(document).on('select2:select select2:unselect select2:clear', '.subject_ids', function (e) {
             const $select = $(this);
             // Small delay to ensure value is updated
-            setTimeout(function() {
+            setTimeout(function () {
                 handleSubjectChange($select[0]);
             }, 50);
         });
@@ -1123,7 +1159,7 @@
             if (!row.find('.topic-filter').hasClass('d-none')) {
                 // Handle array of IDs - convert to comma-separated string for URL
                 let chapterIdsParam = Array.isArray(chapterIds) ? chapterIds.join(',') : (chapterIds || '');
-                
+
                 $.ajax({
                     url: `{{ URL::to('fetch-topic-by-chapter') }}/${chapterIdsParam}`,
                     type: 'GET',
@@ -1143,7 +1179,7 @@
                             toastr.error('error encountered ' + result.msgText);
                         }
                     },
-                    error: function(xhr, status, error) {
+                    error: function (xhr, status, error) {
                         console.error('AJAX error fetching topics:', error);
                         console.error('Response:', xhr.responseText);
                     }
@@ -1162,7 +1198,7 @@
         $(document).on('select2:select select2:unselect select2:clear', '.chapter_ids', function (e) {
             const $select = $(this);
             // Small delay to ensure value is updated
-            setTimeout(function() {
+            setTimeout(function () {
                 handleChapterChange($select[0]);
             }, 50);
         });

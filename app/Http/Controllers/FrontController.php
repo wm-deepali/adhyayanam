@@ -231,51 +231,73 @@ class FrontController extends Controller
 
     public function courseIndex(Request $request)
     {
+        $exam_id = $request->query('exam_id');
+        $category_id = $request->query('category_id');
+        $sub_category_id = $request->query('sub_category_id');
         $search = $request->query('search');
+        $sort = $request->query('sort');
 
-        $subjectQuery = Subject::with(['chapters']);
-        $data['subjects'] = $subjectQuery->get();
-        $chapterQuery = Chapter::with(['subject']);
-        $data['chapters'] = $chapterQuery->get();
+        // Limit commission, categories, subcategories
+        $data['commissions'] = ExaminationCommission::with(['categories.subCategories'])
+            ->get();
 
-        $topicQuery = CourseTopic::with(['subject', 'chapter']);
-        $data['topics'] = $topicQuery->get();
+        // Load subcategories when category selected
+        $data['subcategories'] = collect();
 
+        if ($category_id) {
+            $data['subcategories'] = SubCategory::where('category_id', $category_id)
+                ->get();
+        }
+
+        // Course query
         $courseQuery = Course::with(['examinationCommission', 'category', 'subCategory']);
 
-        // ---- FILTERS BASED ON MULTIPLE IDs ----
-        if (!empty($subject_id)) {
-            $courseQuery->whereJsonContains('subject_id', (string) $subject_id);
+        // Filters
+        if ($exam_id) {
+            $courseQuery->where('examination_commission_id', $exam_id);
         }
 
-        if (!empty($chapter_id)) {
-            $courseQuery->whereJsonContains('chapter_id', (string) $chapter_id);
+        if ($category_id) {
+            $courseQuery->where('category_id', $category_id);
         }
 
-        if (!empty($topic_id)) {
-            $courseQuery->whereJsonContains('topic_id', (string) $topic_id);
+        if ($sub_category_id) {
+            $courseQuery->where('sub_category_id', $sub_category_id);
         }
 
-        // ---- SAFE SEARCH ----
+        // Search
         if ($search) {
             $courseQuery->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                    ->orwhere('course_heading', 'like', "%{$search}%")
+                    ->orWhere('course_heading', 'like', "%{$search}%")
                     ->orWhere('short_description', 'like', "%{$search}%");
             });
         }
 
-        $data['courses'] = $courseQuery->paginate(10)->withQueryString();
+        // Sorting
+        if ($sort) {
+
+            if ($sort == 'newest') {
+                $courseQuery->latest();
+            }
+
+            if ($sort == 'price_low') {
+                $courseQuery->orderBy('offered_price', 'asc');
+            }
+
+            if ($sort == 'price_high') {
+                $courseQuery->orderBy('offered_price', 'desc');
+            }
+
+        } else {
+            // Default sorting
+            $courseQuery->latest();
+        }
+
+        // Pagination
+        $data['courses'] = $courseQuery->paginate(9)->withQueryString();
 
         return view('front.user.courses', $data);
-    }
-
-    public function courseDetails($id)
-    {
-        $data['course'] = Course::findOrFail($id);
-
-        // dd($data['course']->toArray());
-        return view('front.user.course-detail', $data);
     }
 
     public function courseFilter(Request $request, $id)
@@ -334,6 +356,20 @@ class FrontController extends Controller
         $data['courses'] = $courseQuery->paginate(10)->withQueryString();
         $data['subcat'] = $id;
         return view('front.user.courses', $data);
+    }
+
+    public function courseDetails($id)
+    {
+        $course = Course::withCount([
+            'orders as orders_count' => function ($q) {
+                $q->where('order_status', 'PAID');
+            }
+        ])->findOrFail($id);
+
+        $avgRating = round($course->reviews->avg('rating'), 1);
+        $totalReviews = $course->reviews->count();
+
+        return view('front.user.course-detail', compact('course', 'avgRating', 'totalReviews'));
     }
 
     public function enquiryIndex()
@@ -457,80 +493,73 @@ class FrontController extends Controller
         $data['data'] = TestPlanner::findOrFail($id);
         return view('front.user.test-planner-details', $data);
     }
-    public function studyMaterialIndex(Request $request, $examid = null, $catid = null, $subcat = null)
+    public function studyMaterialIndex(Request $request)
     {
-        $subject_id = $request->query('subject_id');
-        $chapter_id = $request->query('chapter_id');
-        $topic_id = $request->query('topic_id');
+
+        $exam_id = $request->query('exam_id');
+        $category_id = $request->query('category_id');
+        $sub_category_id = $request->query('sub_category_id');
         $search = $request->query('search');
+        $sort = $request->query('sort');
 
-        // ===== SUBJECT FILTERS =====
-        $subjectQuery = Subject::with(['chapters']);
-        if ($examid)
-            $subjectQuery->where('exam_com_id', $examid);
-        if ($catid)
-            $subjectQuery->where('category_id', $catid);
-        if ($subcat)
-            $subjectQuery->where('sub_category_id', $subcat);
-        $data['subjects'] = $subjectQuery->get();
+        // Limit commission, categories, subcategories
+        $data['commissions'] = ExaminationCommission::with(['categories.subCategories'])
+            ->get();
 
-        // ===== CHAPTER FILTERS =====
-        $chapterQuery = Chapter::with(['subject']);
-        if ($examid)
-            $chapterQuery->where('exam_com_id', $examid);
-        if ($catid)
-            $chapterQuery->where('category_id', $catid);
-        if ($subcat)
-            $chapterQuery->where('sub_category_id', $subcat);
-        $data['chapters'] = $chapterQuery->get();
+        // Load subcategories when category selected
+        $data['subcategories'] = collect();
 
-        // ===== TOPIC FILTERS =====
-        $topicQuery = CourseTopic::with(['subject', 'chapter']);
-        if ($examid)
-            $topicQuery->where('exam_com_id', $examid);
-        if ($catid)
-            $topicQuery->where('category_id', $catid);
-        if ($subcat)
-            $topicQuery->where('sub_category_id', $subcat);
-        $data['topics'] = $topicQuery->get();
+        if ($category_id) {
+            $data['subcategories'] = SubCategory::where('category_id', $category_id)
+                ->get();
+        }
 
-        // ===== STUDY MATERIALS =====
+        // Study Material Query
         $studyMaterialsQuery = StudyMaterial::with(['commission', 'category', 'subcategory']);
-
-        if ($examid)
-            $studyMaterialsQuery->where('commission_id', $examid);
-        if ($catid)
-            $studyMaterialsQuery->where('category_id', $catid);
-        if ($subcat)
-            $studyMaterialsQuery->where('sub_category_id', $subcat);
-
-        // ---- FILTERS BASED ON MULTIPLE IDs ----
-        if (!empty($subject_id)) {
-            $studyMaterialsQuery->whereJsonContains('subject_id', (string) $subject_id);
+        // Filters
+        if ($exam_id) {
+            $studyMaterialsQuery->where('commission_id', $exam_id);
         }
 
-        if (!empty($chapter_id)) {
-            $studyMaterialsQuery->whereJsonContains('chapter_id', (string) $chapter_id);
+        if ($category_id) {
+            $studyMaterialsQuery->where('category_id', $category_id);
         }
 
-        if (!empty($topic_id)) {
-            $studyMaterialsQuery->whereJsonContains('topic_id', (string) $topic_id);
+        if ($sub_category_id) {
+            $studyMaterialsQuery->where('sub_category_id', $sub_category_id);
         }
 
-        // ---- SAFE SEARCH ----
+        // Search
         if ($search) {
             $studyMaterialsQuery->where(function ($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")
+                $q->Where('title', 'like', "%{$search}%")
                     ->orWhere('short_description', 'like', "%{$search}%");
             });
         }
 
-        $data['studyMaterials'] = $studyMaterialsQuery->paginate(10)->withQueryString();
+        // Sorting
+        if ($sort) {
 
-        // Keep the route parameters for pagination and filters
-        $data['examid'] = $examid;
-        $data['catid'] = $catid;
-        $data['subcat'] = $subcat;
+            if ($sort == 'newest') {
+                $studyMaterialsQuery->latest();
+            }
+
+            if ($sort == 'price_low') {
+                $studyMaterialsQuery->orderBy('price', 'asc');
+            }
+
+            if ($sort == 'price_high') {
+                $studyMaterialsQuery->orderBy('price', 'desc');
+            }
+
+        } else {
+            // Default sorting
+            $studyMaterialsQuery->latest();
+        }
+
+        // Pagination
+        $data['studyMaterials'] = $studyMaterialsQuery->paginate(9)->withQueryString();
+
 
         return view('front.user.study-material', $data);
     }
@@ -710,116 +739,87 @@ class FrontController extends Controller
     public function testseriesIndex(Request $request)
     {
 
+        $exam_id = $request->query('exam_id');
+        $category_id = $request->query('category_id');
+        $sub_category_id = $request->query('sub_category_id');
         $search = $request->query('search');
+        $sort = $request->query('sort');
 
-        $subjectQuery = Subject::with(['chapters']);
-        $data['subjects'] = $subjectQuery->get();
-        $chapterQuery = Chapter::with(['subject']);
-        $data['chapters'] = $chapterQuery->get();
+        // Limit commission, categories, subcategories
+        $data['commissions'] = ExaminationCommission::with(['categories.subCategories'])
+            ->get();
 
-        $topicQuery = CourseTopic::with(['subject', 'chapter']);
-        $data['topics'] = $topicQuery->get();
+        // Load subcategories when category selected
+        $data['subcategories'] = collect();
 
-        // Base query (menu-level filters)
-        $query = TestSeries::with('testseries');
-
-        /* ================= SEARCH ================= */
-        if ($request->filled('search')) {
-            $query->where('title', 'like', '%' . $request->search . '%');
-            $data['search'] = $request->search;
+        if ($category_id) {
+            $data['subcategories'] = SubCategory::where('category_id', $category_id)
+                ->get();
         }
 
-        /* ================= SUBJECT FILTER ================= */
-        if ($request->filled('subject_id')) {
-            $subjectId = (int) $request->subject_id;
+        // Test Series Query
+        $testSeriesQuery = TestSeries::with('testseries', 'commission', 'category', 'subcategory');
 
-            $query->whereHas('testseries', function ($q) use ($subjectId) {
-                $q->whereJsonContains('subject_ids', $subjectId);
+        // Filters
+        if ($exam_id) {
+            $testSeriesQuery->where('exam_com_id', $exam_id);
+        }
+
+        if ($category_id) {
+            $testSeriesQuery->where('category_id', $category_id);
+        }
+
+        if ($sub_category_id) {
+            $testSeriesQuery->where('sub_category_id', $sub_category_id);
+        }
+
+        // Search
+        if ($search) {
+            $testSeriesQuery->where(function ($q) use ($search) {
+                $q->Where('title', 'like', "%{$search}%")
+                    ->orWhere('short_description', 'like', "%{$search}%");
             });
         }
 
-        /* ================= CHAPTER FILTER ================= */
-        if ($request->filled('chapter_id')) {
-            $chapterId = (int) $request->chapter_id;
+        // Sorting
+        if ($sort) {
 
-            $query->whereHas('testseries', function ($q) use ($chapterId) {
-                $q->whereJsonContains('chapter_ids', $chapterId);
-            });
+            if ($sort == 'newest') {
+                $testSeriesQuery->latest();
+            }
+
+            if ($sort == 'price_low') {
+                $testSeriesQuery->orderBy('price', 'asc');
+            }
+
+            if ($sort == 'price_high') {
+                $testSeriesQuery->orderBy('price', 'desc');
+            }
+
+        } else {
+            // Default sorting
+            $testSeriesQuery->latest();
         }
 
-        /* ================= TOPIC FILTER ================= */
-        if ($request->filled('topic_id')) {
-            $topicId = (int) $request->topic_id;
+        // Pagination
+        $data['testPackages'] = $testSeriesQuery->paginate(9)->withQueryString();
 
-            $query->whereHas('testseries', function ($q) use ($topicId) {
-                $q->whereJsonContains('topic_ids', $topicId);
-            });
-        }
-
-        $data['testPackages'] = $query->paginate(10)->withQueryString();
-
-        return view('front.test-series', $data);
-    }
-
-    public function testseries(Request $request, $examid, $catid, $subcat)
-    {
-        $data['subcat'] = SubCategory::findOrFail($subcat);
-
-        // Sidebar data
-        $data['subjects'] = Subject::where('sub_category_id', $subcat)->get();
-        $data['chapters'] = Chapter::where('sub_category_id', $subcat)->get();
-        $data['topics'] = CourseTopic::where('sub_category_id', $subcat)->get();
-
-        // Base query (menu-level filters)
-        $query = TestSeries::with('testseries')
-            ->where('exam_com_id', $examid)
-            ->where('category_id', $catid)
-            ->where('sub_category_id', $subcat);
-
-        /* ================= SEARCH ================= */
-        if ($request->filled('search')) {
-            $query->where('title', 'like', '%' . $request->search . '%');
-            $data['search'] = $request->search;
-        }
-
-        /* ================= SUBJECT FILTER ================= */
-        if ($request->filled('subject_id')) {
-            $subjectId = (int) $request->subject_id;
-
-            $query->whereHas('testseries', function ($q) use ($subjectId) {
-                $q->whereJsonContains('subject_ids', $subjectId);
-            });
-        }
-
-        /* ================= CHAPTER FILTER ================= */
-        if ($request->filled('chapter_id')) {
-            $chapterId = (int) $request->chapter_id;
-
-            $query->whereHas('testseries', function ($q) use ($chapterId) {
-                $q->whereJsonContains('chapter_ids', $chapterId);
-            });
-        }
-
-        /* ================= TOPIC FILTER ================= */
-        if ($request->filled('topic_id')) {
-            $topicId = (int) $request->topic_id;
-
-            $query->whereHas('testseries', function ($q) use ($topicId) {
-                $q->whereJsonContains('topic_ids', $topicId);
-            });
-        }
-
-        $data['testPackages'] = $query->paginate(10)->withQueryString();
-
-        return view('front.test-series', $data);
+        return view('front.user.test-series', $data);
     }
 
     public function testseriesDetail($slug)
     {
-        $testseries = TestSeries::where('slug', $slug)->first();
+
+        $testseries = TestSeries::where('slug', $slug)->withCount([
+            'orders as orders_count' => function ($q) {
+                $q->where('order_status', 'PAID');
+            }
+        ])->first();
+
         $data['testseries'] = $testseries;
         $data['relatedtestseries'] = TestSeries::where('exam_com_id', $testseries->exam_com_id)->where('id', '!=', $testseries->id)->get();
-        return view('front.test-series-detail', $data);
+        // dd($testseries->toArray());
+        return view('front.user.test-series-details', $data);
     }
 
     public function subjectPapers($id)

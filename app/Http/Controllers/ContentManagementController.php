@@ -1734,7 +1734,6 @@ class ContentManagementController extends Controller
 
             'name' => 'required|string|max:255',
             'duration' => 'required|string|max:255',
-            'weekly_study' => 'required|numeric|max:0',
             'course_fee' => 'required|numeric|min:0',
 
             // 🔥 Discount is PERCENTAGE
@@ -1884,7 +1883,6 @@ class ContentManagementController extends Controller
 
             'name' => 'required|string|max:255',
             'duration' => 'required|string|max:255',
-            'weekly_study' => 'required|numeric|max:0',
             'course_fee' => 'required|numeric|min:0',
 
             // 🔥 Discount is PERCENTAGE

@@ -67,11 +67,12 @@
 
                             {{-- Category Wise Counts --}}
                             @php
-                                $chapterCount = $testseries->testseries->where('type_name', 'Chapter Test')->count();
-                                $subjectCount = $testseries->testseries->where('type_name', 'Subject Wise')->count();
-                                $topicCount = $testseries->testseries->where('type_name', 'Topic Wise')->count();
-                                $fullCount = $testseries->testseries->where('type_name', 'Full Test')->count();
-                                $prevCount = $testseries->testseries->where('paper_type', 1)->count();
+                                $fullCount = $testseries->testseries->where('type', 1)->count();
+                                $subjectCount = $testseries->testseries->where('type', 2)->count();
+                                $chapterCount = $testseries->testseries->where('type', 3)->count();
+                                $topicCount = $testseries->testseries->where('type', 4)->count();
+                                $currentCount = $testseries->testseries->where('type', 5)->count();
+                                $prevCount = $testseries->testseries->where('type', 6)->count();
                             @endphp
 
                             <div class="row">
@@ -86,6 +87,7 @@
                                 <div class="col-md-6">
                                     <div class="list-group mb-3">
                                         <div class="list-group-item">Full Tests: {{ $fullCount }}</div>
+                                        <div class="list-group-item">Current Affair Papers: {{ $currentCount }}</div>
                                         <div class="list-group-item">Previous Year Papers: {{ $prevCount }}</div>
                                     </div>
                                 </div>
@@ -117,7 +119,7 @@
                                 </div>
 
                                 <div class="text-center mb-3">
-                                    <a href="{{ route('order.checkout', ['package_id' => $testseries->id, 'type' => 'Test Series']) }}"
+                                    <a href="{{ route('user.process-order', ['type' => 'test-series', 'id' => $testseries->id]) }}"
                                         class="btn btn-primary btn-lg">
                                         Buy Now
                                     </a>
@@ -183,7 +185,7 @@
                                                     </div>
 
                                                     <div>
-                                                        <a href="{{ route('live-test', base64_encode($testpaper->id)) }}"
+                                                        <a href="{{ route('test.instruction', base64_encode($testpaper->id)) }}"
                                                             class="btn btn-success btn-sm">
                                                             Attempt Now
                                                         </a>
@@ -232,7 +234,7 @@
                                                     </div>
 
                                                     <div>
-                                                        <a href="{{ route('live-test', base64_encode($testpaper->id)) }}"
+                                                        <a href="{{ route('test.instruction', base64_encode($testpaper->id)) }}"
                                                             class="btn btn-success btn-sm">
                                                             Attempt Now
                                                         </a>

@@ -184,8 +184,16 @@ class TeacherResultController extends Controller
 
         $answer = StudentTestAnswer::find($request->question_id);
 
+
         if (!$answer) {
             return response()->json(['status' => false, 'msg' => 'Answer not found']);
+        }
+
+        if ($request->marks > $answer->positive_mark) {
+            return response()->json([
+                'status' => false,
+                'msg' => 'Marks cannot be greater than maximum marks (' . $answer->positive_mark . ')'
+            ]);
         }
 
         $attempt = StudentTestAttempt::find($answer->attempt_id);
@@ -226,7 +234,7 @@ class TeacherResultController extends Controller
         } elseif ($newMarks > 0 && $newMarks < $max) {
             $answer->evaluation_status = 'partial';
         } else {
-            $answer->evaluation_status = 'evaluated';
+            $answer->evaluation_status = 'pending';
         }
 
         $answer->requires_manual_check = false;

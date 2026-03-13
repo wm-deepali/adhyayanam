@@ -103,8 +103,8 @@
 						<h4>Courses & Test Series</h4>
 						<ul class="list-link">
 							<li><a href="{{route('courses')}}">Our Courses</a></li>
-							<li><a href="test-series.html">Test Series</a></li>
-							<li><a href="#">PYQ</a></li>
+							<li><a href="{{ route('test-series-list') }}">Test Series</a></li>
+							<li><a href="{{ route('pyq-papers') }}">PYQ</a></li>
 							<li><a href="{{route('study.material.front')}}">Study Material</a></li>
 							<li><a href="{{route('daily.boost.front')}}">Daily Booster</a></li>
 							<li><a href="{{route('test.planner.front')}}">Test Planner</a></li>

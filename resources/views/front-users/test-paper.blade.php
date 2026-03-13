@@ -108,10 +108,7 @@
                                                 // Percentage calculation
                                                 $percentage = $total > 0 ? round(($score / $total) * 100, 2) : 0;
 
-                                                // Get division from model accessor
-                                                $division = $attempt->result_division;
-                                                
-
+                                                 $division = '';
                                                 // Badge colors
                                                 $badgeClass =
                                                     ($division == 'Fail') ? 'bg-danger' :
@@ -130,7 +127,7 @@
                                             {{-- DIVISION --}}
                                             <div>
                                                 <span class="badge {{ $badgeClass }}">
-                                                    {{ $division ?? 'N/A' }}
+                                                    {{ $division }}
                                                 </span>
                                             </div>
 

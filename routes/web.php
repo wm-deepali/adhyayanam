@@ -62,12 +62,13 @@ Route::get('/about', function () {
     return view('about');
 });
 
-Route::get('pyq-papers/{examid}/{catid}/{subcat}', [FrontController::class, 'pyqPapers'])->name('pyq-papers');
+Route::get('pyq-papers/{examid?}/{catid?}/{subcat?}', [FrontController::class, 'pyqPapers'])->name('pyq-papers');
 Route::get('test-series-list/{examid?}/{catid?}/{subcat?}', [FrontController::class, 'testseriesIndex'])->name('test-series-list');
 Route::get('test-series/details/{slug}', [FrontController::class, 'testseriesDetail'])->name('test-series-detail');
 
 
-Route::get('live-test/{id}', [LiveTestController::class, 'livetest'])->name('live-test');
+Route::get('/test-instruction/{id}', [LiveTestController::class,'testInstruction'])->name('test.instruction');
+Route::get('/live-test/{id}', [LiveTestController::class,'liveTest'])->name('live-test');
 Route::post('/fetch-question', [LiveTestController::class, 'fetchQuestion']);
 Route::post('/save-answer', [LiveTestController::class, 'saveAttemptAnswer']);
 Route::post('/finalize-test', [LiveTestController::class, 'finalizeStudentTest']);
@@ -223,17 +224,13 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
 
     })->name('student.login');
 
-        Route::get('/thank-you', function () {
-            return view('front.thank-you');
-        })->name('thank.you');
-
     // student panel routes
     Route::middleware(['auth', 'isStudent'])->group(function () {
-
+        
         Route::get('/user/dashboard', function () {
             return view('front-users.dashboard');
-        })->name('user.dashboard');
-
+            })->name('user.dashboard');
+            
         Route::get('/user-test-planner', function () {
             return view('front-users.test-planner');
         })->name('user-test-planner');
@@ -249,7 +246,7 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
         Route::post('/video/{id}/watch', [FrontUserController::class, 'watch']);
         Route::post('/student/homework/upload', [FrontUserController::class, 'uploadAssignment'])->name('student.homework.upload');
         Route::post('/student/course-review', [FrontUserController::class, 'storeCourseReview'])->name('student.course.review');
-
+        
         // my study material routes
         Route::get('/my-study-material', [FrontUserController::class, 'StudyMaterial'])->name('user.study-material');
         Route::delete('/user/user-activity/delete/{id}', [FrontUserController::class, 'activityDelete'])->name('user-activity.destroy');
@@ -257,15 +254,16 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
         Route::get('/user/test-series', [FrontUserController::class, 'myTestSeries'])->name('user.test-series');
         Route::get('user/test-series-detail/{slug}', [FrontUserController::class, 'testSeriesDetail'])->name('user.test-series-detail');
         Route::get('/user/test-papers', [FrontUserController::class, 'listUserTestPapers'])->name('user.test-papers');
-
+        
         Route::get('/user/setting', [FrontUserController::class, 'setting'])->name('user.setting');
         Route::post('user/register-student', [FrontUserController::class, 'studentRegister'])->name('register-student');
         Route::post('user/change-student-password', [FrontUserController::class, 'studentChangePassword'])->name('change-student-password');
-        Route::get('user/process-order/{type}/{id}', [App\Http\Controllers\PaymentController::class, 'orderProcess'])->name('user.process-order');
-    
-        Route::any('order/status', [App\Http\Controllers\PaymentController::class, 'orderStatus'])->name('order.status');
         Route::get('student/wallet', [App\Http\Controllers\StudentWalletController::class, 'index'])->name('student.wallet');
 
+        Route::get('user/process-order/{type}/{id}', [App\Http\Controllers\PaymentController::class, 'orderProcess'])->name('user.process-order');
+        Route::any('order/status', [App\Http\Controllers\PaymentController::class, 'orderStatus'])->name('order.status');
+        Route::get('/thank-you/{order}', [App\Http\Controllers\PaymentController::class, 'thankYou'])->name('thank.you');
+        
     });
 
     // admin panel routes

@@ -29,46 +29,62 @@ class PaymentController extends Controller
      {
           $user = User::find(Auth::user()->id);
           if ($type == 'course') {
-               $course = Course::find($id);
-               //instantiate the class
+
+               $course = Course::findOrFail($id);
                $fee = $course->course_fee;
-               $discount = $course->discount;
-               if ($discount != '' && $discount > 0) {
+
+               $discount = (float) ($course->discount ?? 0);
+
+               if ($discount > 0) {
                     $discountAmt = $fee * ($discount / 100);
                } else {
                     $discountAmt = 0;
                }
+
                $payAmount = $fee - $discountAmt;
+
                $package = 'Course';
+
                $order_note = $course->name;
           } else if ($type == 'study-material') {
-               $study = StudyMaterial::find($id);
-               //instantiate the class
-               $fee = $study->mrp;
-               $discount = $study->discount;
-               if ($discount != '' && $discount > 0 && $study->IsPaid == 1) {
+
+               $study = StudyMaterial::findOrFail($id);
+
+               $fee = (float) $study->mrp;
+
+               $discount = (float) ($study->discount ?? 0);
+
+               if ($discount > 0 && $study->IsPaid == 1) {
                     $discountAmt = $fee * ($discount / 100);
                } else {
                     $discountAmt = 0;
                }
+
                $payAmount = $fee - $discountAmt;
+
                $package = 'Study Material';
+
                $order_note = $study->title;
           } else if ($type == 'test-series') {
-               $test = TestSeries::find($id);
-               //instantiate the class
-               $fee = $test->mrp;
-               $discount = $test->discount;
-               if ($discount != '' && $discount > 0) {
+
+               $test = TestSeries::findOrFail($id);
+
+               $fee = (float) $test->mrp;
+
+               $discount = (float) ($test->discount ?? 0);
+
+               if ($discount > 0) {
                     $discountAmt = $fee * ($discount / 100);
                } else {
                     $discountAmt = 0;
                }
+
                $payAmount = $fee - $discountAmt;
+
                $package = 'Test Series';
+
                $order_note = $test->title;
           }
-
 
 
           $url = "https://sandbox.cashfree.com/pg/orders";
@@ -81,12 +97,12 @@ class PaymentController extends Controller
           );
           $tags = array('package_type' => "$package", 'package_id' => $id, 'discount' => "$discount", 'discount_amt' => "$discountAmt", 'amount' => "$fee");
 
- $data = json_encode([
-    'order_id' => 'ORDER_'. rand(111111, 999999),
-    'order_amount' => number_format($payAmount, 2, '.', ''),
-    "order_currency" => "INR",
-    "order_note" => $order_note,
-        
+          $data = json_encode([
+               'order_id' => 'ORDER_' . rand(111111, 999999),
+               'order_amount' => number_format($payAmount, 2, '.', ''),
+               "order_currency" => "INR",
+               "order_note" => $order_note,
+
                'order_tags' => $tags,
                "customer_details" => [
                     "customer_id" => 'CUST_' . rand(111111, 999999),
@@ -95,9 +111,9 @@ class PaymentController extends Controller
                     "customer_phone" => $user->mobile,
                ],
                "order_meta" => [
-                         "return_url" => url('/') . '/order/status/?order_id={order_id}&order_token={order_token}',
+                    "return_url" => url('/') . '/order/status/?order_id={order_id}&order_token={order_token}',
 
-                    ]
+               ]
           ]);
 
           $curl = curl_init($url);
@@ -119,7 +135,8 @@ class PaymentController extends Controller
           if (isset($error_msg)) {
                dd($error_msg);
           }
-         
+
+
           return redirect()->to(json_decode($resp)->payment_link);
      }
 
@@ -162,7 +179,7 @@ class PaymentController extends Controller
                $discount = $order_tags->discount;
                $discount_amt = $order_tags->discount_amt;
                $amount = $order_tags->amount;
-         
+
                $Order = new Order();
                $Order->order_code = $order_id;
                $Order->package_name = $order_note;
@@ -191,19 +208,36 @@ class PaymentController extends Controller
                $transaction->transaction = $order_token;
                $transaction->created_at = $created_at;
                $transaction->save();
-               if ($package_type == 'Course') {
-                    return redirect()->route('courses.detail', $package_id)->with('success', 'Enrolled successfully!');
-               } else if ($package_type == 'Study Material') {
-                    return redirect()->route('study.material.details', $package_id)->with('success', 'Buy successfully!');
-               } else if ($package_type == 'Test Series') {
-                    $test = TestSeries::find($package_id);
-                    return redirect()->route('test-series-detail', $test->slug)->with('success', 'Buy successfully!');
-               }
+               return redirect()->route('thank.you', $Order->id);
 
 
           } else {
                return redirect()->back()->with('error', 'Something went wrong!');
           }
 
+     }
+
+     public function thankYou($orderId)
+     {
+          $order = Order::findOrFail($orderId);
+
+          $course = null;
+          $studyMaterial = null;
+          $testSeries = null;
+
+          if ($order->order_type == 'Course') {
+               $course = Course::find($order->package_id);
+          } elseif ($order->order_type == 'Study Material') {
+               $studyMaterial = StudyMaterial::find($order->package_id);
+          } elseif ($order->order_type == 'Test Series') {
+               $testSeries = TestSeries::find($order->package_id);
+          }
+
+          return view('front.thank-you', compact(
+               'order',
+               'course',
+               'studyMaterial',
+               'testSeries'
+          ));
      }
 }

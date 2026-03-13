@@ -13,6 +13,22 @@ use Illuminate\Http\Request;
 class LiveTestController extends Controller
 {
 
+    public function testInstruction($id)
+    {
+        $decodeId = base64_decode($id);
+
+        $test = Test::findOrFail($decodeId);
+
+        $totalQuestions = TestDetail::where('test_id', $decodeId)
+            ->whereNull('parent_question_id')
+            ->count();
+
+        return view('front.test-instruction', [
+            'test' => $test,
+            'total_questions' => $totalQuestions
+        ]);
+    }
+
     public function liveTest($id)
     {
         $decodeId = base64_decode($id);
@@ -25,12 +41,13 @@ class LiveTestController extends Controller
             ->first();
 
         if ($existingAttempt) {
-            return back()->withErrors([
-                'test' => 'You already have an active test in progress. Please complete it before starting a new test.'
-            ]);
-
-        }
-
+    return redirect()
+        ->route('live-test', base64_encode($existingAttempt->test_id))
+        ->withErrors([
+            'test' => 'You already have an active test in progress.'
+        ])
+        ->with('continue_test', base64_encode($existingAttempt->test_id));
+}
         $test = Test::where('id', $decodeId)->firstOrFail();
 
         $attempt = StudentTestAttempt::where('student_id', $studentId)

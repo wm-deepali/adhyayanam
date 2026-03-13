@@ -2,7 +2,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\CourseReview;
-use PDF;
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Order;
@@ -14,6 +13,7 @@ use App\Helpers\LogActivity;
 use App\Models\StudyMaterial;
 use App\Models\StudentWallet;
 use App\Models\WalletSetting;
+use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\VideoUserProgress;
 use App\Models\StudentTestAttempt;
 use Illuminate\Support\Facades\DB;
@@ -154,21 +154,77 @@ class FrontUserController extends Controller
 
     public function orderDetails($id)
     {
-        $data['order'] = Order::with('student', 'transaction')->where('id', $id)->first();
-        return view('front-users.order-details', $data);
-    }
+        $order = Order::with('student', 'transaction')->findOrFail($id);
 
+        $course = null;
+        $studyMaterial = null;
+        $testSeries = null;
+
+        if ($order->order_type == 'Course') {
+            $course = Course::find($order->package_id);
+        } elseif ($order->order_type == 'Study Material') {
+            $studyMaterial = StudyMaterial::find($order->package_id);
+        } elseif ($order->order_type == 'Test Series') {
+            $testSeries = TestSeries::find($order->package_id);
+        }
+
+        return view('front-users.order-details', compact(
+            'order',
+            'course',
+            'studyMaterial',
+            'testSeries'
+        ));
+    }
     public function printInvoice($id)
     {
-        $data['order'] = Order::with('student', 'transaction')->where('id', $id)->first();
-        return view('front-users.invoice-pdf', $data);
+        $order = Order::with('student', 'transaction')->findOrFail($id);
+
+        $course = null;
+        $studyMaterial = null;
+        $testSeries = null;
+
+        if ($order->order_type == 'Course') {
+            $course = Course::find($order->package_id);
+        } elseif ($order->order_type == 'Study Material') {
+            $studyMaterial = StudyMaterial::find($order->package_id);
+        } elseif ($order->order_type == 'Test Series') {
+            $testSeries = TestSeries::find($order->package_id);
+        }
+
+        return view('front-users.invoice-pdf', compact(
+            'order',
+            'course',
+            'studyMaterial',
+            'testSeries'
+        ));
     }
 
-    public function generatePDF($id)
+    public function generatePdf($id)
     {
-        $data['order'] = Order::with('student', 'transaction')->where('id', $id)->first();
-        $pdf = PDF::loadView('front-users.invoice-pdf', $data);
-        return $pdf->download('invoice.pdf');
+        $order = Order::with('student', 'transaction')->findOrFail($id);
+
+        $course = null;
+        $studyMaterial = null;
+        $testSeries = null;
+
+        if ($order->order_type == 'Course') {
+            $course = Course::find($order->package_id);
+        } elseif ($order->order_type == 'Study Material') {
+            $studyMaterial = StudyMaterial::find($order->package_id);
+        } elseif ($order->order_type == 'Test Series') {
+            $testSeries = TestSeries::find($order->package_id);
+        }
+
+        $data = compact(
+            'order',
+            'course',
+            'studyMaterial',
+            'testSeries'
+        );
+
+        $pdf = Pdf::loadView('front-users.invoice-pdf', $data);
+
+        return $pdf->download('invoice_' . $order->order_code . '.pdf');
     }
 
     public function myCourses()

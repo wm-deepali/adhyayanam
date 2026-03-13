@@ -3,6 +3,84 @@
 @section('title')
     {{ $course->course_heading }} - Course
 @endsection
+<style>
+    .video-wrapper{
+position:relative;
+}
+
+.fullscreen-btn{
+position:absolute;
+top:10px;
+right:10px;
+z-index:10;
+background:#000;
+color:#fff;
+border:none;
+padding:6px 12px;
+border-radius:5px;
+font-size:13px;
+opacity:0.8;
+}
+
+.fullscreen-btn:hover{
+opacity:1;
+}
+
+
+.course-video-card{
+border-radius:10px;
+overflow:hidden;
+}
+
+.lesson-list{
+max-height:500px;
+overflow-y:auto;
+}
+
+.lesson-item{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:12px;
+border-bottom:1px solid #eee;
+cursor:pointer;
+transition:0.2s;
+}
+
+.lesson-item:hover{
+background:#f6f9ff;
+}
+
+.lesson-item.active{
+background:#eef4ff;
+border-left:4px solid #0d6efd;
+}
+
+.lesson-left{
+display:flex;
+align-items:center;
+gap:10px;
+}
+
+.lesson-icon{
+width:28px;
+height:28px;
+background:#0d6efd;
+color:#fff;
+display:flex;
+align-items:center;
+justify-content:center;
+border-radius:50%;
+font-size:12px;
+}
+
+.lesson-title{
+font-size:14px;
+font-weight:500;
+}
+
+
+</style>
 
 @section('content')
     <section class="content">
@@ -11,7 +89,7 @@
             {{-- ================= COURSE HEADER ================= --}}
             <div class="card mb-3">
                 <div class="card-body">
-                    <h4 class="fw-bold mb-1">{{ $course->course_heading }}</h4>
+                    <h4 class="fw-bold mb-1">{{ $course->course_heading }} </h4>
                     <p class="text-muted mb-0">{{ $course->short_description }}</p>
                 </div>
             </div>
@@ -23,11 +101,26 @@
                     {{-- VIDEO PLAYER --}}
                     <div class="card shadow-sm mb-3">
                         <div class="card-body p-2">
-                            <div id="mainVideoContainer" class="text-center">
-                                <div class="text-muted py-5">
-                                    Select a video from the right to start learning
-                                </div>
-                            </div>
+                            <!--<div id="mainVideoContainer" class="text-center">-->
+                            <!--    <div class="text-muted py-5">-->
+                            <!--        Select a video from the right to start learning-->
+                            <!--    </div>-->
+                            <!--</div>-->
+                            
+                            <div class="video-wrapper">
+
+<button id="fullscreenBtn" class="fullscreen-btn">
+⛶ Fullscreen
+</button>
+
+<div id="mainVideoContainer" class="text-center d-flex align-items-center">
+    <div class="text-muted py-5">
+        Select a video from the right to start learning
+    </div>
+</div>
+
+</div>
+
                         </div>
                     </div>
 
@@ -123,9 +216,11 @@
 
                 {{-- ================= SIDEBAR ================= --}}
                 <div class="col-md-4">
-                    <div class="card shadow-sm">
+                    <div class="card shadow-sm course-video-card" >
                         <div class="card-body">
-                            <h6 class="fw-semibold mb-3">📚 Course Videos</h6>
+                            <div class="card-header">
+<h6 class="fw-semibold mb-0">📚 Course Videos</h6>
+</div>
 
                             <ul class="list-group list-group-flush">
                                 @foreach($videoLessons as $lesson)
@@ -162,16 +257,47 @@
 
                                     @endphp
 
-                                    <li class="list-group-item lesson-item" style="cursor:pointer"
-                                        data-video='@json($videoPayload)'>
-                                        ▶ {{ $lesson->title }}
+                                    <!--<li class="list-group-item lesson-item" style="cursor:pointer"-->
+                                    <!--    data-video='@json($videoPayload)'>-->
+                                    <!--    ▶ {{ $lesson->title }}-->
 
-                                        @if($lesson->assignment_file)
-                                            <span class="ms-1 text-primary">📄</span>
-                                        @endif
-                                    </li>
+                                    <!--    @if($lesson->assignment_file)-->
+                                    <!--        <span class="ms-1 text-primary">📄</span>-->
+                                    <!--    @endif-->
+                                    <!--</li>-->
+                                    <div class="lesson-list">
+
+
+
+<li class="lesson-item"
+data-video='@json($videoPayload)'>
+
+<div class="lesson-left">
+
+<span class="lesson-icon">▶</span>
+
+<div>
+
+<div class="lesson-title">
+{{ $lesson->title }}
+</div>
+
+@if($lesson->assignment_file)
+<small class="text-primary">Assignment Available</small>
+@endif
+
+</div>
+
+</div>
+
+</li>
+
+
+
+</div>
                                 @endforeach
                             </ul>
+                            
                         </div>
                     </div>
                 </div>
@@ -347,6 +473,18 @@
                 lessonItems[0].click();
             }
         });
+    </script>
+    <script>
+        document.getElementById('fullscreenBtn').addEventListener('click',function(){
+
+const videoBox = document.getElementById('mainVideoContainer');
+
+if(videoBox.requestFullscreen){
+videoBox.requestFullscreen();
+}
+
+});
+
     </script>
 
     <style>

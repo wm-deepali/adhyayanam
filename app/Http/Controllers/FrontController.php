@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Validator;
+use Carbon\Carbon;
 use App\Models\SEO;
 use App\Models\Faq;
 use App\Models\Page;
@@ -440,10 +441,61 @@ class FrontController extends Controller
         return redirect()->back()->with('success', 'Our representative will call you soon!');
     }
 
-    public function currentAffairsIndex()
+    public function currentAffairsIndex(Request $request)
     {
-        $data['topics'] = Topic::with('currentAffair')->get();
-        return view('front.user.current-affair', $data);
+        $keyword = $request->keyword;
+        $date = $request->search;
+        $sort = $request->sort;
+
+        $topics = Topic::whereHas('currentAffair', function ($q) use ($keyword, $date, $sort) {
+
+            if ($keyword) {
+                $q->where('title', 'like', '%' . $keyword . '%');
+            }
+
+            if ($date) {
+                $q->whereDate('publishing_date', $date);
+            }
+
+            if ($sort == 'week') {
+                $q->where('publishing_date', '>=', Carbon::now()->subWeek());
+            }
+
+            if ($sort == 'month') {
+                $q->where('publishing_date', '>=', Carbon::now()->subMonth());
+            }
+
+        })->with([
+                    'currentAffair' => function ($q) use ($keyword, $date, $sort) {
+
+                        if ($keyword) {
+                            $q->where('title', 'like', '%' . $keyword . '%');
+                        }
+
+                        if ($date) {
+                            $q->whereDate('publishing_date', $date);
+                        }
+
+                        if ($sort == 'week') {
+                            $q->where('publishing_date', '>=', Carbon::now()->subWeek());
+                        }
+
+                        if ($sort == 'month') {
+                            $q->where('publishing_date', '>=', Carbon::now()->subMonth());
+                        }
+
+                        if ($sort == 'oldest') {
+                            $q->orderBy('publishing_date', 'asc');
+                        } else {
+                            $q->orderBy('publishing_date', 'desc');
+                        }
+
+                        $q->limit(5);
+
+                    }
+                ])->paginate(5)->withQueryString();
+
+        return view('front.user.current-affair', compact('topics'));
     }
 
     public function currentAffairsDetail($id)
@@ -726,13 +778,36 @@ class FrontController extends Controller
         return view('front.user.batches-and-online-programme', $data);
     }
 
-    public function pyqPapers($examid, $catid, $subcat)
+    public function pyqPapers($examid = null, $catid = null, $subcat = null)
     {
-        $data['subcat'] = SubCategory::findOrFail($subcat);
-        $data['papers'] = Test::where('paper_type', 1)->where('competitive_commission_id', $examid)->where('exam_category_id', $catid)->where('exam_subcategory_id', $subcat)->get();
-        $data['subjects'] = Subject::where('sub_category_id', $subcat)->get();
-        $data['pyq_content'] = PyqContent::where('commission_id', $examid)->where('category_id', $catid)->where('sub_category_id', $subcat)->first();
-        // dd($data['papers']->toArray());
+        $data['subcat'] = $subcat ? SubCategory::findOrFail($subcat) : null;
+
+        $data['papers'] = Test::where('paper_type', 1)
+
+            ->when($examid, function ($query) use ($examid) {
+                $query->where('competitive_commission_id', $examid);
+            })
+
+            ->when($catid, function ($query) use ($catid) {
+                $query->where('exam_category_id', $catid);
+            })
+
+            ->when($subcat, function ($query) use ($subcat) {
+                $query->where('exam_subcategory_id', $subcat);
+            })
+
+            ->get();
+
+        $data['subjects'] = Subject::when($subcat, function ($query) use ($subcat) {
+            $query->where('sub_category_id', $subcat);
+        })->get();
+
+        $data['pyq_content'] = PyqContent::query()
+            ->when($examid, fn($q) => $q->where('commission_id', $examid))
+            ->when($catid, fn($q) => $q->where('category_id', $catid))
+            ->when($subcat, fn($q) => $q->where('sub_category_id', $subcat))
+            ->first();
+
         return view('front.pyq-papers', $data);
     }
 

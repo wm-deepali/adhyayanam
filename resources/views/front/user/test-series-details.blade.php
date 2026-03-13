@@ -755,7 +755,7 @@ $student = auth()->user();
 
 @if($test->test_type == 'free')
 
-  <a href="{{ route('live-test', base64_encode($test->id)) }}" class="unlock-btn">
+  <a href="{{ route('test.instruction', base64_encode($test->id)) }}" class="unlock-btn">
                 Attempt Test
             </a>
 
@@ -769,7 +769,7 @@ $student = auth()->user();
 
         @if($checkExist)
 
-            <a href="{{ route('live-test', base64_encode($test->id)) }}" class="unlock-btn">
+            <a href="{{ route('test.instruction', base64_encode($test->id)) }}" class="unlock-btn">
                 Attempt Test
             </a>
 

@@ -7,204 +7,305 @@
     <title>{{ $test->name }}</title>
 
     <style>
-        body {
-            font-family: "Segoe UI", Arial, sans-serif;
-            margin: 0px !important;
-            background: #eef1f7;
-            width: 100vw;
-            height: 100vh;
-        }
+       
+body{
+font-family: 'Segoe UI', sans-serif;
+margin:0;
+background:#f4f6fb;
+}
 
-        header {
-            max-width: 100%;
-            background: linear-gradient(to right, #202040, #30305a);
-            padding: 16px 30px;
-            color: white;
-            display: flex;
-            justify-content: space-between;
-            font-size: 18px;
-            font-weight: 600;
-            align-items: center;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
-        }
+/* HEADER */
 
-        header .time-box {
-            padding: 8px 14px;
-            border-radius: 6px;
-            background: rgba(0, 0, 0, 0.2);
-            font-size: 14px;
-        }
+header{
+background:linear-gradient(90deg,#1e2a55,#283b8a);
+color:white;
+padding:15px 25px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+box-shadow:0 3px 10px rgba(0,0,0,0.2);
+}
 
-        .main-wrapper {
-            display: flex;
-            max-width: 100%;
-            gap: 20px;
-            padding: 20px;
-        }
+.time-box{
+background:rgba(255,255,255,0.15);
+padding:8px 14px;
+border-radius:6px;
+font-weight:600;
+}
 
-        .left-panel {
-            width: 72%;
-            background: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.15);
-        }
 
-        .right-panel {
-            width: 28%;
-            padding: 15px;
-        }
+/* MAIN LAYOUT */
 
-        .right-panel-card {
-            background: #fff;
-            padding: 12px;
-            border-radius: 10px;
-            box-shadow: 0px 2px 12px rgba(0, 0, 0, 0.12);
-        }
+.main-wrapper{
+display:flex;
+gap:20px;
+padding:20px;
+}
 
-        .question-header {
-            font-size: 16px;
-            padding: 10px 14px;
-            background: #e9effc;
-            border-radius: 6px;
-            margin-bottom: 15px;
-            border-left: 4px solid #4a6fff;
-            font-weight: 600;
-            color: #28304a;
-        }
+.left-panel{
+width:70%;
+background:white;
+border-radius:12px;
+padding:25px;
+box-shadow:0 10px 25px rgba(0,0,0,0.08);
+}
 
-        .question-block {
-            background: #fff;
-            border-radius: 6px;
-            padding: 14px;
-            border: 1px solid #e3e7ed;
-            min-height: 200px;
-        }
+.right-panel{
+width:30%;
+}
 
-        .options label {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 10px;
-            margin-bottom: 8px;
-            border-radius: 6px;
-            border: 1px solid #dcdcdc;
-            cursor: pointer;
-            transition: 0.25s;
-            background: #fafafa;
-        }
 
-        .options label:hover {
-            border-color: #4a6fff;
-            background: #f5f8ff;
-        }
+/* QUESTION */
 
-        textarea {
-            width: 100%;
-            height: 120px;
-            border-radius: 6px;
-            border: 1px solid #ccc;
-            padding: 10px;
-            outline: none;
-        }
+.question-header{
+background:#eef2ff;
+padding:12px 16px;
+border-radius:8px;
+font-weight:600;
+margin-bottom:15px;
+border-left:5px solid #4a6fff;
+}
 
-        textarea:focus {
-            border-color: #4a6fff;
-        }
+.question-block{
+background:white;
+padding:10px;
+margin-bottom:10px;
+}
 
-        button.action-btn,
-        button.clear-btn,
-        button.submit-btn {
-            padding: 10px 20px;
-            font-weight: 600;
-            cursor: pointer;
-            border-radius: 6px;
-            border: none;
-            font-size: 14px;
-            transition: 0.3s;
-        }
+#question-text{
+font-size:17px;
+font-weight:600;
+line-height:1.6;
+margin-bottom:15px;
+}
 
-        .action-btn {
-            background: #4a6fff;
-            color: white;
-        }
 
-        .action-btn:hover {
-            background: #3450d4;
-        }
+/* OPTION CARD STYLE */
 
-        .clear-btn {
-            background: #ff4444;
-            color: white;
-        }
+.options{
+display:block;
+border:1px solid #dcdcdc;
+border-radius:10px;
+padding:14px 16px;
+margin-bottom:10px;
+cursor:pointer;
+transition:0.3s;
+background:white;
+box-shadow:0 2px 6px rgba(0,0,0,0.05);
+}
 
-        .clear-btn:hover {
-            background: #d93131;
-        }
+.options:hover{
+border-color:#4a6fff;
+background:#f5f8ff;
+transform:translateY(-1px);
+}
 
-        .submit-btn {
-            width: 100%;
-            background: #11b867;
-            color: white;
-            margin-top: 12px;
-        }
+.options input{
+margin-right:10px;
+}
 
-        .submit-btn:hover {
-            background: #0d9752;
-        }
+.options input:checked + span{
+font-weight:600;
+}
 
-        .btn-footer {
-            margin-top: 15px;
-            display: flex;
-            justify-content: space-between;
-        }
 
-        .count-box {
-            display: flex;
-            justify-content: space-between;
-            font-size: 14px;
-            margin: 8px 0;
-        }
+/* BUTTONS */
 
-        .question-grid button {
-            padding: 10px;
-            border-radius: 6px;
-            font-size: 13px;
-            font-weight: bold;
-            border: none;
-            cursor: pointer;
-        }
+.btn-footer{
+display:flex;
+justify-content:space-between;
+margin-top:20px;
+}
 
-        .notVisited {
-            background: #cfd5e4 !important;
-            color: #333;
-        }
+.action-btn{
+background:#4a6fff;
+color:white;
+border:none;
+font-size: 18px;
+    padding: 10px 18px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+}
 
-        .visited {
-            background: #ffc14d !important;
-        }
+.clear-btn{
+background:#ff4b4b;
+color:white;
+border:none;
+font-size: 18px;
+    padding: 10px 18px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+}
 
-        .answered {
-            background: #52cc71 !important;
-        }
+.action-btn:hover{
+background:#314dcf;
+}
 
-        .question-grid button:hover {
-            transform: scale(1.05);
-        }
+.clear-btn:hover{
+background:#d73535;
+}
 
-        .question-grid {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 6px;
-        }
 
-        .right-title {
-            font-size: 18px;
-            font-weight: bold;
-            color: #344675;
-            margin-bottom: 12px;
-            text-align: center;
-        }
+/* RIGHT PANEL */
+
+.right-panel-card{
+background:linear-gradient(135deg,#ffffff,#f7f8ff);
+border-radius:14px;
+padding:18px;
+box-shadow:0 10px 25px rgba(0,0,0,0.08);
+}
+
+.right-title{
+font-size:18px;
+font-weight:600;
+margin-bottom:10px;
+text-align:center;
+color:#2a335a;
+}
+
+
+/* COUNT BOX */
+
+.count-box{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:10px;
+font-size:14px;
+margin-bottom:10px;
+}
+
+.count-box div{
+background:white;
+padding:8px;
+border-radius:6px;
+text-align:center;
+box-shadow:0 2px 5px rgba(0,0,0,0.05);
+}
+
+
+/* QUESTION GRID */
+
+.question-grid{
+display:grid;
+grid-template-columns:repeat(5,1fr);
+gap:6px;
+margin-top:10px;
+}
+
+.question-grid button{
+border:none;
+padding:8px;
+border-radius:6px;
+font-weight:600;
+cursor:pointer;
+}
+
+.notVisited{
+background:#d9dce6;
+}
+
+.visited{
+background:#ffc857;
+}
+
+.answered{
+background:#41c96d;
+color:white;
+}
+
+.question-grid button:hover{
+transform:scale(1.05);
+}
+
+
+/* SUBMIT BUTTON */
+
+.submit-btn{
+width:100%;
+margin-top:15px;
+padding:12px;
+background:#12b76a;
+color:white;
+border:none;
+border-radius:8px;
+font-weight:600;
+font-size:15px;
+cursor:pointer;
+}
+
+.submit-btn:hover{
+background:#0e9f5a;
+}
+
+
+/* SUBJECTIVE WRAPPER */
+
+.subjective-wrapper{
+margin-top:20px;
+}
+
+
+/* LABEL */
+
+.sub-label{
+display:block;
+font-size:15px;
+font-weight:600;
+margin-bottom:8px;
+color:#333;
+}
+
+
+/* TEXTAREA */
+
+.sub-textarea{
+width:100%;
+min-height:140px;
+border:1px solid #dcdcdc;
+border-radius:8px;
+padding:12px;
+font-size:14px;
+resize:vertical;
+outline:none;
+transition:0.3s;
+}
+
+.sub-textarea:focus{
+border-color:#4a6fff;
+box-shadow:0 0 5px rgba(74,111,255,0.3);
+}
+
+
+/* UPLOAD BOX */
+
+.upload-box{
+background:#f7f9ff;
+border:1px dashed #cfd7ff;
+padding:12px;
+border-radius:8px;
+}
+
+
+/* INPUT */
+
+.upload-input{
+margin-top:5px;
+}
+
+
+/* NOTE */
+
+.upload-note{
+font-size:12px;
+color:#777;
+margin-top:5px;
+}
+
+
+
+
     </style>
 
     <script src="//ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
@@ -256,16 +357,34 @@
 
         <!-- RIGHT PANEL -->
         <div class="right-panel">
-            <div class="right-title">{{ auth()->user()->name }}</div>
+            <!--<div class="right-title">{{ auth()->user()->name }}</div>-->
 
             <div class="right-panel-card">
 
-                <div class="count-box" style="display:block;font-size:14px;">
-                    <b id="ansCount">{{ $answered_count }}</b> Answered
-                    <b id="notAnsCount">{{ $pending_count }}</b> Not Answered
-                    <div><b id="visitCount">0</b> Visited</div>
-                    <div><b id="notVisitCount">0</b> Not Visited</div>
-                </div>
+                <div class="count-box">
+
+<div>
+<b id="ansCount">{{ $answered_count }}</b><br>
+Answered
+</div>
+
+<div>
+<b id="notAnsCount">{{ $pending_count }}</b><br>
+Not Answered
+</div>
+
+<div>
+<b id="visitCount">0</b><br>
+Visited
+</div>
+
+<div>
+<b id="notVisitCount">0</b><br>
+Not Visited
+</div>
+
+</div>
+
 
 
                 <hr>
@@ -480,9 +599,13 @@
 
                     form.append(`
                 <label class="options">
-                    <input type="radio" name="mcq" value="${opt}" data-key="${key}">
-                    ${key}. ${opt}
-                </label>
+
+<input type="radio" name="mcq" value="${opt}" data-key="${key}">
+
+<span>${key}. ${opt}</span>
+
+</label>
+
             `);
                 }
 
@@ -491,50 +614,164 @@
 
 
         //===================== SUBJECTIVE UI ======================
+        // function loadSubjective(form, q) {
+
+        //     switch (q.answer_format) {
+
+        //         case "text input":
+        //             form.append(`
+        //         <textarea name="answer_text" placeholder="Type your answer here..."></textarea>
+        //     `);
+        //             break;
+
+        //         case "audio":
+        //             form.append(`
+        //         <label style="font-size:14px;font-weight:600;">Upload Audio</label>
+        //         <input type="file" name="answer_file" accept="audio/*">
+        //         <small style="color:#777">Allowed: mp3, wav</small>
+        //     `);
+        //             break;
+
+        //         case "video":
+        //             form.append(`
+        //         <label style="font-size:14px;font-weight:600;">Upload Video</label>
+        //         <input type="file" name="answer_file" accept="video/*">
+        //         <small style="color:#777">Allowed: mp4, mov</small>
+        //     `);
+        //             break;
+
+        //         case "image":
+        //             form.append(`
+        //         <label style="font-size:14px;font-weight:600;">Upload Image</label>
+        //         <input type="file" name="answer_file" accept="image/*">
+        //         <small style="color:#777">Allowed: jpg, png, jpeg</small>
+        //     `);
+        //             break;
+
+        //         case "document":
+        //             form.append(`
+        //         <label style="font-size:14px;font-weight:600;">Upload Document</label>
+        //         <input type="file" name="answer_file" accept=".pdf,.doc,.docx">
+        //         <small style="color:#777">Allowed: PDF, DOC, DOCX</small>
+        //     `);
+        //             break;
+        //     }
+
+        // }
+        
         function loadSubjective(form, q) {
 
-            switch (q.answer_format) {
+    let html = `<div class="subjective-wrapper">`;
 
-                case "text input":
-                    form.append(`
-                <textarea name="answer_text" placeholder="Type your answer here..."></textarea>
-            `);
-                    break;
+    switch (q.answer_format) {
 
-                case "audio":
-                    form.append(`
-                <label style="font-size:14px;font-weight:600;">Upload Audio</label>
-                <input type="file" name="answer_file" accept="audio/*">
-                <small style="color:#777">Allowed: mp3, wav</small>
-            `);
-                    break;
+        case "text input":
+            html += `
+                <label class="sub-label">Write Your Answer</label>
 
-                case "video":
-                    form.append(`
-                <label style="font-size:14px;font-weight:600;">Upload Video</label>
-                <input type="file" name="answer_file" accept="video/*">
-                <small style="color:#777">Allowed: mp4, mov</small>
-            `);
-                    break;
+                <textarea 
+                    name="answer_text"
+                    class="sub-textarea"
+                    placeholder="Type your answer here..."
+                ></textarea>
+            `;
+            break;
 
-                case "image":
-                    form.append(`
-                <label style="font-size:14px;font-weight:600;">Upload Image</label>
-                <input type="file" name="answer_file" accept="image/*">
-                <small style="color:#777">Allowed: jpg, png, jpeg</small>
-            `);
-                    break;
 
-                case "document":
-                    form.append(`
-                <label style="font-size:14px;font-weight:600;">Upload Document</label>
-                <input type="file" name="answer_file" accept=".pdf,.doc,.docx">
-                <small style="color:#777">Allowed: PDF, DOC, DOCX</small>
-            `);
-                    break;
-            }
+        case "audio":
+            html += `
+                <label class="sub-label">Upload Audio Answer</label>
 
-        }
+                <div class="upload-box">
+
+                    <input 
+                        type="file" 
+                        name="answer_file" 
+                        accept="audio/*"
+                        class="upload-input"
+                    >
+
+                    <div class="upload-note">
+                        Allowed: mp3, wav
+                    </div>
+
+                </div>
+            `;
+            break;
+
+
+        case "video":
+            html += `
+                <label class="sub-label">Upload Video Answer</label>
+
+                <div class="upload-box">
+
+                    <input 
+                        type="file" 
+                        name="answer_file" 
+                        accept="video/*"
+                        class="upload-input"
+                    >
+
+                    <div class="upload-note">
+                        Allowed: mp4, mov
+                    </div>
+
+                </div>
+            `;
+            break;
+
+
+        case "image":
+            html += `
+                <label class="sub-label">Upload Image Answer</label>
+
+                <div class="upload-box">
+
+                    <input 
+                        type="file" 
+                        name="answer_file" 
+                        accept="image/*"
+                        class="upload-input"
+                    >
+
+                    <div class="upload-note">
+                        Allowed: jpg, png, jpeg
+                    </div>
+
+                </div>
+            `;
+            break;
+
+
+        case "document":
+            html += `
+                <label class="sub-label">Upload Document</label>
+
+                <div class="upload-box">
+
+                    <input 
+                        type="file" 
+                        name="answer_file" 
+                        accept=".pdf,.doc,.docx"
+                        class="upload-input"
+                    >
+
+                    <div class="upload-note">
+                        Allowed: PDF, DOC, DOCX
+                    </div>
+
+                </div>
+            `;
+            break;
+    }
+
+    html += `</div>`;
+
+    form.append(html);
+
+}
+
 
         //===================== STORY QUESTIONS ======================
         function loadStory(form, q, childMarks) {

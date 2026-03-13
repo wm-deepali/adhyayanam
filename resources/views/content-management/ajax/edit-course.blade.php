@@ -410,8 +410,12 @@
         $(document).ready(function () {
 
             function calculateOfferedPrice() {
-                let courseFee = parseFloat($('#course_fee').val()) || 0;
-                let discountPercent = parseFloat($('#discount').val()) || 0;
+
+                let courseFee = parseFloat($('#course_fee').val());
+                let discountPercent = parseFloat($('#discount').val());
+
+                if (isNaN(courseFee)) courseFee = 0;
+                if (isNaN(discountPercent)) discountPercent = 0;
 
                 if (discountPercent > 100) {
                     discountPercent = 100;
@@ -423,19 +427,19 @@
 
                 if (offeredPrice < 0) offeredPrice = 0;
 
-                $('#offered_price').val(Math.round(offeredPrice));
+                $('#offered_price').val(offeredPrice.toFixed(2));
             }
 
-            // Auto calculate on change
-            $('#course_fee, #discount').on('input', function () {
+            $('#course_fee, #discount').on('keyup change input', function () {
                 calculateOfferedPrice();
             });
 
-            // 🔥 IMPORTANT: calculate once on page load (edit mode)
-            calculateOfferedPrice();
+            // run once after page fully loaded
+            setTimeout(function () {
+                calculateOfferedPrice();
+            }, 200);
 
         });
-
 
         let isEditLoad = true;
 
@@ -651,8 +655,8 @@
                         response.categories.forEach(category => {
                             categorySelect.innerHTML +=
                                 `<option value="${category.id}" ${category.id == selectedCategory ? 'selected' : ''}>
-                        ${category.name}
-                    </option>`;
+                            ${category.name}
+                        </option>`;
                         });
 
                     },

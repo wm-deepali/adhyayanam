@@ -175,29 +175,29 @@ class TestResultController extends Controller
             'final_status' => 'required|string|in:pending,under_review,published',
             'final_file' => 'nullable|file|max:50000'
         ]);
-        
+
         $attempt = StudentTestAttempt::findOrFail($request->attempt_id);
-   
+
         // If admin publishes, attempt becomes completed
         if ($request->final_status === 'published') {
             $attempt->status = 'published';
         }
-        
+
         // ============================
         // 2️⃣ Save FINAL FILE only
         // ============================
         if ($request->hasFile('final_file')) {
-            
+
             $file = $request->file('final_file');
             $name = time() . '_' . $file->getClientOriginalName();
 
             $file->storeAs('public/evaluations', $name);
-            
+
             $attempt->final_file = $name;
         }
-        
+
         $attempt->save();
-       
+
         return response()->json([
             'status' => true,
             'msg' => 'Evaluation submitted successfully.',
@@ -217,6 +217,13 @@ class TestResultController extends Controller
 
         if (!$answer) {
             return response()->json(['status' => false, 'msg' => 'Answer not found']);
+        }
+
+        if ($request->marks > $answer->positive_mark) {
+            return response()->json([
+                'status' => false,
+                'msg' => 'Marks cannot be greater than maximum marks (' . $answer->positive_mark . ')'
+            ]);
         }
 
         $attempt = StudentTestAttempt::find($answer->attempt_id);
@@ -257,7 +264,7 @@ class TestResultController extends Controller
         } elseif ($newMarks > 0 && $newMarks < $max) {
             $answer->evaluation_status = 'partial';
         } else {
-            $answer->evaluation_status = 'evaluated';
+            $answer->evaluation_status = 'pending';
         }
 
         $answer->requires_manual_check = false;

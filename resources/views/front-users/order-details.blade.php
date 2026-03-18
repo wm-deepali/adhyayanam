@@ -183,11 +183,19 @@
 
                                     @elseif($studyMaterial)
                                         {{ $studyMaterial->title ?? '-' }}
-                                        
+
 
                                     @elseif($testSeries)
                                         {{ $testSeries->title ?? '-' }}
 
+                                    @elseif(isset($papers) && $papers->count())
+                                        @foreach($papers as $paper)
+
+                                            <li style="margin:6px">
+                                                {{ $paper->name }}
+                                            </li>
+
+                                        @endforeach
                                     @else
                                         {{ $order->package_name ?? '-' }}
                                     @endif

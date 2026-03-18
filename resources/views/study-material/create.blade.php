@@ -35,7 +35,7 @@
                         <select class="form-control" name="commission_id" id="exam_com_id">
                             <option value="">--Select--</option>
                             @foreach($commissions as $commission)
-                                <option value="{{ $commission->id }}">{{ $commission->name }}</option>
+                                <option value="{{ $commission->id }}" {{ old('commission_id') == $commission->id ? 'selected' : '' }}>{{ $commission->name }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -44,8 +44,8 @@
                         <label for="language" class="form-label">Select Language</label>
                         <select class="form-control" name="language" id="language" required>
                             <option value="">--Select--</option>
-                            <option value="hindi">Hindi</option>
-                            <option value="english">English</option>
+                            <option value="hindi" {{ old('language') == 'hindi' ? 'selected' : '' }}>Hindi</option>
+                            <option value="english" {{ old('language') == 'english' ? 'selected' : '' }}>English</option>
                         </select>
                     </div>
 
@@ -54,7 +54,9 @@
                         <select class="form-control" name="category_id" id="category_id">
                             <option value="">--Select--</option>
                             @foreach($categories as $category)
-                                <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
+                                    {{ $category->name }}
+                                </option>
                             @endforeach
                         </select>
                     </div>
@@ -94,45 +96,55 @@
 
                     <div class="mb-3">
                         <label for="title" class="form-label">Study Material Heading</label>
-                        <input type="text" class="form-control" name="title" placeholder="Title" required>
+                        <input type="text" class="form-control" name="title" value="{{ old('title') }}" placeholder="Title"
+                            required>
                         @error('title') <span class="text-danger text-left">{{ $message }}</span> @enderror
                     </div>
 
                     <div class="mb-3">
                         <label for="short_description" class="form-label">Short Description</label>
                         <textarea class="form-control" name="short_description" placeholder="Short Description"
-                            required></textarea>
+                            required>{{ old('short_description') }}</textarea>
                         @error('short_description') <span class="text-danger text-left">{{ $message }}</span> @enderror
                     </div>
 
                     <div class="mb-3">
                         <label for="detail_content" class="form-label">Detail Content</label>
-                        <textarea id="editor" name="detail_content" style="height: 200px;"></textarea>
+                        <textarea id="editor" name="detail_content"
+                            style="height: 200px;">{!! old('detail_content') !!}</textarea>
                         @error('detail_content') <span class="text-danger text-left">{{ $message }}</span> @enderror
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label">Title & Description</label>
 
-                        <div id="title-description-wrapper">
-                            <div class="title-description-group mb-2 border rounded p-2">
-                                <div class="row">
-                                    <div class="col-md-12 mb-2">
-                                        <input type="text" class="form-control" name="titles[]" placeholder="Title"
-                                            required>
-                                    </div>
-                                    <div class="col-md-12 mb-2">
-                                        <textarea class="form-control description-editor" id="desc-editor-1"
-                                            name="descriptions[]" placeholder="Description" rows="3" required></textarea>
-                                    </div>
-                                    <div class="col-md-1 d-flex align-items-center">
-                                        <button type="button" class="btn btn-danger btn-sm remove-group">Remove</button>
+                        @php
+                            $oldTitles = old('titles', ['']);
+                            $oldDescriptions = old('descriptions', ['']);
+                        @endphp
 
+                        <div id="title-description-wrapper">
+                            @foreach($oldTitles as $index => $title)
+                                <div class="title-description-group mb-2 border rounded p-2">
+                                    <div class="row">
+                                        <div class="col-md-12 mb-2">
+                                            <input type="text" class="form-control" name="titles[]" value="{{ $title }}"
+                                                required>
+                                        </div>
+
+                                        <div class="col-md-12 mb-2">
+                                            <textarea class="form-control description-editor" id="desc-editor-{{ $index }}"
+                                                name="descriptions[]" rows="3"
+                                                required>{{ $oldDescriptions[$index] ?? '' }}</textarea>
+                                        </div>
+
+                                        <div class="col-md-1">
+                                            <button type="button" class="btn btn-danger btn-sm remove-group">Remove</button>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            @endforeach
                         </div>
-
                         <button type="button" id="add-more-group" class="btn btn-success btn-sm mt-2">
                             <i class="fa fa-plus"></i> Add More
                         </button>
@@ -143,32 +155,34 @@
                     <div class="mb-3">
                         <label for="IsPaid" class="form-label">Paid</label>
                         <select class="form-control select2" name="IsPaid" id="IsPaid" required>
-                            <option value="0">No</option>
-                            <option value="1">Yes</option>
+                            <option value="0" {{ old('IsPaid') == 0 ? 'selected' : '' }}>No</option>
+                            <option value="1" {{ old('IsPaid') == 1 ? 'selected' : '' }}>Yes</option>
                         </select>
                         @error('IsPaid') <span class="text-danger text-left">{{ $message }}</span> @enderror
                     </div>
 
                     <div class="mb-3 priceField" style="display: none;">
                         <label for="mrp" class="form-label">MRP:</label>
-                        <input type="number" class="form-control" id="mrp" name="mrp">
+                        <input type="number" class="form-control" id="mrp" name="mrp" value="{{ old('mrp') }}">
                     </div>
 
                     <div class="mb-3 priceField" style="display: none;">
                         <label for="discount" class="form-label">Discount (%):</label>
-                        <input type="number" class="form-control" id="discount" name="discount">
+                        <input type="number" class="form-control" id="discount" name="discount"
+                            value="{{ old('discount') }}">
                     </div>
 
                     <div class="mb-3 priceField" style="display: none;">
                         <label for="offered-price" class="form-label">Offered Price:</label>
-                        <input type="text" class="form-control" id="offered-price" name="price" readonly>
+                        <input type="text" class="form-control" id="offered-price" name="price" value="{{ old('price') }}"
+                            readonly>
                     </div>
 
                     <div class="mb-3">
                         <label for="status" class="form-label">Status</label>
                         <select class="form-control select2" name="status" required>
-                            <option value="Active">Active</option>
-                            <option value="Inactive">Inactive</option>
+                            <option value="Active" {{ old('status') == 'Active' ? 'selected' : '' }}>Active</option>
+                            <option value="Inactive" {{ old('status') == 'Inactive' ? 'selected' : '' }}>Inactive</option>
                         </select>
                     </div>
 
@@ -180,24 +194,27 @@
                     <div class="mb-3">
                         <label for="is_pdf_downloadable" class="form-label">Is PDF Downloadable?</label>
                         <select class="form-control select2" name="is_pdf_downloadable" required>
-                            <option value="1">Yes</option>
-                            <option value="0">No</option>
+                            <option value="1" {{ old('is_pdf_downloadable') == 1 ? 'selected' : '' }}>Yes</option>
+                            <option value="0" {{ old('is_pdf_downloadable') == 0 ? 'selected' : '' }}>No</option>
                         </select>
                     </div>
 
                     <div class="mb-3">
                         <label for="meta_title" class="form-label">Meta Title</label>
-                        <input type="text" class="form-control" name="meta_title" placeholder="Meta Title">
+                        <input type="text" class="form-control" name="meta_title" value="{{ old('meta_title') }}"
+                            placeholder="Meta Title">
                     </div>
 
                     <div class="mb-3">
                         <label for="meta_keyword" class="form-label">Meta Keyword</label>
-                        <input type="text" class="form-control" name="meta_keyword" placeholder="Meta Keyword">
+                        <input type="text" class="form-control" name="meta_keyword" value="{{ old('meta_keyword') }}"
+                            placeholder="Meta Keyword">
                     </div>
 
                     <div class="mb-3">
                         <label for="meta_description" class="form-label">Meta Description</label>
-                        <input type="text" class="form-control" name="meta_description" placeholder="Meta Description">
+                        <input type="text" class="form-control" name="meta_description"
+                            value="{{ old('meta_description') }}" placeholder="Meta Description">
                     </div>
 
                     <button type="submit" class="btn btn-primary">Save</button>
@@ -213,10 +230,25 @@
 
     <script>
         $(document).ready(function () {
+            let oldCommission = "{{ old('commission_id') }}";
+            let oldCategory = "{{ old('category_id') }}";
+            let oldSubCategory = "{{ old('sub_category_id') }}";
+            let oldSubjects = @json(old('subject_id', []));
+            let oldChapters = @json(old('chapter_id', []));
+            let oldTopics = @json(old('topic_id', []));
+
+            let oldBasedOn = "{{ old('based_on') }}";
+            if (oldBasedOn) {
+                $('#based_on').val(oldBasedOn);
+                $('#based-on-value').text(oldBasedOn);
+                $('#based-on-text').show();
+            }
+
             CKEDITOR.replace('editor', {
                 filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
                 filebrowserUploadMethod: 'form'
             });
+
             if ($.fn.select2) {
                 $('.select2').select2({
                     width: '100%',
@@ -226,7 +258,7 @@
             } else {
                 console.error("❌ Select2 not loaded!");
             }
-            // rest of your JS...
+
 
             // AJAX dependent dropdowns (same logic, with select2 updates)
             $(document).on('change', '#exam_com_id', function (event) {
@@ -243,12 +275,28 @@
                     success: function (result) {
                         if (result.success) {
                             $('#category_id').html(result.html);
+
+                            if (oldCategory) {
+
+                                // 🔥 FORCE SELECT OPTION
+                                $('#category_id option').each(function () {
+                                    if ($(this).val() == oldCategory) {
+                                        $(this).prop('selected', true);
+                                    }
+                                });
+
+                                $('#category_id').trigger('change');
+                            }
                         } else {
                             toastr.error('error encountered ' + result.msgText);
                         }
                     },
                 });
             });
+
+            if (oldCommission) {
+                $('#exam_com_id').val(oldCommission).trigger('change');
+            }
 
             $(document).on('change', '#category_id', function (event) {
 
@@ -262,16 +310,23 @@
                         success: function (result) {
                             if (result.success) {
                                 if (result.html != '') {
+
                                     $('#sub_category_id').html(result.html);
                                     $('.sub-cat').removeClass('hidecls');
                                     $('#sub_category_id').attr("required", true);
-                                }
-                                else {
+
+                                    // ✅ ADD THIS BLOCK
+                                    if (oldSubCategory) {
+                                        $('#sub_category_id option[value="' + oldSubCategory + '"]').prop('selected', true);
+                                        $('#sub_category_id').trigger('change');
+                                    }
+
+                                } else {
+
                                     $('#sub_category_id').val("").trigger('change');
                                     $('.sub-cat').addClass('hidecls');
                                     $('#sub_category_id').attr("required", false);
                                 }
-
                             } else {
                                 toastr.error('error encountered ' + result.msgText);
                             }
@@ -301,9 +356,17 @@
                     success: function (result) {
                         if (result.success) {
                             $('#subject_id').html(result.html);
-                        } else {
-                            //alert(result.msgText);
-                            //toastr.error('error encountered ' + result.msgText);
+
+                            // ✅ SELECT OLD VALUES
+                            if (oldSubjects && oldSubjects.length > 0) {
+
+                                oldSubjects.forEach(function (val) {
+                                    $('#subject_id option[value="' + val + '"]').prop('selected', true);
+                                });
+
+                                // IMPORTANT for select2
+                                $('#subject_id').trigger('change.select2');
+                            }
                         }
                     },
                 });
@@ -320,8 +383,22 @@
                         dataType: 'json',
                         success: function (result) {
                             if (result.success && result.html) {
+
                                 $('#chapter_id').html(result.html);
+
+                                // ✅ AUTO SELECT OLD CHAPTERS
+                                if (oldChapters && oldChapters.length > 0) {
+
+                                    oldChapters.forEach(function (val) {
+                                        $('#chapter_id option[value="' + val + '"]').prop('selected', true);
+                                    });
+
+                                    // IMPORTANT for select2
+                                    $('#chapter_id').trigger('change.select2');
+                                }
+
                             } else {
+
                                 $('#chapter_id').html('<option value="">--Select--</option>').trigger('change');
                             }
                         },
@@ -346,8 +423,22 @@
                         dataType: 'json',
                         success: function (result) {
                             if (result.success && result.html) {
+
                                 $('#topic_id').html(result.html);
+
+                                // ✅ AUTO SELECT OLD TOPICS
+                                if (oldTopics && oldTopics.length > 0) {
+
+                                    oldTopics.forEach(function (val) {
+                                        $('#topic_id option[value="' + val + '"]').prop('selected', true);
+                                    });
+
+                                    // IMPORTANT for select2
+                                    $('#topic_id').trigger('change.select2');
+                                }
+
                             } else {
+
                                 $('#topic_id').html('<option value="">--Select--</option>').trigger('change');
                             }
                         },
@@ -451,13 +542,23 @@
             });
         });
 
-        let descEditorCount = 1; // track number of CKEditor instances
+        let descEditorCount = $('.description-editor').length;
 
-        // Initialize CKEditor for the first description
-        CKEDITOR.replace('desc-editor-1', {
-            filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
-            filebrowserUploadMethod: 'form'
-        });
+        function initAllEditors() {
+            $('.description-editor').each(function () {
+                let id = $(this).attr('id');
+
+                if (!CKEDITOR.instances[id]) {
+                    CKEDITOR.replace(id, {
+                        filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
+                        filebrowserUploadMethod: 'form'
+                    });
+                }
+            });
+        }
+
+        // Run on page load
+        initAllEditors();
 
 
         // Add More / Remove functionality for Title & Description
@@ -466,30 +567,26 @@
             const newEditorId = `desc-editor-${descEditorCount}`;
 
             const newGroup = `
-                <div class="title-description-group mb-2 border rounded p-2">
-                    <div class="row">
-                        <div class="col-md-12 mb-2">
-                            <input type="text" class="form-control" name="titles[]" placeholder="Title" required>
-                        </div>
-                        <div class="col-md-12 mb-2">
-                            <textarea class="form-control description-editor" id="${newEditorId}" name="descriptions[]" placeholder="Description" rows="3" required></textarea>
-                        </div>
-                        <div class="col-md-1 d-flex align-items-center">
-                            <div class="col-md-1 d-flex align-items-center">
-                                                 <button type="button" class="btn btn-danger btn-sm remove-group">Remove</button>
-
-                                            </div>
-                        </div>
-                    </div>
-                </div>`;
+                                                                        <div class="title-description-group mb-2 border rounded p-2">
+                                                                            <div class="row">
+                                                                                <div class="col-md-12 mb-2">
+                                                                                    <input type="text" class="form-control" name="titles[]" placeholder="Title" required>
+                                                                                </div>
+                                                                                <div class="col-md-12 mb-2">
+                                                                                    <textarea class="form-control description-editor" id="${newEditorId}" name="descriptions[]" placeholder="Description" rows="3" required></textarea>
+                                                                                </div>
+                                                                                <div class="col-md-1 d-flex align-items-center">
+                                                                                                         <button type="button" class="btn btn-danger btn-sm remove-group">Remove</button>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>`;
 
             $('#title-description-wrapper').append(newGroup);
 
             // Initialize CKEditor for the new textarea
-            CKEDITOR.replace(newEditorId, {
-                filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
-                filebrowserUploadMethod: 'form'
-            });
+            setTimeout(() => {
+                initAllEditors();
+            }, 100);
 
         });
 

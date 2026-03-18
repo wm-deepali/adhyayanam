@@ -31,7 +31,7 @@
                         <select class="form-control " name="commission_id" id="exam_com_id" required>
                             <option value="">--Select--</option>
                             @foreach($commissions as $commission)
-                                <option value="{{ $commission->id }}" {{ $material->commission_id == $commission->id ? 'selected' : '' }}>
+                                <option value="{{ $commission->id }}" {{ old('commission_id', $material->commission_id) == $commission->id ? 'selected' : '' }}>
                                     {{ $commission->name }}
                                 </option>
                             @endforeach
@@ -41,8 +41,10 @@
                         <label for="language" class="form-label">Select Language</label>
                         <select class="form-control" name="language" id="language" required>
                             <option value="">--Select--</option>
-                            <option value="hindi" {{ $material->language == 'hindi' ? 'selected' : '' }}>Hindi</option>
-                            <option value="english" {{ $material->language == 'english' ? 'selected' : '' }}>English</option>
+                            <option value="hindi" {{ old('language', $material->language) == 'hindi' ? 'selected' : '' }}>
+                                Hindi</option>
+                            <option value="english" {{ old('language', $material->language) == 'english' ? 'selected' : '' }}>
+                                English</option>
                         </select>
                     </div>
                     <div class="mb-3">
@@ -50,7 +52,7 @@
                         <select class="form-control" name="category_id" id="category_id" required>
                             <option value="">--Select--</option>
                             @foreach($categories as $category)
-                                <option value="{{ $category->id }}" {{ $material->category_id == $category->id ? 'selected' : '' }}>{{ $category->name }}
+                                <option value="{{ $category->id }}" {{ old('category_id', $material->category_id) == $category->id ? 'selected' : '' }}>{{ $category->name }}
                                 </option>
                             @endforeach
                         </select>
@@ -60,7 +62,7 @@
                         <select class="form-control" name="sub_category_id" id="sub_category_id">
                             <option value="">--Select--</option>
                             @foreach($subcategories as $subcategory)
-                                <option value="{{ $subcategory->id }}" {{ $material->sub_category_id == $subcategory->id ? 'selected' : '' }}>
+                                <option value="{{ $subcategory->id }}" {{ old('sub_category_id', $material->sub_category_id) == $subcategory->id ? 'selected' : '' }}>
                                     {{ $subcategory->name }}
                                 </option>
                             @endforeach
@@ -71,7 +73,7 @@
                         <label>Select Subject</label>
                         <select class="form-control select2" name="subject_id[]" id="subject_id" multiple>
                             @php
-                                $selectedSubjects = $material->subject_id ?? [];
+                                $selectedSubjects = old('subject_id', $material->subject_id ?? []);
                             @endphp
                             @foreach($subjects as $subject)
                                 <option value="{{ $subject->id }}" {{ in_array($subject->id, $selectedSubjects) ? 'selected' : '' }}>{{ $subject->name }}
@@ -84,7 +86,7 @@
                         <label>Select Chapter</label>
                         <select class="form-control select2" name="chapter_id[]" id="chapter_id" multiple>
                             @php
-                                $selectedChapters = $material->chapter_id ?? [];
+                                $selectedChapters = old('chapter_id', $material->chapter_id ?? []);
                             @endphp
                             @foreach($chapters as $chapter)
                                 <option value="{{ $chapter->id }}" {{ in_array($chapter->id, $selectedChapters) ? 'selected' : '' }}>{{ $chapter->name }}
@@ -97,7 +99,7 @@
                         <label>Select Topic</label>
                         <select class="form-control select2" name="topic_id[]" id="topic_id" multiple>
                             @php
-                                $selectedTopics = $material->topic_id ?? [];
+                                $selectedTopics = old('topic_id', $material->topic_id ?? []);
                             @endphp
                             @foreach($topics as $topic)
                                 <option value="{{ $topic->id }}" {{ in_array($topic->id, $selectedTopics) ? 'selected' : '' }}>
@@ -115,7 +117,7 @@
 
                     <div class="mb-3">
                         <label for="title" class="form-label">Title</label>
-                        <input type="text" class="form-control" name="title" value="{{ $material->title }}"
+                        <input type="text" class="form-control" name="title" value="{{ old('title', $material->title) }}"
                             placeholder="Title" required>
                         @if ($errors->has('title'))
                             <span class="text-danger text-left">{{ $errors->first('title') }}</span>
@@ -124,8 +126,8 @@
 
                     <div class="mb-3">
                         <label for="short_description" class="form-label">Short Description</label>
-                        <textarea class="form-control" name="short_description"
-                            required>{{ $material->short_description }}</textarea>
+                        <textarea class="form-control"
+                            name="short_description">{{ old('short_description', $material->short_description) }}</textarea>
                         @if ($errors->has('short_description'))
                             <span class="text-danger text-left">{{ $errors->first('short_description') }}</span>
                         @endif
@@ -133,8 +135,8 @@
 
                     <div class="mb-3">
                         <label for="detail_content" class="form-label">Detail Content</label>
-                        <textarea id="editor" name="detail_content"
-                            style="height: 200px;">{!! $material->detail_content !!}</textarea>
+                        <textarea id="editor"
+                            name="detail_content">{!! old('detail_content', $material->detail_content) !!}</textarea>
                         @if ($errors->has('detail_content'))
                             <span class="text-danger text-left">{{ $errors->first('detail_content') }}</span>
                         @endif
@@ -144,23 +146,52 @@
                     <hr>
                     <h5>Study Material Sections</h5>
                     <div id="section-wrapper">
-                        @if(isset($sections) && count($sections) > 0)
-                            @foreach($sections as $index => $section)
-                                <div class="section-block border p-3 mb-3 rounded">
-                                    <input type="hidden" name="section_ids[]" value="{{ $section->id }}">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <strong>Section {{ $loop->iteration }}</strong>
-                                        <button type="button" class="btn btn-danger btn-sm remove-section">Remove</button>
-                                    </div>
-                                    <div class="mt-2">
-                                        <input type="text" name="titles[]" class="form-control mb-2" value="{{ $section->title }}"
-                                            placeholder="Section Title" required>
-                                        <textarea name="descriptions[]" id="section_description_{{ $loop->index }}"
-                                            class="form-control ckeditor-section" rows="3" placeholder="Section Description"
-                                            required>{{ $section->description }}</textarea>
-                                    </div>
-                                </div>
-                            @endforeach
+                       @php
+    $oldTitles = old('titles');
+    $oldDescriptions = old('descriptions');
+@endphp
+
+@if($oldTitles)
+    @foreach($oldTitles as $index => $title)
+        <div class="section-block border p-3 mb-3 rounded">
+            <input type="hidden" name="section_ids[]" value="">
+            <div class="d-flex justify-content-between align-items-center">
+                <strong>Section {{ $loop->iteration }}</strong>
+                <button type="button" class="btn btn-danger btn-sm remove-section">Remove</button>
+            </div>
+            <div class="mt-2">
+                <input type="text" name="titles[]" class="form-control mb-2"
+                    value="{{ $title }}" placeholder="Section Title" required>
+
+                <textarea name="descriptions[]"
+                    id="section_description_{{ $index }}"
+                    class="form-control ckeditor-section"
+                    placeholder="Section Description"
+                    required>{{ $oldDescriptions[$index] ?? '' }}</textarea>
+            </div>
+        </div>
+    @endforeach
+
+@elseif(isset($sections) && count($sections) > 0)
+
+    @foreach($sections as $index => $section)
+        <div class="section-block border p-3 mb-3 rounded">
+            <input type="hidden" name="section_ids[]" value="{{ $section->id }}">
+            <div class="d-flex justify-content-between align-items-center">
+                <strong>Section {{ $loop->iteration }}</strong>
+                <button type="button" class="btn btn-danger btn-sm remove-section">Remove</button>
+            </div>
+            <div class="mt-2">
+                <input type="text" name="titles[]" class="form-control mb-2"
+                    value="{{ $section->title }}" required>
+
+                <textarea name="descriptions[]"
+                    id="section_description_{{ $index }}"
+                    class="form-control ckeditor-section"
+                    required>{{ $section->description }}</textarea>
+            </div>
+        </div>
+    @endforeach
                         @else
                             <div class="section-block border p-3 mb-3 rounded">
                                 <div class="d-flex justify-content-between align-items-center">
@@ -184,8 +215,8 @@
                     <div class="mb-3">
                         <label for="IsPaid" class="form-label">Paid</label>
                         <select class="form-control" name="IsPaid" id="IsPaid" required>
-                            <option value="0" {{ $material->IsPaid == 0 ? 'selected' : '' }}>No</option>
-                            <option value="1" {{ $material->IsPaid == 1 ? 'selected' : '' }}>Yes</option>
+                            <option value="0" {{ old('IsPaid', $material->IsPaid) == 0 ? 'selected' : '' }}>No</option>
+                            <option value="1" {{ old('IsPaid', $material->IsPaid) == 1 ? 'selected' : '' }}>Yes</option>
                         </select>
                         @if ($errors->has('IsPaid'))
                             <span class="text-danger text-left">{{ $errors->first('IsPaid') }}</span>
@@ -194,7 +225,8 @@
 
                     <div class="mb-3 priceField" style="{{ $material->IsPaid == 1 ? '' : 'display: none;' }}">
                         <label for="mrp" class="form-label">MRP:</label>
-                        <input type="number" class="form-control" id="mrp" name="mrp" value="{{ $material->mrp }}">
+                        <input type="number" class="form-control" id="mrp" name="mrp"
+                            value="{{ old('mrp', $material->mrp) }}">
                         @if ($errors->has('mrp'))
                             <span class="text-danger text-left">{{ $errors->first('mrp') }}</span>
                         @endif
@@ -203,7 +235,7 @@
                     <div class="mb-3 priceField" style="{{ $material->IsPaid == 1 ? '' : 'display: none;' }}">
                         <label for="discount" class="form-label">Discount (%):</label>
                         <input type="number" class="form-control" id="discount" name="discount"
-                            value="{{ $material->discount }}">
+                            value="{{ old('discount', $material->discount) }}">
                         @if ($errors->has('discount'))
                             <span class="text-danger text-left">{{ $errors->first('discount') }}</span>
                         @endif
@@ -212,7 +244,7 @@
                     <div class="mb-3 priceField" style="{{ $material->IsPaid == 1 ? '' : 'display: none;' }}">
                         <label for="offered-price" class="form-label">Offered Price:</label>
                         <input type="text" class="form-control" id="offered-price" name="price"
-                            value="{{ $material->price }}" readonly>
+                            value="{{ old('price', $material->price) }}" readonly>
                         @if ($errors->has('price'))
                             <span class="text-danger text-left">{{ $errors->first('price') }}</span>
                         @endif
@@ -221,8 +253,10 @@
                     <div class="mb-3">
                         <label for="status" class="form-label">Status</label>
                         <select class="form-control" name="status" required>
-                            <option value="Active" {{ $material->status == 'Active' ? 'selected' : '' }}>Active</option>
-                            <option value="Inactive" {{ $material->status == 'Inactive' ? 'selected' : '' }}>Inactive</option>
+                            <option value="Active" {{ old('status', $material->status) == 'Active' ? 'selected' : '' }}>Active
+                            </option>
+                            <option value="Inactive" {{ old('status', $material->status) == 'Inactive' ? 'selected' : '' }}>
+                                Inactive</option>
                         </select>
                         @if ($errors->has('status'))
                             <span class="text-danger text-left">{{ $errors->first('status') }}</span>
@@ -245,14 +279,14 @@
 
                     <div class="mb-3 form-check">
                         <input type="checkbox" class="form-check-input" id="is_pdf_downloadable" name="is_pdf_downloadable"
-                            value="1" {{ $material->is_pdf_downloadable ? 'checked' : '' }}>
+                            value="1" {{ old('is_pdf_downloadable', $material->is_pdf_downloadable) ? 'checked' : '' }}>
                         <label class="form-check-label" for="is_pdf_downloadable">PDF Downloadable</label>
                     </div>
 
                     <div class="mb-3">
                         <label for="meta_title" class="form-label">Meta Title</label>
-                        <input type="text" class="form-control" name="meta_title" value="{{ $material->meta_title }}"
-                            placeholder="Meta Title">
+                        <input type="text" class="form-control" name="meta_title"
+                            value="{{ old('meta_title', $material->meta_title) }}" placeholder="Meta Title">
                         @if ($errors->has('meta_title'))
                             <span class="text-danger text-left">{{ $errors->first('meta_title') }}</span>
                         @endif
@@ -260,8 +294,8 @@
 
                     <div class="mb-3">
                         <label for="meta_keyword" class="form-label">Meta Keyword</label>
-                        <input type="text" class="form-control" name="meta_keyword" value="{{ $material->meta_keyword }}"
-                            placeholder="Meta Keyword">
+                        <input type="text" class="form-control" name="meta_keyword"
+                            value="{{ old('meta_keyword', $material->meta_keyword) }}" placeholder="Meta Keyword">
                         @if ($errors->has('meta_keyword'))
                             <span class="text-danger text-left">{{ $errors->first('meta_keyword') }}</span>
                         @endif
@@ -270,7 +304,8 @@
                     <div class="mb-3">
                         <label for="meta_description" class="form-label">Meta Description</label>
                         <input type="text" class="form-control" name="meta_description"
-                            value="{{ $material->meta_description }}" placeholder="Meta Description">
+                            value="{{ old('meta_description', $material->meta_description) }}"
+                            placeholder="Meta Description">
                         @if ($errors->has('meta_description'))
                             <span class="text-danger text-left">{{ $errors->first('meta_description') }}</span>
                         @endif
@@ -314,18 +349,18 @@
             let uniqueId = 'section_description_' + Date.now();
 
             let sectionHtml = `
-            <div class="section-block border p-3 mb-3 rounded">
-                <input type="hidden" name="section_ids[]" value="">
-                <div class="d-flex justify-content-between align-items-center">
-                    <strong>Section ${sectionCount}</strong>
-                    <button type="button" class="btn btn-danger btn-sm remove-section">Remove</button>
-                </div>
-                <div class="mt-2">
-                    <input type="text" name="titles[]" class="form-control mb-2" placeholder="Section Title" required>
-                    <textarea name="descriptions[]" id="${uniqueId}" class="form-control ckeditor-section" rows="3" placeholder="Section Description" required></textarea>
-                </div>
-            </div>
-        `;
+                                <div class="section-block border p-3 mb-3 rounded">
+                                    <input type="hidden" name="section_ids[]" value="">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <strong>Section ${sectionCount}</strong>
+                                        <button type="button" class="btn btn-danger btn-sm remove-section">Remove</button>
+                                    </div>
+                                    <div class="mt-2">
+                                        <input type="text" name="titles[]" class="form-control mb-2" placeholder="Section Title" required>
+                                        <textarea name="descriptions[]" id="${uniqueId}" class="form-control ckeditor-section" rows="3" placeholder="Section Description" required></textarea>
+                                    </div>
+                                </div>
+                            `;
 
             $('#section-wrapper').append(sectionHtml);
 
@@ -386,6 +421,40 @@
             }
 
             updateDisableSelects();
+
+            let oldCommission = "{{ old('commission_id', $material->commission_id) }}";
+let oldCategory = "{{ old('category_id', $material->category_id) }}";
+let oldSubCategory = "{{ old('sub_category_id', $material->sub_category_id) }}";
+
+if (oldCommission) {
+    $('#exam_com_id').val(oldCommission).trigger('change');
+
+    setTimeout(() => {
+        $('#category_id').val(oldCategory).trigger('change');
+
+        setTimeout(() => {
+            $('#sub_category_id').val(oldSubCategory).trigger('change');
+        }, 500);
+
+    }, 500);
+}
+
+let oldSubjects = @json(old('subject_id', $material->subject_id ?? []));
+let oldChapters = @json(old('chapter_id', $material->chapter_id ?? []));
+let oldTopics = @json(old('topic_id', $material->topic_id ?? []));
+
+setTimeout(() => {
+    $('#subject_id').val(oldSubjects).trigger('change');
+
+    setTimeout(() => {
+        $('#chapter_id').val(oldChapters).trigger('change');
+
+        setTimeout(() => {
+            $('#topic_id').val(oldTopics).trigger('change');
+        }, 500);
+
+    }, 500);
+}, 1000);
 
             // Bind to change events
             $('#subject_id, #chapter_id').on('change', function () {
@@ -527,11 +596,17 @@
             $('#mrp, #discount').on('input', calculateOfferedPrice);
             calculateOfferedPrice();
 
-            // Initialize CKEditor
-            CKEDITOR.replace('editor', {
-                filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
-                filebrowserUploadMethod: 'form'
-            });
-        });
+  CKEDITOR.replace('editor', {
+    filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
+    filebrowserUploadMethod: 'form'
+});
+
+CKEDITOR.on('instanceReady', function (event) {
+    @if(old('detail_content'))
+        event.editor.setData(`{!! old('detail_content') !!}`);
+    @endif
+});
+
+});
     </script>
 @endsection

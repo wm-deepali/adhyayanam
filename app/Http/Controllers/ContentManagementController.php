@@ -2689,7 +2689,7 @@ class ContentManagementController extends Controller
         $material = StudyMaterial::findOrFail($id);
 
         // Validation
-        $validatedData = $request->validate([
+        $validator = Validator::make($request->all(), [
             'commission_id' => 'required|integer',
             'category_id' => 'required|integer',
             'sub_category_id' => 'nullable|integer',
@@ -2728,6 +2728,15 @@ class ContentManagementController extends Controller
             'descriptions' => 'nullable|array',
             'descriptions.*' => 'nullable|string',
         ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
+
+        // ✅ ADD THIS LINE
+        $validatedData = $validator->validated();
 
         // Update main material
         $material->fill([

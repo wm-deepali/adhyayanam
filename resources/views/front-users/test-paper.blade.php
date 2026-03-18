@@ -49,6 +49,13 @@
                                             Test ID: #{{ $test->id }}
                                         </small>
                                     </td>
+
+
+                                    {{-- ATTEMPT NUMBER --}}
+                                    <td class="text-center">
+                                        <span class="badge bg-info text-dark">Attempt #{{ $loop->iteration }}</span>
+                                    </td>
+
                                     <td>
                                         @php
                                             $paperType = $test->paper_type;
@@ -74,11 +81,6 @@
                                             echo $typeName;
                                         @endphp
                                         ({{ ucfirst($test->test_paper_type) }})
-                                    </td>
-
-                                    {{-- ATTEMPT NUMBER --}}
-                                    <td class="text-center">
-                                        <span class="badge bg-info text-dark">Attempt #{{ $loop->iteration }}</span>
                                     </td>
 
                                     {{-- STATUS --}}
@@ -108,7 +110,7 @@
                                                 // Percentage calculation
                                                 $percentage = $total > 0 ? round(($score / $total) * 100, 2) : 0;
 
-                                                 $division = '';
+                                                $division = '';
                                                 // Badge colors
                                                 $badgeClass =
                                                     ($division == 'Fail') ? 'bg-danger' :

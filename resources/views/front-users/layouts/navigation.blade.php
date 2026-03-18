@@ -39,10 +39,18 @@
 						<ul class="treeview-menu">
 							<li><a href="{{route('user.test-series')}}"><i class="icon-Commit"><span
 											class="path1"></span><span class="path2"></span></i>Test Series</a></li>
+							<li>
+								<a href="{{ route('user.my-pyq-papers') }}">
+									<i class="icon-Commit"><span
+											class="path1"></span><span class="path2"></span></i>
+								My PYQ Papers
+								</a>
+							</li>
 							<li><a href="{{route('user.test-papers')}}"><i class="icon-Commit"><span
 											class="path1"></span><span class="path2"></span></i>Test Results</a></li>
 						</ul>
 					</li>
+
 
 					<li class="treeview">
 						<a href="#">

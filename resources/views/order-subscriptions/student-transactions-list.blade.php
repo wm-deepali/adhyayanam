@@ -111,7 +111,7 @@
 
                                         {{-- Download Invoice --}}
                                         @if(\App\Helpers\Helper::canAccess('manage_students') && optional($res->order)->id)
-                                            <a href="{{ route('user.generate-pdf', $res->order->id) }}"
+                                            <a href="{{ route('students.generate-pdf', $res->order->id) }}"
                                                title="Download Invoice">
                                                 <i class="fa fa-download"></i>
                                             </a>

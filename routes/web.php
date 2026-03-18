@@ -32,6 +32,7 @@ use App\Http\Controllers\CMS\NoticeBoardController;
 use App\Http\Controllers\CMS\InstituteFeatureController;
 use App\Http\Controllers\CMS\InstituteHighlightController;
 use App\Http\Controllers\CMS\HomeSectionController;
+use App\Http\Controllers\PaperController;
 
 /*
 |--------------------------------------------------------------------------
@@ -67,8 +68,8 @@ Route::get('test-series-list/{examid?}/{catid?}/{subcat?}', [FrontController::cl
 Route::get('test-series/details/{slug}', [FrontController::class, 'testseriesDetail'])->name('test-series-detail');
 
 
-Route::get('/test-instruction/{id}', [LiveTestController::class,'testInstruction'])->name('test.instruction');
-Route::get('/live-test/{id}', [LiveTestController::class,'liveTest'])->name('live-test');
+Route::get('/test-instruction/{id}', [LiveTestController::class, 'testInstruction'])->name('test.instruction');
+Route::get('/live-test/{id}', [LiveTestController::class, 'liveTest'])->name('live-test');
 Route::post('/fetch-question', [LiveTestController::class, 'fetchQuestion']);
 Route::post('/save-answer', [LiveTestController::class, 'saveAttemptAnswer']);
 Route::post('/finalize-test', [LiveTestController::class, 'finalizeStudentTest']);
@@ -226,11 +227,11 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
 
     // student panel routes
     Route::middleware(['auth', 'isStudent'])->group(function () {
-        
+
         Route::get('/user/dashboard', function () {
             return view('front-users.dashboard');
-            })->name('user.dashboard');
-            
+        })->name('user.dashboard');
+
         Route::get('/user-test-planner', function () {
             return view('front-users.test-planner');
         })->name('user-test-planner');
@@ -246,7 +247,7 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
         Route::post('/video/{id}/watch', [FrontUserController::class, 'watch']);
         Route::post('/student/homework/upload', [FrontUserController::class, 'uploadAssignment'])->name('student.homework.upload');
         Route::post('/student/course-review', [FrontUserController::class, 'storeCourseReview'])->name('student.course.review');
-        
+
         // my study material routes
         Route::get('/my-study-material', [FrontUserController::class, 'StudyMaterial'])->name('user.study-material');
         Route::delete('/user/user-activity/delete/{id}', [FrontUserController::class, 'activityDelete'])->name('user-activity.destroy');
@@ -254,16 +255,23 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
         Route::get('/user/test-series', [FrontUserController::class, 'myTestSeries'])->name('user.test-series');
         Route::get('user/test-series-detail/{slug}', [FrontUserController::class, 'testSeriesDetail'])->name('user.test-series-detail');
         Route::get('/user/test-papers', [FrontUserController::class, 'listUserTestPapers'])->name('user.test-papers');
-        
+
+        Route::get('/user/my-pyq-papers', [FrontUserController::class, 'myPyqPapers'])->name('user.my-pyq-papers');
+
         Route::get('/user/setting', [FrontUserController::class, 'setting'])->name('user.setting');
         Route::post('user/register-student', [FrontUserController::class, 'studentRegister'])->name('register-student');
         Route::post('user/change-student-password', [FrontUserController::class, 'studentChangePassword'])->name('change-student-password');
         Route::get('student/wallet', [App\Http\Controllers\StudentWalletController::class, 'index'])->name('student.wallet');
 
+        Route::post('/paper/add-cart', [PaperController::class, 'addCart'])->name('paper.add.cart');
+        Route::get('/paper/remove/{id}', [PaperController::class, 'remove'])->name('paper.remove');
+        Route::get('/paper/cart', [PaperController::class, 'cart'])->name('paper.cart');
+        Route::post('/paper/checkout', [PaperController::class, 'checkout'])->name('paper.checkout');
+
         Route::get('user/process-order/{type}/{id}', [App\Http\Controllers\PaymentController::class, 'orderProcess'])->name('user.process-order');
         Route::any('order/status', [App\Http\Controllers\PaymentController::class, 'orderStatus'])->name('order.status');
         Route::get('/thank-you/{order}', [App\Http\Controllers\PaymentController::class, 'thankYou'])->name('thank.you');
-        
+
     });
 
     // admin panel routes
@@ -709,6 +717,7 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
         Route::get('students/registered-student-list', [StudentController::class, 'RegisterStudentList'])->name('students.registered-student-list')->middleware('custom.permission:manage_students');
         Route::get('students/view-all-orders/{id}', [StudentController::class, 'ViewAllOrder'])->name('students.view-all-orders')->middleware('custom.permission:manage_students');
         Route::get('students/student-order-detail/{id}', [OrderController::class, 'studentOrderDetails'])->name('students.student-order-detail')->middleware('custom.permission:manage_students');
+        Route::get('/students/generate-pdf/{id}', [FrontUserController::class, 'generatePDF'])->name('students.generate-pdf');
         Route::get('students/change-status', [StudentController::class, 'changeStatus'])->name('students.change-status')->middleware('custom.permission:manage_students_status');
         Route::get('students/change-password/{id}', [StudentController::class, 'studentChangePassword'])->name('students.change-password')->middleware('custom.permission:students.view-all-orders');
         Route::post('students/update-password/{id}', [StudentController::class, 'studentUpdatePassword'])->name('students.update-password')->middleware('custom.permission:manage_students_edit');

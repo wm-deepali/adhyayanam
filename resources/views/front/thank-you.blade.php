@@ -156,7 +156,15 @@
                 <div class="info-box">
                     <span>{{ $order->order_type ?? 'Package'}}</span>
                     <strong>
-                        {{ $course->name ?? $studyMaterial->title ?? $testSeries->title ?? 'Package' }}
+                        @if($order->order_type == 'Course')
+                            {{ $course->name }}
+                        @elseif($order->order_type == 'Study Material')
+                            {{ $studyMaterial->title }}
+                        @elseif($order->order_type == 'Test Series')
+                            {{ $testSeries->title }}
+                        @elseif($order->order_type == 'Paper')
+                            PYQ Papers
+                        @endif
                     </strong>
                 </div>
 
@@ -167,21 +175,54 @@
 
             </div>
 
+            @if(isset($papers) && $papers->count())
+
+                <div style="margin-top:20px;text-align:left">
+
+                    <h4 style="margin-bottom:10px;">Purchased Papers</h4>
+
+                    <ul style="padding-left:18px">
+
+                        @foreach($papers as $paper)
+
+                            <li style="margin-bottom:6px">
+                                {{ $paper->name }}
+                            </li>
+
+                        @endforeach
+
+                    </ul>
+
+                </div>
+
+            @endif
 
             <div class="thank-btns">
 
                 @if($order->order_type == 'Test Series')
+
                     <a href="{{ route('user.test-series-detail', $testSeries->slug) }}" class="start-btn">
                         Start Your Test
                     </a>
+
                 @elseif($order->order_type == 'Course')
+
                     <a href="{{ route('course.detail', $course->id) }}" class="start-btn">
                         Start Learning
                     </a>
+
                 @elseif($order->order_type == 'Study Material')
+
                     <a href="{{ route('study.material.details', $studyMaterial->id) }}" class="start-btn">
                         View Study Material
                     </a>
+
+                @elseif($order->order_type == 'Paper')
+
+                    <a href="{{ route('user.test-papers') }}" class="start-btn">
+                        View Purchased Papers
+                    </a>
+
                 @endif
 
                 <a href="{{route('user.dashboard')}}" class="dashboard-btn">

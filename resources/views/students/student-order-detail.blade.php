@@ -109,9 +109,31 @@
                                 <tr>
                                     <td>1</td>
                                     <td>{{$order->order_type}}</td>
-                                    <td>
-                                        {{$order->detail ?? ''}}
-                                    </td>
+                                   <td>
+
+                                    @if($course)
+                                        {{ $course->name ?? '-' }}
+
+                                    @elseif($studyMaterial)
+                                        {{ $studyMaterial->title ?? '-' }}
+
+
+                                    @elseif($testSeries)
+                                        {{ $testSeries->title ?? '-' }}
+
+                                    @elseif(isset($papers) && $papers->count())
+                                        @foreach($papers as $paper)
+
+                                            <li style="margin:6px">
+                                                {{ $paper->name }}
+                                            </li>
+
+                                        @endforeach
+                                    @else
+                                        {{ $order->package_name ?? '-' }}
+                                    @endif
+
+                                </td>
                                     <td>{{$order->quantity ?? 0}}</td>
                                     <td>&#8377;{{$order->billed_amount ?? 0}}</td>
                                 </tr>

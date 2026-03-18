@@ -267,28 +267,42 @@
 
 
 
-                                    <div class="paper-right">
+<div class="paper-right">
 
-                                        @if($paper->test_type == 'paid')
+@if(!auth()->check())
 
-                                            <div class="paper-price ">
-                                                ₹{{$paper->offer_price}}
-                                            </div>
-
-                                        @endif
-
-
-                                        @auth
-    <a href="{{ route('test.instruction', base64_encode($paper->id)) }}" class="attempt-btn">
-        Attempt Now
-    </a>
-@else
+    {{-- NOT LOGGED IN --}}
     <a href="{{ route('student.login') }}" class="attempt-btn">
         Login to Attempt
     </a>
-@endauth
 
-                                    </div>
+@else
+
+    {{-- LOGGED IN USER --}}
+
+    @if($paper->test_type == 'paid')
+
+        <div class="paper-price">
+            ₹{{$paper->offer_price}}
+        </div>
+
+        <button class="attempt-btn add-to-cart"
+                data-id="{{$paper->id}}">
+            Add to Cart
+        </button>
+
+    @else
+
+        <a href="{{ route('test.instruction', base64_encode($paper->id)) }}"
+           class="attempt-btn">
+           Attempt Now
+        </a>
+
+    @endif
+
+@endif
+
+</div>
 
                                 </div>
 
@@ -346,8 +360,6 @@
 
             });
 
-        </script>
-        <script>
 
             $("#yearSearch").on("keyup", function () {
 
@@ -362,6 +374,23 @@
             });
 
 
+$(".add-to-cart").click(function(){
+
+    let paper_id = $(this).data("id");
+
+    $.ajax({
+        url:"{{ route('paper.add.cart') }}",
+        method:"POST",
+        data:{
+            paper_id:paper_id,
+            _token:"{{csrf_token()}}"
+        },
+        success:function(res){
+            alert("Paper added to cart");
+        }
+    });
+
+});
         </script>
 
     </body>

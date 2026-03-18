@@ -1,6 +1,10 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Models\Course;
+use App\Models\StudyMaterial;
+use App\Models\Test;
+use App\Models\TestSeries;
 use App\Models\User;
 use App\Models\Order;
 use App\Models\Transaction;
@@ -175,7 +179,32 @@ class OrderController extends Controller
 
     public function studentOrderDetails($id)
     {
-        $data['order'] = Order::with('student', 'transaction')->where('id', $id)->first();
-        return view('students.student-order-detail', $data);
+        $order = Order::with('student', 'transaction')->findOrFail($id);
+
+        $course = null;
+        $studyMaterial = null;
+        $testSeries = null;
+        $papers = null;
+
+        if ($order->order_type == 'Course') {
+            $course = Course::find($order->package_id);
+        } elseif ($order->order_type == 'Study Material') {
+            $studyMaterial = StudyMaterial::find($order->package_id);
+        } elseif ($order->order_type == 'Test Series') {
+            $testSeries = TestSeries::find($order->package_id);
+        } elseif ($order->order_type == 'Paper') {
+
+            $ids = explode(',', $order->package_id);
+
+            $papers = Test::whereIn('id', $ids)->get();
+
+        }
+         return view('students.student-order-detail', compact(
+            'order',
+            'course',
+            'studyMaterial',
+            'testSeries',
+            'papers'
+        ));
     }
 }

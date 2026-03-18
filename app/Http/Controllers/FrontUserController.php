@@ -2,6 +2,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\CourseReview;
+use App\Models\Test;
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Order;
@@ -159,6 +160,7 @@ class FrontUserController extends Controller
         $course = null;
         $studyMaterial = null;
         $testSeries = null;
+        $papers = null;
 
         if ($order->order_type == 'Course') {
             $course = Course::find($order->package_id);
@@ -166,15 +168,23 @@ class FrontUserController extends Controller
             $studyMaterial = StudyMaterial::find($order->package_id);
         } elseif ($order->order_type == 'Test Series') {
             $testSeries = TestSeries::find($order->package_id);
+        } elseif ($order->order_type == 'Paper') {
+
+            $ids = explode(',', $order->package_id);
+
+            $papers = Test::whereIn('id', $ids)->get();
+
         }
 
         return view('front-users.order-details', compact(
             'order',
             'course',
             'studyMaterial',
-            'testSeries'
+            'testSeries',
+            'papers'
         ));
     }
+    
     public function printInvoice($id)
     {
         $order = Order::with('student', 'transaction')->findOrFail($id);
@@ -206,6 +216,7 @@ class FrontUserController extends Controller
         $course = null;
         $studyMaterial = null;
         $testSeries = null;
+        $papers = null;
 
         if ($order->order_type == 'Course') {
             $course = Course::find($order->package_id);
@@ -213,13 +224,20 @@ class FrontUserController extends Controller
             $studyMaterial = StudyMaterial::find($order->package_id);
         } elseif ($order->order_type == 'Test Series') {
             $testSeries = TestSeries::find($order->package_id);
+         } elseif ($order->order_type == 'Paper') {
+
+            $ids = explode(',', $order->package_id);
+
+            $papers = Test::whereIn('id', $ids)->get();
+
         }
 
         $data = compact(
             'order',
             'course',
             'studyMaterial',
-            'testSeries'
+            'testSeries',
+            'papers'
         );
 
         $pdf = Pdf::loadView('front-users.invoice-pdf', $data);
@@ -478,5 +496,23 @@ class FrontUserController extends Controller
         return view('front-users.test-paper', compact('attemptedTests'));
     }
 
+    public function myPyqPapers()
+    {
+        $orders = Order::where('student_id', auth()->id())
+            ->where('order_type', 'Paper')
+            ->where('payment_status', 'PAID')
+            ->get();
+
+        $paper_ids = [];
+
+        foreach ($orders as $order) {
+            $ids = explode(',', $order->package_id);
+            $paper_ids = array_merge($paper_ids, $ids);
+        }
+
+        $papers = Test::whereIn('id', $paper_ids)->get();
+
+        return view('front-users.my-pyq-papers', compact('papers'));
+    }
 
 }

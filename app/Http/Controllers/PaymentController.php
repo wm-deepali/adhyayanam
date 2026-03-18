@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Models\Test;
 use App\Models\User;
 use App\Models\Order;
 use App\Models\Transaction;
@@ -84,6 +85,22 @@ class PaymentController extends Controller
                $package = 'Test Series';
 
                $order_note = $test->title;
+          } else if ($type == 'paper') {
+
+               $ids = explode(',', $id);
+
+               $papers = Test::whereIn('id', $ids)->get();
+
+               $fee = $papers->sum('offer_price');
+
+               $discount = 0;
+               $discountAmt = 0;
+
+               $payAmount = $fee;
+
+               $package = 'Paper';
+
+               $order_note = 'PYQ Papers';
           }
 
 
@@ -208,6 +225,9 @@ class PaymentController extends Controller
                $transaction->transaction = $order_token;
                $transaction->created_at = $created_at;
                $transaction->save();
+               if ($package_type == 'Paper') {
+                    session()->forget('paper_cart');
+               }
                return redirect()->route('thank.you', $Order->id);
 
 
@@ -224,6 +244,7 @@ class PaymentController extends Controller
           $course = null;
           $studyMaterial = null;
           $testSeries = null;
+          $papers = null;
 
           if ($order->order_type == 'Course') {
                $course = Course::find($order->package_id);
@@ -231,13 +252,20 @@ class PaymentController extends Controller
                $studyMaterial = StudyMaterial::find($order->package_id);
           } elseif ($order->order_type == 'Test Series') {
                $testSeries = TestSeries::find($order->package_id);
+          } elseif ($order->order_type == 'Paper') {
+
+               $ids = explode(',', $order->package_id);
+
+               $papers = Test::whereIn('id', $ids)->get();
+
           }
 
           return view('front.thank-you', compact(
                'order',
                'course',
                'studyMaterial',
-               'testSeries'
+               'testSeries',
+               'papers'
           ));
      }
 }

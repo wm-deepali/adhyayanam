@@ -16,8 +16,18 @@ class LiveTestController extends Controller
     public function testInstruction($id)
     {
         $decodeId = base64_decode($id);
+        $studentId = auth()->id();
 
         $test = Test::findOrFail($decodeId);
+
+        $existingAttempt = StudentTestAttempt::where('student_id', $studentId)
+            ->where('status', 'in_progress')
+            ->where('test_id', '!=', $decodeId)
+            ->first();
+
+        $continueTest = $existingAttempt
+            ? base64_encode($existingAttempt->test_id)
+            : null;
 
         $totalQuestions = TestDetail::where('test_id', $decodeId)
             ->whereNull('parent_question_id')
@@ -25,7 +35,8 @@ class LiveTestController extends Controller
 
         return view('front.test-instruction', [
             'test' => $test,
-            'total_questions' => $totalQuestions
+            'total_questions' => $totalQuestions,
+            'continueTest' => $continueTest // ✅ ADD THIS
         ]);
     }
 
@@ -34,20 +45,6 @@ class LiveTestController extends Controller
         $decodeId = base64_decode($id);
         $studentId = auth()->id();
 
-        // 🔒 RULE: Only one test can be in progress
-        $existingAttempt = StudentTestAttempt::where('student_id', $studentId)
-            ->where('status', 'in_progress')
-            ->where('test_id', '!=', $decodeId)
-            ->first();
-
-        if ($existingAttempt) {
-    return redirect()
-        ->route('live-test', base64_encode($existingAttempt->test_id))
-        ->withErrors([
-            'test' => 'You already have an active test in progress.'
-        ])
-        ->with('continue_test', base64_encode($existingAttempt->test_id));
-}
         $test = Test::where('id', $decodeId)->firstOrFail();
 
         $attempt = StudentTestAttempt::where('student_id', $studentId)

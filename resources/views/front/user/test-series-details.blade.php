@@ -710,7 +710,6 @@
                     @endphp
 
                     @if(!$checkExist)
-
                         <a href="{{route('user.process-order', ['type' => 'test-series', 'id' => $testseries->id])}}">
                             <button class="buy-btn">Enroll Now</button>
                         </a>

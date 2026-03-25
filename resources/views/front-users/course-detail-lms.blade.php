@@ -323,15 +323,28 @@ data-video='@json($videoPayload)'>
                 late: { label: 'Late Submission', class: 'bg-warning text-dark' },
             };
 
-            function youtubeEmbed(url) {
-                if (!url) return '';
-                if (url.includes('youtube.com/watch?v=')) {
-                    let id = url.split('v=')[1];
-                    if (id.includes('&')) id = id.split('&')[0];
-                    return 'https://www.youtube.com/embed/' + id;
-                }
-                return url;
-            }
+           function youtubeEmbed(url) {
+
+    if (!url) return '';
+
+    // youtu.be format
+    if (url.includes('youtu.be/')) {
+        return 'https://www.youtube.com/embed/' + url.split('youtu.be/')[1].split('?')[0];
+    }
+
+    // youtube watch format
+    if (url.includes('youtube.com/watch')) {
+        const urlObj = new URL(url);
+        return 'https://www.youtube.com/embed/' + urlObj.searchParams.get("v");
+    }
+
+    // already embed
+    if (url.includes('/embed/')) {
+        return url;
+    }
+
+    return url;
+}
 
             lessonItems.forEach(item => {
                 item.addEventListener('click', function () {

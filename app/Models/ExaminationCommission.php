@@ -28,10 +28,6 @@ class ExaminationCommission extends Model
     {
         return $this->hasMany(Category::class, 'exam_com_id');
     }
-    public function courses()
-    {
-        return $this->hasMany(Course::class);
-    }
 
     public function subjects()
     {
@@ -41,6 +37,11 @@ class ExaminationCommission extends Model
     public function creator()
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function courses()
+    {
+        return $this->hasMany(Course::class, 'examination_commission_id');
     }
 
 }

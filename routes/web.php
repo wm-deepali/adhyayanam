@@ -228,9 +228,7 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
     // student panel routes
     Route::middleware(['auth', 'isStudent'])->group(function () {
 
-        Route::get('/user/dashboard', function () {
-            return view('front-users.dashboard');
-        })->name('user.dashboard');
+        Route::get('/user/dashboard', [FrontUserController::class, 'index'])->name('user.dashboard');
 
         Route::get('/user-test-planner', function () {
             return view('front-users.test-planner');

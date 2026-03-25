@@ -24,9 +24,27 @@ use App\Models\StudentWalletTransaction;
 use Illuminate\Support\Facades\Validator;
 use App\Models\LogActivity as LogActivityModel;
 use App\Models\StudentHomeworkSubmission;
+use App\Models\ExaminationCommission;
+use App\Models\NoticeBoard;
 
 class FrontUserController extends Controller
 {
+
+    public function index()
+    {
+        $commissions = ExaminationCommission::has('courses') // ✅ only those having courses
+            ->withCount('courses')
+            ->take(4)
+            ->get();
+
+        $notices = NoticeBoard::where('status', 1)
+            ->latest()
+            ->take(10)
+            ->get();
+
+        return view('front-users.dashboard', compact('commissions', 'notices'));
+    }
+
     public function studentRegister(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -184,7 +202,7 @@ class FrontUserController extends Controller
             'papers'
         ));
     }
-    
+
     public function printInvoice($id)
     {
         $order = Order::with('student', 'transaction')->findOrFail($id);
@@ -224,7 +242,7 @@ class FrontUserController extends Controller
             $studyMaterial = StudyMaterial::find($order->package_id);
         } elseif ($order->order_type == 'Test Series') {
             $testSeries = TestSeries::find($order->package_id);
-         } elseif ($order->order_type == 'Paper') {
+        } elseif ($order->order_type == 'Paper') {
 
             $ids = explode(',', $order->package_id);
 
@@ -338,7 +356,7 @@ class FrontUserController extends Controller
             ->get();
 
         // dd($videoLessons->toArray());
-        return view('front-users.course-detail-lms', compact('course', 'videoLessons', 'review', 'reviews'));
+        return view('front-users.course-detail-lms', compact('course', 'videoLessons', 'review'));
     }
 
     public function uploadAssignment(Request $request)

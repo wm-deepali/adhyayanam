@@ -96,25 +96,20 @@
 
         <h3>Instructions</h3>
 
-        @if ($errors->has('test'))
+      @if($continueTest)
 
-            <div style="background:#ffe5e5;color:#b30000;padding:12px;border-radius:6px;margin-bottom:15px;">
+    <div style="background:#ffe5e5;color:#b30000;padding:12px;border-radius:6px;margin-bottom:15px;">
+        You already have an active test in progress.
 
-                {{ $errors->first('test') }}
+        <div style="margin-top:10px;">
+            <a href="{{ route('live-test', $continueTest) }}"
+               style="display:inline-block;background:#004085;color:#fff;padding:8px 15px;border-radius:5px;text-decoration:none;">
+                ▶ Continue Previous Test
+            </a>
+        </div>
+    </div>
 
-                @if(session('continue_test'))
-                <pre>{{ print_r(session('continue_test')) }}</pre>
-                    <div style="margin-top:10px;">
-                        <a href="{{ route('live-test', session('continue_test')) }}"
-                            style="color:#004085;font-weight:600;text-decoration:underline;">
-                            Continue Previous Test
-                        </a>
-                    </div>
-                @endif
-
-            </div>
-
-        @endif
+@endif
 
         @if($test->test_instruction)
 

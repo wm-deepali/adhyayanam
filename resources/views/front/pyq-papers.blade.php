@@ -105,6 +105,24 @@
             font-size: 16px;
             font-weight: 500;
         }
+         @media (max-width: 768px) {
+             .paper-card {
+    background: #fff;
+    border-radius: 10px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: start;
+    gap: 14px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    transition: 0.3s;
+    border-left: 5px solid #e74c3c;
+}
+.filter-box {
+    height: auto;
+}
+         }
     </style>
 
 @endsection

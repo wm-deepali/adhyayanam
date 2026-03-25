@@ -179,11 +179,26 @@
         padding: 40px 25px;
       }
       .right-form {
-        padding: 40px 30px;
+        padding: 40px 15px;
       }
       .login-card {
-        margin: 20px;
+        /*margin: 20px;*/
       }
+      .login-wrapper {
+    min-height: auto;
+    display: flex;
+    align-items: center;
+    padding: 30px 15px;
+}
+.login-card {
+    background: white;
+    border-radius: 7px;
+    overflow: hidden;
+    box-shadow: 0 25px 70px rgba(0, 0, 0, 0.12);
+    border: none;
+    max-width: 100%;
+    margin: auto;
+}
     }
   </style>
 </head>

@@ -5,6 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $test->name }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
 
     <style>
        
@@ -305,6 +308,60 @@ margin-top:5px;
 
 
 
+@media (max-width: 768px) {
+    .right-panel-card{
+        display:none;
+    }
+    .left-panel {
+    width: 100%;
+    background: white;
+    border-radius: 12px;
+    padding: 15px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+}
+.main-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+}
+.action-btn {
+    background: #4a6fff;
+    color: white;
+    border: none;
+    font-size: 14px;
+    padding: 5px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+}
+.clear-btn {
+    background: #ff4b4b;
+    color: white;
+    border: none;
+    font-size: 14px;
+     padding: 5px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+}
+.question-header {
+    background: #eef2ff;
+    padding: 8px 8px;
+    border-radius: 8px;
+    font-weight: 600;
+    margin-bottom: 0px;
+    border-left: 5px solid #4a6fff;
+}
+.mobile-t{
+    display:none;
+}
+.question-header div{
+    flex-direction:column !important;
+    gap:10px !important;
+}
+
+}
 
     </style>
 
@@ -314,8 +371,9 @@ margin-top:5px;
 <body>
 
     <header>
-        <div>{{ $test->name }}</div>
+        <div class="mobile-t">{{ $test->name }}</div>
         <div class="time-box">Time Left: <span id="time"></span></div>
+        <div class="togolmenu" data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample" aria-controls="offcanvasExample"> View More</div>
     </header>
 
     <div class="main-wrapper">
@@ -395,6 +453,49 @@ Not Visited
 
                 <button id="submitTestBtn" class="submit-btn">Submit Test</button>
             </div>
+           
+
+<div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title" id="offcanvasExampleLabel">Offcanvas</h5>
+    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body">
+                    <div class="count-box">
+
+<div>
+<b id="ansCount">{{ $answered_count }}</b><br>
+Answered
+</div>
+
+<div>
+<b id="notAnsCount">{{ $pending_count }}</b><br>
+Not Answered
+</div>
+
+<div>
+<b id="visitCount">0</b><br>
+Visited
+</div>
+
+<div>
+<b id="notVisitCount">0</b><br>
+Not Visited
+</div>
+
+</div>
+
+
+
+                <hr>
+
+                <div style="font-weight:600;margin-bottom:5px;">Question Navigator</div>
+
+                <div class="question-grid" id="btnGrid"></div>
+
+                <button id="submitTestBtn" class="submit-btn">Submit Test</button>
+  </div>
+</div>
         </div>
 
     </div>

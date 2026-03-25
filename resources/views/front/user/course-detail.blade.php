@@ -92,6 +92,103 @@
       border: 1px solid #ddd;
       padding: 8px;
     }
+    /* ====================== MOBILE FIXED BOTTOM BAR ====================== */
+.mobile-fixed-price-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    gap: 15px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.price-section {
+    flex: 1;
+}
+
+.price-label {
+    font-size: 12px;
+    color: #64748b;
+    display: block;
+    margin-bottom: 2px;
+}
+
+.price-value {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1e2937;
+}
+
+.price-value del {
+    font-size: 14px;
+    color: #999;
+    margin-left: 6px;
+    font-weight: 400;
+}
+
+.enroll-section {
+    flex-shrink: 0;
+}
+
+.enroll-btn {
+    background: #2563eb;
+    color: white;
+    padding: 14px 28px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 16px;
+    text-decoration: none;
+    white-space: nowrap;
+    box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+    transition: all 0.3s ease;
+}
+
+.enroll-btn:hover {
+    background: #1d4ed8;
+    transform: translateY(-2px);
+}
+
+.enroll-btn.disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+/* Safe area for mobile (iPhone notch etc.) */
+@media (max-width: 576px) {
+    .mobile-fixed-price-bar {
+        padding-bottom: max(12px, env(safe-area-inset-bottom));
+    }
+}
+    
+      @media (max-width: 768px) {
+          .wd-social-icons{
+              display:none !important;
+          }
+          .course-page-title {
+    position: relative;
+    padding: 15px 0px 35px !important;
+    background-repeat: repeat;
+    background-color: var(--color-fourtyfive);
+}
+.ts-breadcrumb {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0px;
+    margin: 10px 0 20px 0;
+    font-size: 14px;
+}
+.course-page-title h2{
+    font-size:22px !important;
+}
+      }
   </style>
 
 @endsection
@@ -208,47 +305,44 @@
       <div class="auto-container">
 
         <!-- Upper Box -->
-        <div class="upper-box">
-          <div class="row clearfix">
+        <div class="upper-box py-4">
+    <div class="row g-3 g-lg-4">
 
-            <!-- Course Info -->
-            <div class="course-info col-lg-3 col-md-6 col-sm-12">
-              <div class="inner-box">
+        <!-- Course Info Cards -->
+        <div class="course-info col-6 col-lg-3">
+            <div class="inner-box h-100">
                 <span class="icon flaticon-hourglass"></span>
                 Duration
                 <strong>{{$course->duration}} Weeks</strong>
-              </div>
             </div>
+        </div>
 
-            <!-- Weekly Study -->
-            <div class="course-info col-lg-3 col-md-6 col-sm-12">
-              <div class="inner-box">
+        <div class="course-info col-6 col-lg-3">
+            <div class="inner-box h-100">
                 <span class="icon flaticon-three-o-clock-clock"></span>
                 Weekly study
                 <strong>{{$course->weekly_study ?? 0}} Hours / Week</strong>
-              </div>
             </div>
+        </div>
 
-            <!-- Course Mode -->
-            <div class="course-info col-lg-3 col-md-6 col-sm-12">
-              <div class="inner-box">
+        <div class="course-info col-6 col-lg-3">
+            <div class="inner-box h-100">
                 <span class="icon flaticon-internet"></span>
                 Mode
                 <strong>{{$course->course_mode}}</strong>
-              </div>
             </div>
-
-            <!-- Last Update -->
-            <div class="course-info col-lg-3 col-md-6 col-sm-12">
-              <div class="inner-box">
-                <span class="icon flaticon-document"></span>
-                Last Update:
-                <strong>{{ \Carbon\Carbon::parse($course->created_at)->format('M d Y') }}</strong>
-              </div>
-            </div>
-
-          </div>
         </div>
+
+        <div class="course-info col-6 col-lg-3">
+            <div class="inner-box h-100">
+                <span class="icon flaticon-document"></span>
+                Last Update
+                <strong>{{ \Carbon\Carbon::parse($course->created_at)->format('M d Y') }}</strong>
+            </div>
+        </div>
+
+    </div>
+</div>
         <!-- End Upper Box -->
 
         <div class="row clearfix">
@@ -375,6 +469,36 @@
               </div>
             </div>
           </div>
+          <div class="mobile-fixed-price-bar d-lg-none">
+    <div class="price-section">
+        <span class="price-label">Course Fee</span>
+        <div class="price-value">
+            ₹{{$course->offered_price}}
+            <del>₹{{$course->course_fee}}</del>
+        </div>
+    </div>
+    
+    <div class="enroll-section">
+        @if(auth()->user() && auth()->user()->email != '' && auth()->user()->type == 'student')
+            @php
+                $user_id = auth()->user()->id;
+                $package_id = $course->id;
+                $type = 'Course';
+                $checkExist = Helper::GetStudentOrder($type, $package_id, $user_id)
+            @endphp
+            @if(!$checkExist)
+                <a class="enroll-btn" 
+                   href="{{route('user.process-order', ['type' => 'course', 'id' => $course->id])}}">
+                    Enroll Now
+                </a>
+            @else
+                <a class="enroll-btn disabled" href="Javascript:void(0);">Already Enrolled</a>
+            @endif
+        @else
+            <a class="enroll-btn" href="{{route('student.login')}}">Enroll Now</a>
+        @endif
+    </div>
+</div>
 
         </div>
         <div class="course-info-tabs">

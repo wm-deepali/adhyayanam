@@ -14,7 +14,7 @@
 
 @section('content')
   <style>
-    /* Clean & Premium Study Material Details - Final Fixed Version */
+
     .study-detail-banner {
       background: linear-gradient(135deg, #f0f7ff 0%, #e0f2fe 100%);
       padding: 60px 0 80px;
@@ -323,14 +323,71 @@
       .custom-accordion .accordion-body {
         padding: 1.25rem 1.5rem;
       }
+      .study-detail-banner {
+    background: linear-gradient(135deg, #f0f7ff 0%, #e0f2fe 100%);
+    padding: 10px 0 40px;
+    position: relative;
+}
+.study-detail-title {
+    font-size: 22px;
+    font-weight: 900;
+    color: #1e293b;
+    margin-bottom: 0px;
+    margin-top: 0px;
+}
+.ts-breadcrumb {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0px;
+    margin: 10px 0 0px 0;
+    font-size: 12px;
+    margin-bottom: 15px;
+}
+.study-detail-short {
+    font-size: 16px;
+    line-height: 1.5;
+    color: #475569;
+    margin-bottom: 10px;
+}
+.study-detail-quick-patti {
+    width: 93%;
+    margin: auto;
+    border-radius: 7px;
+    margin-top: 20px;
+    background: linear-gradient(90deg, #9e9e9e 0%, #032369 100%);
+    color: white;
+    padding: 19px 0;
+}
     }
+    
+    .px-responsive {
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+/* Tablet (md to lg) - 25px */
+@media (min-width: 768px) and (max-width: 991.98px) {
+    .px-responsive {
+        padding-left: 25px;
+        padding-right: 25px;
+    }
+}
+
+/* Desktop (lg and above) - 50px */
+@media (min-width: 992px) {
+    .px-responsive {
+        padding-left: 50px;
+        padding-right: 50px;
+    }
+}
   </style>
 
   <!-- Banner Patti (Simple Info) -->
   <section class="study-detail-banner">
     <div class="container">
       <div class="row align-items-center">
-        <div class="col-lg-12" style="padding:0 50px;">
+        <div class="col-lg-12 px-responsive" >
           <div class="ts-breadcrumb">
             <a href="{{ url('/') }}">Home</a>
 
@@ -485,7 +542,7 @@
       <div class="row g-5">
         <!-- Left: Content -->
         <div class="col-lg-8">
-          <div class="study-content border rounded-3 p-5 shadow-sm bg-white">
+          <div class="study-content border rounded-3 p-3 p-sm-3 p-md-4 p-lg-5 shadow-sm bg-white">
             @if($canAccess)
               {!! $studyMaterial->detail_content !!}
             @else

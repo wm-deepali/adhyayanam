@@ -206,6 +206,7 @@
 
   .sub-list.show {
     max-height: 500px;
+    overflow:auto;
     /* adjust if you have many items */
   }
 
@@ -355,7 +356,7 @@
     <!-- End Page Title -->
     <section class="courses-section py-5 bg-white">
       <div class="container">
-        <div class="row g-4">
+      {{--  <div class="row g-4">
 
           <!-- Left Sidebar -->
           <!-- Left Sidebar -->
@@ -592,7 +593,291 @@
             <!-- Pagination -->
 
           </div>
-        </div>
+        </div> --}}
+        <div class="row g-4">
+  <!-- Left Sidebar – visible only on lg+ -->
+  <div class="col-lg-4 col-xl-3 d-none d-lg-block">
+<div class="sidebar-categories card border-0 shadow-sm rounded-4 p-4 sticky-top"
+              style="top: 100px;height:70vh;">
+              <h5 class="sidebar-title fw-bold mb-4">Browse Categories</h5>
+
+              <!-- Science & Technology -->
+              <!--<button class="category-btn fw-semibold text-start w-100 py-3 px-4 rounded-3 mb-3 border-0" data-category="science">-->
+              <!--  Science & Technology-->
+              <!--</button>-->
+              <!-- Science & Technology -->
+              @foreach($commissions->take(3) as $commission)
+
+                <button
+                  class="category-btn fw-semibold text-start w-100 py-3 px-4 rounded-3 mb-3 border-0 d-flex align-items-center justify-content-between"
+                  data-category="commission-{{ $commission->id }}">
+
+                  <span>{{ $commission->name }}</span>
+                  <i class="fas fa-chevron-down category-arrow transition-all"></i>
+
+                </button>
+
+
+                <ul class="sub-list list-unstyled ms-3" id="sub-commission-{{ $commission->id }}">
+
+                  @foreach($commission->categories->take(3) as $category)
+
+                              <li class="mb-2">
+                                <a href="{{ route('test-series-list', [
+                      'exam_id' => $commission->id,
+                      'category_id' => $category->id
+                    ]) }}"
+                                  class="sub-btn d-block py-2 px-3 rounded-3 text-decoration-none 
+                                                                                    {{ request('category_id') == $category->id ? 'active' : '' }}">
+
+                                  {{ $category->name }}
+
+                                </a>
+                              </li>
+
+                              <hr class="sub-divider">
+
+                  @endforeach
+
+                </ul>
+
+              @endforeach
+
+            </div>
+  </div>
+
+<!-- Left Sidebar – ab responsive offcanvas ban gaya -->
+<div class="offcanvas offcanvas-start offcanvas-lg border-0 shadow-sm m-0" 
+     tabindex="-1" 
+     id="categoryDrawer" 
+     aria-labelledby="categoryDrawerLabel">
+
+  <!-- Offcanvas header (mobile pe dikhega) -->
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title fw-bold" id="categoryDrawerLabel">Browse Categories</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <hr>
+
+  <!-- Offcanvas body – yahan pura sidebar content jayega -->
+  @foreach($commissions->take(3) as $commission)
+  <button
+    class="category-btn fw-semibold text-start w-100 py-3 px-4 rounded-3 mb-3 border-0 d-flex align-items-center justify-content-between"
+    type="button"
+    data-bs-toggle="collapse"
+    data-bs-target="#sub-commission-{{ $commission->id }}"
+    aria-expanded="false"
+    aria-controls="sub-commission-{{ $commission->id }}">
+    <span>{{ $commission->name }}</span>
+    <i class="fas fa-chevron-down category-arrow transition-all"></i>
+  </button>
+
+  <ul class="sub-list list-unstyled ms-3 collapse" 
+      id="sub-commission-{{ $commission->id }}">
+    @foreach($commission->categories->take(10) as $category)
+      <li class="mb-2">
+        <a href="{{ route('test-series-list', [
+          'exam_id' => $commission->id,
+          'category_id' => $category->id
+        ]) }}"
+          class="sub-btn d-block py-2 px-3 rounded-3 text-decoration-none
+            {{ request('category_id') == $category->id ? 'active' : '' }}">
+          {{ $category->name }}
+        </a>
+      </li>
+      <hr class="sub-divider">
+    @endforeach
+  </ul>
+@endforeach
+</div>
+
+  <!-- Right Content -->
+  <div class="col-lg-8 col-xl-9">
+    <!-- Mobile hamburger button -->
+    <button class="btn btn-outline-primary d-lg-none mb-3 w-100 d-flex align-items-center justify-content-center gap-2" 
+            type="button" data-bs-toggle="offcanvas" data-bs-target="#categoryDrawer">
+      <i class="fas fa-list-ul"></i> Browse Categories
+    </button>
+
+     <!-- Toolbar -->
+            <div class="toolbar card border-0 shadow-sm rounded-4 mb-4 overflow-hidden" style="background: #f7f7f7">
+              <form method="GET" action="{{ route('test-series-list') }}">
+
+                <!-- Keep existing filters -->
+                <input type="hidden" name="exam_id" value="{{ request('exam_id') }}">
+                <input type="hidden" name="category_id" value="{{ request('category_id') }}">
+                <input type="hidden" name="sub_category_id" value="{{ request('sub_category_id') }}">
+
+                <div class="card-body d-flex align-items-center justify-content-between flex-wrap gap-3 p-3 px-4">
+
+                  <!-- Search -->
+                  <div class="input-group" style="max-width: 500px;">
+                    <span class="input-group-text bg-white border-end-0 rounded-start-pill">
+                      <i class="fas fa-search text-muted"></i>
+                    </span>
+
+                    <input type="search" name="search" value="{{ request('search') }}"
+                      class="form-control border-start-0 shadow-none rounded-end-pill"
+                      placeholder="Search test series...">
+                  </div>
+
+                  <!-- Sort -->
+                  <div class="d-flex align-items-center gap-3">
+                    <span class="text-muted fw-medium" style="white-space:nowrap;">Sort by:</span>
+
+                    <select name="sort" class="form-select rounded-pill shadow-none" style="min-width: 180px;"
+                      onchange="this.form.submit()">
+                      <option value="">Recommended</option>
+
+                      <option value="newest" {{ request('sort') == 'newest' ? 'selected' : '' }}>
+                        Newest First
+                      </option>
+
+                      <option value="price_low" {{ request('sort') == 'price_low' ? 'selected' : '' }}>
+                        Price: Low to High
+                      </option>
+
+                      <option value="price_high" {{ request('sort') == 'price_high' ? 'selected' : '' }}>
+                        Price: High to Low
+                      </option>
+
+                    </select>
+
+                    <!-- Search Button -->
+                    <!--<button class="btn btn-primary rounded-pill px-4">-->
+                    <!--  Search-->
+                    <!--</button>-->
+                  </div>
+
+                </div>
+              </form>
+            </div>
+
+            <!-- Topic Pills -->
+            <div class="topic-pills mb-4 d-flex flex-wrap gap-2" id="topicPills">
+
+              @if($subcategories->isNotEmpty())
+
+
+                @foreach($subcategories->take(3) as $sub)
+
+                          <a href="{{ route('test-series-list', [
+                    'exam_id' => request('exam_id'),
+                    'category_id' => request('category_id'),
+                    'sub_category_id' => $sub->id
+                  ]) }}"
+                            class="btn {{ request('sub_category_id') == $sub->id ? 'btn-primary' : 'btn-outline-secondary' }} px-4 py-2">
+
+                            {{ $sub->name }}
+
+                          </a>
+
+                @endforeach
+
+              @else
+
+                <span class="text-muted">Select a category to view sub categories</span>
+
+              @endif
+
+            </div>
+
+            <!-- test seies Grid -->
+            <div class="row g-4 testseries-grid" style="margin-bottom:10px;">
+
+              @if($testPackages->count())
+
+                @foreach($testPackages as $data)
+                  <div class="col-xl-4 col-lg-6 col-md-6 col-sm-12 testseries-card"
+                    data-commission="{{ strtolower($data->commission->slug ?? $data->commission->id) }}"
+                    data-category="{{ $data->category_id ?? 'all' }}">
+                    <!-- SAME CARD DESIGN AS ORIGINAL -->
+                    <div class="newtestseries-card rounded-4 shadow-sm h-100 overflow-hidden position-relative"
+                      style="background: linear-gradient(135deg, {{ $loop->index % 3 == 0 ? '#e6f0ff' : ($loop->index % 3 == 1 ? '#eaffea' : '#f3e6ff') }}, #ffffff); border: 1px solid #e0e0e0;">
+                      <div class="newtestseries-card-inner p-3 d-flex flex-column h-100">
+                        <!-- Logo -->
+                        <div class="newtestseries-logo-wrapper text-center mb-2">
+                          <div class="newtestseries-logo-frame border-5 border-white mx-auto">
+                            <img src="{{ url('storage/' . $data->logo) }}" alt="{{ $data->title }}"
+                              class="w-100 h-100 object-cover">
+                          </div>
+                        </div>
+                        <!-- Title -->
+                        <h4 class="newtestseries-title fw-bold text-start mb-1 text-dark">
+                          {{ $data->title }}
+                        </h4>
+                        <!-- Test Count -->
+                        <div class="newtestseries-test-count d-flex justify-content-between align-items-center mb-2">
+                          <span class="newtestseries-count-left fw-medium text-primary">
+                            {{ count($data->testseries) }} Test
+                            <span class="newtestseries-free text-success ms-1">
+                              | {{ $data->fee_type == 'paid' ? 'Premium' : 'Free' }}
+                            </span>
+                          </span>
+                          <span class="newtestseries-count-right small text-muted">Available
+                            Now</span>
+                        </div>
+                        <!-- Features Table -->
+                        <div class="newtestseries-features mb-4 flex-grow-1">
+                          <div class="newtestseries-feature-row d-flex justify-content-between py-2 border-bottom">
+                            <span class="newtestseries-label">Chapter Test</span>
+                            <span class="newtestseries-value fw-medium">
+                              {{ $data->testseries->where('type_name', 'Chapter Test')->count() }}
+                            </span>
+                          </div>
+                          <div class="newtestseries-feature-row d-flex justify-content-between py-2 border-bottom">
+                            <span class="newtestseries-label">Current Affairs</span>
+                            <span class="newtestseries-value fw-medium">
+                              {{ $data->testseries->where('type_name', 'Current Affairs')->count() }}
+                            </span>
+                          </div>
+                          <div class="newtestseries-feature-row d-flex justify-content-between py-2">
+                            <span class="newtestseries-label">Subject Test</span>
+                            <span class="newtestseries-value fw-medium">
+                              {{ $data->testseries->where('type_name', 'Subject Wise')->count() }}
+                            </span>
+                          </div>
+                        </div>
+                        <!-- View Button -->
+                        <div class="mt-auto">
+                          <a href="{{ route('test-series-detail', $data->slug) }}"
+                            class="newtestseries-view-btn btn w-100 py-2 fw-medium d-flex align-items-center justify-content-center gap-2">
+                            <i class="bi bi-arrow-right-circle"></i>
+                            View Test Series
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                @endforeach
+
+              @else
+
+                <!-- Empty State -->
+                <div class="col-12">
+
+                  <div class="text-center py-5">
+
+                    <i class="fas fa-book-open fa-3x text-muted mb-3"></i>
+
+                    <h4 class="fw-bold">No Test Series Found</h4>
+
+                    <p class="text-muted">
+                      Try adjusting your search or category filters.
+                    </p>
+
+                  </div>
+
+                </div>
+
+              @endif
+
+            </div>
+
+
+            {{ $testPackages->links('pagination::bootstrap-5') }}
+  </div>
+</div>
       </div>
     </section>
 

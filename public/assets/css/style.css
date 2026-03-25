@@ -1,6 +1,4 @@
-/* 
-	font-family: 'Manrope', sans-serif;
-*/
+
 
 @import url('global.css');
 @import url('header.css');
@@ -3255,7 +3253,7 @@ height: 200px;
 
 .course-page-title{
 	position:relative;
-	padding:90px 0px 135px;
+	padding:50px 0px 135px;
 	background-repeat:repeat;
 	background-color:var(--color-fourtyfive);
 }
@@ -3273,9 +3271,10 @@ height: 200px;
 	font-weight:700;
 	font-size:var(--font-60);
 	color:var(--color-three);
-	margin-top:var(--margin-top-10);
+	margin-top:0px;
 	margin-bottom:var(--margin-bottom-20);
 	font-family:var(--font-family-Titillium-Web);
+	
 }
 
 .course-page-title .rating{
@@ -4476,7 +4475,8 @@ height: 200px;
 	height:35px;
 	line-height:35px;
 	text-align:center;
-	border-radius:50px;
+	background: #e6e4e4;
+    border-radius: 4px;
 	display:inline-block;
 	font-size:var(--font-16);
 	color:var(--color-fiftytwo);
@@ -6564,6 +6564,11 @@ height: 200px;
 		color: #646f79;
 	}
 	@media only screen and (max-width: 645px) {
+	    .page-title .auto-container {
+	display: flex;
+	flex-direction:column;
+	gap: 15px;
+}
 		.mbdy {
 			display: block;
 		}
@@ -6988,6 +6993,9 @@ height: 200px;
 	width: 100%;
 	padding: 16px;
 }
+.current-aff-osd {
+    padding: 35px 0;
+}
 
 }
 
@@ -7086,4 +7094,10 @@ height: 200px;
 }
 .disable {
 	opacity: 0.4;
+}
+
+@media only screen and (max-width: 767px) {
+    .main-header .logo .logo-lg .light-logo{
+        display:none;
+    }
 }

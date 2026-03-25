@@ -88,6 +88,39 @@ border-radius:6px;
 font-size:14px;
 }
 
+@media (max-width: 740px) {
+    .sidebar-logo{
+        display:none;
+    }
+    .course-card {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    background: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    margin-bottom: 20px;
+    align-items: flex-start;
+}
+.course-image {
+    width: 100%;
+    flex-shrink: 0;
+}
+.course-title-row {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: start;
+    margin-bottom: 10px;
+}
+.start-btn {
+    text-align: left;
+}
+.content{
+    padding:0px !important;
+}
+}
 </style>
 
 

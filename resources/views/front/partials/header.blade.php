@@ -142,8 +142,8 @@
     rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Titillium+Web:wght@300;400;600;700;900&display=swap"
     rel="stylesheet">
-<link rel="shortcut icon" href="{{url('images/favicon.svg')}}" type="image/x-icon">
-<link rel="icon" href="{{url('images/favicon.svg')}}" type="image/x-icon">
+<link rel="shortcut icon" href="{{url('images/fav.ico')}}" type="image/x-icon">
+<link rel="icon" href="{{url('images/fav.ico')}}" type="image/x-icon">
 
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>

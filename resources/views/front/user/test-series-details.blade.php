@@ -433,6 +433,190 @@
             background: #6366f1;
             color: white;
         }
+        
+        .price-card {
+    padding: 12px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+
+    /* Default: mobile-friendly (non-absolute, centered) */
+    position: static;          /* ya static bhi chalega */
+    width: 90%;
+    max-width: 400px;            /* optional: bahut bada na ho mobile pe */
+    margin: 22px auto 0;         /* top margin + horizontal center */
+}
+
+/* Desktop / large screen pe absolute positioning apply karo */
+@media (min-width: 992px) {     /* lg breakpoint (Bootstrap default) */
+    .price-card {
+        position: absolute;
+        right: 120px;
+        top: 50px;
+        width: 360px;               /* ya jo bhi desktop pe chahiye */
+        margin: 0;                  /* mobile wala margin hata do */
+        /* agar parent ke relative hone ki zarurat ho to parent pe position: relative; daal dena */
+    }
+}
+
+.mobile-price-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: #fff;
+    padding: 10px 15px;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 999;
+}
+
+.price-left strong {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.price-left .old {
+    text-decoration: line-through;
+    font-size: 13px;
+    margin-left: 5px;
+    color: #888;
+}
+
+.price-right .buy-btn {
+    padding: 8px 16px;
+    font-size: 14px;
+}
+
+
+@media (max-width: 540px) { 
+    .topics-grid {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 12px;
+}
+.topics-wrapper {
+    background: white;
+    padding: 13px;
+    border-radius: 18px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+    margin-top: 30px;
+}
+.topic-btn {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    background: #f7f9ff;
+    border: none;
+    padding: 8px;
+    border-radius: 12px;
+    text-align: left;
+    cursor: pointer;
+    transition: .3s;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+.topics-wrapper h2 {
+    margin-bottom: 15px;
+    font-size: 20px;
+}
+.topic-content h4 {
+    margin: 0;
+    font-size: 15px;
+}
+.details-card {
+    margin-top: 30px;
+    background: white;
+    padding: 15px;
+    border-radius: 18px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+}
+.details-points {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 10px;
+    margin-top: 25px;
+}
+.details-card h2{
+   margin-bottom: 15px;
+    font-size: 20px; 
+}
+.test-item {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    justify-content: space-between;
+    padding: 10px 10px;
+    border-radius: 10px;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    transition: all 0.2s ease;
+}
+.unlock-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 15px;
+    background: #6366f1;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 10px;
+}
+.feature-card {
+    margin-top: 30px;
+    background: white;
+    padding: 15px;
+    border-radius: 18px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+}
+.feature-card h2{
+     margin-bottom: 15px;
+    font-size: 20px; 
+}
+   .notes-card {
+    background: white;
+    padding: 15px;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+    margin: 30px 0;
+}
+.ts-banner {
+    background: linear-gradient(135deg, #eef2ff, #f7f9ff);
+    padding: 10px 0 90px 0;
+    position: relative;
+    overflow: visible;
+}
+.ts-banner h1 {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: -15px;
+     margin-top: 0px; 
+}
+.ts-breadcrumb {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0px;
+    margin: 10px 0 12px 0;
+    font-size: 12px;
+}
+.ts-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 15px;
+    flex-wrap: wrap;
+}
+.wd-social-icons{
+    display:none !important;
+}
+    
+}
     </style>
 
 
@@ -552,6 +736,45 @@
             </div>
 
         </div>
+        <div class="mobile-price-bar d-md-none">
+
+    <div class="price-left">
+        <strong>
+            {{ $testseries->fee_type == 'paid' ? '₹'.$testseries->price : 'Free' }}
+        </strong>
+
+        @if($testseries->mrp)
+            <span class="old">₹{{ $testseries->mrp }}</span>
+        @endif
+    </div>
+
+    <div class="price-right">
+        @if(auth()->user() && auth()->user()->type == 'student')
+
+            @php
+                $user_id = auth()->user()->id;
+                $package_id = $testseries->id;
+                $type = 'Test Series';
+                $checkExist = Helper::GetStudentOrder($type, $package_id, $user_id);
+            @endphp
+
+            @if(!$checkExist)
+                <a href="{{route('user.process-order', ['type' => 'test-series', 'id' => $testseries->id])}}">
+                    <button class="buy-btn">Enroll Now</button>
+                </a>
+            @else
+                <button class="buy-btn" disabled>Enrolled</button>
+            @endif
+
+        @else
+            <a href="{{route('student.login')}}">
+                <button class="buy-btn">Enroll Now</button>
+            </a>
+        @endif
+    </div>
+
+</div>
+
 
     </section>
 

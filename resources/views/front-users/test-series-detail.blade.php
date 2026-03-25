@@ -4,6 +4,26 @@
     Test Series Detail
 @endsection
 
+<style>
+.cb-item{
+     align-items:center ;
+}
+     @media (max-width: 740px) {
+.content{
+    padding:0px !important;
+}
+.card-body{
+    padding:10px !important;
+   
+    flex-direction:column !important;
+    gap:10px !important;
+}
+.cb-item{
+     align-items:start !important;
+}
+}
+</style>
+
 @section('content')
 
     @php
@@ -37,7 +57,7 @@
 
                     {{-- Test Series Summary --}}
                     <div class="card mb-4 shadow-sm">
-                        <div class="card-body">
+                        <div class="card-body ">
 
                             <div class="text-center mb-3">
                                 <img src="{{ asset('storage/' . $testseries->logo) }}" class="img-fluid rounded"
@@ -155,7 +175,7 @@
 
                                         @foreach($testseries->tests->where('paper_type', '!=', 1) as $testpaper)
                                             <div class="card mb-2 shadow-sm">
-                                                <div class="card-body d-flex justify-content-between align-items-center">
+                                                <div class="card-body cb-item d-flex justify-content-between ">
 
                                                     <div>
                                                         <strong>{{ $testpaper->name }}</strong>

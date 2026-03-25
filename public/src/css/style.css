@@ -21573,8 +21573,12 @@ body .main-header .navbar .nav > li.search-box > a:hover, body .main-header .nav
   position: absolute; }
 
 @media (max-width: 767px) {
+    .main-header .logo .logo-lg .light-logo {
+    display: none !important;
+}
   .main-sidebar {
-    margin-top: 110px;
+    margin-top: 0px;
+     z-index: 999;
     margin-left: 0;
     padding-top: 0px;
     -webkit-transform: translate(-19.29rem, 0);

@@ -4516,7 +4516,7 @@
 
 
 				// Commission button click (tumhare existing event listener ke ANDAR last mein yeh daal do)
-				document.querySelectorAll('.mat-category-btn').forEach(btn => {
+				document.querySelectorAll('#commissionTabs .mat-category-btn').forEach(btn => {
 					btn.addEventListener('click', function () {
 						// ── yahan tumhara purana logic (active class, load sub-categories, filter cards etc.) ──
 

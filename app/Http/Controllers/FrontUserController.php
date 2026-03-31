@@ -2,6 +2,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\CourseReview;
+use App\Models\Teacher;
 use App\Models\Test;
 use Carbon\Carbon;
 use App\Models\User;
@@ -32,17 +33,207 @@ class FrontUserController extends Controller
 
     public function index()
     {
-        $commissions = ExaminationCommission::has('courses') // ✅ only those having courses
-            ->withCount('courses')
+        $studentId = Auth::id();
+
+        // =========================
+        // 1. Popular Courses (Sold based)
+        // =========================
+        $popularCourses = Order::select('package_id', \DB::raw('COUNT(*) as total_sales'))
+            ->where('order_type', 'Course')
+            ->whereNotNull('package_id')
+            ->groupBy('package_id')
+            ->orderByDesc('total_sales')
             ->take(4)
             ->get();
 
+        if ($popularCourses->isEmpty()) {
+            $courses = Course::latest()->take(4)->get();
+        } else {
+            $courseIds = $popularCourses->pluck('package_id');
+
+            $courses = Course::whereIn('id', $courseIds)
+                ->get()
+                ->sortByDesc(function ($course) use ($popularCourses) {
+                    return $popularCourses->firstWhere('package_id', $course->id)->total_sales ?? 0;
+                });
+        }
+
+        // =========================
+        // 2. Notices
+        // =========================
         $notices = NoticeBoard::where('status', 1)
             ->latest()
             ->take(10)
             ->get();
 
-        return view('front-users.dashboard', compact('commissions', 'notices'));
+        // =========================
+        // 3. Students & Teachers Count
+        // =========================
+        $studentCount = User::where('type', 'student')->count() + 1236;
+        $teacherCount = Teacher::count() + 18;
+
+        // =========================
+        // 4. Courses & Video Count
+        // =========================
+        $courseCount = Course::count();
+        $videoCourseCount = Course::where('course_mode', 'Video Learning')->count();
+
+        // =========================
+        // 5. Test Series Count
+        // =========================
+        $testSeriesCount = TestSeries::count();
+
+        // =========================
+        // 6. Best Instructors
+        // =========================
+        $teachers = Teacher::latest()->take(4)->get();
+
+        // =========================
+        // 7. Upcoming Classes
+        // =========================
+        $upcomingClasses = Video::with('teacher')
+            ->where('type', 'live_class')
+            ->orderBy('schedule_date', 'asc')
+            ->orderBy('start_time', 'asc')
+            ->take(4)
+            ->get();
+
+        // =========================
+        // 8. ALL ATTEMPTS (Single Query - Optimization)
+        // =========================
+        $attempts = StudentTestAttempt::with('test')
+            ->where('student_id', $studentId)
+            ->where('status', '!=', 'in_progress')
+            ->get();
+
+        $inProgressTests = StudentTestAttempt::where('student_id', $studentId)
+            ->where('status', 'in_progress')
+            ->count();
+
+        $totalTests = Test::count();
+
+        // =========================
+        // 9. Completion Stats
+        // =========================
+        $completedTests = $attempts->count();
+        $inactiveTests = max($totalTests - ($completedTests + $inProgressTests), 0);
+
+        $completedPercent = $totalTests > 0 ? round(($completedTests / $totalTests) * 100) : 0;
+        $inProgressPercent = $totalTests > 0 ? round(($inProgressTests / $totalTests) * 100) : 0;
+        $inactivePercent = $totalTests > 0 ? round(($inactiveTests / $totalTests) * 100) : 0;
+
+        // =========================
+        // 10. Top 5 Test Performance
+        // =========================
+        $topTests = $attempts->sortByDesc(function ($attempt) {
+            return ($attempt->actual_marks > 0)
+                ? ($attempt->final_score / $attempt->actual_marks)
+                : 0;
+        })->take(5);
+
+        $testNames = [];
+        $testScores = [];
+
+        foreach ($topTests as $attempt) {
+            $testNames[] = $attempt->test->title ?? 'Test';
+
+            $percentage = ($attempt->actual_marks > 0)
+                ? round(($attempt->final_score / $attempt->actual_marks) * 100)
+                : 0;
+
+            $testScores[] = $percentage;
+        }
+
+        // =========================
+        // 11. Pass / Fail
+        // =========================
+        $passed = 0;
+        $failed = 0;
+
+        foreach ($attempts as $attempt) {
+            $percentage = ($attempt->actual_marks > 0)
+                ? ($attempt->final_score / $attempt->actual_marks) * 100
+                : 0;
+
+            if ($percentage >= 40) {
+                $passed++;
+            } else {
+                $failed++;
+            }
+        }
+
+        // =========================
+        // 12. Monthly Usage
+        // =========================
+        $currentMonth = $attempts->whereBetween('created_at', [
+            now()->startOfMonth(),
+            now()->endOfMonth()
+        ])->count();
+
+        $lastMonth = $attempts->whereBetween('created_at', [
+            now()->subMonth()->startOfMonth(),
+            now()->subMonth()->endOfMonth()
+        ])->count();
+
+        $usageChange = $lastMonth > 0
+            ? round((($currentMonth - $lastMonth) / $lastMonth) * 100, 1)
+            : ($currentMonth > 0 ? 100 : 0);
+
+        // Month-wise usage
+        $monthlyUsage = $attempts->groupBy(function ($item) {
+            return Carbon::parse($item->created_at)->month;
+        });
+
+        $usageData = [];
+
+        for ($i = 1; $i <= 12; $i++) {
+            $usageData[] = isset($monthlyUsage[$i]) ? $monthlyUsage[$i]->count() : 0;
+        }
+
+        // =========================
+        // 13. Monthly Progress
+        // =========================
+        $monthlyProgress = [];
+
+        for ($i = 1; $i <= 12; $i++) {
+            if (isset($monthlyUsage[$i])) {
+
+                $avg = $monthlyUsage[$i]->avg(function ($attempt) {
+                    return ($attempt->actual_marks > 0)
+                        ? ($attempt->final_score / $attempt->actual_marks) * 100
+                        : 0;
+                });
+
+                $monthlyProgress[] = round($avg);
+            } else {
+                $monthlyProgress[] = 0;
+            }
+        }
+
+        return view('front-users.dashboard', compact(
+            'courses',
+            'notices',
+            'studentCount',
+            'teacherCount',
+            'courseCount',
+            'videoCourseCount',
+            'testSeriesCount',
+            'teachers',
+            'upcomingClasses',
+            'completedPercent',
+            'inProgressPercent',
+            'inactivePercent',
+            'completedTests',
+            'inProgressTests',
+            'inactiveTests',
+            'testNames',
+            'testScores',
+            'passed',
+            'failed',
+            'usageChange',
+            'usageData',
+            'monthlyProgress'
+        ));
     }
 
     public function studentRegister(Request $request)
@@ -489,6 +680,7 @@ class FrontUserController extends Controller
             ->where('status', '!=', 'in_progress') // ⬅ EXCLUDE IN-PROGRESS TESTS
             ->pluck('test_id')
             ->toArray();
+
 
         return view('front-users.test-series', compact('paidOrders', 'freeSeries', 'studentAttempts'));
     }

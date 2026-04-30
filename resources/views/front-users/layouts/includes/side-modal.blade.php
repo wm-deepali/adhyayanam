@@ -46,128 +46,91 @@
           </div>
         </div>
         <div class="dropdown-divider my-30"></div>
-        <div>
-          <div class="d-flex align-items-center mb-30">
-            <div class="me-15 bg-primary-light h-50 w-50 l-h-60 rounded text-center">
-              <span class="icon-Library fs-24"><span class="path1"></span><span class="path2"></span></span>
-            </div>
-            <div class="d-flex flex-column fw-500">
-              <a href="extra_profile.html" class="text-dark hover-primary mb-1 fs-16">My Profile</a>
-              <span class="text-fade">Account settings and more</span>
-            </div>
-          </div>
-          <div class="d-flex align-items-center mb-30">
-            <div class="me-15 bg-danger-light h-50 w-50 l-h-60 rounded text-center">
-              <span class="icon-Write fs-24"><span class="path1"></span><span class="path2"></span></span>
-            </div>
-            <div class="d-flex flex-column fw-500">
-              <a href="mailbox.html" class="text-dark hover-danger mb-1 fs-16">My Messages</a>
-              <span class="text-fade">Inbox and tasks</span>
-            </div>
-          </div>
-          <div class="d-flex align-items-center mb-30">
-            <div class="me-15 bg-success-light h-50 w-50 l-h-60 rounded text-center">
-              <span class="icon-Group-chat fs-24"><span class="path1"></span><span class="path2"></span></span>
-            </div>
-            <div class="d-flex flex-column fw-500">
-              <a href="setting.html" class="text-dark hover-success mb-1 fs-16">Settings</a>
-              <span class="text-fade">Accout Settings</span>
-            </div>
-          </div>
-          <div class="d-flex align-items-center mb-30">
-            <div class="me-15 bg-info-light h-50 w-50 l-h-60 rounded text-center">
-              <span class="icon-Attachment1 fs-24"><span class="path1"></span><span class="path2"></span><span
-                  class="path3"></span><span class="path4"></span></span>
-            </div>
-            <div class="d-flex flex-column fw-500">
-              <a href="https://netiias.com/design/test-series.html" class="text-dark hover-info mb-1 fs-16">Test
-                Series</a>
-              <span class="text-fade">latest tasks and projects</span>
-            </div>
-          </div>
-        </div>
-        <div class="dropdown-divider my-30"></div>
-        <div>
-          <div class="media-list">
-            <a class="media media-single px-0" href="#">
-              <h4 class="w-50 text-gray fw-500">10:10</h4>
-              <div class="media-body ps-15 bs-5 rounded border-primary">
-                <p>Morbi quis ex eu arcu auctor sagittis.</p>
-                <span class="text-fade">by Johne</span>
-              </div>
-            </a>
+        <div class="multinav">
+            <div class="multinav-scroll" style="height: calc(100vh - 70px);">
+                <!-- sidebar menu-->
+                <ul class="sidebar-menu" data-widget="tree">
+                    <li>
+                        <a href="{{route('user.dashboard')}}">
+                            <i data-feather="home"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{route('user.orders')}}">
+                            <i data-feather="shopping-cart"></i>
+                            <span>Order History</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('user.mycourses') }}">
+                            <i data-feather="book"></i>
+                            <span>My Courses</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('user.study-material') }}">
+                            <i data-feather="file-text"></i>
+                            <span>My Study Material</span>
+                        </a>
+                    </li>
 
-            <a class="media media-single px-0" href="#">
-              <h4 class="w-50 text-gray fw-500">08:40</h4>
-              <div class="media-body ps-15 bs-5 rounded border-success">
-                <p>Proin iaculis eros non odio ornare efficitur.</p>
-                <span class="text-fade">by Amla</span>
-              </div>
-            </a>
+                    <li class="treeview">
+                        <a href="#">
+                            <i data-feather="pie-chart"></i>
+                            <span>Test Series</span>
+                            <span class="pull-right-container">
+                                <i class="fa fa-angle-right pull-right"></i>
+                            </span>
+                        </a>
+                        <ul class="treeview-menu">
+                            <li><a href="{{route('user.test-series')}}"><i class="icon-Commit"></i>Test Series</a></li>
+                            <li><a href="{{ route('user.my-pyq-papers') }}"><i class="icon-Commit"></i>My PYQ Papers</a></li>
+                            <li><a href="{{route('user.test-papers')}}"><i class="icon-Commit"></i>Test Results</a></li>
+                        </ul>
+                    </li>
 
-            <a class="media media-single px-0" href="#">
-              <h4 class="w-50 text-gray fw-500">07:10</h4>
-              <div class="media-body ps-15 bs-5 rounded border-info">
-                <p>In mattis mi ut posuere consectetur.</p>
-                <span class="text-fade">by Josef</span>
-              </div>
-            </a>
+                    <li class="treeview">
+                        <a href="#">
+                            <i data-feather="credit-card"></i>
+                            <span>My Wallet</span>
+                            <span class="pull-right-container">
+                                <i class="fa fa-angle-right pull-right"></i>
+                            </span>
+                        </a>
+                        <ul class="treeview-menu">
+                            <li>
+                                <a href="{{ route('student.wallet') }}">
+                                    <i class="icon-Commit"></i>Wallet Transaction
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
 
-            <a class="media media-single px-0" href="#">
-              <h4 class="w-50 text-gray fw-500">01:15</h4>
-              <div class="media-body ps-15 bs-5 rounded border-danger">
-                <p>Morbi quis ex eu arcu auctor sagittis.</p>
-                <span class="text-fade">by Rima</span>
-              </div>
-            </a>
+                    <li>
+                        <a href="{{route('user.setting')}}">
+                            <i data-feather="settings"></i>
+                            <span>Setting</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{route('logout')}}">
+                            <i data-feather="log-out"></i>
+                            <span>Logout</span>
+                        </a>
+                    </li>
+                </ul>
 
-            <a class="media media-single px-0" href="#">
-              <h4 class="w-50 text-gray fw-500">23:12</h4>
-              <div class="media-body ps-15 bs-5 rounded border-warning">
-                <p>Morbi quis ex eu arcu auctor sagittis.</p>
-                <span class="text-fade">by Alaxa</span>
-              </div>
-            </a>
-            <a class="media media-single px-0" href="#">
-              <h4 class="w-50 text-gray fw-500">10:10</h4>
-              <div class="media-body ps-15 bs-5 rounded border-primary">
-                <p>Morbi quis ex eu arcu auctor sagittis.</p>
-                <span class="text-fade">by Johne</span>
-              </div>
-            </a>
-
-            <a class="media media-single px-0" href="#">
-              <h4 class="w-50 text-gray fw-500">08:40</h4>
-              <div class="media-body ps-15 bs-5 rounded border-success">
-                <p>Proin iaculis eros non odio ornare efficitur.</p>
-                <span class="text-fade">by Amla</span>
-              </div>
-            </a>
-
-            <a class="media media-single px-0" href="#">
-              <h4 class="w-50 text-gray fw-500">07:10</h4>
-              <div class="media-body ps-15 bs-5 rounded border-info">
-                <p>In mattis mi ut posuere consectetur.</p>
-                <span class="text-fade">by Josef</span>
-              </div>
-            </a>
-
-            <a class="media media-single px-0" href="#">
-              <h4 class="w-50 text-gray fw-500">01:15</h4>
-              <div class="media-body ps-15 bs-5 rounded border-danger">
-                <p>Morbi quis ex eu arcu auctor sagittis.</p>
-                <span class="text-fade">by Rima</span>
-              </div>
-            </a>
-
-            <a class="media media-single px-0" href="#">
-              <h4 class="w-50 text-gray fw-500">23:12</h4>
-              <div class="media-body ps-15 bs-5 rounded border-warning">
-                <p>Morbi quis ex eu arcu auctor sagittis.</p>
-                <span class="text-fade">by Alaxa</span>
-              </div>
-            </a>
-          </div>
+                <!-- Sidebar Widget (Promotion Box) -->
+                <div class="sidebar-widgets mt-4">
+                    <div class="mx-25 mb-30 pb-20 side-bx bg-primary-light rounded20">
+                        <div class="text-center">
+                            <img src="https://edulearn-lms-admin-template.multipurposethemes.com/images/svg-icon/color-svg/custom-24.svg"
+                                 class="sideimg p-5" alt="">
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
       </div>
     </div>

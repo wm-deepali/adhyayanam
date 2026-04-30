@@ -18,9 +18,9 @@
       <!-- Sidebar toggle button-->
 	  <div class="app-menu">
 		<ul class="header-megamenu nav">
-			<li class="btn-group nav-item">
-				<a href="#" class="waves-effect waves-light nav-link push-btn btn-primary-light ms-0" data-toggle="push-menu" role="button">
-					<i data-feather="menu"></i>
+			<li class="">
+				<a href="{{url('/')}}" class="" >
+					<img src="{{ url('images/Neti-logo.png')}}" alt="logo" style="width:100px; padding-bottom:10px;">
 			    </a>
 			</li>
 			<li class="btn-group d-lg-inline-flex d-none">
@@ -63,6 +63,7 @@
 			<li class="btn-group nav-item d-xl-inline-flex d-none">
 				<a href="#" data-provide="fullscreen" class="waves-effect waves-light nav-link btn-primary-light svg-bt-icon" title="Full Screen">
 					<i data-feather="maximize"></i>
+					
 			    </a>
 			</li>
 			

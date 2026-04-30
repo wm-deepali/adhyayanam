@@ -1960,7 +1960,11 @@
 			font-size: 1rem !important;
 			padding: 0.5rem 1.5rem !important;
 		}
+		.mobilemargin{
+		    margin-top:15px;
+		}
 	}
+	
 </style>
 
 @section('content')
@@ -1985,10 +1989,10 @@
 		<!-- Main Slider Section Start -->
 		<section class="home-section ">
 			<div class="container">
-				<div class="row align-items-stretch">
+				<div class="row  row g-0 g-md-3 align-items-stretch">
 
 					<!-- Banner Slider Box -->
-					<div class="col-md-8" style="padding-right:0px;">
+					<div class="col-12 col-md-8" style="padding-right:0px;">
 						<div class="card box-shadow h-100 p-0">
 							<div class="main-slider-carousel owl-carousel owl-theme">
 
@@ -2005,7 +2009,7 @@
 					</div>
 
 					<!-- Notice Board Box -->
-					<div class="col-md-4">
+					<div class="col-12 col-md-4 mobilemargin">
 						<div class="card notice-box shadow rounded-card">
 
 							<!-- Header -->
@@ -3305,16 +3309,19 @@
 								<hr>
 								<div class="nav flex-column nav-pills gap-2" id="matMainPills" role="tablist"
 									aria-orientation="vertical">
-									@foreach($commissions as $index => $commission)
-										<button
-											class="mat-category-btn nav-link w-100 text-start py-3 px-4 {{ $index == 0 ? 'active' : '' }}"
-											data-bs-toggle="pill" data-bs-target="#commission-{{ $commission->id }}"
-											type="button" data-commission-id="{{ $commission->id }}">
-											{{ $commission->name }}
-										</button>
+																		@foreach($commissions as $index => $commission)
+									<button
+										class="mat-category-btn nav-link w-100 text-start py-3 px-4 {{ $index == 0 ? 'active' : '' }}"
+										data-bs-toggle="pill" data-bs-target="#commission-{{ $commission->id }}"
+										type="button">
+
+										{{ $commission->name }}
+
+									</button>
 									@endforeach
 								</div>
 							</div>
+							
 							<div class="mobile-all-study d-block d-lg-none p-4">
 								<div class="container">
 									<h5 class="fw-bold mb-3">All Study Materials</h5>
@@ -3391,97 +3398,106 @@
 							</div>
 
 							<!-- Tab Content Wrapper -->
-							<div class="p-4" id="matMainTabContent">
+							<div class="tab-content p-4" id="matMainTabContent">
+
 								@foreach($commissions as $cIndex => $commission)
-									<div class="tab-pane fade {{ $cIndex == 0 ? 'show active' : '' }}"
-										id="commission-{{ $commission->id }}">
+								<div class="tab-pane fade {{ $cIndex == 0 ? 'show active' : '' }}"
+									id="commission-{{ $commission->id }}">
 
-										<!-- CATEGORY TABS -->
-										<ul class="nav nav-pills mb-4 gap-2 flex-nowrap overflow-auto">
-											@foreach($commission->categories as $index => $category)
-												<li class="nav-item">
-													<button
-														class="btn btn-outline-secondary btn-sm {{ $index == 0 ? 'active' : '' }}"
-														data-bs-toggle="pill"
-														data-bs-target="#cat-{{ $commission->id }}-{{ $category->id }}">
-														{{ $category->name }}
-													</button>
-												</li>
-											@endforeach
-										</ul>
+									<!-- CATEGORY TABS -->
+									<ul class="nav nav-pills mb-4 gap-2">
+										@foreach($commission->categories as $index => $category)
+										<li class="nav-item">
+											<button
+												class="btn btn-outline-secondary btn-sm11 {{ $index == 0 ? 'active' : '' }}"
+												data-bs-toggle="pill"
+												data-bs-target="#cat-{{ $commission->id }}-{{ $category->id }}">
+												{{ $category->name }}
+											</button>
+										</li>
+										@endforeach
+									</ul>
 
-										<hr>
+									<hr>
 
-										<!-- CATEGORY CONTENT -->
-										<div class="tab-content">
+									<!-- CATEGORY CONTENT -->
+									<div class="tab-content">
 
-											@foreach($commission->categories as $index => $category)
-												<div class="tab-pane fade {{ $index == 0 ? 'show active' : '' }}"
-													id="cat-{{ $commission->id }}-{{ $category->id }}">
-													<div class="row g-4 study-grid">
-														<!-- ✅ NO DATA MESSAGE -->
-														<div class="no-data-study text-center w-100" style="display:none;">
-															<div class="p-5">
-																<h5 class="text-muted">No study material found</h5>
-																<p class="text-muted">Try another filter</p>
-															</div>
+										@foreach($commission->categories as $index => $category)
+										<div class="tab-pane fade {{ $index == 0 ? 'show active' : '' }}"
+											id="cat-{{ $commission->id }}-{{ $category->id }}">
+
+											<div class="row g-4">
+
+												@foreach($studyMaterial[$commission->id] ?? [] as $material)
+
+												@if($material->category_id == $category->id)
+
+												<div class="edu-course-card col-xl-4 col-lg-6 col-md-6 sm-12"
+													data-commission="{{ $commission->id }}"
+													data-category="{{ $material->category_id ?? 'all' }}"
+													data-category-name="{{ addslashes($category->name) }}">
+
+													<div class="edu-card">
+														<div class="edu-card-image">
+															<a href="{{ route('study.material.details', $material->id) }}"
+																class="block">
+																<img src="{{ url('storage/' . $material->banner) }}"
+																	alt="{{ $material->title }}" class="edu-thumbnail">
+															</a>
 														</div>
 
-
-														@foreach($studyMaterial[$commission->id] ?? [] as $material)
-															@if($material->category_id == $category->id)
-																<div class="edu-study-card col-xl-4 col-lg-6 col-md-6 col-sm-12"
-																	data-commission="{{ $commission->id }}"
-																	data-category="{{ $material->category_id ?? 'all' }}"
-																	data-category-name="{{ addslashes($category->name) }}">
-																	<div class="edu-card">
-																		<div class="edu-card-image">
-																			<a href="{{ route('study.material.details', $material->id) }}"
-																				class="block">
-																				<img src="{{ url('storage/' . $material->banner) }}"
-																					alt="{{ $material->title }}" class="edu-thumbnail">
-																			</a>
-																		</div>
-																		<div class="edu-card-body">
-																			<div class="edu-meta">
-																				<div class="edu-duration">
-																					{{ $material->is_pdf_downloadable ? 'Pdf Available' : '' }}
-																				</div>
-																				<div class="edu-price">
-																					{{ $material->IsPaid ? '₹' . $material->price : 'Free' }}
-																				</div>
-																			</div>
-																			<p class="commission-name">
-																				{{ $material->subcategory->name ?? '' }}
-																			</p>
-																			<h3 class="edu-title">
-																				<a
-																					href="{{ route('study.material.details', $material->id) }}">
-																					{{ $material->title }}
-																				</a>
-																			</h3>
-																			<p class="edu-description">{{ $material->short_description }}
-																			</p>
-																			<div class="edu-actions">
-																				<a href="{{ route('study.material.details', $material->id) }}"
-																					class="edu-btn edu-btn-outline"
-																					style="width: 100%; display: flex; justify-content: center; text-align: center;">
-																					View Details
-																					<span
-																						class="arrow-icon flaticon-arrow-pointing-to-right"></span>
-																				</a>
-																			</div>
-																		</div>
-																	</div>
+														<div class="edu-card-body">
+															<div class="edu-meta">
+																<div class="edu-duration">
+																	{{ $material->is_pdf_downloadable ? 'Pdf Available' :
+																	''}}
 																</div>
-															@endif
-														@endforeach
+
+																<div class="edu-price">
+																	{{ $material->IsPaid ? '₹' . $material->price : 'Free'
+																	}}
+																</div>
+															</div>
+															<p class="commission-name">
+																{{$material->subcategory->name}}
+															</p>
+
+															<h3 class="edu-title">
+																<a
+																	href="{{ route('study.material.details', $material->id) }}">{{
+																	$material->title }}</a>
+															</h3>
+
+															<p class="edu-description">{{ $material->short_description }}
+															</p>
+
+															<div class="edu-actions">
+
+																<a href="{{ route('study.material.details', $material->id) }}"
+																	class="edu-btn edu-btn-outline"
+																	style="width: 100%;display: flex;justify-content: center; text-align: center;">
+																	View Details
+																	<span
+																		class="arrow-icon flaticon-arrow-pointing-to-right"></span>
+																</a>
+															</div>
+														</div>
 													</div>
 												</div>
-											@endforeach
+
+												@endif
+
+												@endforeach
+
+											</div>
 										</div>
+										@endforeach
+
 									</div>
+								</div>
 								@endforeach
+
 							</div>
 						</div>
 					</div>

@@ -4,6 +4,21 @@
     {{ $course->course_heading }} - Live Classes
 @endsection
 
+<style>
+    @media (max-width: 740px) {
+   
+.content{
+    padding:0px !important;
+}
+.nav{
+    flex-wrap:nowrap !important;
+    overflow:scroll;
+}
+ .nav .nav-item{
+    white-space:nowrap;
+}
+}
+</style>
 @section('content')
     <section class="content">
 

@@ -924,7 +924,7 @@ class FrontController extends Controller
         $message = "$otp is the One Time Password(OTP) to verify your MOB number at Web Mingo, This OTP is Usable only once and is valid for 10 min,PLS DO NOT SHARE THE OTP WITH ANYONE";
         $dlt_id = '1307161465983326774';
         $request_parameter = array(
-            'authkey' => '133780AZGqc6gKWfh63da1812P1',
+            'authkey' => '133780AWLy8zZpC690b124aP1',
             'mobiles' => $mobile_number,
             'message' => urlencode($message),
             'sender' => 'WMINGO',

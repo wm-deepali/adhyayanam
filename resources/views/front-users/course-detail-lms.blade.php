@@ -79,6 +79,12 @@ font-size:14px;
 font-weight:500;
 }
 
+@media (max-width: 740px) {
+   
+.content{
+    padding:0px !important;
+}
+}
 
 </style>
 
@@ -94,7 +100,7 @@ font-weight:500;
                 </div>
             </div>
 
-            <div class="row">
+            <div class="row flex-column-reverse flex-lg-row">
                 {{-- ================= MAIN CONTENT ================= --}}
                 <div class="col-md-8">
 
@@ -132,10 +138,16 @@ font-weight:500;
                     {{-- COURSE DETAIL --}}
                     {{-- COURSE DETAIL --}}
                     <div class="card mt-3">
-                        <div class="card-body">
-                            {!! $course->detail_content !!}
-                        </div>
-                    </div>
+    <div class="card-body p-3 p-md-4">
+        
+        <div class="table-responsive" style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
+            <div class="content-table-wrapper">
+                {!! $course->detail_content !!}
+            </div>
+        </div>
+        
+    </div>
+</div>
 
                     {{-- ================= COURSE REVIEWS ================= --}}
                     <div class="card mt-3">
@@ -324,25 +336,25 @@ data-video='@json($videoPayload)'>
             };
 
            function youtubeEmbed(url) {
-
+ 
     if (!url) return '';
-
+ 
     // youtu.be format
     if (url.includes('youtu.be/')) {
         return 'https://www.youtube.com/embed/' + url.split('youtu.be/')[1].split('?')[0];
     }
-
+ 
     // youtube watch format
     if (url.includes('youtube.com/watch')) {
         const urlObj = new URL(url);
         return 'https://www.youtube.com/embed/' + urlObj.searchParams.get("v");
     }
-
+ 
     // already embed
     if (url.includes('/embed/')) {
         return url;
     }
-
+ 
     return url;
 }
 

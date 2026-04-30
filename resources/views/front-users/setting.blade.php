@@ -4,6 +4,18 @@
 Test Series
 @endsection
 
+<style>
+     @media (max-width: 740px) {
+    
+    .content {
+    
+    padding: 0 !important;
+    
+}
+
+}
+</style>
+
 @section('content')
 <!-- Main content -->
 <section class="content">

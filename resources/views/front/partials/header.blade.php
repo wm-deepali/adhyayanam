@@ -23,7 +23,7 @@
         display: none;
         position: fixed;
         left: 0;
-        top: var(--header-height, 107px);
+        top: 60px;
         /* fallback 107px */
         width: 100vw;
         background: #fff;
@@ -132,6 +132,8 @@
         -o-transition: all 500ms ease;
         margin-right: 25px;
     }
+    
+  
 </style>
 <link href="{{url('assets/css/bootstrap.css')}}" rel="stylesheet">
 <link href="{{url('assets/css/style.css')}}" rel="stylesheet">
@@ -156,6 +158,39 @@
     .container {
         max-width: 100%;
     }
+    .mobile-menu .navigation li.dropdown ul {
+    display: none;
+    padding-left: 20px;
+}
+
+.mobile-menu .navigation li.dropdown.open > a {
+    color: orange;
+    font-weight: 600;
+}
+
+.overflow-hidden {
+    overflow: hidden;
+}
+
+ @media (min-width: 767px) {
+    .top-header-login1 {
+      display:none;
+    }
+
+    
+  }
+ @media (max-width: 767px) {
+    .top-header-login {
+      margin-right:15px;
+    }
+.btn-style-one{
+    background:#fff !important;
+    color:black !important;
+    border:1px solid gray !important;
+    border-radius:4px;
+}
+    
+  }
 </style>
 
 <!-- Main Header -->
@@ -203,7 +238,7 @@
                                             class="flaticon-add-user"></i> Dashboard</span></a>
                             @else
                                 <a href="{{route('student.login')}}" class="theme-btn btn-style-one"><span
-                                        class="txt"><i class="flaticon-add-user"></i> Sign Up / Sign Up</span></a>
+                                        class="txt"><i class="flaticon-add-user"></i> Sign In / Sign Up</span></a>
                             @endif
                         </div>
                     </div>
@@ -218,11 +253,23 @@
                 <div class="inner-container d-flex justify-content-between align-items-center flex-wrap">
                     <div class="logo-box">
                         <div class="logo"><a href="{{url('/')}}"><img src="{{ url('images/Neti-logo.png')}}"
-                                    style="width:150px;" alt="" title=""></a></div>
+                                    style="width:100px;" alt="" title=""></a></div>
                     </div>
                     <div class="nav-outer d-flex align-items-center flex-wrap">
+                        
                         <!-- Mobile Navigation Toggler -->
-                        <div class="mobile-nav-toggler"><span class="icon flaticon-menu"></span></div>
+                        <div class="top-header-login top-header-login1">
+                            @if(auth()->user() && auth()->user()->type == 'student')
+                                <a href="{{route('user.dashboard')}}" class="theme-btn btn-style-one"><span class="txt"><i
+                                            class="flaticon-add-user"></i> Dashboard</span></a>
+                            @else
+                                <a href="{{route('student.login')}}" class="theme-btn btn-style-one"><span
+                                        class="txt"><i class="flaticon-add-user"></i> Sign Up / Sign Up</span></a>
+                            @endif
+                        </div>
+                        <div class="mobile-nav-toggler"> <span class="icon flaticon-menu"></span></div>
+                        
+                        
                         <!-- Main Menu -->
                         <nav class="main-menu show navbar-expand-md">
                             <div class="navbar-header">
@@ -240,7 +287,7 @@
                                 <ul class="navigation clearfix">
                                     <li><a href="{{url('/')}}">Home</a></li>
                                     <li class="dropdown">
-                                        <a href="#">Our Institute</a>
+                                        <a href="#">Our Institute </a>
                                         <div class="mega-menu-container">
                                             <div class="mega-menu-left">
                                                 <div class="mega-menu-tab active" data-tab="tab-institute-1">Institute
@@ -512,29 +559,207 @@
 
 
         <!-- Sticky Header -->
-        <div class="sticky-header" style="padding:0px 30px;">
+        <div class="sticky-header" style="padding:0px 0px;">
             <div class="container d-flex justify-content-between align-items-center flex-wrap">
                 <div class="logo">
-                    <a href="{{url('/')}}" title=""><img src="{{url('images/Neti-logo.png')}}" style="width:120px;"
+                    <a href="{{url('/')}}" title=""><img src="{{url('images/Neti-logo.png')}}" style="width:100px;"
                             alt="Adhyayanam Logo" title=""></a>
                 </div>
                 <nav class="main-menu"></nav>
+                <div class="d-flex  align-items-center" >
+                 <div class="top-header-login top-header-login1">
+                            @if(auth()->user() && auth()->user()->type == 'student')
+                                <a href="{{route('user.dashboard')}}" class="theme-btn btn-style-one"><span class="txt"><i
+                                            class="flaticon-add-user"></i> Dashboard</span></a>
+                            @else
+                                <a href="{{route('student.login')}}" class="theme-btn btn-style-one"><span
+                                        class="txt"><i class="flaticon-add-user"></i> Sign Up / Sign Up</span></a>
+                            @endif
+                        </div>
                 <div class="mobile-nav-toggler"><span class="icon flaticon-menu"></span></div>
+                </div>
+               
             </div>
         </div>
         <!-- End Sticky Menu -->
 
 
         <!-- Mobile Menu -->
-        <div class="mobile-menu">
-            <div class="menu-backdrop"></div>
-            <div class="close-btn"><span class="icon flaticon-cancel"></span></div>
-            <nav class="menu-box">
-                <div class="nav-logo"><a href="index-2.html"><img src="{{url('images/logo.png')}}" alt="" title=""></a>
-                </div>
-                <div class="menu-outer"></div>
-            </nav>
-        </div><!-- End Mobile Menu -->
+        <!-- Mobile Menu -->
+<!-- ==================== MOBILE MENU ==================== -->
+<div class="mobile-menu">
+    <div class="menu-backdrop"></div>
+    <div class="close-btn"><span class="icon flaticon-cancel"></span></div>
+    
+    <nav class="menu-box">
+        <div class="nav-logo">
+            <a href="{{ url('/') }}">
+                <img src="{{ url('images/Neti-logo.png') }}" alt="Logo" style="width: 100px;">
+            </a>
+        </div>
+        
+        <div class="menu-outer1">
+            <ul class="navigation clearfix">
+                <li><a href="{{url('/')}}">Home</a></li>
+                
+                <li class="dropdown">
+                    <a href="#">Our Institute</a>
+                    <ul>
+                        <li><a href="{{route('about')}}">About Us</a></li>
+                        <li><a href="{{route('our.team.index')}}">Our Team</a></li>
+                        <li><a href="{{route('vision.mission')}}">Vision & Mission</a></li>
+                    </ul>
+                </li>
+
+                <li class="dropdown">
+                    <a href="#">Courses</a>
+                    <ul>
+                        @foreach($examinationCommission as $commission)
+                            <li class="dropdown">
+                                <a href="#">{{$commission->name}}</a>
+                                <ul>
+                                    @foreach($commission->categories as $category)
+                                        @foreach($category->subCategories as $subCat)
+                                            <li>
+                                                <a href="{{ route('courses', [
+                                                    'exam_id' => $commission->id,
+                                                    'category_id' => $category->id,
+                                                    'sub_category_id' => $subCat->id
+                                                ]) }}">
+                                                    {{ $subCat->name }}
+                                                </a>
+                                            </li>
+                                        @endforeach
+                                    @endforeach
+                                </ul>
+                            </li>
+                        @endforeach
+                    </ul>
+                </li>
+
+                <li class="dropdown">
+        <a href="#">Test Series</a>
+        <ul>
+            @foreach($examinationCommission as $commission)
+                <li class="dropdown">   <!-- Yeh inner dropdown hai -->
+                    <a href="#">{{$commission->name}}</a>
+                    <ul>
+                        @foreach($commission->categories as $category)
+                            <li class="dropdown">   <!-- Yeh bhi inner dropdown -->
+                                <a href="#">{{$category->name}}</a>
+                                <ul>
+                                    @foreach($category->subCategories as $subCat)
+                                        <li>
+                                            <a href="{{ route('test-series-list', [
+                                                'exam_id' => $commission->id,
+                                                'category_id' => $category->id,
+                                                'sub_category_id' => $subCat->id
+                                            ]) }}">
+                                                {{ $subCat->name }}
+                                            </a>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            </li>
+                        @endforeach
+                    </ul>
+                </li>
+            @endforeach
+        </ul>
+    </li>
+
+                <li class="dropdown">
+                    <a href="#">Study Material</a>
+                    <ul>
+                        @foreach($examinationCommission as $commission)
+                            <li class="dropdown">
+                                <a href="#">{{$commission->name}}</a>
+                                <ul>
+                                    @foreach($commission->categories as $category)
+                                        @foreach($category->subCategories as $subCat)
+                                            <li>
+                                                <a href="{{ route('study.material.front', [
+                                                    'exam_id' => $commission->id,
+                                                    'category_id' => $category->id,
+                                                    'sub_category_id' => $subCat->id
+                                                ]) }}">
+                                                    {{ $subCat->name }}
+                                                </a>
+                                            </li>
+                                        @endforeach
+                                    @endforeach
+                                </ul>
+                            </li>
+                        @endforeach
+                    </ul>
+                </li>
+
+                <li class="dropdown">
+                    <a href="#">Current Affairs</a>
+                    <ul>
+                        <li><a href="{{route('current.index')}}">View Current Affairs</a></li>
+                    </ul>
+                </li>
+
+                <li class="dropdown">
+                    <a href="#">PYQ</a>
+                    <ul>
+                        @foreach($examinationCommission as $commission)
+                            <li class="dropdown">
+                                <a href="#">{{$commission->name}}</a>
+                                <ul>
+                                    @foreach($commission->categories as $category)
+                                        @foreach($category->subCategories as $subCat)
+                                            <li>
+                                                <a href="{{route('pyq-papers', ['examid' => $commission->id, 'catid' => $category->id, 'subcat' => $subCat->id])}}">
+                                                    {{ $subCat->name }}
+                                                </a>
+                                            </li>
+                                        @endforeach
+                                    @endforeach
+                                </ul>
+                            </li>
+                        @endforeach
+                    </ul>
+                </li>
+
+                <li class="dropdown">
+                    <a href="#">Syllabus</a>
+                    <ul>
+                        @foreach($examinationCommission as $commission)
+                            <li class="dropdown">
+                                <a href="#">{{$commission->name}}</a>
+                                <ul>
+                                    @foreach($commission->categories as $category)
+                                        @foreach($category->subCategories as $subCat)
+                                            <li>
+                                                <a href="{{ route('syllabus.front', [
+                                                    'examid' => $commission->id,
+                                                    'catid' => $category->id,
+                                                    'subcat' => $subCat->id
+                                                ]) }}">
+                                                    {{ $subCat->name }}
+                                                </a>
+                                            </li>
+                                        @endforeach
+                                    @endforeach
+                                </ul>
+                            </li>
+                        @endforeach
+                    </ul>
+                </li>
+
+                <li class="dropdown">
+                    <a href="#">Student Corner</a>
+                    <ul>
+                        <li><a href="{{route('daily.boost.front')}}">Daily Booster</a></li>
+                        <li><a href="{{route('test.planner.front')}}">Test Planner</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </nav>
+</div>
     </div>
 </header>
 
@@ -543,107 +768,100 @@
 
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        // Function to initialize a header's mega menu
-        function initMegaMenu(headerSelector) {
-            const header = document.querySelector(headerSelector);
-            if (!header) return;
+$(document).ready(function() {
 
-            const dropdowns = header.querySelectorAll('.dropdown');
-            const tabs = header.querySelectorAll('.mega-menu-tab');
+    // ==================== MOBILE MENU ====================
+   $('.mobile-nav-toggler').on('click', function() {
+        $('.mobile-menu').addClass('active');
+    });
 
-            // Calculate and set the top for each mega menu container
-            function updateMegaMenuTop() {
-                const headerHeight = header.offsetHeight;
-                header.querySelectorAll('.mega-menu-container').forEach(menu => {
-                    menu.style.top = `${headerHeight}px`;
-                });
-            }
+    $('.mobile-menu .close-btn, .menu-backdrop').on('click', function() {
+        $('.mobile-menu').removeClass('active');
+    });
 
-            updateMegaMenuTop();
-            window.addEventListener('resize', updateMegaMenuTop);
+    // ==================== MOBILE DROPDOWN - FIXED VERSION ====================
+  $(document).on('click', '.mobile-menu .navigation li.dropdown > a', function(e) {
+        e.preventDefault();
+        e.stopImmediatePropagation();   // Yeh line zaroori hai nested ke liye
 
-            // Choose activation method: 'hover' or 'click'
-            const activationMethod = 'hover';
+        var $li = $(this).parent('li');
 
-            // Dropdown activation
-            dropdowns.forEach(dropdown => {
-                if (activationMethod === 'hover') {
-                    dropdown.addEventListener('mouseenter', () => {
-                        dropdowns.forEach(d => d.classList.remove('active'));
-                        dropdown.classList.add('active');
-                    });
-                    dropdown.addEventListener('mouseleave', () => {
-                        dropdown.classList.remove('active');
-                    });
-                } else { // click mode
-                    dropdown.addEventListener('click', function (e) {
-                        e.preventDefault();
-                        const isActive = this.classList.contains('active');
-                        dropdowns.forEach(d => d.classList.remove('active'));
-                        if (!isActive) {
-                            this.classList.add('active');
-                        }
-                    });
-                }
-            });
-
-            // Tab activation
-            tabs.forEach(tab => {
-                tab.addEventListener('mouseenter', function () {
-                    const parentContainer = this.closest('.mega-menu-container');
-                    const siblingTabs = parentContainer.querySelectorAll('.mega-menu-tab');
-                    const siblingPanels = parentContainer.querySelectorAll('.mega-menu-panel');
-
-                    siblingTabs.forEach(t => t.classList.remove('active'));
-                    siblingPanels.forEach(p => p.classList.remove('active'));
-
-                    const tabId = this.getAttribute('data-tab');
-                    const activePanel = parentContainer.querySelector(`#${tabId}`);
-
-                    this.classList.add('active');
-                    if (activePanel) activePanel.classList.add('active');
-                });
-            });
-
-            // Close dropdowns when clicking outside (for click mode)
-            if (activationMethod === 'click') {
-                document.addEventListener('click', function (e) {
-                    if (!e.target.closest(headerSelector + ' .dropdown')) {
-                        dropdowns.forEach(d => d.classList.remove('active'));
-                    }
-                });
-            }
+        // Agar already open hai to close kar do
+        if ($li.hasClass('open')) {
+            $li.removeClass('open');
+            $li.find('ul').first().slideUp(250);
+            return;
         }
 
-        // Initialize mega menus for both main header and sticky header
-        initMegaMenu('.header-lower');
-        initMegaMenu('.sticky-header');
+        // Sab open dropdowns close kar do (sirf same level ke)
+        $li.siblings('li.dropdown').removeClass('open').find('ul').slideUp(250);
+
+        // Current ko open kar do
+        $li.addClass('open');
+        $li.find('ul').first().slideDown(250);
     });
-</script>
-<script>
-    // Dynamically update mega menu top position
-    function updateMegaMenuPosition() {
-        const header = document.querySelector('.header-lower, .sticky-header');
-        if (!header) return;
 
-        const headerHeight = header.offsetHeight;
-        document.documentElement.style.setProperty('--header-height', `${headerHeight}px`);
-    }
-
-    // Run initially
-    updateMegaMenuPosition();
-
-    // Run on resize (header height may change)
-    window.addEventListener('resize', updateMegaMenuPosition);
-
-    // Run when sticky header activates (most themes add/remove class)
-    const observer = new MutationObserver(updateMegaMenuPosition);
-    observer.observe(document.body, { attributes: true, subtree: true });
-
-    // Also trigger on scroll (sticky usually changes on scroll)
-    window.addEventListener('scroll', () => {
-        // Debounce if needed, but simple version:
-        requestAnimationFrame(updateMegaMenuPosition);
+    // Close mobile menu when clicking outside
+    $(document).on('click', function(e) {
+        if (!$(e.target).closest('.mobile-menu, .mobile-nav-toggler').length) {
+            $('.mobile-menu').removeClass('active');
+        }
     });
+
+    // Resize handler
+    $(window).on('resize', function() {
+        if ($(window).width() > 991) {
+            $('.mobile-menu').removeClass('active');
+            $('.mobile-menu .navigation li.dropdown').removeClass('open');
+            $('.mobile-menu .navigation li.dropdown ul').hide();
+        }
+    });
+
+    // ==================== DESKTOP MEGA MENU ====================
+    $('.dropdown').hover(function() {
+        if ($(window).width() > 991) {
+            $('.dropdown').removeClass('active');
+            $(this).addClass('active');
+        }
+    }, function() {
+        if ($(window).width() > 991) {
+            $(this).removeClass('active');
+        }
+    });
+
+    // Mega Menu Tab Switching
+    $('.mega-menu-tab').on('click', function() {
+        var $parent = $(this).closest('.mega-menu-container');
+        
+        $parent.find('.mega-menu-tab').removeClass('active');
+        $parent.find('.mega-menu-panel').removeClass('active');
+
+        $(this).addClass('active');
+        $('#' + $(this).data('tab')).addClass('active');
+    });
+
+    // Close mega menu when clicking outside
+    $(document).on('click', function(e) {
+        if (!$(e.target).closest('.dropdown').length) {
+            $('.dropdown').removeClass('active');
+        }
+    });
+
+    // Resize Handler
+    $(window).on('resize', function() {
+        if ($(window).width() > 991) {
+            $('.mobile-menu').removeClass('active');
+            $('body').removeClass('overflow-hidden');
+        }
+    });
+
+    // Close mobile menu on Escape key
+    $(document).on('keydown', function(e) {
+        if (e.key === "Escape") {
+            $('.mobile-menu').removeClass('active');
+            $('body').removeClass('overflow-hidden');
+        }
+    });
+
+});
 </script>

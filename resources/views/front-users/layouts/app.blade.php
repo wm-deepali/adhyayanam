@@ -29,8 +29,8 @@
 	<!-- Style-->  
 	<link rel="stylesheet" href="{{ asset('src/css/style.css')}}">
 	<link rel="stylesheet" href="{{ asset('src/css/skin_color.css')}}">
-     	<link rel="shortcut icon" href="{{url('images/favicon.svg')}}" type="image/x-icon">
-	<link rel="icon" href="{{url('images/favicon.svg')}}" type="image/x-icon">
+  <link rel="shortcut icon" href="{{url('images/fav.ico')}}" type="image/x-icon">
+<link rel="icon" href="{{url('images/fav.ico')}}" type="image/x-icon">
   </head>
 <style>
     .fade:not(.show) {
@@ -186,106 +186,7 @@ filter: alpha(opacity=50) !important;
 	<script src="{{ asset('src/js/template.js')}}"></script>
 	<script src="{{ asset('src/js/pages/dashboard.js')}}"></script>
     @stack('after-scripts')
-    <!-- / Scripts -->
-    <script>
-        if(jQuery("#registerModal").length != 0) {
-            jQuery('#registerModal').modal({backdrop: 'static', keyboard: false})  
-            jQuery("#registerModal").modal();
-        
-            function validate_password() {
- 
-                let pass = document.getElementById('password').value;
-                let confirm_pass = document.getElementById('confirm_password').value;
-                if (pass != confirm_pass) {
-                    document.getElementById('wrong_pass_alert').style.color = 'red';
-                    document.getElementById('wrong_pass_alert').innerHTML
-                        = '☒ Use same password';
-                    document.getElementById('saveUser').disabled = true;
-                    document.getElementById('saveUser').style.opacity = (0.4);
-                } else {
-                    document.getElementById('wrong_pass_alert').style.color = 'green';
-                    document.getElementById('wrong_pass_alert').innerHTML =
-                        '🗹 Password Matched';
-                    document.getElementById('saveUser').disabled = false;
-                    document.getElementById('saveUser').style.opacity = (1);
-                }
-            }
-
-            $('#saveUser').on("click",function (e) {
-                var flag=true;
-                function check_field(id)
-                {
-            
-                    if(!$("#"+id).val() ) //Also check Others????
-                    {
-            
-                        $('#'+id+'_msg').fadeIn(200).show().html('Required Field').addClass('required');
-                        // $('#'+id).css({'background-color' : '#E8E2E9'});
-                        flag=false;
-                    }
-                    else
-                    {
-                        $('#'+id+'_msg').fadeOut(200).hide();
-                        //$('#'+id).css({'background-color' : '#FFFFFF'});    //White color
-                    }
-                }
-            
-                //Validate Input box or selection box should not be blank or empty
-                check_field("first_name");
-                check_field("last_name");
-                check_field("email");
-                check_field("gender");
-                check_field("date_of_birth");
-                check_field("password");
-                check_field("confirm_password");
-                if(flag==false)
-                {
-                    return false;
-                }
-                e.preventDefault();
-                var data = new FormData($('#registerForm')[0]);//form name
-                $.ajax({
-                    headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    url: "{{route('register-student')}}",
-                    type: 'POST',
-                    data: data,
-                    cache: false,
-                    contentType: false,
-                    processData: false,
-                    success: function(result){
-                    if (result.success) {
-                            alert("Registered Suceessfully")
-                            window.location.href= `{{url('/user/dashboard')}}`
-                            //location.reload();
-                            sessionStorage.setItem('otpVerified', 'true');
-                            
-                            
-                    } else {
-                        if(result.code == 422)
-                        {
-                            if(result.errors)
-                            {
-                                for (const key in result.errors) {
-                                    $(`#${key}_msg`).fadeIn(200).show().html(result.errors[key][0]);
-                                }
-                            
-                            }
-                        }
-                    }
-                            
-                            
-                        
-                    },
-                    });
-                
-                
-            });
-        }
-        
-        
-    </script>
+   
      
 </body>
 

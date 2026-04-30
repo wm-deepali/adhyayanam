@@ -468,9 +468,9 @@
 
           <!-- Left Sidebar -->
           <!-- Left Sidebar -->
-          <div class="col-lg-4 col-xl-3">
+          <div class="col-lg-4 col-xl-3  d-none d-lg-block">
             <div class="sidebar-categories card border-0 shadow-sm rounded-4 p-4 sticky-top"
-              style="top: 100px;height:70vh;">
+              style="top: 100px;height:auto;">
               <h5 class="sidebar-title fw-bold mb-4">Browse Categories</h5>
 
               <!-- Science & Technology -->
@@ -520,6 +520,10 @@
 
           <!-- Right Content -->
           <div class="col-lg-8 col-xl-9">
+               <button class="btn btn-outline-primary d-lg-none mb-3 w-100 d-flex align-items-center justify-content-center gap-2" 
+            type="button" data-bs-toggle="offcanvas" data-bs-target="#categoryDrawer">
+      <i class="fas fa-list-ul"></i> Browse Categories
+    </button>
 
             <!-- Toolbar -->
             <div class="toolbar card border-0 shadow-sm rounded-4 mb-4 overflow-hidden" style="background: #f7f7f7">
@@ -566,9 +570,9 @@
                     </select>
 
                     <!-- Search Button -->
-                    <button class="btn btn-primary rounded-pill px-4">
-                      Search
-                    </button>
+                    <!--<button class="btn btn-primary rounded-pill px-4">-->
+                    <!--  Search-->
+                    <!--</button>-->
                   </div>
 
                 </div>
@@ -606,13 +610,13 @@
 
             <!-- study material Grid -->
 
-            <div class="row g-4">
+            <div class="row g-2">
 
               @if($studyMaterials->count())
               
                 @foreach($studyMaterials as $material)
 
-                  <div class="edu-course-card col-xl-4 col-lg-6 col-md-6 sm-12" data-commission="{{ $commission->id }}"
+                  <div class="edu-course-card col-12 col-md-6 col-xl-4" data-commission="{{ $commission->id }}"
                     data-category="{{ $material->category_id ?? 'all' }}"
                     data-category-name="{{ addslashes($category->name) }}">
 
@@ -686,6 +690,56 @@
             <!-- Pagination -->
 
           </div>
+          <div class="offcanvas offcanvas-start offcanvas-lg border-0 shadow-sm m-0" 
+     tabindex="-1" 
+     id="categoryDrawer" 
+     aria-labelledby="categoryDrawerLabel">
+
+  <!-- Offcanvas header (mobile pe dikhega) -->
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title fw-bold" id="categoryDrawerLabel">Browse Categories</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <hr>
+
+  <!-- Offcanvas body – yahan pura sidebar content jayega -->
+                @foreach($commissions->take(3) as $commission)
+
+                <button
+                  class="category-btn fw-semibold text-start w-100 py-3 px-4 rounded-3 mb-3 border-0 d-flex align-items-center justify-content-between"
+                  data-category="commission-{{ $commission->id }}">
+
+                  <span>{{ $commission->name }}</span>
+                  <i class="fas fa-chevron-down category-arrow transition-all"></i>
+
+                </button>
+
+
+                <ul class="sub-list list-unstyled ms-3" id="sub-commission-{{ $commission->id }}">
+
+                  @foreach($commission->categories->take(3) as $category)
+
+                              <li class="mb-2">
+                                <a href="{{ route('study.material.front', [
+                      'exam_id' => $commission->id,
+                      'category_id' => $category->id
+                    ]) }}"
+                                  class="sub-btn d-block py-2 px-3 rounded-3 text-decoration-none 
+                                                                                                                    {{ request('category_id') == $category->id ? 'active' : '' }}">
+
+                                  {{ $category->name }}
+
+                                </a>
+                              </li>
+
+                              <hr class="sub-divider">
+
+                  @endforeach
+
+                </ul>
+
+              @endforeach
+</div>
         </div>
       </div>
     </section>

@@ -62,6 +62,13 @@
                                             <ul class="dropdown-menu">
 
                                                 {{-- EDIT --}}
+
+                                                <li>
+                                                    <a class="dropdown-item"
+                                                        href="{{ route('current.affairs.topic.view', $topic->id) }}">
+                                                        <i class="fas fa-eye"></i> View
+                                                    </a>
+                                                </li>
                                                 @if(\App\Helpers\Helper::canAccess('manage_ca_categories_edit'))
                                                     <li>
                                                         <a class="dropdown-item" href="#" data-bs-toggle="modal"

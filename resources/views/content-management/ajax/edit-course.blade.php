@@ -299,7 +299,12 @@
                                 <label for="thumbnail_image" class="form-label">Upload Thumbnail</label>
                                 <input type="file" class="form-control" name="thumbnail_image" id="thumbnail_image"
                                     accept="image/*">
-                                <img src="{{ asset('storage/' . $course->thumbnail_image) }}" alt="Thumbnail" width="100">
+                                <small class="text-muted">
+                                    Max size: 2MB | JPG, PNG, WEBP
+                                    If form fails, please re-upload image
+                                </small>
+                                <img id="thumbnail_preview" src="{{ asset('storage/' . $course->thumbnail_image) }}"
+                                    width="120" style="margin-top:10px;">
                                 @if ($errors->has('thumbnail_image'))
                                     <span class="text-danger text-left">{{ $errors->first('thumbnail_image') }}</span>
                                 @endif
@@ -330,7 +335,12 @@
                                 <label for="banner_image" class="form-label">Upload Banner</label>
                                 <input type="file" class="form-control" name="banner_image" id="banner_image"
                                     accept="image/*">
-                                <img src="{{ asset('storage/' . $course->banner_image) }}" alt="Banner" width="100">
+                                <small class="text-muted">
+                                    Max size: 2MB | JPG, PNG, WEBP
+                                    If form fails, please re-upload image
+                                </small>
+                                <img id="banner_preview" src="{{ asset('storage/' . $course->banner_image) }}"
+                                    width="120" style="margin-top:10px;">
                                 @if ($errors->has('banner_image'))
                                     <span class="text-danger text-left">{{ $errors->first('banner_image') }}</span>
                                 @endif
@@ -408,6 +418,27 @@
     <script>
 
         $(document).ready(function () {
+
+            $('#thumbnail_image').on('change', function (e) {
+                let reader = new FileReader();
+
+                reader.onload = function (e) {
+                    $('#thumbnail_preview').attr('src', e.target.result);
+                }
+
+                reader.readAsDataURL(this.files[0]);
+            });
+
+
+            $('#banner_image').on('change', function (e) {
+                let reader = new FileReader();
+
+                reader.onload = function (e) {
+                    $('#banner_preview').attr('src', e.target.result);
+                }
+
+                reader.readAsDataURL(this.files[0]);
+            });
 
             function calculateOfferedPrice() {
 
@@ -655,8 +686,8 @@
                         response.categories.forEach(category => {
                             categorySelect.innerHTML +=
                                 `<option value="${category.id}" ${category.id == selectedCategory ? 'selected' : ''}>
-                            ${category.name}
-                        </option>`;
+                                                ${category.name}
+                                            </option>`;
                         });
 
                     },

@@ -1750,7 +1750,7 @@ class ContentManagementController extends Controller
             'chapter_id.*' => 'exists:chapter,id',
 
             'topic_id' => 'nullable|array',
-            'topic_id.*' => 'exists:topic,id',
+            'topic_id.*' => 'exists:course_topics,id',
 
             'language_of_teaching' => 'required|array|min:1',
             'language_of_teaching.*' => 'string',
@@ -1898,7 +1898,7 @@ class ContentManagementController extends Controller
             'chapter_id.*' => 'exists:chapter,id',
 
             'topic_id' => 'nullable|array',
-            'topic_id.*' => 'exists:topic,id',
+            'topic_id.*' => 'exists:course_topics,id',
 
             'language_of_teaching' => 'required|array|min:1',
             'language_of_teaching.*' => 'string',
@@ -2131,6 +2131,13 @@ class ContentManagementController extends Controller
     {
         $data['topics'] = Topic::latest()->paginate(10);
         return view('current-affairs.topic', $data);
+    }
+
+    public function topicView($id)
+    {
+        $topic = Topic::with(['creator', 'currentAffair'])->findOrFail($id);
+
+        return view('current-affairs.topicview', compact('topic'));
     }
 
     public function topicStore(Request $request)

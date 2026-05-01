@@ -1,10 +1,10 @@
 @extends('layouts.app')
 
 @section('title', 'Update Sub Admin Password')
-
 @section('content')
-<div class="card">
-    <div class="card-header d-flex justify-content-between align-items-center">
+
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
         <h5 class="mb-0">Update Password</h5>
 
         <a href="{{ route('sub-admins.index') }}" class="btn btn-secondary btn-sm">
@@ -12,9 +12,8 @@
         </a>
     </div>
 
-    <div class="card-body">
-
-        {{-- Flash Messages --}}
+        <div class="card-body">
+ {{-- Flash Messages --}}
         @if(session('success'))
             <div class="alert alert-success">{{ session('success') }}</div>
         @endif
@@ -27,9 +26,7 @@
                     @endforeach
                 </ul>
             </div>
-        @endif
-
-        <form action="{{ route('sub-admins.password.update', $user->id) }}" method="POST">
+        @endif            <form action="{{ route('sub-admins.password.update', $user->id) }}" method="POST">
             @csrf
 
             <div class="row">
@@ -73,6 +70,7 @@
             </div>
 
         </form>
+        </div>
 
-    </div>
-</div
+ </div>
+@endsection

@@ -826,12 +826,39 @@
 
                         <div class="topic-content">
 
-                            <h4>{{ $name }}</h4>
+                           <h4>{{ $name }}</h4>
 
-                            <p>{{ $tests->count() }} Tests</p>
+<p>{{ $tests->count() }} Tests</p>
 
-                            <span>{{ $tests->sum('total_questions') }} Questions</span>
+<span>{{ $tests->sum('total_questions') }} Questions</span>
 
+@php
+    $types = $tests->pluck('test_paper_type')->unique()->filter()->values();
+
+    $labels = [
+        'MCQ' => 'MCQ',
+        'Subjective' => 'Subjective',
+        'Passage' => 'Case Based',
+    ];
+
+    if ($types->count() == 1) {
+        // Only one type
+        $typeText = ($labels[$types[0]] ?? $types[0]) . ' Only';
+    } elseif ($types->count() == 3) {
+        // All types
+        $typeText = 'Combined (MCQ + Subjective + Case)';
+    } else {
+        // Mixed (2 types)
+        $mapped = $types->map(fn($t) => $labels[$t] ?? $t);
+        $typeText = 'Mixed (' . $mapped->implode(' + ') . ')';
+    }
+@endphp
+
+@if($types->count())
+    <small style="color:#045279; font-weight:600;">
+        {{ $typeText }}
+    </small>
+@endif
                         </div>
 
                         </button>
@@ -959,15 +986,27 @@
 
                             <h3>{{ $test->name }}</h3>
 
-                            <div class="test-meta">
+                           <div class="test-meta">
 
-                                <span>{{ $test->total_questions }} Questions</span>
+    <span>{{ $test->total_questions }} Questions</span>
+    <span>{{ $test->total_marks }} Marks</span>
+    <span>{{ $test->duration }} Min</span>
 
-                                <span>{{ $test->total_marks }} Marks</span>
+    {{-- ✅ NEW: PAPER TYPE --}}
+    @php
+        $labels = [
+            'MCQ' => 'MCQ Only',
+            'Subjective' => 'Subjective Only',
+            'Passage' => 'Case Based',
+            'Combined' => 'Mixed (MCQ + Subjective + Case)'
+        ];
+    @endphp
 
-                                <span>{{ $test->duration }} Min</span>
+    <span style="color:#045279; font-weight:600;">
+        {{ $labels[$test->test_paper_type] ?? $test->test_paper_type }}
+    </span>
 
-                            </div>
+</div>
 
                         </div>
 

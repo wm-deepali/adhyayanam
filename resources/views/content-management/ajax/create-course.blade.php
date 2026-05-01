@@ -27,8 +27,8 @@
 
                             <div class="mb-3">
                                 <label for="feature" class="form-label">Feature</label>
-                                <input class="form-control" id="feature" name="feature" type="checkbox" data-toggle="toggle"
-                                    data-onstyle="success" data-offstyle="danger" data-width="100">
+                                <input class="form-control" id="feature" name="feature" type="checkbox" {{ old('feature') ? 'checked' : '' }} data-toggle="toggle" data-onstyle="success" data-offstyle="danger"
+                                    data-width="100">
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -36,8 +36,9 @@
                                 <label for="course_mode" class="form-label">Course Mode</label>
                                 <select class="form-control" name="course_mode" id="course_mode" required>
                                     <option value="" selected disabled>None</option>
-                                    <option value="Online">Online</option>
-                                    <option value="Video Learning">Video Learning</option>
+                                    <option value="Online" {{ old('course_mode') == 'Online' ? 'selected' : '' }}>Online
+                                    </option>
+                                    <option value="Video Learning" {{ old('course_mode') == 'Video Learning' ? 'selected' : '' }}>Video Learning</option>
                                 </select>
                                 @error('course_mode')
                                     <span class="text-danger">{{ $message }}</span>
@@ -54,7 +55,9 @@
                                     required>
                                     <option value="" selected disabled>None</option>
                                     @foreach($examinationCommissions as $commission)
-                                        <option value="{{ $commission->id }}">{{ $commission->name }}</option>
+                                        <option value="{{ $commission->id }}" {{ old('examination_commission_id') == $commission->id ? 'selected' : '' }}>
+                                            {{ $commission->name }}
+                                        </option>
                                     @endforeach
                                 </select>
                                 @error('examination_commission_id')
@@ -92,7 +95,8 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="name" class="form-label">Course Name</label>
-                                <input type="text" class="form-control" name="name" placeholder="Course Name" required>
+                                <input type="text" class="form-control" value="{{ old('name') }}" name="name"
+                                    placeholder="Course Name" required>
                                 @error('name')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
@@ -154,8 +158,8 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="duration" class="form-label">Duration (Weeks)</label>
-                                <input type="number" class="form-control" name="duration" placeholder="Duration in Weeks"
-                                    required>
+                                <input type="number" class="form-control" value="{{ old('duration') }}" name="duration"
+                                    placeholder="Duration in Weeks" required>
                                 @error('duration')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
@@ -165,15 +169,15 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="weekly_study" class="form-label">Weekly Study (Hours)</label>
-                                <input type="number" class="form-control" name="weekly_study" placeholder="Hours per Week"
-                                    required>
+                                <input type="number" value="{{ old('weekly_study') }}" class="form-control"
+                                    name="weekly_study" placeholder="Hours per Week" required>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="course_fee" class="form-label">Fee</label>
-                                <input type="number" class="form-control" id="course_fee" name="course_fee"
-                                    placeholder="Fee" required>
+                                <input type="number" value="{{ old('course_fee') }}" class="form-control" id="course_fee"
+                                    name="course_fee" placeholder="Fee" required>
                                 @error('course_fee')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
@@ -185,8 +189,8 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="discount" class="form-label">Discount (%)</label>
-                                <input type="number" class="form-control" id="discount" name="discount"
-                                    placeholder="Discount" required>
+                                <input type="number" value="{{ old('discount') }}" class="form-control" id="discount"
+                                    name="discount" placeholder="Discount" required>
                                 @error('discount')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
@@ -195,8 +199,8 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="offered_price" class="form-label">Offered Price</label>
-                                <input type="number" class="form-control" id="offered_price" name="offered_price"
-                                    placeholder="Offered Price" required readonly>
+                                <input type="number" value="{{ old('offered_price') }}" class="form-control"
+                                    id="offered_price" name="offered_price" placeholder="Offered Price" required readonly>
                                 @error('offered_price')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
@@ -208,8 +212,8 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="num_classes" class="form-label">Number Of Classes</label>
-                                <input type="number" class="form-control" name="num_classes" placeholder="Number Of Classes"
-                                    required>
+                                <input type="number" value="{{ old('num_classes') }}" class="form-control"
+                                    name="num_classes" placeholder="Number Of Classes" required>
                                 @error('num_classes')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
@@ -218,8 +222,8 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="num_topics" class="form-label">Number Of Topics</label>
-                                <input type="number" class="form-control" name="num_topics" placeholder="Number Of Topics"
-                                    required>
+                                <input type="number" value="{{ old('num_topics') }}" class="form-control" name="num_topics"
+                                    placeholder="Number Of Topics" required>
                                 @error('num_topics')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
@@ -232,8 +236,8 @@
                             <div class="mb-3">
                                 <label for="language_of_teaching" class="form-label">Languages</label>
                                 <select class="form-control select2" name="language_of_teaching[]" multiple>
-                                    <option value="English">English</option>
-                                    <option value="Hindi">Hindi</option>
+                                    <option value="English" {{ old('language_of_teaching') && in_array('English', old('language_of_teaching')) ? 'selected' : '' }}>English</option>
+                                    <option value="Hindi" {{ old('language_of_teaching') && in_array('Hindi', old('language_of_teaching')) ? 'selected' : '' }}>Hindi</option>
                                 </select>
                                 @error('language_of_teaching')
                                     <span class="text-danger">{{ $message }}</span>
@@ -243,8 +247,8 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="course_heading" class="form-label">Heading*</label>
-                                <input type="text" class="form-control" name="course_heading" placeholder="Heading"
-                                    required>
+                                <input type="text" value="{{ old('course_heading') }}" aria-controls="" class="form-control"
+                                    name="course_heading" placeholder="Heading" required>
                                 @error('course_heading')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
@@ -255,8 +259,8 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="short_description" class="form-label">Short Description</label>
-                                <input type="text" class="form-control" name="short_description"
-                                    placeholder="Short Description" required>
+                                <input type="text" value="{{ old('short_description') }}" class="form-control"
+                                    name="short_description" placeholder="Short Description" required>
                                 @error('short_description')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
@@ -267,7 +271,11 @@
                                 <label for="thumbnail_image" class="form-label">Upload Thumbnail</label>
                                 <input type="file" class="form-control" name="thumbnail_image" id="thumbnail_image"
                                     accept="image/*">
-
+                                <small class="text-muted">
+                                    Max size: 2MB | JPG, PNG, WEBP
+                                    If form fails, please re-upload image
+                                </small>
+                                <img id="thumbnail_preview" style="max-width:150px; margin-top:10px; display:none;">
                                 @if ($errors->has('thumbnail_image'))
                                     <span class="text-danger text-left">{{ $errors->first('thumbnail_image') }}</span>
                                 @endif
@@ -276,7 +284,8 @@
                     </div>
                     <div class="mb-3">
                         <label for="course_overview" class="form-label">Course Overview*</label>
-                        <textarea id="course_overview" name="course_overview" style="height: 300px;"></textarea>
+                        <textarea id="course_overview" name="course_overview"
+                            style="height: 300px;">{{ old('course_overview') }}</textarea>
                         @error('course_overview')
                             <span class="text-danger">{{ $message }}</span>
                         @enderror
@@ -284,7 +293,8 @@
 
                     <div class="mb-3">
                         <label for="detail_content" class="form-label">Course Detail*</label>
-                        <textarea id="detail_content" name="detail_content" style="height: 200px;"></textarea>
+                        <textarea id="detail_content" name="detail_content"
+                            style="height: 200px;">{{ old('detail_content') }}</textarea>
                         @error('detail_content')
                             <span class="text-danger">{{ $message }}</span>
                         @enderror
@@ -296,7 +306,11 @@
                                 <label for="banner_image" class="form-label">Upload Banner</label>
                                 <input type="file" class="form-control" name="banner_image" id="banner_image"
                                     accept="image/*">
-
+                                <small class="text-muted">
+                                    Max size: 2MB | JPG, PNG, WEBP
+                                    If form fails, please re-upload image
+                                </small>
+                                <img id="banner_preview" style="max-width:150px; margin-top:10px; display:none;">
                                 @if ($errors->has('banner_image'))
                                     <span class="text-danger text-left">{{ $errors->first('banner_image') }}</span>
                                 @endif
@@ -305,8 +319,8 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="youtube_url" class="form-label">Youtube Video Url</label>
-                                <input type="text" class="form-control" name="youtube_url" placeholder="Youtube Video Url"
-                                    required>
+                                <input type="text" value="{{ old('youtube_url') }}" class="form-control" name="youtube_url"
+                                    placeholder="Youtube Video Url" required>
                                 @error('youtube_url')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
@@ -317,7 +331,8 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="meta_title" class="form-label">Meta Title</label>
-                                <input type="text" class="form-control" name="meta_title" placeholder="Meta Title" required>
+                                <input type="text" value="{{ old('meta_title') }}" class="form-control" name="meta_title"
+                                    placeholder="Meta Title" required>
                                 @error('meta_title')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
@@ -326,7 +341,8 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="meta_keyword" class="form-label">Meta Keywords</label>
-                                <input type="text" class="form-control" name="meta_keyword" placeholder="Tag, Tag" required>
+                                <input type="text" value="{{ old('meta_keyword') }}" class="form-control"
+                                    name="meta_keyword" placeholder="Tag, Tag" required>
                                 @error('meta_keyword')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
@@ -337,8 +353,8 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="meta_description" class="form-label">Meta Description</label>
-                                <input type="text" class="form-control" name="meta_description"
-                                    placeholder="Meta Description" required>
+                                <input type="text" value="{{ old('meta_description') }}" class="form-control"
+                                    name="meta_description" placeholder="Meta Description" required>
                                 @error('meta_description')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
@@ -347,7 +363,8 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="image_alt_tag" class="form-label">Alt Tag</label>
-                                <input type="text" class="form-control" name="image_alt_tag" placeholder="Tag" required>
+                                <input type="text" value="{{ old('image_alt_tag') }}" class="form-control"
+                                    name="image_alt_tag" placeholder="Tag" required>
                                 @error('image_alt_tag')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
@@ -372,6 +389,38 @@
     <script>
 
         $(document).ready(function () {
+
+            let oldCategory = "{{ old('category_id') }}";
+            let oldSubCategory = "{{ old('sub_category_id') }}";
+            let oldCommission = "{{ old('examination_commission_id') }}";
+            let oldSubjects = @json(old('subject_id', []));
+            let oldTopics = @json(old('topic_id', []));
+
+            // STEP 1: trigger commission
+            if (oldCommission) {
+                $('#examination_commission_id').val(oldCommission).trigger('change');
+            }
+
+
+            $('#thumbnail_image').on('change', function (e) {
+                let reader = new FileReader();
+
+                reader.onload = function (e) {
+                    $('#thumbnail_preview').attr('src', e.target.result).show();
+                }
+
+                reader.readAsDataURL(this.files[0]);
+            });
+
+            $('#banner_image').on('change', function (e) {
+                let reader = new FileReader();
+
+                reader.onload = function (e) {
+                    $('#banner_preview').attr('src', e.target.result).show();
+                }
+
+                reader.readAsDataURL(this.files[0]);
+            });
 
             function calculateOfferedPrice() {
                 let courseFee = parseFloat($('#course_fee').val()) || 0;
@@ -404,6 +453,16 @@
                 filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
                 filebrowserUploadMethod: 'form'
             });
+
+            setTimeout(() => {
+                if (CKEDITOR.instances.course_overview) {
+                    CKEDITOR.instances.course_overview.setData(`{!! old('course_overview') !!}`);
+                }
+
+                if (CKEDITOR.instances.detail_content) {
+                    CKEDITOR.instances.detail_content.setData(`{!! old('detail_content') !!}`);
+                }
+            }, 500);
 
             setInterval(function () {
                 $(document).find(".cke_notifications_area").remove();
@@ -438,6 +497,12 @@
                         success: function (result) {
                             if (result.success) {
                                 $('#subject_id').html(result.html).trigger('change');
+                                $('#subject_id').select2();
+
+                                let oldSubjects = @json(old('subject_id', []));
+                                if (oldSubjects.length) {
+                                    $('#subject_id').val(oldSubjects).trigger('change');
+                                }
                             } else {
                                 $('#subject_id').html('<option value="">--Select--</option>').trigger('change');
                             }
@@ -461,6 +526,12 @@
                         success: function (result) {
                             if (result.success) {
                                 $('#chapter_id').html(result.html).trigger('change');
+                                $('#chapter_id').select2();
+
+                                let oldChapters = @json(old('chapter_id', []));
+                                if (oldChapters.length) {
+                                    $('#chapter_id').val(oldChapters).trigger('change');
+                                }
                             } else {
                                 $('#chapter_id').html('<option value="">--Select--</option>').trigger('change');
                             }
@@ -483,6 +554,12 @@
                         success: function (result) {
                             if (result.success) {
                                 $('#topic_id').html(result.html).trigger('change');
+                                $('#topic_id').select2();
+
+                                let oldTopics = @json(old('topic_id', []));
+                                if (oldTopics.length) {
+                                    $('#topic_id').val(oldTopics).trigger('change');
+                                }
                             } else {
                                 $('#topic_id').html('<option value="">--Select--</option>').trigger('change');
                             }
@@ -591,9 +668,15 @@
                     dataType: 'json',
                     success: function (response) {
                         categorySelect.innerHTML = '<option value="" selected disabled>None</option>';
+
                         response.categories.forEach(category => {
                             categorySelect.innerHTML += `<option value="${category.id}">${category.name}</option>`;
                         });
+
+                        let oldCategory = "{{ old('category_id') }}";
+                        if (oldCategory) {
+                            $('#category_id').val(oldCategory).trigger('change');
+                        }
                     },
                     error: function (error) {
                         console.error('Error fetching categories:', error);
@@ -608,9 +691,15 @@
                     dataType: 'json',
                     success: function (response) {
                         subCategorySelect.innerHTML = '<option value="" selected disabled>None</option>';
+
                         response.subcategories.forEach(subcategory => {
                             subCategorySelect.innerHTML += `<option value="${subcategory.id}">${subcategory.name}</option>`;
                         });
+
+                        let oldSubCategory = "{{ old('sub_category_id') }}";
+                        if (oldSubCategory) {
+                            $('#sub_category_id').val(oldSubCategory).trigger('change');
+                        }
                     },
                     error: function (error) {
                         console.error('Error fetching subcategories:', error);

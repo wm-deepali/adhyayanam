@@ -134,7 +134,7 @@ class SubAdminController extends Controller
     public function editPassword($id)
     {
         $user = User::findOrFail($id);
-        return view('sub-admins.update-password', compact('user'));
+        return view('admin.sub-admins.update-password', compact('user'));
     }
 
     public function updatePassword(Request $request, $id)

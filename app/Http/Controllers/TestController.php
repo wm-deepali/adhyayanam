@@ -57,15 +57,107 @@ class TestController extends Controller
         return view('test-paper.create', $data);
     }
 
-    public function testBankIndex()
+    public function testBankIndex(Request $request)
     {
-        $data['test'] = Test::with('subject', 'topic', 'commission', 'category', 'testDetails')->orderBy('created_at', 'desc')->paginate(10);
+        $query = Test::with([
+            'subject',
+            'topic',
+            'chapter',
+            'commission',
+            'category',
+            'subcategory',
+            'testDetails'
+        ])->latest();
 
-        $data['commissions'] = ExaminationCommission::get();
-        return view('test-paper.index', $data);
+        // ✅ Filters
+        $query->when(
+            $request->commission_id,
+            fn($q) =>
+            $q->where('competitive_commission_id', $request->commission_id)
+        );
+
+        $query->when(
+            $request->category_id,
+            fn($q) =>
+            $q->where('exam_category_id', $request->category_id)
+        );
+
+        $query->when(
+            $request->sub_category_id,
+            fn($q) =>
+            $q->where('exam_subcategory_id', $request->sub_category_id)
+        );
+
+        $query->when($request->test_type_filter, function ($q) use ($request) {
+            $q->where('test_type', $request->test_type_filter);
+        });
+
+        // ✅ QUESTION TYPE FILTER (MCQ / SUBJECTIVE / STORY)
+        $query->when($request->paper_category, function ($q) use ($request) {
+            $q->where('test_paper_type', $request->paper_category);
+        });
+
+        // ✅ Test Type
+        if ($request->filled('test_type')) {
+            switch ($request->test_type) {
+                case '0':
+                    $query->whereNull('subject_id')
+                        ->whereNull('chapter_id')
+                        ->whereNull('topic_id')
+                        ->where('paper_type', 0);
+                    break;
+
+                case '1':
+                    $query->whereNotNull('subject_id')
+                        ->whereNull('chapter_id')
+                        ->whereNull('topic_id')
+                        ->where('paper_type', 0);
+                    break;
+
+                case '2':
+                    $query->whereNotNull('chapter_id')
+                        ->whereNull('topic_id')
+                        ->where('paper_type', 0);
+                    break;
+
+                case '3':
+                    $query->whereNotNull('topic_id')
+                        ->where('paper_type', 0);
+                    break;
+            }
+        }
+
+        // ✅ Search
+        if ($request->filled('search')) {
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'LIKE', "%{$search}%")
+                    ->orWhere('test_code', 'LIKE', "%{$search}%")
+                    ->orWhereHas('commission', fn($sub) => $sub->where('name', 'LIKE', "%{$search}%"))
+                    ->orWhereHas('category', fn($sub) => $sub->where('name', 'LIKE', "%{$search}%"))
+                    ->orWhereHas('subcategory', fn($sub) => $sub->where('name', 'LIKE', "%{$search}%"))
+                    ->orWhereHas('subject', fn($sub) => $sub->where('name', 'LIKE', "%{$search}%"))
+                    ->orWhereHas('chapter', fn($sub) => $sub->where('name', 'LIKE', "%{$search}%"))
+                    ->orWhereHas('topic', fn($sub) => $sub->where('name', 'LIKE', "%{$search}%"));
+            });
+        }
+
+        // ✅ Pagination
+        $test = $query->paginate(10)->withQueryString();
+
+        $commissions = ExaminationCommission::all();
+
+        // ✅ AJAX response
+        if ($request->ajax()) {
+            return response()->json([
+                'html' => view('test-paper.table-rows', compact('test'))->render(),
+                'pagination' => $test->links()->render()
+            ]);
+        }
+
+        return view('test-paper.index', compact('test', 'commissions'));
     }
-
-
     public function filter(Request $request)
     {
         $query = Test::with(['subject', 'topic', 'commission', 'category', 'testDetails'])
@@ -140,7 +232,7 @@ class TestController extends Controller
         }
 
 
-        $test = $query->paginate(10);
+        $test = $query->paginate(10)->appends($request->all());
 
         $html = view('test-paper.table-rows', compact('test'))->render();
 
@@ -768,13 +860,27 @@ class TestController extends Controller
 
     public function download($id)
     {
-        $paper = Test::with('category', 'subcategory', 'commission', 'subject', 'topic', 'chapter', 'testDetails.question')->findOrFail($id);
-        $data['paper'] = $paper;
-        $pdf = PDF::loadView('test-paper.pdf-view', $data);
-        // dd($$paper->name . '.pdf');
-        return $pdf->download($paper->name . '.pdf');
-    }
+        ini_set('memory_limit', '256M');
 
+        $paper = Test::with([
+            'category:id,name',
+            'subcategory:id,name',
+            'commission:id,name',
+            'subject:id,name',
+            'topic:id,name',
+            'chapter:id,name',
+            'testDetails.question'
+        ])->findOrFail($id);
+
+        $pdf = PDF::loadView('test-paper.pdf-view', compact('paper'))
+            ->setOptions([
+                'dpi' => 72,
+                'isHtml5ParserEnabled' => true,
+                'isRemoteEnabled' => false
+            ]);
+
+        return $pdf->stream($paper->name . '.pdf');
+    }
 
 
     public function edit($id)
@@ -2810,18 +2916,18 @@ class TestController extends Controller
     {
         try {
             ini_set('memory_limit', '-1');
-            
+
             // Handle comma-separated subject IDs
             $subjectIds = explode(',', $subject);
             $subjectIds = array_filter(array_map('intval', $subjectIds));
-            
+
             if (empty($subjectIds)) {
                 return response()->json([
                     "success" => false,
                     'msgText' => 'No valid subject IDs provided',
                 ]);
             }
-            
+
             // If single ID, use where; if multiple, use whereIn
             if (count($subjectIds) == 1) {
                 $datas = Chapter::where('status', 1)->where('subject_id', $subjectIds[0])->get();
@@ -2847,18 +2953,18 @@ class TestController extends Controller
     {
         try {
             ini_set('memory_limit', '-1');
-            
+
             // Handle comma-separated chapter IDs
             $chapterIds = explode(',', $chapter);
             $chapterIds = array_filter(array_map('intval', $chapterIds));
-            
+
             if (empty($chapterIds)) {
                 return response()->json([
                     "success" => false,
                     'msgText' => 'No valid chapter IDs provided',
                 ]);
             }
-            
+
             // If single ID, use where; if multiple, use whereIn
             if (count($chapterIds) == 1) {
                 $datas = CourseTopic::where('status', 1)->where('chapter_id', $chapterIds[0])->get();

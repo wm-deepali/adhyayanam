@@ -1,8 +1,6 @@
 @extends('layouts.app')
 
-@section('title')
-    Test Paper
-@endsection
+@section('title', 'Test Paper')
 
 @section('content')
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
@@ -18,8 +16,8 @@
             background-color: #ffc107 !important;
         }
     </style>
-
     <div class="bg-light rounded">
+
         <div class="card">
             <div class="card-body">
                 <div class="d-flex">
@@ -88,6 +86,28 @@
                             </div>
                         </div>
 
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Free / Paid</label>
+                                <select class="form-control" id="test_type_filter">
+                                    <option value="">--Select--</option>
+                                    <option value="free">Free</option>
+                                    <option value="paid">Paid</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Paper Type</label>
+                                <select class="form-control" id="paper_category">
+                                    <option value="">--Select--</option>
+                                    <option value="mcq">MCQ</option>
+                                    <option value="subjective">Subjective</option>
+                                    <option value="story">Story Based</option>
+                                </select>
+                            </div>
+                        </div>
                         {{-- Search --}}
                         <div class="col-md-3">
                             <div class="form-group">
@@ -96,6 +116,7 @@
                                     placeholder="Search test papers...">
                             </div>
                         </div>
+
 
                         {{-- Buttons --}}
                         <div class="col-md-6" style="margin-top: 25px;">
@@ -136,9 +157,10 @@
         </div>
     </div>
 
-     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function () {
+
             $(document).on('change', '#exam_com_id', function (event) {
 
                 $('#category_id').html("");
@@ -196,44 +218,53 @@
 
             });
 
-            // 🔹 Filter Now
-            $('.filterbtn').on('click', function () {
+            function fetchData(url = null) {
+
                 let data = {
                     commission_id: $('#exam_com_id').val(),
                     category_id: $('#category_id').val(),
                     sub_category_id: $('#sub_category_id').val(),
                     test_type: $('#test_type').val(),
                     search: $('#search').val(),
+
+                    // ✅ NEW
+                    test_type_filter: $('#test_type_filter').val(),
+                    paper_category: $('#paper_category').val(),
                 };
 
                 $.ajax({
-                    url: "{{ route('test.paper.filter') }}",
+                    url: url ?? "{{ route('test.bank.index') }}",
                     type: "GET",
                     data: data,
                     beforeSend: function () {
-                        $('#testPaperTableBody').html(`<tr><td colspan="9" class="text-center">Loading...</td></tr>`);
+                        $('#testPaperTableBody').html('<tr><td colspan="10">Loading...</td></tr>');
                     },
-                    success: function (response) {
-                        $('#testPaperTableBody').html(response.html);
-                    },
-                    error: function () {
-                        $('#testPaperTableBody').html(`<tr><td colspan="9" class="text-center text-danger">Error loading data</td></tr>`);
+                    success: function (res) {
+                        $('#testPaperTableBody').html(res.html);
+                        $('.d-flex.justify-content-center.mt-3').html(res.pagination);
                     }
                 });
+            }
+
+            // FILTER
+            $('.filterbtn').click(function () {
+                fetchData();
             });
 
-            // 🔹 Reset Filters
-            $('.resetbtn').on('click', function () {
-                $('#exam_com_id').val('');
-                $('#category_id').val('');
-                $('#sub_category_id').val('');
-                $('#test_type').val('');
-                $('#search').val('');
+            // RESET
+            $('.resetbtn').click(function () {
+                $('select, input').val('');
                 $('.sub-cat').addClass('hidecls');
-                $('.filterbtn').click(); // reload default listing
+                fetchData();
+            });
+
+            // PAGINATION
+            $(document).on('click', '.pagination a', function (e) {
+                e.preventDefault();
+                fetchData($(this).attr('href'));
             });
 
         });
-
     </script>
+
 @endsection

@@ -14,7 +14,9 @@
                         <h6 class="card-subtitle mb-2 text-muted">Create Question section here.</h6>
                     </div>
                     <div class="justify-content-end">
-                        <a href='{{route('question.bank.create')}}' class="btn btn-primary">&#43; Add</a>
+                        <a href="{{ url()->previous() }}" class="btn btn-secondary">
+                    ← Back
+                </a>
                     </div>
                 </div>
                 <div class="mt-2">
@@ -333,7 +335,6 @@
     </div>
     <script src="https://cdn.ckeditor.com/4.16.2/full/ckeditor.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
 
     <script>
         $(document).ready(function () {

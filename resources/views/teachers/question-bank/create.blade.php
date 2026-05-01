@@ -14,7 +14,9 @@
                         <h6 class="card-subtitle mb-2 text-muted">Create Question section here.</h6>
                     </div>
                     <div class="justify-content-end">
-                        <a href='{{route('teacher.question.bank.create')}}' class="btn btn-primary">&#43; Add</a>
+                        <a href="{{ url()->previous() }}" class="btn btn-secondary">
+                            ← Back
+                        </a>
                     </div>
                 </div>
                 <div class="mt-2">
@@ -141,7 +143,7 @@
                                         <label for="show_on_pyq">Show on PYQ</label>
                                     </div>
                                 </div>
-                               <div class="col-md-6" id="mcq_question_form" style="display:none;">
+                                <div class="col-md-6" id="mcq_question_form" style="display:none;">
 
                                     <div class="question-count form-group">
                                         <h4>Question 1</h4>
@@ -323,7 +325,8 @@
                                 </div>
                                 <div id="question-clone"></div>
                                 <div class="col-md-12 d-flex justify-content-end mt-2" id="add-more-btn-dv">
-                                    <button type="button" id="add-more" class="btn btn-secondary mb-3" style="display:none;">Add More</button>
+                                    <button type="button" id="add-more" class="btn btn-secondary mb-3"
+                                        style="display:none;">Add More</button>
                                 </div>
                             </div>
                             <hr>
@@ -479,7 +482,7 @@
 
     </script>
 
-     <script>
+    <script>
         document.addEventListener('DOMContentLoaded', function () {
 
             /* =========================================================

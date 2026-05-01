@@ -16,7 +16,9 @@
                         </h6>
                     </div>
                     <div class="justify-content-end">
-                        <a href="{{ route('teacher.question.bank.index') }}" class="btn btn-primary">Back</a>
+                        <a href="{{ url()->previous() }}" class="btn btn-secondary">
+                            ← Back
+                        </a>
                     </div>
                 </div>
 

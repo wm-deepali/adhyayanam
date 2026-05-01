@@ -12,7 +12,9 @@
                     <h5 class="card-title">Edit Question</h5>
                     <h6 class="card-subtitle text-muted">Edit question details here</h6>
                 </div>
-                <a href="{{ route('question.bank.create') }}" class="btn btn-primary">+ Add</a>
+                <a href="{{ url()->previous() }}" class="btn btn-secondary">
+                    ← Back
+                </a>
             </div>
 
             @include('layouts.includes.messages')
@@ -385,6 +387,7 @@
 
 {{-- ================= CKEDITOR ================= --}}
 <script src="https://cdn.ckeditor.com/4.16.2/full/ckeditor.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 
 <script>
@@ -507,28 +510,32 @@ document.getElementById('add-sub-question')?.addEventListener('click', function 
 
     const container = document.getElementById('story-sub-questions');
     const last = container.querySelector('.sub-question-block:last-child');
+
     const clone = last.cloneNode(true);
 
-    /* CLEAR VALUES */
+    // ✅ Clear values
     clone.querySelectorAll('textarea').forEach(el => el.value = '');
     clone.querySelectorAll('select').forEach(el => el.selectedIndex = 0);
 
-    /* RESET ID */
+    // ✅ Reset hidden id
     const idInput = clone.querySelector('input[name="sub_question_id[]"]');
     if (idInput) idInput.value = '';
 
-    /* DESTROY OLD CKEDITOR INSTANCES */
+    // ✅ IMPORTANT: Remove CKEditor UI wrappers from clone
+    clone.querySelectorAll('.cke').forEach(el => el.remove());
+
+    // ✅ Remove old IDs from clone ONLY
     clone.querySelectorAll('textarea.editor').forEach(el => {
-        if (el.id && CKEDITOR.instances[el.id]) {
-            CKEDITOR.instances[el.id].destroy(true);
-        }
         el.removeAttribute('id');
     });
 
     container.appendChild(clone);
-    clone.querySelectorAll('textarea.editor').forEach(initEditor);
-});
 
+    // ✅ Initialize editor ONLY for clone
+    setTimeout(() => {
+        clone.querySelectorAll('textarea.editor').forEach(initEditor);
+    }, 50);
+});
 
 /* =====================================================
    REMOVE SUB QUESTION

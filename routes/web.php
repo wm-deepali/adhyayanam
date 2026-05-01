@@ -523,6 +523,7 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
         // CURRENT AFFAIRS - TOPIC
         Route::prefix('current-affairs/topic')->name('current.affairs.topic.')->group(function () {
             Route::get('/', [ContentManagementController::class, 'topicIndex'])->name('index')->middleware('custom.permission:manage_ca_categories');
+            Route::get('/view/{id}', [ContentManagementController::class, 'topicView'])->name('view')->middleware('custom.permission:manage_ca_categories');
             Route::post('/store', [ContentManagementController::class, 'topicStore'])->name('store')->middleware('custom.permission:manage_ca_categories_add');
             Route::put('/update/{id}', [ContentManagementController::class, 'topicUpdate'])->name('update')->middleware('custom.permission:manage_ca_categories_edit');
             Route::delete('/delete/{id}', [ContentManagementController::class, 'topicDelete'])->name('delete')->middleware('custom.permission:manage_ca_categories_delete');

@@ -860,6 +860,7 @@ class TestController extends Controller
 
     public function download($id)
     {
+        set_time_limit(120); // 🔥 increase execution time
         ini_set('memory_limit', '256M');
 
         $paper = Test::with([
@@ -871,12 +872,22 @@ class TestController extends Controller
             'chapter:id,name',
             'testDetails.question'
         ])->findOrFail($id);
+        $logoPath = public_path('images/Neti-logo.png');
 
-        $pdf = PDF::loadView('test-paper.pdf-view', compact('paper'))
+        $logoBase64 = null;
+
+        if (file_exists($logoPath)) {
+            $type = pathinfo($logoPath, PATHINFO_EXTENSION);
+            $data = file_get_contents($logoPath);
+
+            $logoBase64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+        }
+
+        $pdf = PDF::loadView('test-paper.pdf-view', compact('paper', 'logoBase64'))
             ->setOptions([
                 'dpi' => 72,
                 'isHtml5ParserEnabled' => true,
-                'isRemoteEnabled' => false
+                'isRemoteEnabled' => true
             ]);
 
         return $pdf->stream($paper->name . '.pdf');

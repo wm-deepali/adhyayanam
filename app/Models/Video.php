@@ -39,7 +39,8 @@ class Video extends Model
         'status',
         'support',
         'no_of_times_can_view',
-        'created_by'
+        'created_by',
+        'show_assignment'
     ];
 
 
@@ -100,4 +101,5 @@ class Video extends Model
     {
         return $this->belongsTo(User::class, 'created_by');
     }
+    
 }

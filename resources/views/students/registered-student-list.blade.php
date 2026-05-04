@@ -92,24 +92,65 @@
                   </td>
 
                   <td>
-                    <div class="d-flex gap-2">
+                    <div class="dropdown">
+                      <button class="btn btn-primary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        Actions
+                      </button>
+
+                      <ul class="dropdown-menu">
+
+                        {{-- Change Password --}}
+                        @if(\App\Helpers\Helper::canAccess('manage_students_edit'))
+                          <li>
+                            <a class="dropdown-item" href="{{ route('students.change-password', $res->id) }}">
+                              🔒 Change Password
+                            </a>
+                          </li>
+                        @endif
+
+                        {{-- View Profile --}}
+                        <li>
+                          <a class="dropdown-item" href="{{ route('students.student-profile-detail', $res->id) }}">
+                            👤 View Details
+                          </a>
+                        </li>
+
+                        {{-- View Orders --}}
+                        <li>
+                          <a class="dropdown-item" href="{{ route('students.view-all-orders', $res->id) }}">
+                            🛒 View Orders
+                          </a>
+                        </li>
+
+                        <li>
+                          <hr class="dropdown-divider">
+                        </li>
+
+                        {{-- Test Series --}}
+                        <li>
+                          <a class="dropdown-item" href="{{ route('admin.results.all') }}?student_id={{ $res->id }}">
+                            📝 Tests
+                          </a>
+                        </li>
 
 
-                      @if(\App\Helpers\Helper::canAccess('manage_students_edit'))
-                        <a href="{{ route('students.change-password', $res->id) }}" title="Change Password">
-                          <i class="fa fa-user-lock"></i>
-                        </a>
-                      @endif
-                      {{-- View Details --}}
-                      <a href="{{ route('students.student-profile-detail', $res->id) }}" title="View Details">
-                        <i class="fa fa-user"></i>
-                      </a>
+                        {{-- Study Material --}}
+                        <li>
+                          <a class="dropdown-item"
+                            href="{{ route('students.study-material.list', ['student_id' => $res->id]) }}">
+                            📄 Study Material
+                          </a>
+                        </li>
 
-                      {{-- View Orders --}}
-                      <a href="{{ route('students.view-all-orders', $res->id) }}" title="View Orders">
-                        <i class="fa fa-shopping-cart"></i>
-                      </a>
+                        {{-- Videos --}}
+                        <li>
+                          <a class="dropdown-item"
+                            href="{{ route('students.student-videos-list') }}?student_id={{ $res->id }}">
+                            🎥 Videos
+                          </a>
+                        </li>
 
+                      </ul>
                     </div>
                   </td>
                 </tr>

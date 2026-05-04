@@ -124,11 +124,10 @@ class VideoController extends Controller
         $validator = Validator::make($requestData, $rules);
 
         if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'code' => 422,
-                'errors' => $validator->errors(),
-            ]);
+          return response()->json([
+    'success' => false,
+    'errors' => $validator->errors(),
+], 422); // 🔥 THIS IS THE FIX
         }
 
         /*
@@ -149,7 +148,7 @@ class VideoController extends Controller
                     'subject_id' => $request->subject_id,
                     'chapter_id' => $request->chapter_id,
                     'topic_id' => $request->topic_id,
-
+                    'show_assignment' => isset($request->show_assignment[$i]) ? 1 : 0,
                     'title' => $title,
                     'slug' => $request->video_slug[$i] ?? null,
                     'access_till' => $request->access_till,
@@ -217,6 +216,10 @@ class VideoController extends Controller
                     'live_link' => $request->live_link[$i] ?? null,
                     'status' => $request->live_status[$i] ?? 'active',
                     'content' => $request->live_content[$i] ?? null,
+
+                    // 🔥 ADD THIS
+                    'show_assignment' => isset($request->show_assignment[$i]) ? 1 : 0,
+
                     'created_by' => auth()->id(),
                 ];
 
@@ -361,7 +364,7 @@ class VideoController extends Controller
                 'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
 
                 // Assignment & Solution FILES
-                'video_assignment_file' => 'nullable|file|mimes:pdf,doc,docx|max:5120',
+                'video_assignment_file' => 'nullable|file|mimes:pdf,doc,docx|max:5',
                 'video_solution_file' => 'nullable|file|mimes:pdf,doc,docx|max:5120',
                 'live_assignment_file' => 'nullable|file|mimes:pdf,doc,docx|max:5120',
                 'live_solution_file' => 'nullable|file|mimes:pdf,doc,docx|max:5120',
@@ -691,4 +694,12 @@ class VideoController extends Controller
         ]);
     }
 
+    public function toggleAssignment(Request $request, $id)
+    {
+        $video = Video::findOrFail($id);
+        $video->show_assignment = $request->show_assignment;
+        $video->save();
+
+        return response()->json(['success' => true]);
+    }
 }

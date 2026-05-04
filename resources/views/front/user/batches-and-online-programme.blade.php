@@ -66,13 +66,40 @@
         @endforeach
         
         <div class="col-12">
-          <ul class="styled-pagination">
-            <li><a href="#" class="active">1</a></li>
-            <li><a href="#">2</a></li>
-            <li><a href="#">3</a></li>
-            <li class="next"><a href="#"><span class="flaticon-arrow-pointing-to-right"></span></a></li>
-          </ul>
-        </div>
+    <ul class="styled-pagination">
+
+        {{-- Previous --}}
+        @if ($batches->onFirstPage())
+            <li class="disabled"><span>&laquo;</span></li>
+        @else
+            <li>
+                <a href="{{ $batches->previousPageUrl() }}">&laquo;</a>
+            </li>
+        @endif
+
+        {{-- Page Numbers --}}
+        @foreach ($batches->getUrlRange(1, $batches->lastPage()) as $page => $url)
+            <li>
+                <a href="{{ $url }}"
+                   class="{{ $page == $batches->currentPage() ? 'active' : '' }}">
+                    {{ $page }}
+                </a>
+            </li>
+        @endforeach
+
+        {{-- Next --}}
+        @if ($batches->hasMorePages())
+            <li class="next">
+                <a href="{{ $batches->nextPageUrl() }}">
+                    <span class="flaticon-arrow-pointing-to-right"></span>
+                </a>
+            </li>
+        @else
+            <li class="disabled"><span>&raquo;</span></li>
+        @endif
+
+    </ul>
+</div>
 
 
       </div>

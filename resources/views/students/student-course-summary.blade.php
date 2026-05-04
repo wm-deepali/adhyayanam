@@ -75,23 +75,29 @@
 
                                     {{-- ACTIONS --}}
                                     <td>
-                                        <div class="d-flex gap-2">
-                                            {{-- View Student --}}
-                                            @if(!empty($res->id))
-                                                <a href="{{ route('students.student-profile-detail', $res->id) }}"
-                                                    title="View Student">
-                                                    <i class="fa fa-user-graduate"></i>
-                                                </a>
-                                            @endif
+                                        <div class="dropdown">
+                                            <button class="btn btn-primary btn-sm dropdown-toggle" type="button"
+                                                data-bs-toggle="dropdown">
+                                                Actions
+                                            </button>
+                                            <ul class="dropdown-menu">
 
+                                                {{-- View Profile --}}
+                                                <li>
+                                                    <a class="dropdown-item"
+                                                        href="{{ route('students.student-profile-detail', $res->id) }}">
+                                                        👤 View Details
+                                                    </a>
+                                                </li>
 
-                                            {{-- View Course Detail --}}
-                                            @if(!empty($res->course_id))
-                                                <a href="{{ route('students.student-course-detail', [$res->id, $res->course_id]) }}"
-                                                    title="View Course Detail">
-                                                    <i class="fa fa-eye"></i>
-                                                </a>
-                                            @endif
+                                                <li>
+                                                    <a class="dropdown-item"
+                                                        href="{{ route('order.course-orders') }}?student_id={{ $res->id }}">
+                                                        🛒 View Course Orders
+                                                    </a>
+                                                </li>
+
+                                            </ul>
                                         </div>
                                     </td>
                                 </tr>

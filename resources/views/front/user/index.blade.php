@@ -1960,11 +1960,11 @@
 			font-size: 1rem !important;
 			padding: 0.5rem 1.5rem !important;
 		}
-		.mobilemargin{
-		    margin-top:15px;
+
+		.mobilemargin {
+			margin-top: 15px;
 		}
 	}
-	
 </style>
 
 @section('content')
@@ -2138,185 +2138,6 @@
 		</section>
 		<!-- End Intro Section  -->
 
-		<!-- Start Courses Section  -->
-		<!--<section class="course-page-section osd">-->
-		<!--	<div class="container" style="padding:30px;">-->
-
-		<!--		<div class="row clearfix">-->
-		<!--			<div class="col-12">-->
-		<!--				<div class="sec-title centered">-->
-		<!--					<h2 class="main-heading">{{ $pageContent['courses'] ?? 'Courses We Offers' }}</h2>-->
-		<!--					<p class="sub-heading">-->
-		<!--						{{ $pageSubContent['courses'] ?? "Get unlimited access to the most relevant Mock Tests, on India's Structured Online Test series platform"}}-->
-
-		<!--					</p>-->
-		<!--				</div>-->
-		<!--			</div>-->
-
-		<!--			<div class="newtab-wrapper">-->
-		<!--				<ul class="newtab-menu">-->
-		<!--					<li class="newtab-item active" data-tab="all">All Courses</li>-->
-		<!--					@foreach($commissions as $commission)-->
-		<!--						<li class="newtab-item" data-tab="{{ strtolower($commission->slug ?? $commission->id) }}">-->
-		<!--							{{ $commission->name }}-->
-		<!--						</li>-->
-		<!--					@endforeach-->
-
-		<!--				</ul>-->
-		<!--			</div>-->
-		<!--			@foreach($courses as $course)-->
-		<!--				<div class="edu-course-card col-xl-3 col-lg-6 col-md-6 sm-12"-->
-		<!--					data-commission="{{ strtolower($course->examinationCommission->slug ?? $course->examinationCommission->id) }}">-->
-		<!--					<div class="edu-card">-->
-		<!--						<div class="edu-card-image">-->
-		<!--							<a href="{{ route('courses.detail', $course->id) }}" class="block">-->
-		<!--								<img src="{{ url('storage/' . $course->thumbnail_image) }}"-->
-		<!--									alt="{{ $course->image_alt_tag }}" class="edu-thumbnail">-->
-		<!--							</a>-->
-		<!--						</div>-->
-
-		<!--						<div class="edu-card-body">-->
-		<!--							<div class="edu-meta">-->
-		<!--								<div class="edu-duration">-->
-		<!--									<span class="icon flaticon-hourglass"></span>-->
-		<!--									{{ $course->duration }} Week-->
-		<!--								</div>-->
-
-		<!--								<div class="edu-price">₹{{ $course->offered_price }}</div>-->
-		<!--							</div>-->
-		<!--							<p class="commission-name">{{$course->examinationCommission->name}}</p>-->
-
-		<!--							<h3 class="edu-title">-->
-		<!--								<a href="{{ route('courses.detail', $course->id) }}">{{ $course->name }}</a>-->
-		<!--							</h3>-->
-
-		<!--							<p class="edu-description">{{ $course->course_heading }}</p>-->
-
-		<!--							<div class="edu-actions">-->
-
-		<!--								<a href="{{ route('courses.detail', $course->id) }}" class="edu-btn edu-btn-outline"-->
-		<!--									style="width: 100%;-->
-		<!--																																																																																																											display: flex;-->
-		<!--																																																																																																											justify-content: center;-->
-		<!--																																																																																																											text-align: center;-->
-		<!--																																																																																																										">-->
-		<!--									View Details-->
-		<!--									<span class="arrow-icon flaticon-arrow-pointing-to-right"></span>-->
-		<!--								</a>-->
-		<!--							</div>-->
-		<!--						</div>-->
-		<!--					</div>-->
-		<!--				</div>-->
-		<!--			@endforeach-->
-		<!--			<div class="col-12">-->
-		<!--				<div class="button-box">-->
-		<!--					<a href="{{route('courses')}}" class="theme-btn btn-style-three"><span class="txt">View-->
-		<!--							All</span></a>-->
-		<!--				</div>-->
-		<!--			</div>-->
-
-		<!--		</div>-->
-		<!--	</div>-->
-		<!--</section>-->
-		{{-- <section class="course-page-section osd py-5 bg-white">
-			<div class="container" style="padding:15px;">
-				<div class="sec-title text-center mb-5">
-					<h2 class="main-heading">{{ $pageContent['courses'] ?? 'Courses We Offers' }}</h2>
-					<p class="sub-heading">
-						{{ $pageSubContent['courses'] ?? "Get unlimited access to the most relevant Mock Tests, on India's
-						Structured Online Test series platform" }}
-					</p>
-				</div>
-				<div class="mat-main-card shadow-lg rounded-4 overflow-hidden border border-light bg-white">
-					<div class="row g-0">
-						<!-- LEFT SIDEBAR: Commissions -->
-						<div class="col-lg-3 mat-sidebar border-end bg-white shadow-sm rounded-start">
-							<div class="p-4">
-								<h5 class="fw-bold mb-4 text-start text-black">Examination Commission</h5>
-								<hr>
-								<div class="nav flex-column nav-pills gap-2" id="commissionTabsCourses" role="tablist"
-									aria-orientation="vertical">
-									@foreach($commissions as $index => $commission)
-									<button
-										class="mat-category-btn nav-link w-100 text-start py-3 px-4 {{ $index == 0 ? 'active' : '' }}"
-										data-bs-toggle="pill" data-bs-target="#commission-courses-{{ $commission->id }}"
-										type="button" data-commission-id="{{ $commission->id }}">
-										{{ $commission->name }}
-									</button>
-									@endforeach
-								</div>
-							</div>
-						</div>
-
-						<!-- RIGHT CONTENT -->
-						<div class="col-lg-9">
-							<div class="p-4 bg-white ">
-								<!-- Sub-Category Tabs -->
-								<ul class="nav nav-pills mb-4 gap-3 flex-nowrap overflow-auto" id="subCategoryTabsCourses">
-									<!-- "All" tab by default -->
-									<li class="nav-item">
-										<button class="btn btn-outline-secondary btn-sm11 active" data-category="all">
-											All Courses
-										</button>
-									</li>
-									<!-- Sub-categories will be dynamically added here via JS -->
-								</ul>
-
-								<!-- All Courses Cards (filtered by JS) -->
-								<div class="row g-1 g-md-4 courses-grid">
-									@foreach($courses as $course)
-									<div class="edu-course-card col-xl-4 col-lg-6 col-md-6 col-sm-12"
-										data-commission="{{ strtolower($course->examinationCommission->slug ?? $course->examinationCommission->id) }}"
-										data-category="{{ $course->category_id ?? 'all' }}"
-										data-category-name="{{ addslashes($course->category->name ?? 'Unknown') }}">
-										<div class="edu-card">
-											<div class="edu-card-image">
-												<a href="{{ route('courses.detail', $course->id) }}" class="block">
-													<img src="{{ url('storage/' . $course->thumbnail_image) }}"
-														alt="{{ $course->image_alt_tag }}" class="edu-thumbnail">
-												</a>
-											</div>
-											<div class="edu-card-body">
-												<div class="edu-meta">
-													<div class="edu-duration">
-														<span class="icon flaticon-hourglass"></span>
-														{{ $course->duration }} Week
-													</div>
-													<div class="edu-price">₹{{ $course->offered_price }}</div>
-												</div>
-												<p class="commission-name">{{ $course->examinationCommission->name }}</p>
-												<h3 class="edu-title">
-													<a href="{{ route('courses.detail', $course->id) }}">{{ $course->name
-														}}</a>
-												</h3>
-												<p class="edu-description">{{ $course->course_heading }}</p>
-												<div class="edu-actions">
-													<a href="{{ route('courses.detail', $course->id) }}"
-														class="edu-btn edu-btn-outline"
-														style="width: 100%; display: flex; justify-content: center; text-align: center;">
-														View Details
-														<span class="arrow-icon flaticon-arrow-pointing-to-right"></span>
-													</a>
-												</div>
-											</div>
-										</div>
-									</div>
-									@endforeach
-								</div>
-
-								<!-- View All Button -->
-								<div class="text-center mt-5">
-									<a href="{{ route('courses') }}"
-										class="newtestseries-all-btn btn btn-outline-primary btn-lg px-5 py-3 rounded-pill d-lg-inline-block d-md-inline-block d-sm-block btn-mobile-sm">
-										View All Courses
-									</a>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</section> --}}
 
 		<!-- Start Courses Section -->
 		<section class="course-page-section osd py-5 bg-white">
@@ -2678,112 +2499,6 @@
 		</section>
 		<!-- End Current Affairs Section  -->
 
-		<!-- Start Test Series Section -->
-		<!--<section class="newtestseries-section py-5 bg-light">-->
-		<!--	<div class="container">-->
-		<!-- Section Title -->
-		<!--		<div class="sec-title text-center mb-5">-->
-		<!--			<h2 class="main-heading">{{ $pageContent['test_series'] ?? 'Our Test Series' }}</h2>-->
-		<!--			<p class="sub-heading text-center">-->
-		<!--				{{ $pageSubContent['test_series'] ?? "Unlimited Access to High-Quality Mock Tests Designed for UPSC, SSC, Banking, Railways, State PCS& All Major Exams"}}-->
-		<!--			</p>-->
-
-		<!--		</div>-->
-		<!--		<div class="newtab-wrapper">-->
-		<!--			<ul class="newtab-menu">-->
-
-		<!--				<li class="newtab-item active" data-tab="all">All Test Series</li>-->
-
-		<!--				@foreach($commissions as $commission)-->
-		<!--					<li class="newtab-item" data-tab="{{ strtolower($commission->slug ?? $commission->id) }}">-->
-		<!--						{{ $commission->name }}-->
-		<!--					</li>-->
-		<!--				@endforeach-->
-
-		<!--			</ul>-->
-		<!--		</div>-->
-		<!-- Cards Grid -->
-		<!--		<div class="row g-4">-->
-		<!--			@foreach($testSeries as $data)-->
-		<!--				<div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 testseries-card"-->
-		<!--					data-commission="{{ strtolower($data->commission->slug ?? $data->commission->id) }}">-->
-
-		<!--					<div class="newtestseries-card rounded-4 shadow-sm h-100 overflow-hidden position-relative"-->
-		<!--						style="background: linear-gradient(135deg, {{ $loop->index % 3 == 0 ? '#e6f0ff' : ($loop->index % 3 == 1 ? '#eaffea' : '#f3e6ff') }}, #ffffff); border: 1px solid #e0e0e0;">-->
-		<!--						<div class="newtestseries-card-inner p-3 d-flex flex-column h-100">-->
-
-		<!-- Logo with white frame -->
-		<!--							<div class="newtestseries-logo-wrapper text-center mb-2">-->
-		<!--								<div class="newtestseries-logo-frame   border-5 border-white  mx-auto">-->
-		<!--									<img src="{{ url('storage/' . $data->logo) }}" alt="{{ $data->title }}" class=""-->
-		<!--										style="width: 100%; height: 100%; object-fit: cover;" />-->
-		<!--								</div>-->
-		<!--							</div>-->
-
-		<!-- Test Series Name -->
-		<!--							<h4 class="newtestseries-title fw-bold text-start mb-1 text-dark">-->
-		<!--								{{ $data->title }}-->
-		<!--							</h4>-->
-
-		<!-- Divider -->
-		<!--<hr class="newtestseries-divider mx-auto my-3" style="width: 60%; border-top: 2px solid #dee2e6;">-->
-
-		<!-- Test Count Line -->
-		<!--							<div-->
-		<!--								class="newtestseries-test-count d-flex justify-content-between align-items-center mb-2 ">-->
-		<!--								<span class="newtestseries-count-left fw-medium text-primary">-->
-		<!--									{{ count($data->testseries)}} Test-->
-		<!--									<span class="newtestseries-free text-success ms-1">| @if($data->fee_type == 'paid')-->
-		<!--									Premium @else Free @endif-->
-		<!--										Free</span>-->
-		<!--								</span>-->
-		<!--								<span class="newtestseries-count-right small text-muted">-->
-		<!--									Available Now-->
-		<!--								</span>-->
-		<!--							</div>-->
-
-		<!-- Table-like Features -->
-		<!--							<div class="newtestseries-features mb-4 flex-grow-1">-->
-		<!--								<div-->
-		<!--									class="newtestseries-feature-row d-flex justify-content-between py-2 border-bottom">-->
-		<!--									<span class="newtestseries-label">Chapter Test</span>-->
-		<!--									<span class="newtestseries-value fw-medium">{{$data->testseries->where('type_name', 'Chapter Test')->count()}}</span>-->
-		<!--								</div>-->
-		<!--								<div-->
-		<!--									class="newtestseries-feature-row d-flex justify-content-between py-2 border-bottom">-->
-		<!--									<span class="newtestseries-label">Current Affairs</span>-->
-		<!--									<span class="newtestseries-value fw-medium">{{$data->testseries->where('type_name', 'Current Affairs')->count()}}</span>-->
-		<!--								</div>-->
-		<!--								<div class="newtestseries-feature-row d-flex justify-content-between py-2">-->
-		<!--									<span class="newtestseries-label">Subject Test</span>-->
-		<!--									<span class="newtestseries-value fw-medium">{{$data->testseries->where('type_name', 'Subject Wise')->count()}}</span>-->
-		<!--								</div>-->
-		<!--							</div>-->
-
-		<!-- View Button -->
-		<!--							<div class="mt-auto">-->
-		<!--								<a href=""-->
-		<!--									class="newtestseries-view-btn btn  w-100 py-2 fw-medium d-flex align-items-center justify-content-center gap-2">-->
-		<!--									<i class="bi bi-arrow-right-circle"></i>-->
-		<!--									View Test Series-->
-		<!--								</a>-->
-		<!--							</div>-->
-		<!--						</div>-->
-		<!--					</div>-->
-		<!--				</div>-->
-		<!--			@endforeach-->
-		<!--		</div>-->
-
-		<!-- View All Button -->
-		<!--		<div class="text-center mt-5">-->
-		<!--			<a href="{{ route('test-series-list') }}"-->
-		<!--				class="newtestseries-all-btn btn btn-outline-primary btn-lg px-5 py-3 rounded-pill">-->
-		<!--				View All Test Series-->
-		<!--			</a>-->
-		<!--		</div>-->
-		<!--	</div>-->
-		<!--</section>-->
-		<!-- End Test Series Section -->
 
 		<!-- Start Test Series Section -->
 		<section class="newtestseries-section py-5 bg-light">
@@ -3011,282 +2726,6 @@
 		</section>
 		<!-- End Test Series Section -->
 
-		{{-- <section class="newtestseries-section py-5 bg-light">
-			<div class="container">
-				<!-- Section Title -->
-				<div class="sec-title text-center mb-5">
-					<h2 class="main-heading">{{ $pageContent['test_series'] ?? 'Our Test Series' }}</h2>
-					<p class="sub-heading text-center">
-						{{ $pageSubContent['test_series'] ?? "Unlimited Access to High-Quality Mock Tests Designed for UPSC,
-						SSC, Banking, Railways, State PCS & All Major Exams" }}
-					</p>
-				</div>
-				<div class="mat-main-card shadow-lg rounded-4 overflow-hidden border border-light bg-white">
-					<div class="row g-0">
-						<!-- LEFT SIDEBAR: Commissions -->
-						<div class="col-lg-3 mat-sidebar border-end bg-white shadow-sm rounded-start">
-							<div class="p-4">
-								<h5 class="fw-bold mb-4 text-start text-black">Examination Commission</h5>
-								<hr>
-								<div class="nav flex-column nav-pills gap-2" id="commissionTabs" role="tablist"
-									aria-orientation="vertical">
-									@foreach($commissions as $index => $commission)
-									<button
-										class="mat-category-btn nav-link w-100 text-start py-3 px-4 {{ $index == 0 ? 'active' : '' }}"
-										data-bs-toggle="pill" data-bs-target="#commission-{{ $commission->id }}"
-										type="button" data-commission-id="{{ $commission->id }}">
-										{{ $commission->name }}
-									</button>
-									@endforeach
-								</div>
-							</div>
-						</div>
-
-						<!-- RIGHT CONTENT -->
-						<div class="col-lg-9">
-							<!-- Sub-Category Tabs (dynamically updated) -->
-							<div class="p-4 bg-white shadow-sm rounded-end">
-								<ul class="nav nav-pills mb-4 gap-3 flex-nowrap overflow-auto" id="subCategoryTabs">
-									<!-- "All" tab by default -->
-									<li class="nav-item">
-										<button class="btn btn-outline-secondary btn-sm11 active" data-category="all">
-											All
-										</button>
-									</li>
-									<!-- Sub-categories will be injected here via JS -->
-								</ul>
-
-								<!-- Cards Grid -->
-								<div class="row g-4 testseries-grid">
-									@foreach($testSeries as $data)
-									<div class="col-xl-4 col-lg-6 col-md-6 col-sm-12 testseries-card"
-										data-commission="{{ strtolower($data->commission->slug ?? $data->commission->id) }}"
-										data-category="{{ $data->category_id ?? 'all' }}">
-										<!-- SAME CARD DESIGN AS ORIGINAL -->
-										<div class="newtestseries-card rounded-4 shadow-sm h-100 overflow-hidden position-relative"
-											style="background: linear-gradient(135deg, {{ $loop->index % 3 == 0 ? '#e6f0ff' : ($loop->index % 3 == 1 ? '#eaffea' : '#f3e6ff') }}, #ffffff); border: 1px solid #e0e0e0;">
-											<div class="newtestseries-card-inner p-3 d-flex flex-column h-100">
-												<!-- Logo -->
-												<div class="newtestseries-logo-wrapper text-center mb-2">
-													<div class="newtestseries-logo-frame border-5 border-white mx-auto">
-														<img src="{{ url('storage/' . $data->logo) }}"
-															alt="{{ $data->title }}" class="w-100 h-100 object-cover">
-													</div>
-												</div>
-												<!-- Title -->
-												<h4 class="newtestseries-title fw-bold text-start mb-1 text-dark">
-													{{ $data->title }}
-												</h4>
-												<!-- Test Count -->
-												<div
-													class="newtestseries-test-count d-flex justify-content-between align-items-center mb-2">
-													<span class="newtestseries-count-left fw-medium text-primary">
-														{{ count($data->testseries) }} Test
-														<span class="newtestseries-free text-success ms-1">
-															| {{ $data->fee_type == 'paid' ? 'Premium' : 'Free' }}
-														</span>
-													</span>
-													<span class="newtestseries-count-right small text-muted">Available
-														Now</span>
-												</div>
-												<!-- Features Table -->
-												<div class="newtestseries-features mb-4 flex-grow-1">
-													<div
-														class="newtestseries-feature-row d-flex justify-content-between py-2 border-bottom">
-														<span class="newtestseries-label">Chapter Test</span>
-														<span class="newtestseries-value fw-medium">
-															{{ $data->testseries->where('type_name', 'Chapter
-															Test')->count() }}
-														</span>
-													</div>
-													<div
-														class="newtestseries-feature-row d-flex justify-content-between py-2 border-bottom">
-														<span class="newtestseries-label">Current Affairs</span>
-														<span class="newtestseries-value fw-medium">
-															{{ $data->testseries->where('type_name', 'Current
-															Affairs')->count() }}
-														</span>
-													</div>
-													<div
-														class="newtestseries-feature-row d-flex justify-content-between py-2">
-														<span class="newtestseries-label">Subject Test</span>
-														<span class="newtestseries-value fw-medium">
-															{{ $data->testseries->where('type_name', 'Subject
-															Wise')->count() }}
-														</span>
-													</div>
-												</div>
-												<!-- View Button -->
-												<div class="mt-auto">
-													<a href="{{ route('test-series-detail' ,$data->slug) }}"
-														class="newtestseries-view-btn btn w-100 py-2 fw-medium d-flex align-items-center justify-content-center gap-2">
-														<i class="bi bi-arrow-right-circle"></i>
-														View Test Series
-													</a>
-												</div>
-											</div>
-										</div>
-									</div>
-									@endforeach
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-				<!-- View All Button -->
-				<div class="text-center mt-5">
-					<a href="{{ route('test-series-list') }}"
-						class="newtestseries-all-btn btn btn-outline-primary btn-lg px-5 py-3 rounded-pill">
-						View All Test Series
-					</a>
-				</div>
-			</div>
-		</section>--}}
-		<!-- Start Study Materials  -->
-		{{-- <section class="mat-study-materials py-5 bg-white">
-			<div class="container" style="padding:30px;">
-				<div class="text-center mb-5">
-					<h2 class="main-heading">{{ $pageContent['study_material'] ?? 'Our Study Materials' }}</h2>
-					<p class="sub-heading">
-						{{ $pageSubContent['study_material'] ?? "Get unlimited access to the most relevant Mock Tests, on
-						India's Structured Online Test series platform"}}
-
-					</p>
-				</div>
-
-				<div class="mat-main-card shadow-lg rounded-4 overflow-hidden border border-light bg-white">
-					<div class="row g-0">
-
-						<!-- LEFT SIDEBAR: Main Categories -->
-						<div class="col-lg-3 mat-sidebar border-end">
-							<div class="p-4">
-								<h5 class="fw-bold mb-4 text-start text-black">Examination Commission</h5>
-								<hr>
-								<div div class="nav flex-column nav-pills gap-2" id="matMainPills" role="tablist"
-									aria-orientation="vertical">
-									@foreach($commissions as $index => $commission)
-									<button
-										class="mat-category-btn nav-link w-100 text-start py-3 px-4 {{ $index == 0 ? 'active' : '' }}"
-										data-bs-toggle="pill" data-bs-target="#commission-{{ $commission->id }}"
-										type="button">
-
-										{{ $commission->name }}
-
-									</button>
-									@endforeach
-								</div>
-							</div>
-						</div>
-
-						<!-- RIGHT CONTENT -->
-						<div class="col-lg-9">
-							<div class="tab-content p-4" id="matMainTabContent">
-
-								@foreach($commissions as $cIndex => $commission)
-								<div class="tab-pane fade {{ $cIndex == 0 ? 'show active' : '' }}"
-									id="commission-{{ $commission->id }}">
-
-									<!-- CATEGORY TABS -->
-									<ul class="nav nav-pills mb-4 gap-2">
-										@foreach($commission->categories as $index => $category)
-										<li class="nav-item">
-											<button
-												class="btn btn-outline-secondary btn-sm11 {{ $index == 0 ? 'active' : '' }}"
-												data-bs-toggle="pill"
-												data-bs-target="#cat-{{ $commission->id }}-{{ $category->id }}">
-												{{ $category->name }}
-											</button>
-										</li>
-										@endforeach
-									</ul>
-
-									<hr>
-
-									<!-- CATEGORY CONTENT -->
-									<div class="tab-content">
-
-										@foreach($commission->categories as $index => $category)
-										<div class="tab-pane fade {{ $index == 0 ? 'show active' : '' }}"
-											id="cat-{{ $commission->id }}-{{ $category->id }}">
-
-											<div class="row g-4">
-
-												@foreach($studyMaterial[$commission->id] ?? [] as $material)
-
-												@if($material->category_id == $category->id)
-
-												<div class="edu-course-card col-xl-4 col-lg-6 col-md-6 sm-12"
-													data-commission="{{ $commission->id }}"
-													data-category="{{ $material->category_id ?? 'all' }}"
-													data-category-name="{{ addslashes($category->name) }}">
-
-													<div class="edu-card">
-														<div class="edu-card-image">
-															<a href="{{ route('study.material.details', $material->id) }}"
-																class="block">
-																<img src="{{ url('storage/' . $material->banner) }}"
-																	alt="{{ $material->title }}" class="edu-thumbnail">
-															</a>
-														</div>
-
-														<div class="edu-card-body">
-															<div class="edu-meta">
-																<div class="edu-duration">
-																	{{ $material->is_pdf_downloadable ? 'Pdf Available' :
-																	''}}
-																</div>
-
-																<div class="edu-price">
-																	{{ $material->IsPaid ? '₹' . $material->price : 'Free'
-																	}}
-																</div>
-															</div>
-															<p class="commission-name">
-																{{$material->subcategory->name}}
-															</p>
-
-															<h3 class="edu-title">
-																<a
-																	href="{{ route('study.material.details', $material->id) }}">{{
-																	$material->title }}</a>
-															</h3>
-
-															<p class="edu-description">{{ $material->short_description }}
-															</p>
-
-															<div class="edu-actions">
-
-																<a href="{{ route('study.material.details', $material->id) }}"
-																	class="edu-btn edu-btn-outline"
-																	style="width: 100%;display: flex;justify-content: center; text-align: center;">
-																	View Details
-																	<span
-																		class="arrow-icon flaticon-arrow-pointing-to-right"></span>
-																</a>
-															</div>
-														</div>
-													</div>
-												</div>
-
-												@endif
-
-												@endforeach
-
-											</div>
-										</div>
-										@endforeach
-
-									</div>
-								</div>
-								@endforeach
-
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</section> --}}
-		<!-- End Study Materials  -->
 
 		<!-- Start Study Materials  -->
 		<section class="mat-study-materials py-5 bg-white">
@@ -3309,19 +2748,19 @@
 								<hr>
 								<div class="nav flex-column nav-pills gap-2" id="matMainPills" role="tablist"
 									aria-orientation="vertical">
-																		@foreach($commissions as $index => $commission)
-									<button
-										class="mat-category-btn nav-link w-100 text-start py-3 px-4 {{ $index == 0 ? 'active' : '' }}"
-										data-bs-toggle="pill" data-bs-target="#commission-{{ $commission->id }}"
-										type="button">
+									@foreach($commissions as $index => $commission)
+										<button
+											class="mat-category-btn nav-link w-100 text-start py-3 px-4 {{ $index == 0 ? 'active' : '' }}"
+											data-bs-toggle="pill" data-bs-target="#commission-{{ $commission->id }}"
+											type="button">
 
-										{{ $commission->name }}
+											{{ $commission->name }}
 
-									</button>
+										</button>
 									@endforeach
 								</div>
 							</div>
-							
+
 							<div class="mobile-all-study d-block d-lg-none p-4">
 								<div class="container">
 									<h5 class="fw-bold mb-3">All Study Materials</h5>
@@ -3401,106 +2840,114 @@
 							<div class="tab-content p-4" id="matMainTabContent">
 
 								@foreach($commissions as $cIndex => $commission)
-								<div class="tab-pane fade {{ $cIndex == 0 ? 'show active' : '' }}"
-									id="commission-{{ $commission->id }}">
+									<div class="tab-pane fade {{ $cIndex == 0 ? 'show active' : '' }}"
+										id="commission-{{ $commission->id }}">
 
-									<!-- CATEGORY TABS -->
-									<ul class="nav nav-pills mb-4 gap-2">
-										@foreach($commission->categories as $index => $category)
-										<li class="nav-item">
-											<button
-												class="btn btn-outline-secondary btn-sm11 {{ $index == 0 ? 'active' : '' }}"
-												data-bs-toggle="pill"
-												data-bs-target="#cat-{{ $commission->id }}-{{ $category->id }}">
-												{{ $category->name }}
-											</button>
-										</li>
-										@endforeach
-									</ul>
+										<!-- CATEGORY TABS -->
+										<ul class="nav nav-pills mb-4 gap-2">
+											@foreach($commission->categories as $index => $category)
+												<li class="nav-item">
+													<button
+														class="btn btn-outline-secondary btn-sm11 {{ $index == 0 ? 'active' : '' }}"
+														data-bs-toggle="pill"
+														data-bs-target="#cat-{{ $commission->id }}-{{ $category->id }}">
+														{{ $category->name }}
+													</button>
+												</li>
+											@endforeach
+										</ul>
 
-									<hr>
+										<hr>
 
-									<!-- CATEGORY CONTENT -->
-									<div class="tab-content">
+										<!-- CATEGORY CONTENT -->
+										<div class="tab-content">
 
-										@foreach($commission->categories as $index => $category)
-										<div class="tab-pane fade {{ $index == 0 ? 'show active' : '' }}"
-											id="cat-{{ $commission->id }}-{{ $category->id }}">
+											@foreach($commission->categories as $index => $category)
+												<div class="tab-pane fade {{ $index == 0 ? 'show active' : '' }}"
+													id="cat-{{ $commission->id }}-{{ $category->id }}">
 
-											<div class="row g-4">
+													<div class="row g-4">
 
-												@foreach($studyMaterial[$commission->id] ?? [] as $material)
+														@foreach($studyMaterial[$commission->id] ?? [] as $material)
 
-												@if($material->category_id == $category->id)
+															@if($material->category_id == $category->id)
 
-												<div class="edu-course-card col-xl-4 col-lg-6 col-md-6 sm-12"
-													data-commission="{{ $commission->id }}"
-													data-category="{{ $material->category_id ?? 'all' }}"
-													data-category-name="{{ addslashes($category->name) }}">
+																						<div class="edu-course-card col-xl-4 col-lg-6 col-md-6 sm-12"
+																							data-commission="{{ $commission->id }}"
+																							data-category="{{ $material->category_id ?? 'all' }}"
+																							data-category-name="{{ addslashes($category->name) }}">
 
-													<div class="edu-card">
-														<div class="edu-card-image">
-															<a href="{{ route('study.material.details', $material->id) }}"
-																class="block">
-																<img src="{{ url('storage/' . $material->banner) }}"
-																	alt="{{ $material->title }}" class="edu-thumbnail">
-															</a>
-														</div>
+																							<div class="edu-card">
+																								<div class="edu-card-image">
+																									<a href="{{ route('study.material.details', $material->id) }}"
+																										class="block">
+																										<img src="{{ url('storage/' . $material->banner) }}"
+																											alt="{{ $material->title }}" class="edu-thumbnail">
+																									</a>
+																								</div>
 
-														<div class="edu-card-body">
-															<div class="edu-meta">
-																<div class="edu-duration">
-																	{{ $material->is_pdf_downloadable ? 'Pdf Available' :
-																	''}}
-																</div>
+																								<div class="edu-card-body">
+																									<div class="edu-meta">
+																										<div class="edu-duration">
+																											{{ $material->is_pdf_downloadable ? 'Pdf Available' :
+																''}}
+																										</div>
 
-																<div class="edu-price">
-																	{{ $material->IsPaid ? '₹' . $material->price : 'Free'
-																	}}
-																</div>
-															</div>
-															<p class="commission-name">
-																{{$material->subcategory->name}}
-															</p>
+																										<div class="edu-price">
+																											{{ $material->IsPaid ? '₹' . $material->price : 'Free'
+																												}}
+																										</div>
+																									</div>
+																									<p class="commission-name">
+																										{{$material->subcategory->name}}
+																									</p>
 
-															<h3 class="edu-title">
-																<a
-																	href="{{ route('study.material.details', $material->id) }}">{{
-																	$material->title }}</a>
-															</h3>
+																									<h3 class="edu-title">
+																										<a
+																											href="{{ route('study.material.details', $material->id) }}">{{
+																$material->title }}</a>
+																									</h3>
 
-															<p class="edu-description">{{ $material->short_description }}
-															</p>
+																									<p class="edu-description">{{ $material->short_description }}
+																									</p>
 
-															<div class="edu-actions">
+																									<div class="edu-actions">
 
-																<a href="{{ route('study.material.details', $material->id) }}"
-																	class="edu-btn edu-btn-outline"
-																	style="width: 100%;display: flex;justify-content: center; text-align: center;">
-																	View Details
-																	<span
-																		class="arrow-icon flaticon-arrow-pointing-to-right"></span>
-																</a>
-															</div>
-														</div>
+																										<a href="{{ route('study.material.details', $material->id) }}"
+																											class="edu-btn edu-btn-outline"
+																											style="width: 100%;display: flex;justify-content: center; text-align: center;">
+																											View Details
+																											<span
+																												class="arrow-icon flaticon-arrow-pointing-to-right"></span>
+																										</a>
+																									</div>
+																								</div>
+																							</div>
+																						</div>
+
+															@endif
+
+														@endforeach
+
 													</div>
 												</div>
+											@endforeach
 
-												@endif
-
-												@endforeach
-
-											</div>
 										</div>
-										@endforeach
-
 									</div>
-								</div>
 								@endforeach
 
 							</div>
 						</div>
+
 					</div>
+				</div>
+
+				<div class="text-center mt-5">
+					<a href="{{ route('study.material.front') }}"
+						class="newtestseries-all-btn btn btn-outline-primary btn-lg px-5 py-3 rounded-pill">
+						View All Study Material
+					</a>
 				</div>
 			</div>
 		</section>
@@ -3761,7 +3208,7 @@
 													style="background: {{ $bgColors[$index % count($bgColors)] }};">
 
 													<div class="newprog-number-circle {{ $circleColors[$index % count($circleColors)] }} text-white
-																																																																																																																																															rounded-circle d-flex align-items-center justify-content-center"
+																																																																																																																																																			rounded-circle d-flex align-items-center justify-content-center"
 														style="width:40px;height:40px;font-size:1.2rem;font-weight:bold;">
 														{{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}
 													</div>
@@ -4290,13 +3737,13 @@
 			// Yeh object sab commissions ke categories ka name rakhega
 			window.commissionCategories = {
 				@foreach($commissions as $commission)
-																																				  "{{ $commission->id }}": {
+																																					  "{{ $commission->id }}": {
 					@foreach($commission->categories as $cat)
 						  "{{ $cat->id }}": "{{ addslashes($cat->name) }}",
 					@endforeach
-																																				  },
+																																					  },
 				@endforeach
-																																  };
+																																	  };
 
 
 			document.addEventListener('DOMContentLoaded', function () {
@@ -4314,10 +3761,10 @@
 						const allTabLi = document.createElement('li');
 						allTabLi.className = 'nav-item';
 						allTabLi.innerHTML = `
-																																		<button class="btn btn-outline-secondary btn-sm11 active" data-category="all">
-																																		  All
-																																		</button>
-																																	  `;
+																																			<button class="btn btn-outline-secondary btn-sm11 active" data-category="all">
+																																			  All
+																																			</button>
+																																		  `;
 						subCategoryTabsContainer.appendChild(allTabLi);
 
 						// Categories collect karo (unique)
@@ -4337,10 +3784,10 @@
 							const li = document.createElement('li');
 							li.className = 'nav-item';
 							li.innerHTML = `
-																																	<button class="btn btn-outline-secondary btn-sm11" data-category="${catId}">
-																																	  ${categoryName}
-																																	</button>
-																																  `;
+																																		<button class="btn btn-outline-secondary btn-sm11" data-category="${catId}">
+																																		  ${categoryName}
+																																		</button>
+																																	  `;
 							subCategoryTabsContainer.appendChild(li);
 						});
 
@@ -4416,10 +3863,10 @@
 						const allTabLi = document.createElement('li');
 						allTabLi.className = 'nav-item';
 						allTabLi.innerHTML = `
-																																		<button class="btn btn-outline-secondary btn-sm11 active" data-category="all">
-																																		  All Courses
-																																		</button>
-																																	  `;
+																																			<button class="btn btn-outline-secondary btn-sm11 active" data-category="all">
+																																			  All Courses
+																																			</button>
+																																		  `;
 						subCategoryTabsContainer.appendChild(allTabLi);
 
 						// Categories collect with names from data-attribute
@@ -4439,10 +3886,10 @@
 							const li = document.createElement('li');
 							li.className = 'nav-item';
 							li.innerHTML = `
-																																		  <button class="btn btn-outline-secondary btn-sm11" data-category="${catId}">
-																																			${catName}
-																																		  </button>
-																																		`;
+																																			  <button class="btn btn-outline-secondary btn-sm11" data-category="${catId}">
+																																				${catName}
+																																			  </button>
+																																			`;
 							subCategoryTabsContainer.appendChild(li);
 						});
 

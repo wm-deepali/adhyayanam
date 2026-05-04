@@ -20,12 +20,23 @@ class StudentController extends Controller
     //
     public function studentProfile($id)
     {
-        $data['profile'] = User::where('id', $id)->where('type', 'student')->first();
-        $data['course'] = Helper::getStudentCourseData($id);
-        $data['testSeries'] = Helper::getStudentTestSeriesData($id);
-        $data['studyMaterial'] = Helper::getStudentStudyMaterialData($id);
-        return view('students.student-profile-detail', $data);
+        $student = User::where('id', $id)
+            ->where('type', 'student')
+            ->firstOrFail();
+
+        return view('students.student-profile-detail', [
+            'profile' => $student,
+
+            'course' => Helper::getStudentCourseData($id),
+            'testSeries' => Helper::getStudentTestSeriesData($id),
+            'studyMaterial' => Helper::getStudentStudyMaterialData($id),
+
+            // 🔥 ADD THESE
+            'orders' => $student->orders()->latest()->limit(5)->get(),
+            'videos' => $student->videoProgress()->with('video')->latest()->limit(5)->get(),
+        ]);
     }
+    
     public function studentChangePassword($id)
     {
         $data['id'] = $id;
@@ -225,16 +236,26 @@ class StudentController extends Controller
 
     public function videoSummary(Request $request)
     {
+        $studentId = $request->student_id;
+
         $query = Video::query()
             ->select(
                 'videos.id',
                 'videos.title',
                 'videos.course_id',
                 'videos.teacher_id',
+                'videos.access_till',
                 DB::raw('COALESCE(SUM(vup.watched_count),0) as total_views'),
                 DB::raw('COUNT(DISTINCT vup.user_id) as total_students')
             )
-            ->leftJoin('video_user_progress as vup', 'vup.video_id', '=', 'videos.id')
+            ->leftJoin('video_user_progress as vup', function ($join) use ($studentId) {
+                $join->on('vup.video_id', '=', 'videos.id');
+
+                // ✅ MAIN FILTER HERE
+                if ($studentId) {
+                    $join->where('vup.user_id', $studentId);
+                }
+            })
             ->with(['course:id,course_heading', 'teacher:id,full_name'])
             ->groupBy(
                 'videos.id',
@@ -298,5 +319,19 @@ class StudentController extends Controller
             'studyMaterial',
             'order'
         ));
+    }
+
+    public function studentStudyMaterialList(Request $request)
+    {
+        $studentId = $request->student_id;
+
+        $materials = Order::with('transaction')
+            ->where('student_id', $studentId)
+            ->where('order_type', 'Study Material')
+            ->latest()
+            ->paginate(10)
+            ->withQueryString();
+
+        return view('students.student-study-material-list', compact('materials', 'studentId'));
     }
 }

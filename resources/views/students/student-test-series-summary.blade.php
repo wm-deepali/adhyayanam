@@ -74,24 +74,38 @@
 
                                     {{-- ACTIONS --}}
                                     <td>
-                                        <div class="d-flex gap-2">
+                                        <div class="dropdown">
+                                            <button class="btn btn-primary btn-sm dropdown-toggle" type="button"
+                                                data-bs-toggle="dropdown">
+                                                Actions
+                                            </button>
 
-                                            {{-- View Student --}}
-                                            @if(!empty($res->id))
-                                                <a href="{{ route('students.student-profile-detail', $res->id) }}"
-                                                    title="View Student">
-                                                    <i class="fa fa-user-graduate"></i>
-                                                </a>
-                                            @endif
+                                            <ul class="dropdown-menu">
 
-                                            {{-- View Test Series Detail --}}
-                                            @if(!empty($res->id) && !empty($res->test_series_id))
-                                                <a href="{{ route('test-series.detail', [$res->id, $res->test_series_id]) }}"
-                                                    title="View Test Series Detail">
-                                                    <i class="fa fa-eye"></i>
-                                                </a>
-                                            @endif
+                                                {{-- View Profile --}}
+                                                <li>
+                                                    <a class="dropdown-item"
+                                                        href="{{ route('students.student-profile-detail', $res->id) }}">
+                                                        👤 View Details
+                                                    </a>
+                                                </li>
 
+                                                <li>
+                                                    <a class="dropdown-item"
+                                                        href="{{ route('order.test-series-orders') }}?student_id={{ $res->id }}">
+                                                        🛒 View Test Series Orders
+                                                    </a>
+                                                </li>
+
+                                                {{-- Test Series --}}
+                                                <li>
+                                                    <a class="dropdown-item"
+                                                        href="{{ route('admin.results.all') }}?student_id={{ $res->id }}">
+                                                        📝 Tests
+                                                    </a>
+                                                </li>
+
+                                            </ul>
                                         </div>
                                     </td>
                                 </tr>

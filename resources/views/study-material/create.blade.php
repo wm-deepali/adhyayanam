@@ -32,7 +32,7 @@
 
                     <div class="mb-3">
                         <label>Select Examination Commission</label>
-                        <select class="form-control" name="commission_id" id="exam_com_id">
+                        <select class="form-control" name="commission_id" id="exam_com_id" required>
                             <option value="">--Select--</option>
                             @foreach($commissions as $commission)
                                 <option value="{{ $commission->id }}" {{ old('commission_id') == $commission->id ? 'selected' : '' }}>{{ $commission->name }}</option>
@@ -51,7 +51,7 @@
 
                     <div class="mb-3">
                         <label>Select Category</label>
-                        <select class="form-control" name="category_id" id="category_id">
+                        <select class="form-control" name="category_id" id="category_id" required>
                             <option value="">--Select--</option>
                             @foreach($categories as $category)
                                 <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
@@ -111,7 +111,7 @@
                     <div class="mb-3">
                         <label for="detail_content" class="form-label">Detail Content</label>
                         <textarea id="editor" name="detail_content"
-                            style="height: 200px;">{!! old('detail_content') !!}</textarea>
+                            style="height: 200px;" required>{!! old('detail_content') !!}</textarea>
                         @error('detail_content') <span class="text-danger text-left">{{ $message }}</span> @enderror
                     </div>
 
@@ -540,6 +540,23 @@
                 var offeredPrice = mrp - (mrp * (discount / 100));
                 $('#offered-price').val(offeredPrice.toFixed(2));
             });
+       
+       setTimeout(() => {
+
+    if (oldSubjects && oldSubjects.length) {
+        $('#subject_id').val(oldSubjects).trigger('change.select2');
+    }
+
+    if (oldChapters && oldChapters.length) {
+        $('#chapter_id').val(oldChapters).trigger('change.select2');
+    }
+
+    if (oldTopics && oldTopics.length) {
+        $('#topic_id').val(oldTopics).trigger('change.select2');
+    }
+
+}, 1200);
+       
         });
 
         let descEditorCount = $('.description-editor').length;

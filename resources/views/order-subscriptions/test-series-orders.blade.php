@@ -81,9 +81,10 @@
                                 <td>{{ $res->student->mobile ?? '-' }}</td>
                                 <td>₹ {{ $res->billed_amount ?? '0' }}</td>
                                 <td>
-                                    <span class="badge bg-success">
-                                        {{ ucfirst($res->payment_status) }}
-                                    </span>
+                                   <span class="badge 
+    {{ $res->payment_status == 'PAID' ? 'bg-success' : 'bg-warning' }}">
+    {{ ucfirst($res->payment_status) }}
+</span>
                                 </td>
                                 <td>
                                     <div class="d-flex gap-2">
@@ -131,7 +132,7 @@
 
             {{-- PAGINATION --}}
             <div class="d-flex justify-content-end mt-3">
-                {{ $orders->links() }}
+                {{ $orders->appends(request()->query())->links() }}
             </div>
 
         </div>

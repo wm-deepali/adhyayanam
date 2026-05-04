@@ -133,7 +133,7 @@
 
             {{-- PAGINATION --}}
             <div class="d-flex justify-content-end mt-3">
-                {{ $transactions->links() }}
+                {{ $transactions->appends(request()->query())->links() }}
             </div>
 
         </div>

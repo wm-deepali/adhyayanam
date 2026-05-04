@@ -101,6 +101,27 @@
 
                     {{-- ================= SCHEDULED ================= --}}
                     <div class="tab-pane fade show active" id="scheduled">
+                        @foreach($liveClassesNow as $class)
+    <div class="card mb-2 shadow-sm border-success">
+        <div class="card-body d-flex justify-content-between align-items-center">
+
+            <div>
+                <h6 class="mb-1 fw-semibold text-success">
+                    🔴 Live Now - {{ $class->title }}
+                </h6>
+                <small class="text-muted">
+                    {{ \Carbon\Carbon::parse($class->schedule_date)->format('d M Y') }},
+                    {{ \Carbon\Carbon::parse($class->start_time)->format('h:i A') }}
+                </small>
+            </div>
+
+            <a href="{{ $class->live_link }}" target="_blank" class="btn btn-success btn-sm px-3">
+                Join Now
+            </a>
+
+        </div>
+    </div>
+@endforeach
                         @forelse($scheduledClasses as $class)
                             <div class="card mb-2 shadow-sm">
                                 <div class="card-body d-flex justify-content-between align-items-center">
@@ -114,9 +135,10 @@
                                         </small>
                                     </div>
 
-                                    <a href="{{ $class->live_link }}" target="_blank" class="btn btn-success btn-sm px-3">
-                                        <i class="bi bi-camera-video"></i> Join
-                                    </a>
+                                    
+                                    <button class="btn btn-secondary btn-sm px-3" disabled>
+    ⏳ Not Started
+</button>
                                 </div>
                             </div>
                         @empty
@@ -139,6 +161,12 @@
                                             {{ \Carbon\Carbon::parse($class->end_time)->format('h:i A') }}
                                         </small>
                                     </div>
+                                    @if($class->assignment_file && $class->show_assignment)
+    <a href="{{ asset('storage/' . $class->assignment_file) }}" target="_blank"
+        class="btn btn-outline-primary btn-sm">
+        📥 Assignment
+    </a>
+@endif
                                 </div>
                             </div>
                         @empty
@@ -165,7 +193,7 @@
 
                                     <div class="d-flex flex-wrap gap-2 align-items-center">
                                         {{-- ASSIGNMENT (Teacher) --}}
-                                        @if($class->assignment_file)
+                                        @if($class->assignment_file && $class->show_assignment)
                                             <a href="{{ asset('storage/' . $class->assignment_file) }}" target="_blank"
                                                 class="btn btn-outline-primary btn-sm">
                                                 📥 Assignment

@@ -105,24 +105,26 @@
             font-size: 16px;
             font-weight: 500;
         }
-         @media (max-width: 768px) {
-             .paper-card {
-    background: #fff;
-    border-radius: 10px;
-    padding: 15px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: start;
-    gap: 14px;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
-    transition: 0.3s;
-    border-left: 5px solid #e74c3c;
-}
-.filter-box {
-    height: auto;
-}
-         }
+
+        @media (max-width: 768px) {
+            .paper-card {
+                background: #fff;
+                border-radius: 10px;
+                padding: 15px;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                align-items: start;
+                gap: 14px;
+                box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+                transition: 0.3s;
+                border-left: 5px solid #e74c3c;
+            }
+
+            .filter-box {
+                height: auto;
+            }
+        }
     </style>
 
 @endsection
@@ -284,44 +286,70 @@
                                     </div>
 
 
+                                    <div class="paper-right">
 
-<div class="paper-right">
+                                        @php
+                                            $isLoggedIn = auth()->user() && auth()->user()->type == 'student';
+                                            $studentId = $isLoggedIn ? auth()->id() : null;
 
-@if(!auth()->check())
+                                            // Replace this with your actual purchase logic
+                                            $isPurchased = $isLoggedIn && \App\Models\Order::where('package_id', $paper->id)
+                                                ->where('order_type', 'Paper')
+                                                ->where('student_id', $studentId)
+                                                ->exists();
+                                        @endphp
 
-    {{-- NOT LOGGED IN --}}
-    <a href="{{ route('student.login') }}" class="attempt-btn">
-        Login to Attempt
-    </a>
+                                        @if(!$isLoggedIn)
 
-@else
+                                            <a href="{{ route('student.login') }}" class="attempt-btn">
+                                                Login to Continue
+                                            </a>
 
-    {{-- LOGGED IN USER --}}
+                                        @else
 
-    @if($paper->test_type == 'paid')
+                                            {{-- FREE PAPER --}}
+                                            @if($paper->test_type == 'free')
 
-        <div class="paper-price">
-            ₹{{$paper->offer_price}}
-        </div>
+                                                <a href="{{ route('test.download', $paper->id) }}" class="attempt-btn">
+                                                    Download
+                                                </a>
 
-        <button class="attempt-btn add-to-cart"
-                data-id="{{$paper->id}}">
-            Add to Cart
-        </button>
+                                                <a href="{{ route('test.instruction', base64_encode($paper->id)) }}"
+                                                    class="attempt-btn">
+                                                    Start Test
+                                                </a>
 
-    @else
+                                            @else
 
-        <a href="{{ route('test.instruction', base64_encode($paper->id)) }}"
-           class="attempt-btn">
-           Attempt Now
-        </a>
+                                                {{-- PAID PAPER --}}
+                                                @if(!$isPurchased)
 
-    @endif
+                                                    <div class="paper-price">
+                                                        ₹{{$paper->offer_price}}
+                                                    </div>
 
-@endif
+                                                    <button class="attempt-btn add-to-cart" data-id="{{$paper->id}}">
+                                                        Add to Cart
+                                                    </button>
 
-</div>
+                                                @else
 
+                                                    <a href="{{ route('test.download', $paper->id) }}" class="attempt-btn">
+                                                        Download
+                                                    </a>
+
+                                                    <a href="{{ route('test.instruction', base64_encode($paper->id)) }}"
+                                                        class="attempt-btn">
+                                                        Start Test
+                                                    </a>
+
+                                                @endif
+
+                                            @endif
+
+                                        @endif
+
+                                    </div>
                                 </div>
 
                             @empty
@@ -392,23 +420,23 @@
             });
 
 
-$(".add-to-cart").click(function(){
+            $(".add-to-cart").click(function () {
 
-    let paper_id = $(this).data("id");
+                let paper_id = $(this).data("id");
 
-    $.ajax({
-        url:"{{ route('paper.add.cart') }}",
-        method:"POST",
-        data:{
-            paper_id:paper_id,
-            _token:"{{csrf_token()}}"
-        },
-        success:function(res){
-            alert("Paper added to cart");
-        }
-    });
+                $.ajax({
+                    url: "{{ route('paper.add.cart') }}",
+                    method: "POST",
+                    data: {
+                        paper_id: paper_id,
+                        _token: "{{csrf_token()}}"
+                    },
+                  success: function (res) {
+    window.location.href = "{{ route('paper.cart') }}";
+}
+                });
 
-});
+            });
         </script>
 
     </body>

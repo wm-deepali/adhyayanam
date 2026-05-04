@@ -18,11 +18,9 @@
                         </h6>
                     </div>
 
-                    <div class="d-flex align-items-center gap-2">
-                        <a href="{{ url()->previous() }}" class="btn btn-secondary btn-sm">
-                            ← Back
-                        </a>
-                    </div>
+                    <a href="{{ url()->previous() }}" class="btn btn-secondary btn-sm">
+                        ← Back
+                    </a>
                 </div>
 
                 {{-- SEARCH --}}
@@ -64,7 +62,7 @@
                                 <th>Payment Status</th>
                                 <th>Transaction ID</th>
                                 <th>Order Status</th>
-                                <th width="10%">Actions</th>
+                                <th width="12%">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -79,13 +77,19 @@
                                     <td>{{ $res->student->name ?? '-' }}</td>
                                     <td>{{ $res->student->mobile ?? '-' }}</td>
                                     <td>₹ {{ $res->total ?? '0' }}</td>
+
+                                    {{-- PAYMENT STATUS --}}
                                     <td>
-                                        <span class="badge bg-success">
+                                        <span class="badge 
+                                                        {{ $res->payment_status == 'PAID' ? 'bg-success' : 'bg-warning' }}">
                                             {{ ucfirst($res->payment_status) }}
                                         </span>
                                     </td>
+
                                     <td>{{ $res->transaction_id ?? '-' }}</td>
                                     <td>{{ ucfirst($res->order_status) }}</td>
+
+                                    {{-- ACTIONS --}}
                                     <td>
                                         <div class="d-flex gap-2">
 
@@ -131,7 +135,7 @@
 
                 {{-- PAGINATION --}}
                 <div class="d-flex justify-content-end mt-3">
-                    {{ $orders->links() }}
+                    {{ $orders->appends(request()->query())->links() }}
                 </div>
 
             </div>

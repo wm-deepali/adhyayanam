@@ -46,6 +46,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\StudyMaterialCategory;
 use App\Models\ExaminationCommission;
 use App\Models\UserMobiileVerification;
+use Barryvdh\DomPDF\Facade\Pdf;
 class FrontController extends Controller
 {
     public function index()
@@ -774,7 +775,7 @@ class FrontController extends Controller
 
     public function batchesIndex()
     {
-        $data['batches'] = BatchProgramme::all();
+        $data['batches'] = BatchProgramme::paginate(10);
         return view('front.user.batches-and-online-programme', $data);
     }
 
@@ -1029,6 +1030,40 @@ class FrontController extends Controller
         return back()->with('success', 'Enquiry submitted successfully!');
     }
 
+    public function testDownload($id)
+    {
+        set_time_limit(120); // 🔥 increase execution time
+        ini_set('memory_limit', '256M');
+
+        $paper = Test::with([
+            'category:id,name',
+            'subcategory:id,name',
+            'commission:id,name',
+            'subject:id,name',
+            'topic:id,name',
+            'chapter:id,name',
+            'testDetails.question'
+        ])->findOrFail($id);
+        $logoPath = public_path('images/Neti-logo.png');
+
+        $logoBase64 = null;
+
+        if (file_exists($logoPath)) {
+            $type = pathinfo($logoPath, PATHINFO_EXTENSION);
+            $data = file_get_contents($logoPath);
+
+            $logoBase64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+        }
+
+        $pdf = PDF::loadView('test-paper.pdf-view', compact('paper', 'logoBase64'))
+            ->setOptions([
+                'dpi' => 72,
+                'isHtml5ParserEnabled' => true,
+                'isRemoteEnabled' => true
+            ]);
+
+        return $pdf->stream($paper->name . '.pdf');
+    }
 
     public function logout()
     {

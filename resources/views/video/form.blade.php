@@ -47,9 +47,7 @@
                 <option value="" selected disabled>None</option>
                 <!-- Options will be dynamically loaded -->
             </select>
-            @error('sub_category_id')
-                <span class="text-danger">{{ $message }}</span>
-            @enderror
+            <div class="text-danger validation-err" id="sub_category_id-err"></div>
         </div>
         <div class="col-md-6 mb-2">
             <label for="courseCategory">Select Course:</label>
@@ -68,18 +66,21 @@
             <select class="form-control" name="subject_id" id="subject_id">
                 <option value="">--Select--</option>
             </select>
+            <div class="text-danger validation-err" id="subject_id-err"></div>
         </div>
         <div class="col-md-6 mb-2">
             <label>Select Chapter</label>
             <select class="form-control" name="chapter_id" id="chapter_id">
                 <option value="">--Select--</option>
             </select>
+            <div class="text-danger validation-err" id="chapter_id-err"></div>
         </div>
         <div class="col-md-6 mb-2">
             <label>Select Topic</label>
             <select class="form-control" name="topic_id" id="topic_id">
                 <option value="">--Select--</option>
             </select>
+            <div class="text-danger validation-err" id="topic_id-err"></div>
         </div>
 
         <div class="col-md-6 mb-2 wa ">
@@ -105,6 +106,7 @@
                             <label>Title</label>
                             <input type="text" class="form-control video_title" name="video_title[]"
                                 placeholder="Enter video title">
+                            <div class="text-danger validation-err" id="video_title-err"></div>
                         </div>
 
                         <!-- Slug -->
@@ -112,6 +114,7 @@
                             <label>Slug</label>
                             <input type="text" class="form-control video_slug" name="video_slug[]"
                                 placeholder="Auto generated slug">
+                            <div class="text-danger validation-err" id="video_slug-err"></div>
                         </div>
 
 
@@ -119,12 +122,14 @@
                         <div class="col-md-6 mb-2">
                             <label>Thumb Image:</label>
                             <input type="file" class="form-control-file" name="video_image[]">
+                            <div class="text-danger validation-err" id="video_image-err"></div>
                         </div>
 
                         <!-- Cover Image -->
                         <div class="col-md-6 mb-2">
                             <label>Cover Image:</label>
                             <input type="file" class="form-control-file" name="video_cover_image[]">
+                            <div class="text-danger validation-err" id="video_cover_image-err"></div>
                         </div>
 
                         <!-- Assignment File -->
@@ -132,6 +137,7 @@
                             <label>Upload Assignment (PDF/Image):</label>
                             <input type="file" class="form-control-file" name="video_assignment_file[]"
                                 accept=".pdf,.doc,.docx,image/*">
+                            <div class="text-danger validation-err" id="video_assignment_file-err"></div>
                         </div>
 
                         <!-- Solution File -->
@@ -139,6 +145,7 @@
                             <label>Upload Solution (PDF/Image):</label>
                             <input type="file" class="form-control-file" name="video_solution_file[]"
                                 accept=".pdf,.doc,.docx,image/*">
+                            <div class="text-danger validation-err" id="video_solution_file-err"></div>
                         </div>
 
                         <!-- Video Type -->
@@ -151,24 +158,28 @@
                                 <option value="Storage">Storage</option>
                                 <option value="Other">Other</option>
                             </select>
+                            <div class="text-danger validation-err" id="video_type-err"></div>
                         </div>
 
                         <!-- Video File -->
                         <div class="col-md-6 mb-2 video_file_div" style="display:none">
                             <label>Video File:</label>
                             <input type="file" class="form-control" name="video_file[]">
+                            <div class="text-danger validation-err" id="video_file-err"></div>
                         </div>
 
                         <!-- Video URL -->
                         <div class="col-md-6 mb-2 video_url_div" style="display:none">
                             <label>Video URL:</label>
                             <input type="text" class="form-control" name="video_url[]">
+                            <div class="text-danger validation-err" id="video_url-err"></div>
                         </div>
 
                         <!-- Duration -->
                         <div class="col-md-6 mb-2 video_duration_div" style="display:none">
                             <label>Duration:</label>
                             <input type="text" class="form-control" name="duration[]">
+                            <div class="text-danger validation-err" id="duration-err"></div>
                         </div>
 
                         <!-- Status -->
@@ -178,12 +189,21 @@
                                 <option value="active">Active</option>
                                 <option value="block">Inactive</option>
                             </select>
+                            <div class="text-danger validation-err" id="video_status-err"></div>
+                        </div>
+
+                        <div class="col-md-6 mb-2">
+                            <label>
+                                <input type="checkbox" name="show_assignment[]" value="1">
+                                Show Assignment to Students
+                            </label>
                         </div>
 
                         <!-- Content -->
                         <div class="col-md-12 mb-2">
                             <label>Content</label>
                             <textarea class="form-control editor" name="video_content[]" rows="3"></textarea>
+                            <div class="text-danger validation-err" id="video_content-err"></div>
                         </div>
 
                         <div class="col-md-12">
@@ -210,18 +230,21 @@
                             <label for="live_title">Title:</label>
                             <input type="text" class="form-control" name="live_title[]"
                                 placeholder="Enter Live Class Title">
+                            <div class="text-danger validation-err" id="live_title-err"></div>
                         </div>
 
                         <!-- Thumb Image -->
                         <div class="col-md-6 mb-2">
                             <label>Thumb Image:</label>
                             <input type="file" class="form-control-file" name="live_image[]">
+                            <div class="text-danger validation-err" id="live_image-err"></div>
                         </div>
 
                         <!-- Cover Image -->
                         <div class="col-md-6 mb-2">
                             <label>Cover Image:</label>
                             <input type="file" class="form-control-file" name="live_cover_image[]">
+                            <div class="text-danger validation-err" id="live_cover_image-err"></div>
                         </div>
 
                         <!-- Assignment File -->
@@ -229,6 +252,7 @@
                             <label>Upload Assignment (PDF/Image):</label>
                             <input type="file" class="form-control-file" name="live_assignment_file[]"
                                 accept=".pdf,.doc,.docx,image/*">
+                            <div class="text-danger validation-err" id="live_assignment_file-err"></div>
                         </div>
 
                         <!-- Solution File -->
@@ -236,24 +260,28 @@
                             <label>Upload Solution (PDF/Image):</label>
                             <input type="file" class="form-control-file" name="live_solution_file[]"
                                 accept=".pdf,.doc,.docx,image/*">
+                            <div class="text-danger validation-err" id="live_solution_file-err"></div>
                         </div>
 
                         <!-- Schedule Date -->
                         <div class="col-md-6 mb-2">
                             <label for="schedule_date">Schedule Date:</label>
                             <input type="date" class="form-control" name="schedule_date[]">
+                            <div class="text-danger validation-err" id="schedule_date-err"></div>
                         </div>
 
                         <!-- Start Time -->
                         <div class="col-md-6 mb-2">
                             <label for="start_time">Start Time:</label>
                             <input type="time" class="form-control" name="start_time[]">
+                            <div class="text-danger validation-err" id="start_time-err"></div>
                         </div>
 
                         <!-- End Time -->
                         <div class="col-md-6 mb-2">
                             <label for="end_time">End Time:</label>
                             <input type="time" class="form-control" name="end_time[]">
+                            <div class="text-danger validation-err" id="end_time-err"></div>
                         </div>
 
                         <!-- Teacher -->
@@ -265,6 +293,7 @@
                                     <option value="{{ $teacher->id }}">{{ $teacher->full_name }}</option>
                                 @endforeach
                             </select>
+                            <div class="text-danger validation-err" id="teacher_id-err"></div>
                         </div>
 
                         <!-- Live Class Link -->
@@ -272,6 +301,7 @@
                             <label for="live_link">Live Class Link (URL):</label>
                             <input type="url" class="form-control" name="live_link[]"
                                 placeholder="Enter live class URL">
+                            <div class="text-danger validation-err" id="live_link-err"></div>
                         </div>
 
 
@@ -282,12 +312,20 @@
                                 <option value="active">Active</option>
                                 <option value="block">Inactive</option>
                             </select>
+                            <div class="text-danger validation-err" id="live_status-err"></div>
                         </div>
 
+                        <div class="col-md-6 mb-2">
+                            <label>
+                                <input type="checkbox" name="show_assignment[]" value="1">
+                                Show Assignment to Students
+                            </label>
+                        </div>
                         <!-- Content -->
                         <div class="col-md-12 mb-2">
                             <label for="content">Content</label>
                             <textarea class="form-control editor" name="live_content[]" rows="3"></textarea>
+                            <div class="text-danger validation-err" id="live_content-err"></div>
                         </div>
 
                         <div class="col-md-12">
@@ -303,7 +341,9 @@
 
 
 
-        <button type="submit" class="btn btn-primary">Submit</button>
+        <button type="submit" class="btn btn-primary" id="submitBtn">
+            Submit
+        </button>
 </form>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
@@ -581,6 +621,7 @@
             }
             e.preventDefault();
             $(".validation-err").html('');
+            $('#submitBtn').prop('disabled', true).text('Submitting...');
             $.ajax({
                 type: 'POST',
                 url: '{{ route("video.store") }}',
@@ -590,21 +631,45 @@
                 success: function (result) {
                     if (result.success) {
                         window.location.href = '{{ route("video.index") }}';
-                    } else {
-                        $(this).attr('disabled', false);
-                        if (result.code == 422) {
-                            for (const key in result.errors) {
-                                $(`#${key}-err`).html(result.errors[key][0]);
-                            }
-                        } else {
-
-                        }
                     }
-
                 },
-                error: function (error) {
-                    console.error('Error saving topic:', error);
-                    alert('Error saving topic. Please try again.');
+                error: function (xhr) {
+                    $(".validation-err").html('');
+                    $('#submitBtn').prop('disabled', false).text('Submit');
+                    // ✅ Handle Laravel validation errors
+                    if (xhr.status === 422) {
+                        let errors = xhr.responseJSON.errors;
+
+                        let firstError = null;
+
+                        $.each(errors, function (field, messages) {
+
+    // 🔥 remove .0, .1, etc
+    let cleanField = field.replace(/\.\d+/g, '');
+
+    // find input
+    let input = $('[name="' + cleanField + '[]"]');
+
+    // show error
+    $('#' + cleanField + '-err').html(messages[0]);
+
+    // highlight
+    input.addClass('is-invalid');
+
+});
+
+                        // 🔥 scroll to first error
+                        if (firstError) {
+                            $('html, body').animate({
+                                scrollTop: firstError.offset().top - 120
+                            }, 500);
+
+                            firstError.focus();
+                        }
+                    } else {
+                        console.error(xhr);
+                        alert('Something went wrong. Please try again.');
+                    }
                 }
             });
         });

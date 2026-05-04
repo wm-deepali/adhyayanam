@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Teacher;
 use App\Http\Controllers\Controller;
 
 use App\Models\Teacher;
+use App\Models\Video;
 use App\Models\WalletTransaction;
 use App\Models\WithdrawalRequest;
 use Illuminate\Http\Request;
@@ -100,5 +101,67 @@ class TeacherController extends Controller
             'withdrawalRequests',
             'pendingWithdrawalsCount'
         ));
+    }
+
+
+    public function liveClasses()
+    {
+        $liveClasses = Video::where('type', 'live_class')
+            ->where('teacher_id', auth()->id())
+            ->with('course')
+            ->latest()
+            ->paginate(10);
+
+        return view('teachers.live-classes.index', compact('liveClasses'));
+    }
+
+    public function uploadAssignment(Request $request, $id)
+    {
+        $request->validate([
+            'assignment_file' => 'required|file|mimes:pdf,doc,docx|max:5120'
+        ]);
+
+        $video = Video::where('id', $id)
+            ->where('teacher_id', auth()->id())
+            ->firstOrFail();
+
+        if ($request->hasFile('assignment_file')) {
+            $video->assignment_file = $request->file('assignment_file')
+                ->store('live/assignments', 'public');
+            $video->save();
+        }
+
+        return back()->with('success', 'Assignment uploaded');
+    }
+
+    public function uploadSolution(Request $request, $id)
+    {
+        $request->validate([
+            'solution_file' => 'required|file|mimes:pdf,doc,docx|max:5120'
+        ]);
+
+        $video = Video::where('id', $id)
+            ->where('teacher_id', auth()->id())
+            ->firstOrFail();
+
+        if ($request->hasFile('solution_file')) {
+            $video->solution_file = $request->file('solution_file')
+                ->store('live/solutions', 'public');
+            $video->save();
+        }
+
+        return back()->with('success', 'Solution uploaded');
+    }
+
+    public function toggleAssignment(Request $request, $id)
+    {
+        $video = Video::where('id', $id)
+            ->where('teacher_id', auth()->id())
+            ->firstOrFail();
+
+        $video->show_assignment = $request->show_assignment;
+        $video->save();
+
+        return back();
     }
 }

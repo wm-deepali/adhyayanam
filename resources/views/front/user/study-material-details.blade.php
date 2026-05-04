@@ -14,7 +14,6 @@
 
 @section('content')
   <style>
-
     .study-detail-banner {
       background: linear-gradient(135deg, #f0f7ff 0%, #e0f2fe 100%);
       padding: 60px 0 80px;
@@ -323,71 +322,76 @@
       .custom-accordion .accordion-body {
         padding: 1.25rem 1.5rem;
       }
-      .study-detail-banner {
-    background: linear-gradient(135deg, #f0f7ff 0%, #e0f2fe 100%);
-    padding: 10px 0 40px;
-    position: relative;
-}
-.study-detail-title {
-    font-size: 22px;
-    font-weight: 900;
-    color: #1e293b;
-    margin-bottom: 0px;
-    margin-top: 0px;
-}
-.ts-breadcrumb {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 0px;
-    margin: 10px 0 0px 0;
-    font-size: 12px;
-    margin-bottom: 15px;
-}
-.study-detail-short {
-    font-size: 16px;
-    line-height: 1.5;
-    color: #475569;
-    margin-bottom: 10px;
-}
-.study-detail-quick-patti {
-    width: 93%;
-    margin: auto;
-    border-radius: 7px;
-    margin-top: 20px;
-    background: linear-gradient(90deg, #9e9e9e 0%, #032369 100%);
-    color: white;
-    padding: 19px 0;
-}
-    }
-    
-    .px-responsive {
-    padding-left: 20px;
-    padding-right: 20px;
-}
 
-/* Tablet (md to lg) - 25px */
-@media (min-width: 768px) and (max-width: 991.98px) {
+      .study-detail-banner {
+        background: linear-gradient(135deg, #f0f7ff 0%, #e0f2fe 100%);
+        padding: 10px 0 40px;
+        position: relative;
+      }
+
+      .study-detail-title {
+        font-size: 22px;
+        font-weight: 900;
+        color: #1e293b;
+        margin-bottom: 0px;
+        margin-top: 0px;
+      }
+
+      .ts-breadcrumb {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 0px;
+        margin: 10px 0 0px 0;
+        font-size: 12px;
+        margin-bottom: 15px;
+      }
+
+      .study-detail-short {
+        font-size: 16px;
+        line-height: 1.5;
+        color: #475569;
+        margin-bottom: 10px;
+      }
+
+      .study-detail-quick-patti {
+        width: 93%;
+        margin: auto;
+        border-radius: 7px;
+        margin-top: 20px;
+        background: linear-gradient(90deg, #9e9e9e 0%, #032369 100%);
+        color: white;
+        padding: 19px 0;
+      }
+    }
+
     .px-responsive {
+      padding-left: 20px;
+      padding-right: 20px;
+    }
+
+    /* Tablet (md to lg) - 25px */
+    @media (min-width: 768px) and (max-width: 991.98px) {
+      .px-responsive {
         padding-left: 25px;
         padding-right: 25px;
+      }
     }
-}
 
-/* Desktop (lg and above) - 50px */
-@media (min-width: 992px) {
-    .px-responsive {
+    /* Desktop (lg and above) - 50px */
+    @media (min-width: 992px) {
+      .px-responsive {
         padding-left: 50px;
         padding-right: 50px;
+      }
     }
-}
   </style>
 
   <!-- Banner Patti (Simple Info) -->
   <section class="study-detail-banner">
     <div class="container">
       <div class="row align-items-center">
-        <div class="col-lg-12 px-responsive" >
+        <div class="col-lg-12 px-responsive">
           <div class="ts-breadcrumb">
             <a href="{{ url('/') }}">Home</a>
 
@@ -439,44 +443,65 @@
           <!-- Static Card View Hierarchy -->
           <!-- Static Compact Button-Card Hierarchy -->
           <div class="content-card-view mt-2">
-            <h2 class="mb-2 text-center text-lg-start" style="font-size:24px;">Subject Details</h2>
+            <h2 class="mb-2 text-center text-lg-start" style="font-size:24px;"> Study Coverage
+            </h2>
 
             <div class="hierarchy-container flex-wrap">
 
-              @forelse($studyMaterial->subjects as $subject)
+              @foreach($studyMaterial->subjects as $subject)
 
-                <div class="level-item subject-level" style="background: linear-gradient(90deg, #e3f2fd, #bbdefb);">
+                <div class="level-item subject-level w-100" style="background: linear-gradient(90deg, #e3f2fd, #bbdefb);">
 
+                  <!-- SUBJECT -->
                   <div class="item-content">
-
                     <i class="fas fa-book me-3 text-primary"></i>
-
-                    <span class="item-title">
-                      {{ $subject->name }}
-                    </span>
-
-                    @php
-                      $chapterCount = $studyMaterial->chapters
-                        ->where('subject_id', $subject->id)
-                        ->count();
-                    @endphp
-
-                    @if($chapterCount)
-                      <span class="badge bg-primary ms-auto">
-                        {{ $chapterCount }} Chapters
-                      </span>
-                    @else
-                      <span class="badge bg-info ms-auto">
-                        Subject Wise
-                      </span>
-                    @endif
-
+                    <span class="item-title fw-bold">{{ $subject->name }}</span>
                   </div>
+
+                  @php
+                    $chapters = $studyMaterial->chapters->where('subject_id', $subject->id);
+                  @endphp
+
+                  <!-- CHAPTERS -->
+                  @if($chapters->count())
+                    <div class="mt-2 ms-4">
+
+                      @foreach($chapters as $chapter)
+                        <div class="d-flex align-items-center mb-1">
+
+                          <i class="fas fa-layer-group text-success me-2"></i>
+                          <span class="chapter-level">{{ $chapter->name }}</span>
+
+                        </div>
+
+                        @php
+                          $topics = $studyMaterial->topics->where('chapter_id', $chapter->id);
+                        @endphp
+
+                        <!-- TOPICS -->
+                        @if($topics->count())
+                          <div class="ms-4 mb-2">
+                            @foreach($topics as $topic)
+                              <div class="d-flex align-items-center small text-muted mb-1">
+                                <i class="fas fa-circle me-2" style="font-size:6px;"></i>
+                                {{ $topic->name }}
+                              </div>
+                            @endforeach
+                          </div>
+                        @endif
+
+                      @endforeach
+
+                    </div>
+                  @else
+                    <div class="ms-4 mt-2 text-muted small">
+                      Subject Wise Content
+                    </div>
+                  @endif
 
                 </div>
 
-              @empty
-              @endforelse
+              @endforeach
 
             </div>
           </div>
@@ -499,7 +524,7 @@
 
         <div class="col-lg-4 col-md-6 text-lg-end text-md-center mt-3 mt-md-0">
           @php
-            $isLoggedIn = auth()->check();
+            $isLoggedIn = auth()->user() && auth()->user()->type == 'student';
             $hasPurchased = $isLoggedIn && \App\Helpers\Helper::GetStudentOrder('Study Material', $studyMaterial->id, auth()->id());
 
             $canAccess = $isLoggedIn && (!$studyMaterial->IsPaid || $hasPurchased);
@@ -512,24 +537,27 @@
           @endif
 
           @if($canAccess)
+
             @if($studyMaterial->is_pdf_downloadable)
               <a href="{{ route('study.material.download', $studyMaterial->id) }}" class="study-detail-buy-btn">
                 Download PDF
               </a>
-            @else
-              <button class="study-detail-buy-btn" disabled>Unlocked</button>
             @endif
+
           @else
-            @auth
+          
+          @if($isLoggedIn)
               <a href="{{ route('user.process-order', ['type' => 'study-material', 'id' => $studyMaterial->id]) }}"
                 class="study-detail-buy-btn">
                 Buy Now - ₹{{ $studyMaterial->price }}
               </a>
             @else
-              <button class="study-detail-buy-btn" href="{{route('student.login')}}">
+              <a class="study-detail-buy-btn" href="{{route('student.login')}}">
                 Login to Unlock{{ $studyMaterial->IsPaid ? ' - ₹' . $studyMaterial->price : ''}}
-              </button>
-            @endauth
+              </a>
+            @endif
+
+
           @endif
         </div>
       </div>
@@ -552,16 +580,16 @@
               <div class="unlock-box text-center py-5 mt-5">
                 <h4 class="text-muted mb-4">Full Content is Locked</h4>
                 <p class="text-muted mb-4">Purchase to unlock complete notes</p>
-                @auth
+                 @if($isLoggedIn)
                   <a href="{{ route('user.process-order', ['type' => 'study-material', 'id' => $studyMaterial->id]) }}"
                     class="study-detail-buy-btn px-5 py-3">
                     Unlock Now - ₹{{ $studyMaterial->price }}
                   </a>
                 @else
-                  <button class="study-detail-buy-btn px-5 py-3" href="{{route('student.login')}}">
-                     Login to Unlock{{ $studyMaterial->IsPaid ? ' - ₹' . $studyMaterial->price : ''}}
-                  </button>
-                @endauth
+                  <a class="study-detail-buy-btn px-5 py-3" href="{{route('student.login')}}">
+                    Login to Unlock{{ $studyMaterial->IsPaid ? ' - ₹' . $studyMaterial->price : ''}}
+                  </a>
+                @endif
               </div>
             @endif
           </div>

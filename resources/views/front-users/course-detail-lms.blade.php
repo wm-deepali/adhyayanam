@@ -273,7 +273,7 @@ font-weight:500;
                                     <!--    data-video='@json($videoPayload)'>-->
                                     <!--    ▶ {{ $lesson->title }}-->
 
-                                    <!--    @if($lesson->assignment_file)-->
+                                    <!--    @if($lesson->assignment_file && $lesson->show_assignment)-->
                                     <!--        <span class="ms-1 text-primary">📄</span>-->
                                     <!--    @endif-->
                                     <!--</li>-->
@@ -294,7 +294,7 @@ data-video='@json($videoPayload)'>
 {{ $lesson->title }}
 </div>
 
-@if($lesson->assignment_file)
+@if($lesson->assignment_file && $lesson->show_assignment)
 <small class="text-primary">Assignment Available</small>
 @endif
 

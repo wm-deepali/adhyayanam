@@ -518,17 +518,26 @@ class FrontUserController extends Controller
             $now = Carbon::now();
 
             $scheduledClasses = $liveClasses->filter(function ($class) use ($now) {
-                return Carbon::parse($class->schedule_date . ' ' . $class->start_time)->gte($now);
+                $start = Carbon::parse($class->schedule_date . ' ' . $class->start_time);
+                return $now->lt($start);
+            });
+
+            $liveClassesNow = $liveClasses->filter(function ($class) use ($now) {
+                $start = Carbon::parse($class->schedule_date . ' ' . $class->start_time);
+                $end = Carbon::parse($class->schedule_date . ' ' . $class->end_time);
+                return $now->between($start, $end);
             });
 
             $finishedClasses = $liveClasses->filter(function ($class) use ($now) {
-                return Carbon::parse($class->schedule_date . ' ' . $class->end_time)->lt($now);
+                $end = Carbon::parse($class->schedule_date . ' ' . $class->end_time);
+                return $now->gt($end);
             });
 
             // dd($scheduledClasses->toArray());
             return view('front-users.course-detail-live', compact(
                 'course',
                 'scheduledClasses',
+                'liveClassesNow',
                 'finishedClasses',
                 'totalSessions',
                 'firstLiveDate',

@@ -112,7 +112,9 @@
     <!-- 🔹 ADDED: LOGO + WEBSITE NAME -->
     <!-- ========================= -->
     <div class="pdf-header">
-        <img src="{{ public_path('images/Neti-logo.png') }}" alt="Logo">
+        @if($logoBase64)
+    <img src="{{ $logoBase64 }}" style="height:45px;">
+@endif
         <div class="site-name">{{ config('app.name') }}</div>
     </div>
 

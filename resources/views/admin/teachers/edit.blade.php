@@ -162,6 +162,7 @@
                     {{-- Account Setup --}}
                     <h4 class="mt-4 mb-3">Account Setup</h4>
                     <div id="account-setup-container">
+                          @if(isset($examMappings) && count($examMappings))
                         @foreach($examMappings as $index => $mapping)
                             <div class="account-block row mb-3" data-index="{{ $index }}">
                                 <div class="col-md-3 mb-3">
@@ -214,6 +215,49 @@
                                 </div>
                             </div>
                         @endforeach
+                        @else
+
+        {{-- 🔥 DEFAULT EMPTY BLOCK --}}
+        <div class="account-block row mb-3" data-index="0">
+
+            <div class="col-md-3 mb-3">
+                <label>Examination Commission</label>
+                <select name="exam_type[]" class="form-control exam_comission" data-index="0">
+                    <option value="">Select Commission</option>
+                    @foreach ($commissions as $commission)
+                        <option value="{{ $commission->id }}">{{ $commission->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="col-md-3 mb-3">
+                <label>Category</label>
+                <select name="category[]" class="form-control category" data-index="0">
+                    <option value="">Select Category</option>
+                </select>
+            </div>
+
+            <div class="col-md-3 mb-3 sub-cat d-none" data-index="0">
+                <label>Sub Category</label>
+                <select name="sub_category[]" class="form-control sub_category" data-index="0">
+                    <option value="">Select Sub Category</option>
+                </select>
+            </div>
+
+            <div class="col-md-3 mb-3">
+                <label>Subject</label>
+                <select name="subject[]" class="form-control subject" data-index="0">
+                    <option value="">Select Subject</option>
+                </select>
+            </div>
+
+            <div class="col-12 text-end">
+                <button type="button" class="btn btn-danger remove-block">Remove</button>
+            </div>
+
+        </div>
+
+    @endif
                     </div>
 
                     <button type="button" id="addMore" class="btn btn-secondary mt-2">Add More</button>

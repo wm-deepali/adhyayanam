@@ -2,6 +2,12 @@
 
 @section('title', 'Manage Video')
 
+<style>
+    .is-invalid {
+        border: 1px solid red !important;
+    }
+</style>
+
 @section('content')
     <div class="bg-light rounded p-2">
         <div class="card">
@@ -17,7 +23,6 @@
                 <div class="mt-2">
                     @include('layouts.includes.messages')
                 </div>
-
                 <form id="categoryForm" enctype="multipart/form-data">
                     @csrf
                     @if(isset($video) && $video->id) @method('POST') @endif
@@ -74,9 +79,7 @@
                                     </option>
                                 @endforeach
                             </select>
-                            @error('sub_category_id')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
+                            <div class="text-danger validation-err" id="sub_category_id-err"></div>
                         </div>
 
                         {{-- Course --}}
@@ -98,6 +101,7 @@
                             <select class="form-control" name="subject_id" id="subject_id">
                                 <option value="">--Select--</option>
                             </select>
+                            <div class="text-danger validation-err" id="subject_id-err"></div>
                         </div>
 
                         <div class="col-md-6 mb-2">
@@ -105,6 +109,7 @@
                             <select class="form-control" name="chapter_id" id="chapter_id">
                                 <option value="">--Select--</option>
                             </select>
+                            <div class="text-danger validation-err" id="chapter_id-err"></div>
                         </div>
 
                         <div class="col-md-6 mb-2">
@@ -112,6 +117,7 @@
                             <select class="form-control" name="topic_id" id="topic_id">
                                 <option value="">--Select--</option>
                             </select>
+                            <div class="text-danger validation-err" id="topic_id-err"></div>
                         </div>
 
 
@@ -189,6 +195,7 @@
                                                     </a>
                                                 </small>
                                             @endif
+                                            <div class="text-danger validation-err" id="video_assignment_file-err"></div>
                                         </div>
 
                                         {{-- Solution File --}}
@@ -203,6 +210,7 @@
                                                     </a>
                                                 </small>
                                             @endif
+                                            <div class="text-danger validation-err" id="video_solution_file-err"></div>
                                         </div>
 
 
@@ -218,18 +226,21 @@
                                                 <option value="Storage" {{ (old('video_type', $video->video_type ?? '') == 'Storage') ? 'selected' : '' }}>Storage</option>
                                                 <option value="Other" {{ (old('video_type', $video->video_type ?? '') == 'Other') ? 'selected' : '' }}>Other</option>
                                             </select>
+                                            <div class="text-danger validation-err" id="video_type-err"></div>
                                         </div>
 
                                         {{-- Video File & URL --}}
                                         <div class="col-md-6 mb-2 video_file_div" style="display:none">
                                             <label>Video File:</label>
                                             <input type="file" class="form-control" name="video_file">
+                                            <div class="text-danger validation-err" id="video_file-err"></div>
                                         </div>
 
                                         <div class="col-md-6 mb-2 video_url_div" style="display:none">
                                             <label>Video URL:</label>
                                             <input type="text" class="form-control" name="video_url"
                                                 value="{{ old('video_url', $video->video_url ?? '') }}">
+                                            <div class="text-danger validation-err" id="video_url-err"></div>
                                         </div>
 
                                         {{-- Duration --}}
@@ -237,6 +248,7 @@
                                             <label>Duration:</label>
                                             <input type="text" class="form-control" name="duration"
                                                 value="{{ old('duration', $video->duration ?? '') }}">
+                                            <div class="text-danger validation-err" id="duration-err"></div>
                                         </div>
 
                                         {{-- Status --}}
@@ -246,8 +258,15 @@
                                                 <option value="active" {{ (old('video_status', $video->status ?? '') == 'active') ? 'selected' : '' }}>Active</option>
                                                 <option value="block" {{ (old('video_status', $video->status ?? '') == 'block') ? 'selected' : '' }}>Inactive</option>
                                             </select>
+                                            <div class="text-danger validation-err" id="status-err"></div>
                                         </div>
 
+                                        <div class="col-md-6 mb-2">
+                                            <label>
+                                                <input type="checkbox" name="show_assignment[]" value="1" {{ old('show_assignment', $video->show_assignment ?? '') ? 'checked' : '' }}>
+                                                Show Assignment to Students
+                                            </label>
+                                        </div>
 
                                         {{-- Content --}}
                                         <div class="col-md-12 mb-2">
@@ -302,6 +321,7 @@
                                             </a>
                                         </small>
                                     @endif
+                                    <div class="text-danger validation-err" id="live_assignment_file-err"></div>
                                 </div>
 
                                 {{-- Solution File --}}
@@ -316,6 +336,7 @@
                                             </a>
                                         </small>
                                     @endif
+                                    <div class="text-danger validation-err" id="live_solution_file-err"></div>
                                 </div>
 
 
@@ -374,6 +395,12 @@
                                     <div class="text-danger validation-err" id="status-err"></div>
                                 </div>
 
+                                <div class="col-md-6 mb-2">
+                                    <label>
+                                        <input type="checkbox" name="show_assignment[]" value="1" {{ old('show_assignment', $video->show_assignment ?? '') ? 'checked' : '' }}>
+                                        Show Assignment to Students
+                                    </label>
+                                </div>
                                 {{-- Content --}}
                                 <div class="col-md-12 mb-2">
                                     <label>Content</label>
@@ -385,7 +412,9 @@
                         </div>
 
                         <div class="col-md-12 mb-2">
-                            <button type="submit" class="btn btn-primary">Submit</button>
+                            <button type="submit" class="btn btn-primary" id="submitBtn">
+                                Submit
+                            </button>
                         </div>
 
                     </div>
@@ -639,7 +668,7 @@
                 }
 
                 $(".validation-err").html('');
-
+                $('#submitBtn').prop('disabled', true).text('Submitting...');
                 $.ajax({
                     type: 'POST',
                     url: '{{ isset($video) && $video->id ? route("video.update", $video->id) : route("video.store") }}',
@@ -655,14 +684,37 @@
 
                     error: function (xhr) {
                         $(".validation-err").html('');
-
+                        $('#submitBtn').prop('disabled', false).text('Submit');
                         // ✅ Handle Laravel validation errors
                         if (xhr.status === 422) {
                             let errors = xhr.responseJSON.errors;
 
+                            let firstError = null;
+
                             $.each(errors, function (field, messages) {
+
+                                let input = $('[name="' + field + '"]');
+
+                                // show error
                                 $('#' + field + '-err').html(messages[0]);
+
+                                // highlight field
+                                input.addClass('is-invalid');
+
+                                // store first error
+                                if (!firstError) {
+                                    firstError = input;
+                                }
                             });
+
+                            // 🔥 scroll to first error
+                            if (firstError) {
+                                $('html, body').animate({
+                                    scrollTop: firstError.offset().top - 120
+                                }, 500);
+
+                                firstError.focus();
+                            }
                         } else {
                             console.error(xhr);
                             alert('Something went wrong. Please try again.');

@@ -83,7 +83,8 @@
                                 <td>₹ {{ $res->paid_amount ?? '0' }}</td>
                                 <td>{{ ucfirst($res->payment_method ?? '-') }}</td>
                                 <td>
-                                    <span class="badge bg-success">
+                                    <span class="badge 
+                                        {{ $res->payment_status == 'PAID' ? 'bg-success' : 'bg-warning' }}">
                                         {{ ucfirst($res->payment_status) }}
                                     </span>
                                 </td>
@@ -133,7 +134,7 @@
 
             {{-- PAGINATION --}}
             <div class="d-flex justify-content-end mt-3">
-                {{ $transactions->links() }}
+                {{ $transactions->appends(request()->query())->links() }}
             </div>
 
         </div>

@@ -102,7 +102,7 @@
 
             {{-- PAGINATION --}}
             <div class="d-flex justify-content-end mt-3">
-                {{ $callbacks->links() }}
+                {{ $callbacks->appends(request()->query())->links() }}
             </div>
 
         </div>

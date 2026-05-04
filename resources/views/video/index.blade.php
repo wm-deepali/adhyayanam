@@ -66,6 +66,7 @@
                                             <th>Source</th>
                                             <th>Ratings</th>
                                             <th>Status</th>
+                                            <th>Show Assignment</th>
                                             <th>Added By</th>
                                             <th>Action</th>
                                         </tr>
@@ -107,6 +108,12 @@
                                                     @endfor
                                                 </td>
                                                 <td>{{ $video->status ? 'Active' : 'Inactive' }}</td>
+                                                  <td>
+    <input type="checkbox"
+        class="toggle-assignment"
+        data-id="{{ $video->id }}"
+        {{ $video->show_assignment ? 'checked' : '' }}>
+</td>
                                                 <td>{{ $video->creator ? $video->creator->name : 'Super Admin'  }}</td>
                                                 <td>
                                                     @php
@@ -192,6 +199,7 @@
                                             <th>Start Time</th>
                                             <th>End Time</th>
                                             <th>Status</th>
+                                           <th>Show Assignment</th>
                                             <th>Added By</th>
                                             <th>Action</th>
                                         </tr>
@@ -207,6 +215,12 @@
                                                 <td>{{ $class->start_time }}</td>
                                                 <td>{{ $class->end_time }}</td>
                                                 <td>{{ $class->status ? 'Active' : 'Inactive' }}</td>
+                                                <td>
+    <input type="checkbox"
+        class="toggle-assignment"
+        data-id="{{ $class->id }}"
+        {{ $class->show_assignment ? 'checked' : '' }}>
+</td>
                                                 <td>{{ $class->creator ? $class->creator->name : 'Super Admin'  }}</td>
 
                                                 <td>
@@ -305,5 +319,25 @@
             liveTabPane.classList.add('show', 'active');
         }
     });
+    $(document).on('change', '.toggle-assignment', function () {
+
+    let id = $(this).data('id');
+    let value = $(this).is(':checked') ? 1 : 0;
+
+    $.ajax({
+        url: '/toggle-assignment/' + id,
+        type: 'POST',
+        data: {
+            _token: '{{ csrf_token() }}',
+            show_assignment: value
+        },
+        success: function () {
+            console.log('Updated');
+        },
+        error: function () {
+            alert('Error updating');
+        }
+    });
+});
 </script>
 @endpush

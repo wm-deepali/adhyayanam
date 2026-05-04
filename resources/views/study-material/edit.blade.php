@@ -382,24 +382,37 @@
 
 
 
-        function updateDisableSelects() {
-            let subjects = $('#subject_id').val() || [];
-            let chapters = $('#chapter_id').val() || [];
+       function updateDisableSelects() {
+    let subjects = $('#subject_id').val() || [];
+    let chapters = $('#chapter_id').val() || [];
 
-            // Enable all by default
-            $('#chapter_id').prop('disabled', false).trigger('change.select2');
-            $('#topic_id').prop('disabled', false).trigger('change.select2');
+    // Normalize arrays
+    if (!Array.isArray(subjects)) subjects = [subjects];
+    if (!Array.isArray(chapters)) chapters = [chapters];
 
-            if (subjects.length > 1) {
-                $('#chapter_id').val(null).trigger('change');
-                $('#chapter_id').prop('disabled', true).trigger('change.select2');
-                $('#topic_id').val(null).trigger('change');
-                $('#topic_id').prop('disabled', true).trigger('change.select2');
-            } else if (chapters.length > 1) {
-                $('#topic_id').val(null).trigger('change');
-                $('#topic_id').prop('disabled', true).trigger('change.select2');
-            }
-        }
+    // Default enable
+    $('#chapter_id').prop('disabled', false);
+    $('#topic_id').prop('disabled', false);
+
+    // POLICY LOGIC
+    if (subjects.length > 1) {
+        // 🔒 Lock both
+        $('#chapter_id').val(null);
+        $('#topic_id').val(null);
+
+        $('#chapter_id').prop('disabled', true);
+        $('#topic_id').prop('disabled', true);
+    }
+    else if (chapters.length > 1) {
+        // 🔒 Lock topic only
+        $('#topic_id').val(null);
+        $('#topic_id').prop('disabled', true);
+    }
+
+    // 🔥 Refresh Select2 UI properly
+    $('#chapter_id').trigger('change.select2');
+    $('#topic_id').trigger('change.select2');
+}
 
         $(document).ready(function () {
 
@@ -420,41 +433,11 @@
                 $('#based-on-text').hide();
             }
 
-            updateDisableSelects();
-
-            let oldCommission = "{{ old('commission_id', $material->commission_id) }}";
-let oldCategory = "{{ old('category_id', $material->category_id) }}";
-let oldSubCategory = "{{ old('sub_category_id', $material->sub_category_id) }}";
-
-if (oldCommission) {
-    $('#exam_com_id').val(oldCommission).trigger('change');
-
-    setTimeout(() => {
-        $('#category_id').val(oldCategory).trigger('change');
-
-        setTimeout(() => {
-            $('#sub_category_id').val(oldSubCategory).trigger('change');
-        }, 500);
-
-    }, 500);
-}
-
-let oldSubjects = @json(old('subject_id', $material->subject_id ?? []));
-let oldChapters = @json(old('chapter_id', $material->chapter_id ?? []));
-let oldTopics = @json(old('topic_id', $material->topic_id ?? []));
 
 setTimeout(() => {
-    $('#subject_id').val(oldSubjects).trigger('change');
+    updateDisableSelects();
+}, 500);
 
-    setTimeout(() => {
-        $('#chapter_id').val(oldChapters).trigger('change');
-
-        setTimeout(() => {
-            $('#topic_id').val(oldTopics).trigger('change');
-        }, 500);
-
-    }, 500);
-}, 1000);
 
             // Bind to change events
             $('#subject_id, #chapter_id').on('change', function () {
@@ -511,6 +494,7 @@ setTimeout(() => {
                     $.get(`{{ url('fetch-exam-category-by-commission') }}/${commission}`, function (result) {
                         if (result.success) {
                             $('#category_id').html(result.html).trigger('change');
+                            updateDisableSelects();
                         }
                     });
                 }
@@ -528,6 +512,7 @@ setTimeout(() => {
                             if (result.html) {
                                 $('#sub_category_id').html(result.html).trigger('change');
                                 $('.sub-cat').removeClass('hidecls');
+                                updateDisableSelects();
                             } else {
                                 $('.sub-cat').addClass('hidecls');
                             }
@@ -545,6 +530,7 @@ setTimeout(() => {
                     $.get(`{{ url('fetch-subject-by-subcategory') }}/${subcat}`, function (result) {
                         if (result.success) {
                             $('#subject_id').html(result.html).trigger('change');
+                            updateDisableSelects();
                         }
                     });
                 }
@@ -558,6 +544,7 @@ setTimeout(() => {
                     $.get(`{{ url('fetch-chapter-by-subject') }}/${subject}`, function (result) {
                         if (result.success) {
                             $('#chapter_id').html(result.html).trigger('change');
+                            updateDisableSelects();
                         }
                     });
                 }
@@ -570,6 +557,7 @@ setTimeout(() => {
                     $.get(`{{ url('fetch-topic-by-chapter') }}/${chapter}`, function (result) {
                         if (result.success) {
                             $('#topic_id').html(result.html).trigger('change');
+                             updateDisableSelects();
                         }
                     });
                 }

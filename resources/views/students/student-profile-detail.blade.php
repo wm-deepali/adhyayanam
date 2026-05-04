@@ -1,195 +1,214 @@
 @extends('layouts.app')
 
-@section('title')
-  Student Details
-@endsection
+@section('title', 'Student Profile')
 
 @section('content')
-  <style>
-    .card.shadow-sm {
-      min-height: 274px;
-    }
 
-    .card-header.bg-transparent.border-0 {
-      padding-top: 15px;
-    }
+<div class="bg-light rounded p-2">
 
-    .card-body.pt-0 {
-      padding-bottom: 0px;
-    }
-
-    .student-profile .card .card-header .profile_img {
-      width: 150px;
-      height: 150px;
-      object-fit: cover;
-      margin: 10px auto;
-      border: 10px solid #ccc;
-      border-radius: 50%;
-    }
-
-    .student-profile .card h3 {
-      font-size: 20px;
-      font-weight: 700;
-    }
-
-    .student-profile .card p {
-      font-size: 16px;
-      color: #000;
-    }
-
-    .student-profile .table th,
-    .student-profile .table td {
-      font-size: 14px;
-      padding: 5px 10px;
-      color: #000;
-    }
-
-    .card-header.bg-transparent.border-0 i {
-      padding-right: 10px;
-    }
-
-    .btn-change-password {
-      text-align: center;
-      padding-top: 15px;
-    }
-
-    .btn-change-password a {
-      text-decoration: none;
-      background-color: #303c54;
-      color: #fff;
-      padding: 10px;
-      border-radius: 2px;
-    }
-
-    .o-right {
-      float: right;
-      font-weight: 600;
-    }
-
-    .listn ul {
-      list-style: none;
-      padding: 10px;
-    }
-  </style>
-  <div class="bg-light rounded p-2">
-    <div class="card">
-      <div class="card-body">
-        <h5 class="card-title">Student Profile Detail</h5>
-        <h6 class="card-subtitle mb-2 text-muted">Manage Students Profile here.</h6>
-
-        <div class="mt-2">
-          @include('layouts.includes.messages')
-        </div>
-
-        <div class="container mt-4 student-profile">
-          <div class="row">
-            <div class="col-lg-4">
-              <div class="card shadow-sm">
-                <div class="card-header bg-transparent text-center">
-                  <img class="profile_img" src="{{asset('/' . $profile->avatar)}}" alt="">
-                  <h3>{{ucfirst($profile->first_name)}} {{ucfirst($profile->last_name)}}</h3>
-                </div>
-                <div class="btn-change-password"><a href="{{route('students.change-password', $profile->id)}}">Change
-                    Password</a></div>
-              </div>
+    {{-- HEADER --}}
+    <div class="card mb-3">
+        <div class="card-body d-flex justify-content-between align-items-center">
+            <div>
+                <h5 class="mb-0">Student Profile</h5>
+                <small class="text-muted">Detailed student overview</small>
             </div>
-            <div class="col-lg-8">
-              <div class="card shadow-sm">
-                <div class="card-header bg-transparent border-0">
-                  <h3 class="mb-0"><i class="far fa-clone pr-1"></i>General Information</h3>
-                </div>
-                <div class="card-body pt-0">
-                  <table class="table table-bordered">
-                    <tr>
-                      <th width="30%">Full Name</th>
-                      <td width="2%">:</td>
-                      <td>{{ucfirst($profile->first_name)}} {{ucfirst($profile->last_name)}}</td>
-                    </tr>
-                    <tr>
-                      <th width="30%">Email Id</th>
-                      <td width="2%">:</td>
-                      <td>{{$profile->email}}</td>
-                    </tr>
-                    <tr>
-                      <th width="30%">Mobile Number </th>
-                      <td width="2%">:</td>
-                      <td>{{$profile->mobile}}</td>
-                    </tr>
-                    <tr>
-                      <th width="30%">Gender</th>
-                      <td width="2%">:</td>
-                      <td>{{$profile->gender}}</td>
-                    </tr>
-                    <tr>
-                      <th width="30%">DOB</th>
-                      <td width="2%">:</td>
-                      <td>{{$profile->date_of_birth}}</td>
-                    </tr>
-                    <tr>
-                      <th width="30%">Full Address</th>
-                      <td width="2%">:</td>
-                      <td>{{$profile->full_address}}</td>
-                    </tr>
-                  </table>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
 
-      </div>
+            <a href="{{ url()->previous() }}" class="btn btn-secondary btn-sm">
+                ← Back
+            </a>
+        </div>
     </div>
-  </div>
-  <div class="bg-light rounded p-2">
+
+    {{-- PROFILE + INFO --}}
     <div class="row">
-      <div class="col-sm-6 col-lg-4">
-        <div class="card mb-4 text-white bg-primary">
-          <div class="card-body">
-            <div class="fs-4 fw-semibold">Test Series</div>
-            <div class="listn">
-              <ul>
-                <li>Total Orders <span class="o-right">{{$testSeries['totalOrder']}}</span></li>
-                <li>Total Billed Amount<span class="o-right">&#8377;{{$testSeries['totalBilledAmount']}}</span></li>
-                <li>Last Order ID<span class="o-right">#{{$testSeries['lastOrderCode']}}</span></li>
-                <li>Last Order Date & Time<span class="o-right">{{$testSeries['lastOrderDate']}}</span></li>
-              </ul>
+
+        {{-- LEFT PROFILE --}}
+        <div class="col-md-4">
+            <div class="card shadow-sm text-center">
+                <div class="card-body">
+
+                    <img class="rounded-circle mb-3"
+                         src="{{ $profile->avatar ? asset('/'.$profile->avatar) : asset('default-user.png') }}"
+                         width="120" height="120">
+
+                    <h5>{{ $profile->full_name }}</h5>
+                    <p class="text-muted">{{ $profile->email }}</p>
+
+                    <a href="{{ route('students.change-password', $profile->id) }}"
+                       class="btn btn-dark btn-sm mt-2">
+                        Change Password
+                    </a>
+
+                </div>
             </div>
-          </div>
         </div>
-      </div>
-      <!-- /.col-->
-      <div class="col-sm-6 col-lg-4">
-        <div class="card mb-4 text-white bg-warning">
-          <div class="card-body">
-            <div class="fs-4 fw-semibold">Courses</div>
-            <div class="listn">
-              <ul>
-                <li>Total Orders <span class="o-right">{{$course['totalOrder']}}</span></li>
-                <li>Total Billed Amount<span class="o-right">&#8377;{{$course['totalBilledAmount']}}</span></li>
-                <li>Last Order ID<span class="o-right">#{{$course['lastOrderCode']}}</span></li>
-                <li>Last Order Date & Time<span class="o-right">{{$course['lastOrderDate']}}</span></li>
-              </ul>
+
+        {{-- RIGHT DETAILS --}}
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <strong>General Information</strong>
+                </div>
+
+                <div class="card-body">
+                    <table class="table table-bordered">
+                        <tr>
+                            <th>Name</th>
+                            <td>{{ $profile->full_name }}</td>
+                        </tr>
+                        <tr>
+                            <th>Email</th>
+                            <td>{{ $profile->email }}</td>
+                        </tr>
+                        <tr>
+                            <th>Mobile</th>
+                            <td>{{ $profile->mobile }}</td>
+                        </tr>
+                        <tr>
+                            <th>Gender</th>
+                            <td>{{ $profile->gender ?? '-' }}</td>
+                        </tr>
+                        <tr>
+                            <th>DOB</th>
+                            <td>{{ $profile->date_of_birth ?? '-' }}</td>
+                        </tr>
+                        <tr>
+                            <th>Joined</th>
+                            <td>{{ $profile->created_at }}</td>
+                        </tr>
+                    </table>
+                </div>
             </div>
-          </div>
         </div>
-      </div>
-      <!-- /.col-->
-      <div class="col-sm-6 col-lg-4">
-        <div class="card mb-4 text-white bg-danger">
-          <div class="card-body">
-            <div class="fs-4 fw-semibold">Study Material</div>
-            <div class="listn">
-              <ul>
-                <li>Total Orders <span class="o-right">{{$studyMaterial['totalOrder']}}</span></li>
-                <li>Total Billed Amount<span class="o-right">&#8377;{{$studyMaterial['totalBilledAmount']}}</span></li>
-                <li>Last Order ID<span class="o-right">#{{$studyMaterial['lastOrderCode']}}</span></li>
-                <li>Last Order Date & Time<span class="o-right">{{$studyMaterial['lastOrderDate']}}</span></li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </div>
-      <!-- /.col-->
+
     </div>
-  </div>
+
+    {{-- SUMMARY CARDS --}}
+    <div class="row mt-3">
+
+        <div class="col-md-4">
+            <div class="card text-white bg-primary">
+                <div class="card-body">
+                    <h6>Test Series</h6>
+                    <p>Total Orders: {{ $testSeries['totalOrder'] ?? 0 }}</p>
+                    <p>Total Amount: ₹{{ $testSeries['totalBilledAmount'] ?? 0 }}</p>
+                    <p>Last Order: #{{ $testSeries['lastOrderCode'] ?? '--' }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card text-white bg-warning">
+                <div class="card-body">
+                    <h6>Courses</h6>
+                    <p>Total Orders: {{ $course['totalOrder'] ?? 0 }}</p>
+                    <p>Total Amount: ₹{{ $course['totalBilledAmount'] ?? 0 }}</p>
+                    <p>Last Order: #{{ $course['lastOrderCode'] ?? '--' }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card text-white bg-danger">
+                <div class="card-body">
+                    <h6>Study Material</h6>
+                    <p>Total Orders: {{ $studyMaterial['totalOrder'] ?? 0 }}</p>
+                    <p>Total Amount: ₹{{ $studyMaterial['totalBilledAmount'] ?? 0 }}</p>
+                    <p>Last Order: #{{ $studyMaterial['lastOrderCode'] ?? '--' }}</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    {{-- TABS --}}
+    <div class="card mt-4">
+        <div class="card-body">
+
+            <ul class="nav nav-tabs">
+                <li class="nav-item">
+                    <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#orders">
+                        Orders
+                    </button>
+                </li>
+
+                <li class="nav-item">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#videos">
+                        Videos
+                    </button>
+                </li>
+            </ul>
+
+            <div class="tab-content mt-3">
+
+                {{-- ORDERS TAB --}}
+                <div class="tab-pane fade show active" id="orders">
+
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Type</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @forelse($orders ?? [] as $order)
+                                <tr>
+                                    <td>{{ $order->order_code }}</td>
+                                    <td>{{ $order->order_type }}</td>
+                                    <td>₹{{ $order->billed_amount }}</td>
+                                    <td>{{ $order->payment_status }}</td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted">
+                                        No orders found
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+
+                </div>
+
+                {{-- VIDEOS TAB --}}
+                <div class="tab-pane fade" id="videos">
+
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Video</th>
+                                <th>Views</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @forelse($videos ?? [] as $v)
+                                <tr>
+                                    <td>{{ $v->video->title ?? '-' }}</td>
+                                    <td>{{ $v->watched_count }}</td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="2" class="text-center text-muted">
+                                        No video activity
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
 @endsection

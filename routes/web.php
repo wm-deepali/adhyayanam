@@ -67,7 +67,7 @@ Route::get('pyq-papers/{examid?}/{catid?}/{subcat?}', [FrontController::class, '
 Route::get('test-series-list/{examid?}/{catid?}/{subcat?}', [FrontController::class, 'testseriesIndex'])->name('test-series-list');
 Route::get('test-series/details/{slug}', [FrontController::class, 'testseriesDetail'])->name('test-series-detail');
 
-
+Route::get('/test/download/{id}', [FrontController::class, 'testDownload'])->name('test.download');
 Route::get('/test-instruction/{id}', [LiveTestController::class, 'testInstruction'])->name('test.instruction');
 Route::get('/live-test/{id}', [LiveTestController::class, 'liveTest'])->name('live-test');
 Route::post('/fetch-question', [LiveTestController::class, 'fetchQuestion']);
@@ -200,6 +200,18 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
                 'saveEvaluation'
             ])->name('save-evaluation');
 
+            Route::get('live-classes', [TeacherController::class, 'liveClasses'])
+                ->name('live.classes');
+
+            Route::post('live/{id}/assignment-upload', [TeacherController::class, 'uploadAssignment'])
+                ->name('live.assignment.upload');
+
+            Route::post('live/{id}/solution-upload', [TeacherController::class, 'uploadSolution'])
+                ->name('live.solution.upload');
+    
+            Route::post('live/{id}/assignment-toggle', [TeacherController::class, 'toggleAssignment'])
+                ->name('live.assignment.toggle');
+
             // 📋 List all submitted assignments for teacher
             Route::get('homework', [TeacherHomeworkController::class, 'index'])
                 ->name('homework.index');
@@ -211,6 +223,8 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
             // ✅ Update evaluation (marks, remark, status)
             Route::patch('homework/{id}', [TeacherHomeworkController::class, 'update'])
                 ->name('homework.update');
+
+
 
         });
     });
@@ -683,6 +697,7 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
             Route::delete('/{video}/delete', [VideoController::class, 'destroy'])->name('destroy')->middleware('custom.permission:manage_videos_delete');
             Route::get('/{video}', [VideoController::class, 'show'])->name('show')->middleware('custom.permission:manage_videos');
         });
+        Route::post('/toggle-assignment/{id}', [VideoController::class, 'toggleAssignment']);
 
         Route::get('homework', [AdminHomeworkController::class, 'index'])
             ->name('homework.index');
@@ -721,6 +736,8 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
         Route::get('students/change-password/{id}', [StudentController::class, 'studentChangePassword'])->name('students.change-password')->middleware('custom.permission:students.view-all-orders');
         Route::post('students/update-password/{id}', [StudentController::class, 'studentUpdatePassword'])->name('students.update-password')->middleware('custom.permission:manage_students_edit');
         Route::get('students/student-profile-detail/{id}', [StudentController::class, 'studentProfile'])->name('students.student-profile-detail')->middleware('custom.permission:manage_students');
+        Route::get('students/study-material', [StudentController::class, 'studentStudyMaterialList'])->name('students.study-material.list');
+
         // TEST SERIES SUMMARY
         Route::get('students/student-test-series-summary', [StudentController::class, 'studentTestSummery'])->name('students.student-test-series-summary')->middleware('custom.permission:manage_student_test_summary');
         Route::get('test-series-summary/{student}/{testSeries}', [StudentController::class, 'studentTestDetail'])->name('test-series.detail');

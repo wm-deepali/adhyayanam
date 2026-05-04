@@ -1,9 +1,8 @@
 @extends('layouts.app')
 
 @section('title')
-    Current Affair
+Order Detail
 @endsection
-
 @section('content')
     <style>
         .company-name {
@@ -55,7 +54,15 @@
     <div class="bg-light rounded p-2">
         <div class="card">
             <div class="card-body">
-                <h5 class="card-title">Order Detail</h5>
+             <div class="d-flex justify-content-between align-items-center mb-3">
+
+    <h5 class="card-title mb-0">Order Detail</h5>
+
+    <a href="{{ url()->previous() }}" class="btn btn-secondary btn-sm">
+        ← Back
+    </a>
+
+</div>
 
                 <div class="mt-2">
                     @include('layouts.includes.messages')

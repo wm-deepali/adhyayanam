@@ -11,22 +11,27 @@ use App\Models\Teacher;
 
 class TestResultController extends Controller
 {
-    public function results()
+    public function results(Request $request)
     {
+        $studentId = $request->student_id;
+
+        $pendingQuery = StudentTestAttempt::where('status', 'pending');
+        $reviewQuery = StudentTestAttempt::where('status', 'under_review');
+        $publishedQuery = StudentTestAttempt::where('status', 'published');
+
+        // ✅ FILTER BY STUDENT (MAIN FIX)
+        if ($studentId) {
+            $pendingQuery->where('student_id', $studentId);
+            $reviewQuery->where('student_id', $studentId);
+            $publishedQuery->where('student_id', $studentId);
+        }
+
         return view('admin.results.index', [
-            'pending' => StudentTestAttempt::where('status', 'pending')
-                ->latest()
-                ->paginate(10, ['*'], 'pending_page'),
-
-            'under_review' => StudentTestAttempt::where('status', 'under_review')
-                ->latest()
-                ->paginate(10, ['*'], 'review_page'),
-
-            'published' => StudentTestAttempt::where('status', 'published')
-                ->latest()
-                ->paginate(10, ['*'], 'published_page'),
-
-            'teachers' => Teacher::where('can_check_tests', 1)->get()
+            'pending' => $pendingQuery->latest()->paginate(10, ['*'], 'pending_page'),
+            'under_review' => $reviewQuery->latest()->paginate(10, ['*'], 'review_page'),
+            'published' => $publishedQuery->latest()->paginate(10, ['*'], 'published_page'),
+            'teachers' => Teacher::where('can_check_tests', 1)->get(),
+            'student_id' => $studentId // optional (for UI use)
         ]);
     }
 

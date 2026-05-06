@@ -49,6 +49,7 @@
                             <th width="80">Edit</th>
                             <th width="80">Status</th>
                             <th width="80">Delete</th>
+                             <th width="120">Approval</th>
                             <th width="120">Extra</th>
                         </tr>
                     </thead>
@@ -59,7 +60,7 @@
 
                             <!-- GROUP HEADER -->
                             <tr class="group-header bg-light fw-bold" data-group="{{ Str::slug($groupName) }}" style="cursor:pointer;">
-                                <td colspan="7">
+                                <td colspan="8">
                                     <span class="toggle-icon me-2">➕</span> {{ $groupName }}
                                 </td>
                             </tr>
@@ -127,6 +128,14 @@
                                                     {{ ($saved[$moduleKey . '_delete'] ?? 'no') == 'yes' ? 'checked' : '' }}>
                                             @endif
                                         </td>
+
+                                           <td>
+    @if(in_array('add', $module['actions']))
+        <label style="font-size:12px;">
+            <input type="checkbox" name="permissions[{{ $moduleKey }}_approval]" value="yes" {{ ($saved[$moduleKey . '_approval'] ?? 'no') == 'yes' ? 'checked' : '' }}> 
+        </label>
+    @endif
+</td>
 
                                         <!-- EXTRA ACTIONS -->
                                         <td>

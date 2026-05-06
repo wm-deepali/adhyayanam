@@ -80,6 +80,7 @@
                             <th width="80">Edit</th>
                             <th width="80">Status</th>
                             <th width="80">Delete</th>
+                            <th width="120">Approval</th>
                             <th width="120">Extra</th>
                         </tr>
                     </thead>
@@ -91,7 +92,7 @@
                                 {{-- GROUP HEADER --}}
                                 <tr class="group-header bg-light fw-bold" data-group="{{ Str::slug($groupName) }}"
                                     style="cursor:pointer;">
-                                    <td colspan="7">
+                                    <td colspan="8">
                                         <span class="toggle-icon me-2">➕</span> {{ $groupName }}
                                     </td>
                                 </tr>
@@ -154,6 +155,15 @@
                                             @endif
                                         </td>
 
+                                        {{-- APPROVAL --}}
+                                         <td class="text-center">
+                                            @if(($saved[$moduleKey . '_approval'] ?? null) === 'yes')
+                                                <span class="badge bg-success">✔</span>
+                                            @else
+                                                —
+                                            @endif
+                                        </td>
+                                        
                                         {{-- EXTRA --}}
                                         <td>
                                             @foreach($extraActions as $ex)

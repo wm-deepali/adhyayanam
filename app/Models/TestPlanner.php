@@ -16,6 +16,7 @@ class TestPlanner extends Model
         'detail_content',
         'pdf',
         'status',
+        'approval_status',
         'created_at'
     ];
 

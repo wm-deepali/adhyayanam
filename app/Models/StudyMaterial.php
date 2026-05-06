@@ -25,6 +25,7 @@ class StudyMaterial extends Model
         'short_description',
         'detail_content',
         'status',
+        'approval_status',
         'meta_title',
         'meta_keyword',
         'meta_description',

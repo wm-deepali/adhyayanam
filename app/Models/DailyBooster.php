@@ -21,7 +21,8 @@ class DailyBooster extends Model
         'meta_title',
         'meta_keyword',
         'meta_description',
-        'created_by'
+        'created_by',
+        'approval_status'
     ];
 
     public function creator()

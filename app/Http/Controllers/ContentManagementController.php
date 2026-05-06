@@ -62,6 +62,7 @@ use Yajra\DataTables\Facades\DataTables;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\WalletTransaction;
 use App\Models\WalletSetting;
+use App\Helpers\Helper;
 
 class ContentManagementController extends Controller
 {
@@ -215,7 +216,7 @@ class ContentManagementController extends Controller
                     </a>
                 </li>';
 
-                    if (\App\Helpers\Helper::canAccess('manage_career_delete')) {
+                    if (Helper::canAccess('manage_career_delete')) {
                         $dropdown .= '
                 <li><hr class="dropdown-divider"></li>
                 <li>
@@ -224,7 +225,7 @@ class ContentManagementController extends Controller
                         ' . csrf_field() . '
                         ' . method_field('DELETE') . '
                         <button type="submit" class="dropdown-item text-danger">
-                            <i class="fa fa-trash me-2"></i> Delete
+                            <i class="fa fa-trash me-2" style="color:#dc3545!important"></i> Delete
                         </button>
                     </form>
                 </li>';
@@ -302,9 +303,27 @@ class ContentManagementController extends Controller
             $data['thumbnail'] = $request->file('thumbnail')->store('thumbnails', 'public');
         }
 
+        $data['approval_status'] = Helper::requiresApproval('manage_blog')
+            ? 'pending'
+            : 'approved';
+
+        $data['created_by'] = auth()->id();
+
         Blog::create($data);
 
         return redirect()->route('cm.blog.articles')->with('success', 'Blog created successfully!');
+    }
+
+    public function approveBlog($id)
+    {
+        $blog = Blog::findOrFail($id);
+
+        $blog->approval_status = 'approved';
+        $blog->save();
+
+        return response()->json([
+            'status' => true
+        ]);
     }
 
     public function blogEdit($id)
@@ -647,7 +666,7 @@ class ContentManagementController extends Controller
         </li>';
 
                     // EDIT permission
-                    if (\App\Helpers\Helper::canAccess('manage_exam_edit')) {
+                    if (Helper::canAccess('manage_exam_edit')) {
                         $dropdown .= '<li>
                 <a class="dropdown-item" href="' . route('cm.exam.edit', $row->id) . '">
                     <i class="fa fa-edit text-warning"></i> Edit
@@ -656,7 +675,7 @@ class ContentManagementController extends Controller
                     }
 
                     // DELETE permission
-                    if (\App\Helpers\Helper::canAccess('manage_exam_delete')) {
+                    if (Helper::canAccess('manage_exam_delete')) {
                         $dropdown .= '<li>
                 <form action="' . route('cm.exam.destroy', $row->id) . '" method="POST" onsubmit="return confirm(\'Are you sure?\')">
                     ' . csrf_field() . method_field("DELETE") . '
@@ -844,7 +863,7 @@ class ContentManagementController extends Controller
         </li>';
 
                     // EDIT permission
-                    if (\App\Helpers\Helper::canAccess('manage_category_edit')) {
+                    if (Helper::canAccess('manage_category_edit')) {
                         $editUrl = route('cm.category.edit', $row->id);
                         $dropdown .= '<li>
            <a class="dropdown-item"  href="' . $editUrl . '">
@@ -854,7 +873,7 @@ class ContentManagementController extends Controller
                     }
 
                     // DELETE permission
-                    if (\App\Helpers\Helper::canAccess('manage_category_delete')) {
+                    if (Helper::canAccess('manage_category_delete')) {
                         $dropdown .= '<li>
            <form action="' . route('cm.category.delete', $row->id) . '" method="POST" onsubmit="return confirm(\'Are you sure?\')">
                     ' . csrf_field() . method_field("DELETE") . '
@@ -1038,7 +1057,7 @@ class ContentManagementController extends Controller
                     $items = '';
 
                     // ✅ SHOW
-                    if (\App\Helpers\Helper::canAccess('manage_subcategory')) {
+                    if (Helper::canAccess('manage_subcategory')) {
                         $items .= '
             <li>
                 <a class="dropdown-item"
@@ -1049,7 +1068,7 @@ class ContentManagementController extends Controller
                     }
 
                     // ✅ EDIT
-                    if (\App\Helpers\Helper::canAccess('manage_subcategory_edit')) {
+                    if (Helper::canAccess('manage_subcategory_edit')) {
                         $items .= '
             <li>
                 <a class="dropdown-item"
@@ -1060,7 +1079,7 @@ class ContentManagementController extends Controller
                     }
 
                     // ✅ DELETE
-                    if (\App\Helpers\Helper::canAccess('manage_subcategory_delete')) {
+                    if (Helper::canAccess('manage_subcategory_delete')) {
                         $items .= '
             <li>
                 <form method="POST"
@@ -1289,7 +1308,7 @@ class ContentManagementController extends Controller
                     $buttons = '';
 
                     // EDIT permission
-                    if (\App\Helpers\Helper::canAccess('manage_subject_edit')) {
+                    if (Helper::canAccess('manage_subject_edit')) {
                         $editUrl = route('cm.subject.edit', $row->id);
                         $buttons .= '
             <a href="' . $editUrl . '" class="btn btn-sm btn-primary" title="Edit">
@@ -1299,7 +1318,7 @@ class ContentManagementController extends Controller
                     }
 
                     // DELETE permission
-                    if (\App\Helpers\Helper::canAccess('manage_subject_delete')) {
+                    if (Helper::canAccess('manage_subject_delete')) {
                         $buttons .= '
             <form action="' . route('cm.subject.delete', $row->id) . '" method="POST" style="display:inline">
                 ' . csrf_field() . '
@@ -1425,7 +1444,7 @@ class ContentManagementController extends Controller
                     $items = '';
 
                     // ✅ SHOW
-                    if (\App\Helpers\Helper::canAccess('manage_subcategory')) {
+                    if (Helper::canAccess('manage_subcategory')) {
                         $items .= '
             <li>
                 <a class="dropdown-item"
@@ -1436,7 +1455,7 @@ class ContentManagementController extends Controller
                     }
 
                     // ✅ EDIT
-                    if (\App\Helpers\Helper::canAccess('manage_subcategory_edit')) {
+                    if (Helper::canAccess('manage_subcategory_edit')) {
                         $items .= '
             <li>
                 <a class="dropdown-item"
@@ -1447,7 +1466,7 @@ class ContentManagementController extends Controller
                     }
 
                     // ✅ DELETE
-                    if (\App\Helpers\Helper::canAccess('manage_subcategory_delete')) {
+                    if (Helper::canAccess('manage_subcategory_delete')) {
                         $items .= '
             <li>
                 <form method="POST"
@@ -1640,12 +1659,20 @@ class ContentManagementController extends Controller
                         ? $row->creator->name
                         : 'Super Admin';
                 })
+                ->addColumn('status', function ($row) {
+
+                    if ($row->status == 'pending') {
+                        return '<span class="badge bg-warning text-dark">Pending</span>';
+                    }
+
+                    return '<span class="badge bg-success">Approved</span>';
+                })
                 ->addColumn('action', function ($row) {
 
                     $buttons = '';
 
                     // SHOW (manage)
-                    if (\App\Helpers\Helper::canAccess('manage_courses')) {
+                    if (Helper::canAccess('manage_courses')) {
                         $buttons .= '
             <li>
                 <a class="dropdown-item" href="' . route('courses.course.show', $row->id) . '">
@@ -1655,7 +1682,7 @@ class ContentManagementController extends Controller
                     }
 
                     // EDIT
-                    if (\App\Helpers\Helper::canAccess('manage_courses_edit')) {
+                    if (Helper::canAccess('manage_courses_edit')) {
                         $buttons .= '
             <li>
                 <a class="dropdown-item" href="' . route('courses.course.edit', $row->id) . '">
@@ -1665,7 +1692,7 @@ class ContentManagementController extends Controller
                     }
 
                     // DELETE
-                    if (\App\Helpers\Helper::canAccess('manage_courses_delete')) {
+                    if (Helper::canAccess('manage_courses_delete')) {
                         $buttons .= '
             <li>
                 <form action="' . route('courses.course.delete', $row->id) . '" method="POST"
@@ -1677,6 +1704,19 @@ class ContentManagementController extends Controller
                     </button>
                 </form>
             </li>';
+                    }
+
+
+                    // APPROVE (ONLY ADMIN)
+                    if ($row->status == 'pending' && auth()->user()->type === 'admin' && is_null(auth()->user()->role_group_id)) {
+                        $buttons .= '
+    <li>
+        <a href="javascript:void(0)" 
+           class="dropdown-item text-success approve-course" 
+           data-id="' . $row->id . '">
+            <i class="fa fa-check me-1"></i> Approve
+        </a>
+    </li>';
                     }
 
                     // If user has no permissions → no dropdown
@@ -1696,11 +1736,20 @@ class ContentManagementController extends Controller
         </div>
     ';
                 })
-                ->rawColumns(['checkbox', 'fee', 'image', 'duration', 'category', 'subcat', 'commission', 'action', 'created_by'])
+                ->rawColumns(['checkbox', 'fee', 'image', 'duration', 'category', 'subcat', 'commission', 'status', 'action', 'created_by'])
                 ->make(true);
         }
         return view('content-management.course');
 
+    }
+
+    public function approveCourse($id)
+    {
+        $course = Course::findOrFail($id);
+        $course->status = 'approved';
+        $course->save();
+
+        return response()->json(['status' => true]);
     }
 
     public function courseShow($id)
@@ -1715,7 +1764,6 @@ class ContentManagementController extends Controller
 
         return view('content-management.course-show', compact('course', 'subjects', 'chapters', 'topics'));
     }
-
 
     public function courseCreate()
     {
@@ -1842,6 +1890,12 @@ class ContentManagementController extends Controller
         $course->feature = $request->has('feature') ? 'on' : 'off';
 
         $course->created_by = auth()->id();
+        if (Helper::requiresApproval('manage_courses')) {
+            $course->status = 'pending';
+        } else {
+            $course->status = 'approved';
+        }
+
         $course->save();
 
         return redirect()
@@ -2002,6 +2056,15 @@ class ContentManagementController extends Controller
         return redirect()->back()->with('success', 'Course deleted successfully!');
     }
 
+    public function approveCurrentAffair($id)
+    {
+        $affair = CurrentAffair::findOrFail($id);
+        $affair->approval_status = 'approved';
+        $affair->save();
+
+        return response()->json(['status' => true]);
+    }
+
     public function currentAffairDelete($id)
     {
         $currentAffair = CurrentAffair::findOrFail($id);
@@ -2056,7 +2119,7 @@ class ContentManagementController extends Controller
         </a>
     ';
 
-                    if (!\App\Helpers\Helper::canAccess('manage_contact_inquiries_delete')) {
+                    if (!Helper::canAccess('manage_contact_inquiries_delete')) {
                         return '
             <div class="dropdown">
                 <button class="btn btn-sm btn-secondary dropdown-toggle" data-bs-toggle="dropdown">
@@ -2257,6 +2320,9 @@ class ContentManagementController extends Controller
             'meta_keyword' => $request->meta_keyword,
             'meta_description' => $request->meta_description,
             'created_by' => auth()->id(),
+            'approval_status' => Helper::requiresApproval('manage_ca')
+                ? 'pending'
+                : 'approved',
         ]);
 
         return redirect()->route('current.affairs.index')->with('success', 'Current Affair added successfully!');
@@ -2398,9 +2464,16 @@ class ContentManagementController extends Controller
 
                 // ✅ Status
                 ->addColumn('status', function ($row) {
-                    return $row->status === 'Active'
+
+                    $publishStatus = $row->status === 'Active'
                         ? '<span class="badge bg-success">Active</span>'
                         : '<span class="badge bg-secondary">Inactive</span>';
+
+                    $approvalStatus = $row->approval_status == 'pending'
+                        ? '<span class="badge bg-warning text-dark">Pending</span>'
+                        : '<span class="badge bg-primary">Approved</span>';
+
+                    return $publishStatus . '<br>' . $approvalStatus;
                 })
 
                 ->addColumn('created_by', function ($row) {
@@ -2414,7 +2487,7 @@ class ContentManagementController extends Controller
 
                     $actions = '';
 
-                    if (\App\Helpers\Helper::canAccess('manage_study_material')) {
+                    if (Helper::canAccess('manage_study_material')) {
                         $actions .= '
                         <li>
                             <a class="dropdown-item text-primary"
@@ -2424,7 +2497,7 @@ class ContentManagementController extends Controller
                         </li>';
                     }
 
-                    if (\App\Helpers\Helper::canAccess('manage_study_material_edit')) {
+                    if (Helper::canAccess('manage_study_material_edit')) {
                         $actions .= '
                         <li>
                             <a class="dropdown-item text-secondary"
@@ -2434,7 +2507,7 @@ class ContentManagementController extends Controller
                         </li>';
                     }
 
-                    if (\App\Helpers\Helper::canAccess('manage_study_material')) {
+                    if (Helper::canAccess('manage_study_material')) {
                         $actions .= '
                         <li>
                             <a class="dropdown-item text-info"
@@ -2444,7 +2517,7 @@ class ContentManagementController extends Controller
                         </li>';
                     }
 
-                    if (\App\Helpers\Helper::canAccess('manage_study_material_delete')) {
+                    if (Helper::canAccess('manage_study_material_delete')) {
                         $actions .= '
                         <li>
                             <form method="POST"
@@ -2452,10 +2525,22 @@ class ContentManagementController extends Controller
                                   onsubmit="return confirm(\'Are you sure?\')">
                                 ' . csrf_field() . method_field('DELETE') . '
                                 <button class="dropdown-item text-danger">
-                                    <i class="fas fa-trash"></i> Delete
+                                    <i class="fas fa-trash" style="color:#dc3545!important"></i> Delete
                                 </button>
                             </form>
                         </li>';
+                    }
+
+                    // APPROVE BUTTON (ADMIN ONLY)
+                    if ($row->status == 'pending' && auth()->user()->type === 'admin' && is_null(auth()->user()->role_group_id)) {
+                        $actions .= '
+    <li>
+        <a href="javascript:void(0)" 
+           class="dropdown-item text-success approve-material" 
+           data-id="' . $row->id . '">
+            <i class="fa fa-check"></i> Approve
+        </a>
+    </li>';
                     }
 
                     if ($actions === '') {
@@ -2490,6 +2575,14 @@ class ContentManagementController extends Controller
         return view('study-material.index');
     }
 
+    public function approveStudyMaterial($id)
+    {
+        $material = StudyMaterial::findOrFail($id);
+        $material->approval_status = 'approved';
+        $material->save();
+
+        return response()->json(['status' => true]);
+    }
 
     public function studyMaterialShow($id)
     {
@@ -2611,6 +2704,11 @@ class ContentManagementController extends Controller
         $studyMaterial->based_on = $basedOn; // Optional, for reference
         $studyMaterial->language = $validatedData['language'];
         $studyMaterial->created_by = auth()->id();
+        if (Helper::requiresApproval('manage_study_material')) {
+            $studyMaterial->approval_status = 'pending';
+        } else {
+            $studyMaterial->approval_status = 'approved';
+        }
         $studyMaterial->save();
 
         if (!empty($validatedData['titles']) && !empty($validatedData['descriptions'])) {
@@ -2910,6 +3008,15 @@ class ContentManagementController extends Controller
                     return '--';
                 })
 
+                ->addColumn('approval_status', function ($row) {
+
+                    if ($row->approval_status == 'pending') {
+                        return '<span class="badge bg-warning text-dark">Pending</span>';
+                    }
+
+                    return '<span class="badge bg-success">Approved</span>';
+                })
+
                 ->addColumn('created_by', function ($row) {
                     return $row->creator->name ?? 'Super Admin';
                 })
@@ -2918,7 +3025,7 @@ class ContentManagementController extends Controller
 
                     $buttons = '';
 
-                    if (\App\Helpers\Helper::canAccess('manage_daily_booster')) {
+                    if (Helper::canAccess('manage_daily_booster')) {
                         $buttons .= '
                         <li>
                             <a class="dropdown-item text-primary"
@@ -2928,7 +3035,7 @@ class ContentManagementController extends Controller
                         </li>';
                     }
 
-                    if (\App\Helpers\Helper::canAccess('manage_daily_booster_edit')) {
+                    if (Helper::canAccess('manage_daily_booster_edit')) {
                         $buttons .= '
                         <li>
                             <a class="dropdown-item text-info"
@@ -2938,7 +3045,7 @@ class ContentManagementController extends Controller
                         </li>';
                     }
 
-                    if (\App\Helpers\Helper::canAccess('manage_daily_booster_delete')) {
+                    if (Helper::canAccess('manage_daily_booster_delete')) {
                         $buttons .= '
                         <li>
                             <form action="' . route('daily.boost.delete', $row->id) . '"
@@ -2946,10 +3053,25 @@ class ContentManagementController extends Controller
                                   onsubmit="return confirm(\'Are you sure?\')">
                                 ' . csrf_field() . method_field('DELETE') . '
                                 <button class="dropdown-item text-danger">
-                                    <i class="fa fa-trash me-2"></i> Delete
+                                    <i class="fa fa-trash me-2" style="color:#dc3545!important"></i> Delete
                                 </button>
                             </form>
                         </li>';
+                    }
+
+                    // APPROVE BUTTON
+                    if (
+                        $row->approval_status == 'pending' &&
+                        auth()->user()->type === 'admin' && is_null(auth()->user()->role_group_id)
+                    ) {
+                        $buttons .= '
+    <li>
+        <a href="javascript:void(0)" 
+           class="dropdown-item text-success approve-daily-booster" 
+           data-id="' . $row->id . '">
+            <i class="fa fa-check me-2"></i> Approve
+        </a>
+    </li>';
                     }
 
                     if ($buttons === '') {
@@ -2968,13 +3090,24 @@ class ContentManagementController extends Controller
                     </div>';
                 })
 
-                ->rawColumns(['checkbox', 'image', 'action'])
+                ->rawColumns(['checkbox', 'image', 'action', 'approval_status'])
                 ->make(true);
         }
 
         return view('daily-booster.index');
     }
 
+    public function approveDailyBooster($id)
+    {
+        $booster = DailyBooster::findOrFail($id);
+
+        $booster->approval_status = 'approved';
+        $booster->save();
+
+        return response()->json([
+            'status' => true
+        ]);
+    }
 
     public function dailyBoostShow($id)
     {
@@ -3058,6 +3191,10 @@ class ContentManagementController extends Controller
         }
 
         $data['created_by'] = auth()->id();
+        $data['approval_status'] = Helper::requiresApproval('manage_daily_booster')
+            ? 'pending'
+            : 'approved';
+
         DailyBooster::create($data);
 
         return redirect()->route('daily.boost.index')->with('success', 'Daily Booster created successfully.');
@@ -3083,9 +3220,16 @@ class ContentManagementController extends Controller
                     return '<input type="checkbox" class="column_checkbox career_checkbox" id="' . $row->id . '" name="career_checkbox[]" />';
                 })
                 ->addColumn('status', function ($row) {
-                    return $row->status == 1
+
+                    $publish = $row->status == 1
                         ? '<span class="badge badge-success">Active</span>'
                         : '<span class="badge badge-secondary">Inactive</span>';
+
+                    $approval = $row->approval_status == 'pending'
+                        ? '<span class="badge bg-warning text-dark">Pending</span>'
+                        : '<span class="badge bg-primary">Approved</span>';
+
+                    return $publish . '<br>' . $approval;
                 })
                 ->addColumn('created_by', function ($row) {
                     return $row->creator
@@ -3097,7 +3241,7 @@ class ContentManagementController extends Controller
                     $buttons = '';
 
                     // VIEW
-                    if (\App\Helpers\Helper::canAccess('manage_test_planner')) {
+                    if (Helper::canAccess('manage_test_planner')) {
                         $buttons .= '
             <li>
                 <a class="dropdown-item text-primary" href="' . route('test.planner.show', $row->id) . '">
@@ -3107,7 +3251,7 @@ class ContentManagementController extends Controller
                     }
 
                     // EDIT
-                    if (\App\Helpers\Helper::canAccess('manage_test_planner_edit')) {
+                    if (Helper::canAccess('manage_test_planner_edit')) {
                         $buttons .= '
             <li>
                 <a class="dropdown-item text-info" href="' . route('test.planner.edit', $row->id) . '">
@@ -3117,7 +3261,7 @@ class ContentManagementController extends Controller
                     }
 
                     // DELETE
-                    if (\App\Helpers\Helper::canAccess('manage_test_planner_delete')) {
+                    if (Helper::canAccess('manage_test_planner_delete')) {
                         $buttons .= '
             <li>
                 <form action="' . route('test.planner.delete', $row->id) . '" 
@@ -3131,6 +3275,20 @@ class ContentManagementController extends Controller
                     </button>
                 </form>
             </li>';
+                    }
+
+                    if (
+                        $row->approval_status == 'pending' &&
+                        auth()->user()->type === 'admin' && is_null(auth()->user()->role_group_id)
+                    ) {
+                        $buttons .= '
+    <li>
+        <a href="javascript:void(0)" 
+           class="dropdown-item text-success approve-planner" 
+           data-id="' . $row->id . '">
+            <i class="fa fa-check me-2"></i> Approve
+        </a>
+    </li>';
                     }
 
                     // If no permission → no dropdown
@@ -3158,6 +3316,15 @@ class ContentManagementController extends Controller
         return view('test-planner.index');
     }
 
+    public function approveTestPlanner($id)
+    {
+        $planner = TestPlanner::findOrFail($id);
+        $planner->approval_status = 'approved';
+        $planner->save();
+
+        return response()->json(['status' => true]);
+    }
+
     public function testPlannerShow($id)
     {
         try {
@@ -3172,30 +3339,6 @@ class ContentManagementController extends Controller
     public function testPlannerCreate()
     {
         return view('test-planner.create');
-    }
-
-    public function testPlannerEdit($id)
-    {
-        $data['testPlanner'] = TestPlanner::findOrFail($id);
-        return view('test-planner.edit', $data);
-    }
-
-    public function testPlannerUpdate(Request $request, $id)
-    {
-        $testPlanner = TestPlanner::findOrFail($id);
-        $testPlanner->title = $request->input('title');
-        $testPlanner->start_date = $request->input('start_date');
-        $testPlanner->short_description = $request->input('short_description');
-        $testPlanner->detail_content = $request->input('detail_content');
-        $testPlanner->status = $request->input('status');
-
-        if ($request->hasFile('pdf')) {
-            $testPlanner->pdf = $request->file('pdf')->store('pdfs', 'public');
-        }
-
-        $testPlanner->save();
-
-        return redirect()->route('test.planner.index')->with('success', 'Test Planner updated successfully');
     }
 
     public function testPlannerStore(Request $request)
@@ -3222,10 +3365,38 @@ class ContentManagementController extends Controller
         if ($request->hasFile('pdf')) {
             $data['pdf'] = $request->file('pdf')->store('pdfs', 'public');
         }
+        $data['approval_status'] = Helper::requiresApproval('manage_test_planner')
+            ? 'pending'
+            : 'approved';
 
         TestPlanner::create($data);
 
         return redirect()->back()->with('success', 'Test Planner created successfully.');
+    }
+
+
+    public function testPlannerEdit($id)
+    {
+        $data['testPlanner'] = TestPlanner::findOrFail($id);
+        return view('test-planner.edit', $data);
+    }
+
+    public function testPlannerUpdate(Request $request, $id)
+    {
+        $testPlanner = TestPlanner::findOrFail($id);
+        $testPlanner->title = $request->input('title');
+        $testPlanner->start_date = $request->input('start_date');
+        $testPlanner->short_description = $request->input('short_description');
+        $testPlanner->detail_content = $request->input('detail_content');
+        $testPlanner->status = $request->input('status');
+
+        if ($request->hasFile('pdf')) {
+            $testPlanner->pdf = $request->file('pdf')->store('pdfs', 'public');
+        }
+
+        $testPlanner->save();
+
+        return redirect()->route('test.planner.index')->with('success', 'Test Planner updated successfully');
     }
     public function testPlannerDelete($id)
     {
@@ -3677,7 +3848,7 @@ class ContentManagementController extends Controller
 
                     $actions = '';
 
-                    if (\App\Helpers\Helper::canAccess('manage_upcoming_exams')) {
+                    if (Helper::canAccess('manage_upcoming_exams')) {
                         $actions .= '
                         <li>
                             <a class="dropdown-item"
@@ -3687,7 +3858,7 @@ class ContentManagementController extends Controller
                         </li>';
                     }
 
-                    if (\App\Helpers\Helper::canAccess('manage_upcoming_exams_edit')) {
+                    if (Helper::canAccess('manage_upcoming_exams_edit')) {
                         $actions .= '
                         <li>
                             <a class="dropdown-item"
@@ -3697,7 +3868,7 @@ class ContentManagementController extends Controller
                         </li>';
                     }
 
-                    if (\App\Helpers\Helper::canAccess('manage_upcoming_exams_delete')) {
+                    if (Helper::canAccess('manage_upcoming_exams_delete')) {
                         $actions .= '
                         <li>
                             <form action="' . route('upcoming.exam.delete', $row->id) . '"
@@ -3705,7 +3876,7 @@ class ContentManagementController extends Controller
                                   onsubmit="return confirm(\'Are you sure?\')">
                                 ' . csrf_field() . method_field('DELETE') . '
                                 <button class="dropdown-item text-danger">
-                                    <i class="fa fa-trash me-2"></i> Delete
+                                    <i class="fa fa-trash me-2" style="color:#dc3545!important"></i> Delete
                                 </button>
                             </form>
                         </li>';

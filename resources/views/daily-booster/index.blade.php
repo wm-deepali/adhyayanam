@@ -46,6 +46,7 @@
                         <th>Thumbnail</th>
                         <th>Video Title</th>
                         <th>Short Description</th>
+                        <th>Approval</th>
                         <th>Added By</th>
                         <th>Actions</th>
                     </tr>
@@ -77,6 +78,7 @@ $(function () {
             { data: 'image', orderable: false, searchable: false },
             { data: 'title', name: 'title' },
             { data: 'short_description', name: 'short_description' },
+            { data: 'approval_status', name: 'approval_status', orderable: false, searchable: false },
             { data: 'created_by', name: 'created_by' },
             { data: 'action', orderable: false, searchable: false },
         ],
@@ -139,5 +141,42 @@ function multi_delete() {
 $('.group_check').on('change', function (event) {
     $(".column_checkbox").prop("checked", event.target.checked);
 });
+
+$(document).on('click', '.approve-daily-booster', function () {
+
+    let id = $(this).data('id');
+
+    let url = "{{ route('daily.boost.approve', ':id') }}";
+    url = url.replace(':id', id);
+
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "Approve this Daily Booster?",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, Approve'
+    }).then((result) => {
+
+        if (result.isConfirmed) {
+
+            $.post(url, {
+                _token: $('meta[name="csrf-token"]').attr('content')
+            }, function () {
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Approved!',
+                    timer: 1200,
+                    showConfirmButton: false
+                });
+
+                $('#dailyBooster').DataTable().ajax.reload();
+            });
+
+        }
+
+    });
+});
+
 </script>
 @endpush

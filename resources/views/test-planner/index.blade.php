@@ -60,7 +60,7 @@
                 buttons: {
                     buttons: [
                         @if(\App\Helpers\Helper::canAccess('manage_test_planner_delete'))
-                                                {
+                                                        {
                                 className: 'btn bg-red color-palette btn-flat hidden delete_btn pull-left',
                                 text: 'Bulk Delete',
                                 action: function (e, dt, node, config) {
@@ -138,5 +138,42 @@
             }
         });
 
+        $(document).on('click', '.approve-planner', function () {
+
+            let id = $(this).data('id');
+
+            let url = "{{ route('test.planner.approve', ':id') }}";
+            url = url.replace(':id', id);
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "Approve this test planner?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, Approve'
+            }).then((result) => {
+
+                if (result.isConfirmed) {
+
+                    $.post(url, {
+                        _token: $('meta[name="csrf-token"]').attr('content')
+                    }, function () {
+
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Approved!',
+                            timer: 1200,
+                            showConfirmButton: false
+                        });
+
+                        $('#testPlanner').DataTable().ajax.reload();
+                    });
+
+                }
+
+            });
+        });
+
     </script>
+
 @endpush

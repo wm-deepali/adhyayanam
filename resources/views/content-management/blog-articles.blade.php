@@ -50,6 +50,7 @@
                                 <th scope="col" width="10%">Type</th>
                                 <th scope="col">Image</th>
                                 <th scope="col">Thumbnail</th>
+                                <th>Status</th>
                                 <th>Added By</th>
                                 <th scope="col">Actions</th>
                             </tr>
@@ -66,6 +67,13 @@
                                     <td>{{ $blog->type }}</td>
                                     <td><img src="{{ asset('storage/' . $blog->image) }}" alt="Image" width="50"></td>
                                     <td><img src="{{ asset('storage/' . $blog->thumbnail) }}" alt="Thumbnail" width="50"></td>
+                                    <td>
+                                        @if($blog->approval_status == 'pending')
+                                            <span class="badge bg-warning text-dark">Pending</span>
+                                        @else
+                                            <span class="badge bg-success">Approved</span>
+                                        @endif
+                                    </td>
                                     <td>{{ $blog->user ? $blog->user->name : 'N/A'  }}</td>
                                     <td>
                                         @if(
@@ -112,6 +120,16 @@
                                                         </li>
                                                     @endif
 
+                                                    @if($blog->approval_status == 'pending' && auth()->user()->type === 'admin' && is_null(auth()->user()->role_group_id))
+    <li>
+        <a href="javascript:void(0)" 
+           class="dropdown-item text-success approve-blog" 
+           data-id="{{ $blog->id }}">
+            <i class="fa fa-check me-1"></i> Approve
+        </a>
+    </li>
+@endif
+
                                                 </ul>
                                             </div>
                                         @else
@@ -129,12 +147,53 @@
             </div>
         </div>
     </div>
-    <script>
+@endsection
+
+
+@push('after-scripts')
+ 
+ <script>
         document.getElementById('blogSearch').addEventListener('keyup', function () {
             let value = this.value.toLowerCase();
             document.querySelectorAll("table tbody tr").forEach(function (row) {
                 row.style.display = row.textContent.toLowerCase().includes(value) ? "" : "none";
             });
         });
+        $(document).on('click', '.approve-blog', function () {
+
+    let id = $(this).data('id');
+
+    let url = "{{ route('blog.approve', ':id') }}";
+    url = url.replace(':id', id);
+
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "Approve this blog?",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, Approve'
+    }).then((result) => {
+
+        if (result.isConfirmed) {
+
+            $.post(url, {
+                _token: $('meta[name="csrf-token"]').attr('content')
+            }, function () {
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Approved!',
+                    timer: 1200,
+                    showConfirmButton: false
+                });
+
+                location.reload();
+            });
+
+        }
+
+    });
+});
     </script>
-@endsection
+  
+  @endpush

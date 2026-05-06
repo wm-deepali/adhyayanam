@@ -338,6 +338,7 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
             Route::put('blog-and-articles/update/{id}', [ContentManagementController::class, 'blogUpdate'])->name('blog.update')->middleware('custom.permission:manage_blog_edit');
             Route::get('blog-and-articles/{id}', [ContentManagementController::class, 'blogShow'])->name('blog.show');
             Route::delete('blog-and-articles/delete/{id}', [ContentManagementController::class, 'blogDelete'])->name('blog.destroy')->middleware('custom.permission:manage_blog_delete');
+            Route::post('blog-and-articles/approve/{id}', [ContentManagementController::class, 'approveBlog'])->name('blog.approve');
 
             // ---------------- FAQ ----------------
             Route::get('faq', [ContentManagementController::class, 'faq'])->name('cm.faq')->middleware('custom.permission:manage_faq');
@@ -469,6 +470,7 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
             Route::delete('/delete/{id}', [ContentManagementController::class, 'courseDelete'])->name('courses.course.delete')->middleware('custom.permission:manage_courses_delete');
             Route::get('/bulk-delete', [ContentManagementController::class, 'courseBulkDelete'])->name('courses.course.bulk-delete')->middleware('custom.permission:manage_courses_delete');
             Route::get('/{course}', [ContentManagementController::class, 'courseShow'])->name('courses.course.show')->middleware('custom.permission:manage_courses');
+            Route::post('/courses/approve/{id}', [ContentManagementController::class, 'approveCourse'])->name('courses.course.approve')->middleware('custom.permission:manage_courses_approve');
         });
 
         // ---------------- ENQUIRIES & CALL ----------------
@@ -507,6 +509,7 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
             Route::delete('/delete/{id}', [ContentManagementController::class, 'studyMaterialDelete'])->name('study.material.delete')->middleware('custom.permission:manage_study_material_delete');
             Route::get('/bulk-delete', [ContentManagementController::class, 'studyMaterialBulkDelete'])->name('study.material.bulk-delete')->middleware('custom.permission:manage_study_material_delete');
             Route::get('/show/{id}', [ContentManagementController::class, 'studyMaterialShow'])->name('study.material.show');
+            Route::post('/approve/{id}', [ContentManagementController::class, 'approveStudyMaterial'])->name('study.material.approve');
         });
 
         // Daily Booster
@@ -518,6 +521,7 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
             Route::get('/edit/{id}', [ContentManagementController::class, 'dailyBoostEdit'])->name('edit')->middleware('custom.permission:manage_daily_booster_edit');
             Route::post('/update/{id}', [ContentManagementController::class, 'dailyBoostUpdate'])->name('update')->middleware('custom.permission:manage_daily_booster_edit');
             Route::delete('/delete/{id}', [ContentManagementController::class, 'dailyBoostDelete'])->name('delete')->middleware('custom.permission:manage_daily_booster_delete');
+            Route::post('/approve/{id}', [ContentManagementController::class, 'approveDailyBooster']) ->name('approve');
         });
         // Bulk delete
         Route::get('booster/bulk-delete', [ContentManagementController::class, 'boosterBulkDelete'])->name('booster.bulk-delete')->middleware('custom.permission:manage_daily_booster_delete');
@@ -532,6 +536,7 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
             Route::post('/update/{id}', [ContentManagementController::class, 'testPlannerUpdate'])->name('update')->middleware('custom.permission:manage_test_planner_edit');
             Route::delete('/delete/{id}', [ContentManagementController::class, 'testPlannerDelete'])->name('delete')->middleware('custom.permission:manage_test_planner_delete');
             Route::get('/bulk-delete', [ContentManagementController::class, 'testPlannerBulkDelete'])->name('bulk-delete')->middleware('custom.permission:manage_test_planner_delete');
+            Route::post('/approve/{id}', [ContentManagementController::class, 'approveTestPlanner'])->name('approve');
         });
 
         // CURRENT AFFAIRS - TOPIC
@@ -552,6 +557,7 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
             Route::put('/update/{id}', [ContentManagementController::class, 'currentAffairUpdate'])->name('update')->middleware('custom.permission:manage_ca_edit');
             Route::get('/show/{id}', [ContentManagementController::class, 'currentAffairShow'])->name('show')->middleware('custom.permission:manage_ca');
             Route::delete('/delete/{id}', [ContentManagementController::class, 'currentAffairDelete'])->name('delete')->middleware('custom.permission:manage_ca_delete');
+            Route::post('/approve/{id}', [ContentManagementController::class, 'approveCurrentAffair'])->name('approve');
         });
 
         // TEST SERIES PACKAGE ROUTES

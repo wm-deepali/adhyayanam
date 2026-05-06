@@ -2984,7 +2984,7 @@
 
 				<!-- Cards Grid -->
 				<div class="row g-4">
-					@foreach($dailyBoosts->random(8) as $data)
+					@foreach($dailyBoosts as $data)
 						<div class="col-12 col-sm-12 col-md-6 col-lg-3 col-xl-3">
 							<div class="daily-boost-card h-100">
 								<div

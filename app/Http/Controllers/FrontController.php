@@ -55,7 +55,7 @@ class FrontController extends Controller
         $data['courses'] = Course::with('examinationCommission')->where('feature', 'on')->orderBy('created_at', 'DESC')->get();
         $data['topics'] = Topic::with('currentAffair')->get();
         $data['testSeries'] = TestSeries::with('commission')->get();
-        $data['dailyBoosts'] = DailyBooster::all();
+        $data['dailyBoosts'] = DailyBooster::take(8)->get();
         $data['teams'] = Team::all();
         $data['upcomingExams'] = UpcomingExam::with('exam_commission')->orderBy('created_at', 'DESC')->limit('5')->get();
         $data['blogs'] = Blog::with('user')->get();

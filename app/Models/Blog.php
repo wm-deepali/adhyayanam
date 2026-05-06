@@ -18,7 +18,8 @@ class Blog extends Model
         'type',
         'image',
         'thumbnail',
-        'created_by'
+        'created_by',
+        'approval_status',
     ];
 
     public function user()

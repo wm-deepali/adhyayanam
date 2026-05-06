@@ -24,7 +24,8 @@ class CurrentAffair extends Model
         'meta_title',
         'meta_keyword',
         'meta_description',
-        'created_by'
+        'created_by',
+        'approval_status'
     ];
 
     // Relationship with Topic

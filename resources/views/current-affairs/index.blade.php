@@ -45,79 +45,97 @@
                                 <th scope="col">Banner</th>
                                 <th scope="col">Alt Tag</th>
                                 <th>Added By</th>
+                                <th>Status</th>
                                 <th scope="col">Action</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach($currentAffairs as $affair)
-                                <tr>
-                                    <th scope="row">{{ $loop->iteration }}</th>
-                                    <td>{{ $affair->topic->name ?? "-"}}</td>
-                                    <td>{{ $affair->title}}</td>
-                                    <td>{{ $affair->short_description}}</td>
-                                    <td>{{ $affair->publishing_date}}</td>
-                                    <td>
-                                        <img src="{{ asset('storage/' . $affair->thumbnail_image) }}" alt="Thumbnail"
-                                            class="img-thumbnail" style="max-width: 60px; max-height: 60px;">
-                                    </td>
-                                    <td>
-                                        <img src="{{ asset('storage/' . $affair->banner_image) }}" alt="Banner"
-                                            class="img-thumbnail" style="max-width: 60px; max-height: 60px;">
-                                    </td>
-                                    <td>{{ $affair->image_alt_tag }}</td>
-                                    <td>{{ $affair->creator ? $affair->creator->name : 'Super Admin'  }}</td>
-                                    <td>
-                                        @if(
-                                                \App\Helpers\Helper::canAccess('manage_ca_edit') ||
-                                                \App\Helpers\Helper::canAccess('manage_ca_delete')
-                                            )
-                                            <div class="dropdown">
-                                                <button class="btn btn-secondary dropdown-toggle btn-sm" type="button"
-                                                    data-bs-toggle="dropdown" aria-expanded="false">
-                                                    Actions
-                                                </button>
+                                        <tr>
+                                            <th scope="row">{{ $loop->iteration }}</th>
+                                            <td>{{ $affair->topic->name ?? "-"}}</td>
+                                            <td>{{ $affair->title}}</td>
+                                            <td>{{ $affair->short_description}}</td>
+                                            <td>{{ $affair->publishing_date}}</td>
+                                            <td>
+                                                <img src="{{ asset('storage/' . $affair->thumbnail_image) }}" alt="Thumbnail"
+                                                    class="img-thumbnail" style="max-width: 60px; max-height: 60px;">
+                                            </td>
+                                            <td>
+                                                <img src="{{ asset('storage/' . $affair->banner_image) }}" alt="Banner"
+                                                    class="img-thumbnail" style="max-width: 60px; max-height: 60px;">
+                                            </td>
+                                            <td>{{ $affair->image_alt_tag }}</td>
+                                            <td>{{ $affair->creator ? $affair->creator->name : 'Super Admin'  }}</td>
+                                            <td>
+                                                @if($affair->approval_status == 'pending')
+                                                    <span class="badge bg-warning text-dark">Pending</span>
+                                                @else
+                                                    <span class="badge bg-success">Approved</span>
+                                                @endif
+                                            </td>
+                                            <td>
+                                @if(
+                                        \App\Helpers\Helper::canAccess('manage_ca_edit') ||
+                                        \App\Helpers\Helper::canAccess('manage_ca_delete')
+                                    )
+                                                    <div class="dropdown">
+                                                        <button class="btn btn-secondary dropdown-toggle btn-sm" type="button"
+                                                            data-bs-toggle="dropdown" aria-expanded="false">
+                                                            Actions
+                                                        </button>
 
-                                                <ul class="dropdown-menu">
+                                                        <ul class="dropdown-menu">
 
-                                                    {{-- VIEW (usually allowed with manage) --}}
-                                                    <li>
-                                                        <a class="dropdown-item"
-                                                            href="{{ route('current.affairs.show', $affair->id) }}">
-                                                            <i class="fas fa-eye"></i> View
-                                                        </a>
-                                                    </li>
+                                                            {{-- VIEW (usually allowed with manage) --}}
+                                                            <li>
+                                                                <a class="dropdown-item"
+                                                                    href="{{ route('current.affairs.show', $affair->id) }}">
+                                                                    <i class="fas fa-eye"></i> View
+                                                                </a>
+                                                            </li>
 
-                                                    {{-- EDIT --}}
-                                                    @if(\App\Helpers\Helper::canAccess('manage_ca_edit'))
-                                                        <li>
-                                                            <a class="dropdown-item"
-                                                                href="{{ route('current.affairs.edit', $affair->id) }}">
-                                                                <i class="fas fa-edit"></i> Edit
-                                                            </a>
-                                                        </li>
-                                                    @endif
+                                                            {{-- EDIT --}}
+                                                            @if(\App\Helpers\Helper::canAccess('manage_ca_edit'))
+                                                                <li>
+                                                                    <a class="dropdown-item"
+                                                                        href="{{ route('current.affairs.edit', $affair->id) }}">
+                                                                        <i class="fas fa-edit"></i> Edit
+                                                                    </a>
+                                                                </li>
+                                                            @endif
 
-                                                    {{-- DELETE --}}
-                                                    @if(\App\Helpers\Helper::canAccess('manage_ca_delete'))
-                                                        <li>
-                                                            <form action="{{ route('current.affairs.delete', $affair->id) }}"
-                                                                method="POST"
-                                                                onsubmit="return confirm('Are you sure you want to delete this current affair?');">
-                                                                @csrf
-                                                                @method('DELETE')
-                                                                <button type="submit" class="dropdown-item text-danger">
-                                                                    <i class="fas fa-trash" style="color:#dc3545!important"></i> Delete
-                                                                </button>
-                                                            </form>
-                                                        </li>
-                                                    @endif
+                                                            {{-- DELETE --}}
+                                                            @if(\App\Helpers\Helper::canAccess('manage_ca_delete'))
+                                                                <li>
+                                                                    <form action="{{ route('current.affairs.delete', $affair->id) }}"
+                                                                        method="POST"
+                                                                        onsubmit="return confirm('Are you sure you want to delete this current affair?');">
+                                                                        @csrf
+                                                                        @method('DELETE')
+                                                                        <button type="submit" class="dropdown-item text-danger">
+                                                                            <i class="fas fa-trash" style="color:#dc3545!important"></i> Delete
+                                                                        </button>
+                                                                    </form>
+                                                                </li>
+                                                            @endif
 
-                                                </ul>
-                                            </div>
-                                        @endif
-                                    </td>
+                                                    @if($affair->approval_status == 'pending' && auth()->user()->type === 'admin'&& is_null(auth()->user()->role_group_id))
+    <li>
+        <a href="javascript:void(0)" 
+           class="dropdown-item text-success approve-ca" 
+           data-id="{{ $affair->id }}">
+            <i class="fa fa-check"></i> Approve
+        </a>
+    </li>
+@endif
 
-                                </tr>
+                                                        </ul>
+                                                    </div>
+                                @endif
+                                            </td>
+
+                                        </tr>
                             @endforeach
                         </tbody>
                     </table>
@@ -131,4 +149,44 @@
             </div>
         </div>
     </div>
+
 @endsection
+@push('after-scripts')
+    <script>
+    $(document).on('click', '.approve-ca', function () {
+
+    let id = $(this).data('id');
+
+    let url = "{{ route('current.affairs.approve', ':id') }}";
+    url = url.replace(':id', id);
+
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "Approve this current affair?",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, Approve'
+    }).then((result) => {
+
+        if (result.isConfirmed) {
+
+            $.post(url, {
+                _token: $('meta[name="csrf-token"]').attr('content')
+            }, function () {
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Approved!',
+                    timer: 1200,
+                    showConfirmButton: false
+                });
+
+                location.reload();
+            });
+
+        }
+
+    });
+});
+</script>
+@endpush

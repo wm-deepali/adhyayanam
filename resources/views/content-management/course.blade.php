@@ -38,6 +38,7 @@
                             <th scope="col">Course Fee</th>
                             <th scope="col">Duration</th>
                             <th scope="col">Added By</th>
+                            <th scope="col">Status</th>
                             <th scope="col">Action</th>
                         </tr>
                     </thead>
@@ -65,7 +66,7 @@
                 buttons: {
                     buttons: [
                         @if(\App\Helpers\Helper::canAccess('manage_courses_delete'))
-                                        {
+                                                                        {
                                 className: 'btn bg-red color-palette btn-flat hidden delete_btn pull-left',
                                 text: 'Bulk Delete',
                                 action: function (e, dt, node, config) {
@@ -106,6 +107,7 @@
                     { data: 'fee', name: 'fee' },
                     { data: 'duration', name: 'duration' },
                     { data: 'created_by', name: 'created_by' },
+                    { data: 'status', name: 'status' },
                     { data: 'action', name: 'action', orderable: false, searchable: false },
                 ],
                 lengthMenu: [10, 50, 100],
@@ -139,6 +141,43 @@
 
 
     <script type="text/javascript">
+        $(document).on('click', '.approve-course', function () {
+
+            let id = $(this).data('id');
+
+            let url = "{{ route('courses.course.approve', ':id') }}";
+            url = url.replace(':id', id);
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "Approve this course?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, Approve'
+            }).then((result) => {
+
+                if (result.isConfirmed) {
+
+                    $.post(url, {
+                        _token: $('meta[name="csrf-token"]').attr('content')
+                    }, function () {
+
+
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Approved!',
+                            timer: 1200,
+                            showConfirmButton: false
+                        });
+
+                        $('.yajra-datatable').DataTable().ajax.reload();
+                    });
+
+                }
+
+            });
+        });
+
 
         $('.group_check').on('change', function (event) {
             if (event.target.checked) {

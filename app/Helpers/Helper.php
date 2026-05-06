@@ -179,4 +179,26 @@ class Helper
         return isset($permissions[$permission]) && $permissions[$permission] === 'yes';
     }
 
+
+    public static function requiresApproval($moduleKey)
+    {
+        $user = auth()->user();
+
+        if (!$user) {
+            return false;
+        }
+
+        // Admin bypass
+        if ($user->type === 'admin' && is_null($user->role_group_id)) {
+            return false;
+        }
+
+        if (!$user->roleGroup) {
+            return false;
+        }
+
+        $permissions = $user->roleGroup->permissions ?? [];
+
+        return isset($permissions[$moduleKey . '_approval']);
+    }
 }

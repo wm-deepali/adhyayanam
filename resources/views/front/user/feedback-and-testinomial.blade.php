@@ -63,15 +63,17 @@
               </div>
             @endif
 
-            @if($errors->any())
+            @if(session('error'))
+
               <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <ul>
-                  @foreach($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                  @endforeach
-                </ul>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+
+                {{ session('error') }}
+
+                <button type="button" class="btn-close" data-bs-dismiss="alert">
+                </button>
+
               </div>
+
             @endif
             <div class="title-box mb-b">
               <h3>Submit Feedback & Testinomial</h3>
@@ -114,7 +116,7 @@
                   <div class="col-lg-6 col-md-6 col-sm-12 form-group">
                     <input type="text" name="username" placeholder="Your name*" required="">
                   </div>
-                  
+
                   <input type="hidden" name="designation" value="Student">
 
                   <div class="col-lg-6 col-md-6 col-sm-12 form-group">
@@ -131,8 +133,18 @@
                   </div>
 
                   <div class="col-lg-12 col-md-12 col-sm-12 form-group">
+
                     <label>Add Photo</label>
-                    <input type="file" name="photo" placeholder="Browse Photo" required="">
+
+                    <input type="file" name="photo" class="form-control @error('photo') is-invalid @enderror"
+                      accept=".jpg,.jpeg,.png,.gif,.webp" required>
+
+                    @error('photo')
+                      <div class="invalid-feedback d-block">
+                        {{ $message }}
+                      </div>
+                    @enderror
+
                   </div>
 
                   <div class="col-lg-12 col-md-12 col-sm-12 form-group">

@@ -1906,24 +1906,92 @@ class ContentManagementController extends Controller
     public function courseEdit($id)
     {
         $data['examinationCommissions'] = ExaminationCommission::all();
-        $data['course'] = Course::with('category', 'subCategory')->findOrFail($id);
-        $data['subjects'] = !empty($data['course']->sub_category_id)
-            ? Subject::where('sub_category_id', $data['course']->sub_category_id)->get()
+
+        $data['course'] = Course::with([
+            'category',
+            'subCategory'
+        ])->findOrFail($id);
+
+        /*
+        |--------------------------------------------------------------------------
+        | Restore old() values after validation fail
+        |--------------------------------------------------------------------------
+        */
+
+        $selectedSubjectIds = old(
+            'subject_id',
+            $data['course']->subject_id ?? []
+        );
+
+        $selectedChapterIds = old(
+            'chapter_id',
+            $data['course']->chapter_id ?? []
+        );
+
+        $selectedTopicIds = old(
+            'topic_id',
+            $data['course']->topic_id ?? []
+        );
+
+        /*
+        |--------------------------------------------------------------------------
+        | Subjects
+        |--------------------------------------------------------------------------
+        */
+
+        $data['subjects'] =
+            !empty($data['course']->sub_category_id)
+            ? Subject::where(
+                'sub_category_id',
+                old(
+                    'sub_category_id',
+                    $data['course']->sub_category_id
+                )
+            )->get()
             : collect();
 
-        // Get decoded arrays automatically (Laravel cast handles this)
-        $subjectIds = $data['course']->subject_id ?? [];
-        $chapterIds = $data['course']->chapter_id ?? [];
+        /*
+        |--------------------------------------------------------------------------
+        | Chapters
+        |--------------------------------------------------------------------------
+        */
 
-        $data['chapters'] = !empty($subjectIds)
-            ? Chapter::whereIn('subject_id', $subjectIds)->get()
+        $data['chapters'] =
+            !empty($selectedSubjectIds)
+            ? Chapter::whereIn(
+                'subject_id',
+                $selectedSubjectIds
+            )->get()
             : collect();
 
-        $data['topics'] = !empty($chapterIds)
-            ? CourseTopic::whereIn('chapter_id', $chapterIds)->get()
+        /*
+        |--------------------------------------------------------------------------
+        | Topics
+        |--------------------------------------------------------------------------
+        */
+
+        $data['topics'] =
+            !empty($selectedChapterIds)
+            ? CourseTopic::whereIn(
+                'chapter_id',
+                $selectedChapterIds
+            )->get()
             : collect();
 
-        return view('content-management.ajax.edit-course', $data);
+        /*
+        |--------------------------------------------------------------------------
+        | Selected Arrays
+        |--------------------------------------------------------------------------
+        */
+
+        $data['selectedSubjectIds'] = $selectedSubjectIds;
+        $data['selectedChapterIds'] = $selectedChapterIds;
+        $data['selectedTopicIds'] = $selectedTopicIds;
+
+        return view(
+            'content-management.ajax.edit-course',
+            $data
+        );
     }
 
     public function courseUpdate(Request $request, $id)
@@ -1965,7 +2033,7 @@ class ContentManagementController extends Controller
             'detail_content' => 'required|string',
 
             // Images optional on update
-            'thumbnail_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
+            'thumbnail_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2',
             'banner_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
 
             'youtube_url' => 'nullable|url',
@@ -2728,27 +2796,46 @@ class ContentManagementController extends Controller
 
     public function downloadPdf($id)
     {
-        $material = StudyMaterial::with([
-            'commission',
-            'category',
-            'subcategory',
-        ])->findOrFail($id);
+        try {
 
-        // Define the PDF file path
-        $pdfFileName = 'study_material_' . $material->id . '.pdf';
-        $pdfFilePath = 'public/study_materials/' . $pdfFileName;
+            $material = StudyMaterial::with([
+                'commission',
+                'category',
+                'subcategory',
+            ])->findOrFail($id);
 
-        // If PDF exists, delete it
-        if (Storage::exists($pdfFilePath)) {
-            Storage::delete($pdfFilePath);
+            /*
+            |--------------------------------------------------------------------------
+            | Generate PDF directly
+            |--------------------------------------------------------------------------
+            */
+
+            $pdf = Pdf::loadView(
+                'study-material.pdf',
+                compact('material')
+            )->setPaper('a4', 'portrait');
+
+            /*
+            |--------------------------------------------------------------------------
+            | Return direct download
+            |--------------------------------------------------------------------------
+            */
+
+            return $pdf->download(
+                'study_material_' . $material->id . '.pdf'
+            );
+
+        } catch (\Exception $e) {
+
+            \Log::error(
+                'Study Material PDF Error: ' . $e->getMessage()
+            );
+
+            return back()->with(
+                'error',
+                'PDF download failed. Please try again.'
+            );
         }
-
-        // Generate new PDF and save
-        $pdf = Pdf::loadView('study-material.pdf', compact('material'))
-            ->setPaper('a4', 'portrait');
-        Storage::put($pdfFilePath, $pdf->output());
-        // Return the newly created PDF as download
-        return response()->download(storage_path('app/' . $pdfFilePath));
     }
 
     public function studyMaterialEdit($id)

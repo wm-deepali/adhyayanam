@@ -505,7 +505,8 @@
             </div>
           </div>
           
-          <div class="offcanvas offcanvas-start offcanvas-lg border-0 shadow-sm m-0" 
+   <!-- Left Sidebar – ab responsive offcanvas ban gaya -->
+<div class="offcanvas offcanvas-start offcanvas-lg border-0 shadow-sm m-0" 
      tabindex="-1" 
      id="categoryDrawer" 
      aria-labelledby="categoryDrawerLabel">
@@ -518,43 +519,37 @@
   <hr>
 
   <!-- Offcanvas body – yahan pura sidebar content jayega -->
- @foreach($commissions->take(3) as $commission)
+  @foreach($commissions->take(3) as $commission)
+  <button
+    class="category-btn fw-semibold text-start w-100 py-3 px-4 rounded-3 mb-3 border-0 d-flex align-items-center justify-content-between"
+    type="button"
+    data-bs-toggle="collapse"
+    data-bs-target="#sub-commission-{{ $commission->id }}"
+    aria-expanded="false"
+    aria-controls="sub-commission-{{ $commission->id }}">
+    <span>{{ $commission->name }}</span>
+    <i class="fas fa-chevron-down category-arrow transition-all"></i>
+  </button>
 
-                <button
-                  class="category-btn fw-semibold text-start w-100 py-3 px-4 rounded-3 mb-3 border-0 d-flex align-items-center justify-content-between"
-                  data-category="commission-{{ $commission->id }}">
-
-                  <span>{{ $commission->name }}</span>
-                  <i class="fas fa-chevron-down category-arrow transition-all"></i>
-
-                </button>
-
-
-                <ul class="sub-list list-unstyled ms-3" id="sub-commission-{{ $commission->id }}">
-
-                  @foreach($commission->categories->take(3) as $category)
-
-                              <li class="mb-2">
-                                <a href="{{ route('courses', [
-                      'exam_id' => $commission->id,
-                      'category_id' => $category->id
-                    ]) }}"
-                                  class="sub-btn d-block py-2 px-3 rounded-3 text-decoration-none 
-                                                                                                                                                    {{ request('category_id') == $category->id ? 'active' : '' }}">
-
-                                  {{ $category->name }}
-
-                                </a>
-                              </li>
-
-                              <hr class="sub-divider">
-
-                  @endforeach
-
-                </ul>
-
-              @endforeach
+  <ul class="sub-list list-unstyled ms-3 collapse" 
+      id="sub-commission-{{ $commission->id }}">
+    @foreach($commission->categories->take(10) as $category)
+      <li class="mb-2">
+        <a href="{{ route('test-series-list', [
+          'exam_id' => $commission->id,
+          'category_id' => $category->id
+        ]) }}"
+          class="sub-btn d-block py-2 px-3 rounded-3 text-decoration-none
+            {{ request('category_id') == $category->id ? 'active' : '' }}">
+          {{ $category->name }}
+        </a>
+      </li>
+      <hr class="sub-divider">
+    @endforeach
+  </ul>
+@endforeach
 </div>
+
 
           <!-- Right Content -->
           <div class="col-lg-8 col-xl-9">
@@ -768,6 +763,7 @@
         });
 
       });
+
 
       document.addEventListener("click", function (e) {
 

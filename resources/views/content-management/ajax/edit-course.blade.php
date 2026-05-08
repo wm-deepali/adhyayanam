@@ -26,8 +26,7 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="feature" class="form-label">Feature</label>
-                                <input class="form-control" id="feature" name="feature" @if($course->feature == 'on') checked
-                                @endif type="checkbox" data-toggle="toggle" data-onstyle="success"
+                                <input class="form-control" id="feature" name="feature" type="checkbox" {{ old('feature', $course->feature) == 'on' ? 'checked' : '' }} data-toggle="toggle" data-onstyle="success"
                                     data-offstyle="danger" data-width="100">
                             </div>
                         </div>
@@ -37,9 +36,8 @@
                                 <select class="form-control" name="course_mode" id="course_mode" required>
                                     <option value="" disabled {{ empty($course->course_mode) ? 'selected' : '' }}>None
                                     </option>
-                                    <option value="Online" {{ $course->course_mode == 'Online' ? 'selected' : '' }}>Online
-                                    </option>
-                                    <option value="Video Learning" {{ $course->course_mode == 'Video Learning' ? 'selected' : '' }}>Video Learning</option>
+                                    <option value="Online" {{ old('course_mode', $course->course_mode) == 'Online' ? 'selected' : '' }}>Online</option>
+                                    <option value="Video Learning" {{ old('course_mode', $course->course_mode) == 'Video Learning' ? 'selected' : '' }}>Video Learning</option>
                                 </select>
                                 @error('course_mode')
                                     <span class="text-danger">{{ $message }}</span>
@@ -56,7 +54,7 @@
                                     required>
                                     <option value="" disabled>None</option>
                                     @foreach($examinationCommissions as $commission)
-                                        <option value="{{ $commission->id }}" {{ $commission->id == $course->examination_commission_id ? 'selected' : '' }}>
+                                        <option value="{{ $commission->id }}" {{ old('examination_commission_id', $course->examination_commission_id) == $commission->id ? 'selected' : '' }}>
                                             {{ $commission->name }}
                                         </option>
                                     @endforeach
@@ -70,8 +68,9 @@
                             <div class="mb-3">
                                 <label for="category_id" class="form-label">Category</label>
                                 <select class="form-control" name="category_id" id="category_id" required>
-                                    <option value="{{$course->category->id}}" selected>{{$course->category->name}}</option>
-                                    <!-- Options will be dynamically loaded -->
+                                    <option value="{{ old('category_id', optional($course->category)->id) }}" selected>
+                                        {{ optional($course->category)->name }}
+                                    </option>
                                 </select>
                                 @error('category_id')
                                     <span class="text-danger">{{ $message }}</span>
@@ -85,9 +84,10 @@
                             <div class="mb-3">
                                 <label for="sub_category_id" class="form-label">Sub Category</label>
                                 <select class="form-control" name="sub_category_id" id="sub_category_id">
-                                    <option value="{{$course->subCategory->id}}" selected>{{$course->subCategory->name}}
+                                    <option value="{{ old('sub_category_id', optional($course->subCategory)->id) }}"
+                                        selected>
+                                        {{ optional($course->subCategory)->name }}
                                     </option>
-                                    <!-- Options will be dynamically loaded -->
                                 </select>
                                 @error('sub_category_id')
                                     <span class="text-danger">{{ $message }}</span>
@@ -98,7 +98,7 @@
                             <div class="mb-3">
                                 <label for="name" class="form-label">Course Name</label>
                                 <input type="text" class="form-control" name="name" placeholder="Course Name"
-                                    value="{{ $course->name }}" required>
+                                    value="{{ old('name', $course->name) }}" required>
                                 @error('name')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
@@ -113,7 +113,7 @@
                                 <label for="subject_id" class="form-label">Subject</label>
                                 <select class="form-control select2" name="subject_id[]" id="subject_id" multiple>
                                     @php
-                                        $selectedSubjects = $course->subject_id ?? [];
+                                        $selectedSubjects = old('subject_id', $selectedSubjectIds ?? []);
                                     @endphp
                                     @foreach($subjects as $subject)
                                         <option value="{{ $subject->id }}" {{ in_array($subject->id, $selectedSubjects) ? 'selected' : '' }}>
@@ -131,7 +131,7 @@
                                 <label for="chapter_id" class="form-label">Chapter</label>
                                 <select class="form-control select2" name="chapter_id[]" id="chapter_id" multiple>
                                     @php
-                                        $selectedChapters = $course->chapter_id ?? [];
+                                        $selectedChapters = old('chapter_id', $selectedChapterIds ?? []);
                                     @endphp
                                     @foreach($chapters as $chapter)
                                         <option value="{{ $chapter->id }}" {{ in_array($chapter->id, $selectedChapters) ? 'selected' : '' }}>
@@ -151,7 +151,7 @@
                                 <label for="topic_id" class="form-label">Topic</label>
                                 <select class="form-control select2" name="topic_id[]" id="topic_id" multiple>
                                     @php
-                                        $selectedTopics = $course->topic_id ?? [];
+                                        $selectedTopics = old('topic_id', $selectedTopicIds ?? []);
                                     @endphp
                                     @foreach($topics as $topic)
                                         <option value="{{ $topic->id }}" {{ in_array($topic->id, $selectedTopics) ? 'selected' : '' }}>{{ $topic->name }}
@@ -178,7 +178,8 @@
                                 <div class="mb-3">
                                     <label for="duration" class="form-label">Duration (Weeks)</label>
                                     <input type="number" class="form-control" name="duration"
-                                        placeholder="Duration in Weeks" value="{{ $course->duration }}" required>
+                                        placeholder="Duration in Weeks" value="{{ old('duration', $course->duration) }}"
+                                        required>
                                     @error('duration')
                                         <span class="text-danger">{{ $message }}</span>
                                     @enderror
@@ -189,7 +190,8 @@
                                 <div class="mb-3">
                                     <label for="weekly_study" class="form-label">Weekly Study (Hours)</label>
                                     <input type="number" class="form-control" name="weekly_study"
-                                        placeholder="Hours per Week" value="{{ $course->weekly_study }}" required>
+                                        placeholder="Hours per Week"
+                                        value="{{ old('weekly_study', $course->weekly_study) }}" required>
                                 </div>
                             </div>
                         </div>
@@ -197,7 +199,7 @@
                             <div class="mb-3">
                                 <label for="course_fee" class="form-label">Fee</label>
                                 <input type="number" class="form-control" id="course_fee" name="course_fee"
-                                    placeholder="Fee" value="{{ $course->course_fee }}" required>
+                                    placeholder="Fee" value="{{ old('course_fee', $course->course_fee) }}" required>
                                 @error('course_fee')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
@@ -210,7 +212,7 @@
                             <div class="mb-3">
                                 <label for="discount" class="form-label">Discount (%)</label>
                                 <input type="number" class="form-control" id="discount" name="discount"
-                                    placeholder="Discount" value="{{ $course->discount }}" required>
+                                    placeholder="Discount" value="{{ old('discount', $course->discount) }}" required>
                                 @error('discount')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
@@ -220,7 +222,8 @@
                             <div class="mb-3">
                                 <label for="offered_price" class="form-label">Offered Price</label>
                                 <input type="number" class="form-control" id="offered_price" name="offered_price"
-                                    placeholder="Offered Price" value="{{ $course->offered_price }}" required readonly>
+                                    placeholder="Offered Price" value="{{ old('offered_price', $course->offered_price) }}"
+                                    required readonly>
                                 @error('offered_price')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
@@ -233,7 +236,7 @@
                             <div class="mb-3">
                                 <label for="num_classes" class="form-label">Number Of Classes</label>
                                 <input type="number" class="form-control" name="num_classes" placeholder="Number Of Classes"
-                                    value="{{ $course->num_classes }}" required>
+                                    value="{{ old('num_classes', $course->num_classes) }}" required>
                                 @error('num_classes')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
@@ -243,7 +246,7 @@
                             <div class="mb-3">
                                 <label for="num_topics" class="form-label">Number Of Topics</label>
                                 <input type="number" class="form-control" name="num_topics" placeholder="Number Of Topics"
-                                    value="{{ $course->num_topics }}" required>
+                                    value="{{ old('num_topics', $course->num_topics) }}" required>
                                 @error('num_topics')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
@@ -257,7 +260,10 @@
                             <div class="mb-3">
                                 <label for="language_of_teaching" class="form-label">Languages</label>
                                 @php
-                                    $selectedLanguages = (array) $course->language_of_teaching;
+                                    $selectedLanguages = old(
+                                        'language_of_teaching',
+                                        (array) $course->language_of_teaching
+                                    );
                                 @endphp
                                 <select class="form-control select2" name="language_of_teaching[]" multiple>
                                     <option value="English" {{ in_array('English', $selectedLanguages) ? 'selected' : '' }}>
@@ -275,7 +281,7 @@
                             <div class="mb-3">
                                 <label for="course_heading" class="form-label">Heading*</label>
                                 <input type="text" class="form-control" name="course_heading" placeholder="Heading"
-                                    value="{{ $course->course_heading }}" required>
+                                    value="{{ old('course_heading', $course->course_heading) }}" required>
                                 @error('course_heading')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
@@ -288,7 +294,8 @@
                             <div class="mb-3">
                                 <label for="short_description" class="form-label">Short Description</label>
                                 <input type="text" class="form-control" name="short_description"
-                                    placeholder="Short Description" value="{{ $course->short_description }}" required>
+                                    placeholder="Short Description"
+                                    value="{{ old('short_description', $course->short_description) }}" required>
                                 @error('short_description')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
@@ -314,7 +321,7 @@
                     <div class="mb-3">
                         <label for="course_overview" class="form-label">Course Overview*</label>
                         <textarea id="course_overview" name="course_overview"
-                            style="height: 300px;">{{ $course->course_overview }}</textarea>
+                            style="height: 300px;">{{ old('course_overview', $course->course_overview) }}</textarea>
                         @error('course_overview')
                             <span class="text-danger">{{ $message }}</span>
                         @enderror
@@ -323,7 +330,7 @@
                     <div class="mb-3">
                         <label for="detail_content" class="form-label">Course Detail*</label>
                         <textarea id="detail_content" name="detail_content"
-                            style="height: 200px;">{{ $course->detail_content }}</textarea>
+                            style="height: 200px;">{{ old('detail_content', $course->detail_content) }}</textarea>
                         @error('detail_content')
                             <span class="text-danger">{{ $message }}</span>
                         @enderror
@@ -339,8 +346,8 @@
                                     Max size: 2MB | JPG, PNG, WEBP
                                     If form fails, please re-upload image
                                 </small>
-                                <img id="banner_preview" src="{{ asset('storage/' . $course->banner_image) }}"
-                                    width="120" style="margin-top:10px;">
+                                <img id="banner_preview" src="{{ asset('storage/' . $course->banner_image) }}" width="120"
+                                    style="margin-top:10px;">
                                 @if ($errors->has('banner_image'))
                                     <span class="text-danger text-left">{{ $errors->first('banner_image') }}</span>
                                 @endif
@@ -350,7 +357,7 @@
                             <div class="mb-3">
                                 <label for="youtube_url" class="form-label">Youtube Video Url</label>
                                 <input type="text" class="form-control" name="youtube_url" placeholder="Youtube Video Url"
-                                    value="{{ $course->youtube_url }}" required>
+                                    value="{{ old('youtube_url', $course->youtube_url) }}" required>
                                 @error('youtube_url')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
@@ -362,7 +369,7 @@
                             <div class="mb-3">
                                 <label for="meta_title" class="form-label">Meta Title</label>
                                 <input type="text" class="form-control" name="meta_title" placeholder="Meta Title"
-                                    value="{{ $course->meta_title }}" required>
+                                    value="{{ old('meta_title', $course->meta_title) }}" required>
                                 @error('meta_title')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
@@ -372,7 +379,7 @@
                             <div class="mb-3">
                                 <label for="meta_keyword" class="form-label">Meta Keywords</label>
                                 <input type="text" class="form-control" name="meta_keyword" placeholder="Tag, Tag"
-                                    value="{{ $course->meta_keyword }}" required>
+                                    value="{{ old('meta_keyword', $course->meta_keyword) }}" required>
                                 @error('meta_keyword')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
@@ -384,7 +391,8 @@
                             <div class="mb-3">
                                 <label for="meta_description" class="form-label">Meta Description</label>
                                 <input type="text" class="form-control" name="meta_description"
-                                    placeholder="Meta Description" value="{{ $course->meta_description }}" required>
+                                    placeholder="Meta Description"
+                                    value="{{ old('meta_description', $course->meta_description) }}" required>
                                 @error('meta_description')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
@@ -394,7 +402,7 @@
                             <div class="mb-3">
                                 <label for="image_alt_tag" class="form-label">Alt Tag</label>
                                 <input type="text" class="form-control" name="image_alt_tag" placeholder="Tag"
-                                    value="{{ $course->image_alt_tag }}" required>
+                                    value="{{ old('image_alt_tag', $course->image_alt_tag) }}" required>
                                 @error('image_alt_tag')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
@@ -418,6 +426,7 @@
     <script>
 
         $(document).ready(function () {
+
 
             $('#thumbnail_image').on('change', function (e) {
                 let reader = new FileReader();
@@ -512,6 +521,24 @@
             setInterval(function () {
                 $(document).find(".cke_notifications_area").remove();
             }, 100);
+
+            setTimeout(() => {
+
+                if (CKEDITOR.instances.course_overview) {
+
+                    CKEDITOR.instances.course_overview.setData(
+                        `{!! old('course_overview', $course->course_overview) !!}`
+                    );
+                }
+
+                if (CKEDITOR.instances.detail_content) {
+
+                    CKEDITOR.instances.detail_content.setData(
+                        `{!! old('detail_content', $course->detail_content) !!}`
+                    );
+                }
+
+            }, 500);
 
 
             if ($.fn.select2) {
@@ -686,8 +713,8 @@
                         response.categories.forEach(category => {
                             categorySelect.innerHTML +=
                                 `<option value="${category.id}" ${category.id == selectedCategory ? 'selected' : ''}>
-                                                ${category.name}
-                                            </option>`;
+                                                                                    ${category.name}
+                                                                                </option>`;
                         });
 
                     },

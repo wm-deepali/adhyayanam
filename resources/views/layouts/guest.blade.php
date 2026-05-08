@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <base href="./">
     <meta charset="utf-8">
@@ -8,17 +9,22 @@
     <title>{{ config('app.name', 'Adhyayanam') }}</title>
     <meta name="theme-color" content="#ffffff">
     @vite('resources/sass/app.scss')
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        crossorigin="anonymous" />
+    <link rel="shortcut icon" href="{{url('images/fav.ico')}}" type="image/x-icon">
+    <link rel="icon" href="{{url('images/fav.ico')}}" type="image/x-icon">
 </head>
+
 <body>
 
-<div class="bg-light min-vh-100 d-flex flex-row align-items-center">
-    <div class="container">
-        <div class="row justify-content-center">
-            @yield('content')
+    <div class="bg-light min-vh-100 d-flex flex-row align-items-center">
+        <div class="container">
+            <div class="row justify-content-center">
+                @yield('content')
+            </div>
         </div>
     </div>
-</div>
-<script src="{{ asset('js/coreui.bundle.min.js') }}"></script>
+    <script src="{{ asset('js/coreui.bundle.min.js') }}"></script>
 </body>
+
 </html>

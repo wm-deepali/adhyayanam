@@ -112,25 +112,6 @@
 
                 <!-- Sidebar: Recent (right on lg+, below on mobile) -->
                 <div class="col-lg-4 sidebar-section sidebar-sticky">
-                    <div class="bg-white rounded-3 shadow mb-4 overflow-hidden">
-                        <div class="bg-card text-dark px-4 py-3">
-                            <h5 class="mb-0">Recent Updates</h5>
-                        </div>
-                        <div class="list-group list-group-flush">
-                            @foreach($relatedBlogs as $data)
-                            <a href="{{ route('blog.details', $data->id) }}" class="list-group-item list-group-item-action px-4 py-3">
-                                <div class="d-flex gap-3">
-                                    <img src="{{ url('storage/' . $data->image) }}" alt="" class="rounded shadow-sm" width="64" height="64" style="object-fit: cover;">
-                                    <div>
-                                        <h6 class="mb-1 line-clamp-2">{{ Illuminate\Support\Str::limit($data->heading, 60) }}</h6>
-                                        <small class="text-muted">{{ Carbon\Carbon::parse($data->created_at)->format('d M Y') }}</small>
-                                    </div>
-                                </div>
-                            </a>
-                            @endforeach
-                        </div>
-                    </div>
-
                     <!-- Tags (optional) -->
                     <div class="bg-white rounded-3 shadow p-4">
                         <h5 class="mb-3">Tags</h5>

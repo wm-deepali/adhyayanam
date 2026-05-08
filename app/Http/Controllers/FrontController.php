@@ -67,8 +67,7 @@ class FrontController extends Controller
         $data['faqs'] = Faq::where('show_on_home', 1)->get();
         $data['studyMaterial'] = StudyMaterial::with('commission')
             ->where('status', 'Active')
-            ->get()
-            ->groupBy('commission_id');
+            ->get();
 
         // Check if the popup has been shown in this session
         if (!session()->has('popup_shown')) {
@@ -411,18 +410,91 @@ class FrontController extends Controller
 
     public function contactUsStore(Request $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255',
-            'website' => 'nullable|url|max:255',
-            'message' => 'required|string',
-        ]);
+        $validatedData = $request->validate(
 
-        ContactUs::create($request->all());
+            [
+                'name' => 'required|string|max:255',
 
-        return redirect()->back()->with('success', 'We`ll contact you soon!');
+                'email' => 'required|email|max:255',
+
+                /*
+                |--------------------------------------------------------------------------
+                | Subject Field
+                |--------------------------------------------------------------------------
+                */
+
+                'subject' => 'nullable|string|max:255',
+
+                'message' => 'required|string|max:5000',
+            ],
+
+            /*
+            |--------------------------------------------------------------------------
+            | Custom Messages
+            |--------------------------------------------------------------------------
+            */
+
+            [
+                'name.required' =>
+                    'Please enter your name.',
+
+                'email.required' =>
+                    'Please enter your email address.',
+
+                'email.email' =>
+                    'Please enter a valid email address.',
+
+                'message.required' =>
+                    'Please enter your message.',
+            ]
+        );
+
+        try {
+
+            /*
+            |--------------------------------------------------------------------------
+            | Save Data
+            |--------------------------------------------------------------------------
+            */
+
+            ContactUs::create([
+
+                'name' => $validatedData['name'],
+
+                'email' => $validatedData['email'],
+
+                /*
+                |--------------------------------------------------------------------------
+                | If DB column still named website
+                |--------------------------------------------------------------------------
+                */
+
+                'website' => $validatedData['subject'] ?? null,
+
+                'message' => $validatedData['message'],
+            ]);
+
+            return redirect()
+                ->back()
+                ->with(
+                    'success',
+                    'We’ll contact you soon!'
+                );
+
+        } catch (\Exception $e) {
+
+            \Log::error(
+                'Contact Form Error: ' . $e->getMessage()
+            );
+
+            return back()
+                ->withInput()
+                ->with(
+                    'error',
+                    'Something went wrong. Please try again.'
+                );
+        }
     }
-
     public function callbackIndex()
     {
         return view('front.user.call-back');
@@ -502,24 +574,11 @@ class FrontController extends Controller
     public function currentAffairsDetail($id)
     {
         $data['current_affair'] = CurrentAffair::findOrFail($id);
-        $relatedBlogs = Blog::where('id', '!=', $id)
-            ->latest()
-            ->take(3)
-            ->get();
 
-        // Check if additional blogs are needed to make up the difference
-        $relatedCount = $relatedBlogs->count();
-
-        if ($relatedCount < 3) {
-            $additionalBlogs = Blog::latest()
-                ->take(3 - $relatedCount)
-                ->get();
-            $relatedBlogs = $relatedBlogs->merge($additionalBlogs);
-        }
         $data['relatedAffairs'] = CurrentAffair::where('id', '!=', $id)
             ->take(2)
             ->get();
-        $data['relatedBlogs'] = $relatedBlogs;
+
         return view('front.user.current-affair-detail', $data);
     }
 
@@ -745,32 +804,144 @@ class FrontController extends Controller
 
     public function feedBackStore(Request $request)
     {
-        $validatedData = $request->validate([
-            'type' => 'required|integer',
-            'username' => 'required|string|max:255',
-            'designation' => 'required|string|max:100',
-            'email' => 'required|email|max:255',
-            'number' => 'required|string|max:20',
-            'message' => 'nullable|string',
+        $validatedData = $request->validate(
 
-            // ⭐ rating required only for testimonial
-            'rating' => 'required_if:type,2|nullable|integer|min:1|max:5',
+            [
+                'type' => 'required|integer|in:1,2',
 
-            'photo' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-        ]);
+                'username' => 'required|string|max:255',
 
-        // Upload photo
-        if ($request->hasFile('photo')) {
-            $file = $request->file('photo');
-            $filename = time() . '_' . $file->getClientOriginalName();
-            $file->move(public_path('uploads/feed-photos'), $filename);
-            $validatedData['photo'] = $filename;
+                'designation' => 'required|string|max:100',
+
+                'email' => 'required|email|max:255',
+
+                'number' => 'required|digits_between:10,15',
+
+                'message' => 'nullable|string|max:2000',
+
+                /*
+                |--------------------------------------------------------------------------
+                | Rating required only for testimonial
+                |--------------------------------------------------------------------------
+                */
+
+                'rating' => 'required_if:type,2|nullable|integer|min:1|max:5',
+
+                /*
+                |--------------------------------------------------------------------------
+                | Photo validation
+                |--------------------------------------------------------------------------
+                */
+
+                'photo' => [
+                    'required',
+                    'image',
+                    'mimes:jpeg,jpg,png,gif,webp',
+                    'max:2048'
+                ],
+            ],
+
+            /*
+            |--------------------------------------------------------------------------
+            | Custom Error Messages
+            |--------------------------------------------------------------------------
+            */
+
+            [
+                'type.required' => 'Please select feedback type.',
+
+                'username.required' => 'Please enter your name.',
+
+                'email.required' => 'Please enter email address.',
+
+                'email.email' => 'Please enter a valid email address.',
+
+                'number.required' => 'Please enter mobile number.',
+
+                'number.digits_between' =>
+                    'Mobile number must be between 10 and 15 digits.',
+
+                'rating.required_if' =>
+                    'Please give rating for testimonial.',
+
+                'photo.required' => 'Please upload a photo.',
+
+                'photo.image' =>
+                    'Uploaded file must be an image.',
+
+                'photo.mimes' =>
+                    'Photo must be jpeg, jpg, png, gif or webp format.',
+
+                'photo.max' =>
+                    'Photo size must not exceed 2MB.',
+            ]
+        );
+
+        try {
+
+            /*
+            |--------------------------------------------------------------------------
+            | Upload Photo
+            |--------------------------------------------------------------------------
+            */
+
+            if ($request->hasFile('photo')) {
+
+                $file = $request->file('photo');
+
+                $filename =
+                    time() . '_' .
+                    preg_replace(
+                        '/[^A-Za-z0-9\.\-_]/',
+                        '',
+                        $file->getClientOriginalName()
+                    );
+
+                $destinationPath =
+                    public_path('uploads/feed-photos');
+
+                /*
+                |--------------------------------------------------------------------------
+                | Create folder if not exists
+                |--------------------------------------------------------------------------
+                */
+
+                if (!file_exists($destinationPath)) {
+
+                    mkdir($destinationPath, 0777, true);
+                }
+
+                $file->move($destinationPath, $filename);
+
+                $validatedData['photo'] = $filename;
+            }
+
+            /*
+            |--------------------------------------------------------------------------
+            | Save Data
+            |--------------------------------------------------------------------------
+            */
+
+            FeedTestimonial::create($validatedData);
+
+            return back()->with(
+                'success',
+                'Feedback & Testimonial submitted successfully!'
+            );
+
+        } catch (\Exception $e) {
+
+            \Log::error(
+                'Feedback Upload Error: ' . $e->getMessage()
+            );
+
+            return back()
+                ->withInput()
+                ->with(
+                    'error',
+                    'Photo upload failed. Please try again.'
+                );
         }
-
-        // save data
-        FeedTestimonial::create($validatedData);
-
-        return back()->with('success', 'Feedback & Testimonial submitted successfully!');
     }
 
     public function batchesIndex()

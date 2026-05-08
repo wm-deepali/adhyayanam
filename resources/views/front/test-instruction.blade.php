@@ -2,7 +2,10 @@
 <html>
 
 <head>
+    
     <title>{{ $test->name }} - Instructions</title>
+     <link rel="shortcut icon" href="{{url('images/fav.ico')}}" type="image/x-icon">
+    <link rel="icon" href="{{url('images/fav.ico')}}" type="image/x-icon">
 
     <style>
         body {

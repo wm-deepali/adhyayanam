@@ -2323,6 +2323,7 @@
 		</section>
 		<!-- End Courses Section  -->
 
+
 		<!-- Start Intstitute Feature Section  -->
 		<section class="newfeature-featured-section">
 			<div class="newfeature-auto-container">
@@ -2532,7 +2533,7 @@
 								</div>
 							</div>
 
-							<div class="mobile-all-testseries d-block d-lg-none p-4">
+							<div class="mobile-all-testseries d-lg-none p-4">
 								<div class="container">
 									<h5 class="fw-bold mb-3">All Test Series</h5>
 
@@ -2726,8 +2727,7 @@
 		</section>
 		<!-- End Test Series Section -->
 
-
-		<!-- Start Study Materials  -->
+		<!-- Start Study material Section -->
 		<section class="mat-study-materials py-5 bg-white">
 			<div class="container" style="padding:30px;">
 				<div class="text-center mb-5">
@@ -2740,7 +2740,7 @@
 				<div class="mat-main-card shadow-lg rounded-4 overflow-hidden border border-light bg-white">
 					<div class="row g-0">
 
-						<!-- LEFT SIDEBAR: Commissions (Mobile pe shuru mein visible) -->
+						<!-- LEFT SIDEBAR: Commissions (Mobile pe initially visible) -->
 						<div id="commission-view-study"
 							class="col-lg-3 mat-sidebar border-end bg-white shadow-sm rounded-start">
 							<div class="p-4">
@@ -2752,7 +2752,7 @@
 										<button
 											class="mat-category-btn nav-link w-100 text-start py-3 px-4 {{ $index == 0 ? 'active' : '' }}"
 											data-bs-toggle="pill" data-bs-target="#commission-{{ $commission->id }}"
-											type="button">
+											type="button" data-commission-id="{{ $commission->id }}">>
 
 											{{ $commission->name }}
 
@@ -2761,12 +2761,13 @@
 								</div>
 							</div>
 
-							<div class="mobile-all-study d-block d-lg-none p-4">
+							{{-- MOBILE ONLY: ALL Study Material SECTION --}}
+							<div class="mobile-all-study d-lg-none p-4">
 								<div class="container">
 									<h5 class="fw-bold mb-3">All Study Materials</h5>
 
 									<div class="row">
-										@foreach($studyMaterial->flatten()->take(4) as $material)
+										@foreach($studyMaterial->take(4) as $material)
 											<div class="study-card-mobile col-12 mt-3">
 												<div class="edu-card">
 													<div class="edu-card-image">
@@ -2809,7 +2810,6 @@
 											</div>
 										@endforeach
 									</div>
-
 									<div class="text-center mt-5">
 										<a href="{{ route('study.material.front') }}"
 											class="newtestseries-all-btn btn btn-outline-primary btn-lg px-5 py-3 rounded-pill">
@@ -2819,7 +2819,9 @@
 
 								</div>
 							</div>
+
 						</div>
+
 
 						<!-- RIGHT CONTENT -->
 						<div id="content-view-study" class="col-lg-9">
@@ -2836,122 +2838,97 @@
 									id="selected-commission-name-study"></span>
 							</div>
 
-							<!-- Tab Content Wrapper -->
-							<div class="tab-content p-4" id="matMainTabContent">
+							<!-- Sub-Category Tabs + Cards -->
+							<div class="p-4 bg-white">
+								<!-- Sub-category pills -->
+								<ul class="nav nav-pills mb-4 gap-3 flex-nowrap overflow-auto" id="subCategoryTabsStudy">
+									<li class="nav-item">
+										<button class="btn btn-outline-secondary btn-sm active" data-category="all">All
+											Study Material</button>
+									</li>
+									<!-- Sub-categories dynamically added via JS -->
+								</ul>
 
-								@foreach($commissions as $cIndex => $commission)
-									<div class="tab-pane fade {{ $cIndex == 0 ? 'show active' : '' }}"
-										id="commission-{{ $commission->id }}">
+								<!-- Courses Cards Grid -->
+								<div class="row g-1 g-md-4 courses-grid">
 
-										<!-- CATEGORY TABS -->
-										<ul class="nav nav-pills mb-4 gap-2">
-											@foreach($commission->categories as $index => $category)
-												<li class="nav-item">
-													<button
-														class="btn btn-outline-secondary btn-sm11 {{ $index == 0 ? 'active' : '' }}"
-														data-bs-toggle="pill"
-														data-bs-target="#cat-{{ $commission->id }}-{{ $category->id }}">
-														{{ $category->name }}
-													</button>
-												</li>
-											@endforeach
-										</ul>
-
-										<hr>
-
-										<!-- CATEGORY CONTENT -->
-										<div class="tab-content">
-
-											@foreach($commission->categories as $index => $category)
-												<div class="tab-pane fade {{ $index == 0 ? 'show active' : '' }}"
-													id="cat-{{ $commission->id }}-{{ $category->id }}">
-
-													<div class="row g-4">
-
-														@foreach($studyMaterial[$commission->id] ?? [] as $material)
-
-															@if($material->category_id == $category->id)
-
-																						<div class="edu-course-card col-xl-4 col-lg-6 col-md-6 sm-12"
-																							data-commission="{{ $commission->id }}"
-																							data-category="{{ $material->category_id ?? 'all' }}"
-																							data-category-name="{{ addslashes($category->name) }}">
-
-																							<div class="edu-card">
-																								<div class="edu-card-image">
-																									<a href="{{ route('study.material.details', $material->id) }}"
-																										class="block">
-																										<img src="{{ url('storage/' . $material->banner) }}"
-																											alt="{{ $material->title }}" class="edu-thumbnail">
-																									</a>
-																								</div>
-
-																								<div class="edu-card-body">
-																									<div class="edu-meta">
-																										<div class="edu-duration">
-																											{{ $material->is_pdf_downloadable ? 'Pdf Available' :
-																''}}
-																										</div>
-
-																										<div class="edu-price">
-																											{{ $material->IsPaid ? '₹' . $material->price : 'Free'
-																												}}
-																										</div>
-																									</div>
-																									<p class="commission-name">
-																										{{$material->subcategory->name}}
-																									</p>
-
-																									<h3 class="edu-title">
-																										<a
-																											href="{{ route('study.material.details', $material->id) }}">{{
-																$material->title }}</a>
-																									</h3>
-
-																									<p class="edu-description">{{ $material->short_description }}
-																									</p>
-
-																									<div class="edu-actions">
-
-																										<a href="{{ route('study.material.details', $material->id) }}"
-																											class="edu-btn edu-btn-outline"
-																											style="width: 100%;display: flex;justify-content: center; text-align: center;">
-																											View Details
-																											<span
-																												class="arrow-icon flaticon-arrow-pointing-to-right"></span>
-																										</a>
-																									</div>
-																								</div>
-																							</div>
-																						</div>
-
-															@endif
-
-														@endforeach
-
-													</div>
-												</div>
-											@endforeach
-
+									<div class="no-data-message text-center w-100" style="display:none;">
+										<div class="p-5">
+											<h5 class="text-muted">No Study Material found</h5>
+											<p class="text-muted">Try selecting a different filter</p>
 										</div>
 									</div>
-								@endforeach
+									@foreach($studyMaterial as $material)
+																<div class="edu-course-card col-xl-4 col-lg-6 col-md-6 sm-12"
+																	data-commission="{{ $material->commission->id }}"
+																	data-category="{{ $material->category_id ?? 'all' }}"
+																	data-category-name="{{ addslashes($material->category->name ?? 'Unknown') }}">
 
+																	<div class="edu-card">
+																		<div class="edu-card-image">
+																			<a href="{{ route('study.material.details', $material->id) }}"
+																				class="block">
+																				<img src="{{ url('storage/' . $material->banner) }}"
+																					alt="{{ $material->title }}" class="edu-thumbnail">
+																			</a>
+																		</div>
+
+																		<div class="edu-card-body">
+																			<div class="edu-meta">
+																				<div class="edu-duration">
+																					{{ $material->is_pdf_downloadable ? 'Pdf Available' :
+										''}}
+																				</div>
+
+																				<div class="edu-price">
+																					{{ $material->IsPaid ? '₹' . $material->price : 'Free'
+																																																																																																												}}
+																				</div>
+																			</div>
+																			<p class="commission-name">
+																				{{$material->subcategory->name}}
+																			</p>
+
+																			<h3 class="edu-title">
+																				<a href="{{ route('study.material.details', $material->id) }}">{{
+										$material->title }}</a>
+																			</h3>
+
+																			<p class="edu-description">{{ $material->short_description }}
+																			</p>
+
+																			<div class="edu-actions">
+
+																				<a href="{{ route('study.material.details', $material->id) }}"
+																					class="edu-btn edu-btn-outline"
+																					style="width: 100%;display: flex;justify-content: center; text-align: center;">
+																					View Details
+																					<span class="arrow-icon flaticon-arrow-pointing-to-right"></span>
+																				</a>
+																			</div>
+																		</div>
+																	</div>
+																</div>
+
+									@endforeach
+								</div>
+
+								<!-- View All Button -->
+								<div class="text-center mt-5">
+									<a href="{{ route('study.material.front') }}"
+										class="newtestseries-all-btn btn btn-outline-primary btn-lg px-5 py-3 rounded-pill">
+										View All Study Material
+									</a>
+								</div>
 							</div>
 						</div>
-
 					</div>
 				</div>
 
-				<div class="text-center mt-5">
-					<a href="{{ route('study.material.front') }}"
-						class="newtestseries-all-btn btn btn-outline-primary btn-lg px-5 py-3 rounded-pill">
-						View All Study Material
-					</a>
-				</div>
 			</div>
 		</section>
-		<!-- End Study Materials  -->
+		<!-- End study material Section  -->
+
 
 		<!-- Start Daily Booster Section -->
 		<section class="courses-section py-5 " style="background:#f8fbff;">
@@ -3208,7 +3185,7 @@
 													style="background: {{ $bgColors[$index % count($bgColors)] }};">
 
 													<div class="newprog-number-circle {{ $circleColors[$index % count($circleColors)] }} text-white
-																																																																																																																																																			rounded-circle d-flex align-items-center justify-content-center"
+																																																																																																																																																																																															rounded-circle d-flex align-items-center justify-content-center"
 														style="width:40px;height:40px;font-size:1.2rem;font-weight:bold;">
 														{{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}
 													</div>
@@ -3511,8 +3488,7 @@
 					return false;
 				});
 			});
-		</script>
-		<script>
+
 			document.addEventListener('DOMContentLoaded', function () {
 				const videoModal = document.getElementById('videoModal');
 				const videoIframe = document.getElementById('videoIframe');
@@ -3537,8 +3513,7 @@
 					videoIframe.src = '';
 				});
 			});
-		</script>
-		<script>
+
 			$('.main-slider-carousel').owlCarousel({
 				items: 1,
 				loop: true,
@@ -3737,15 +3712,15 @@
 			// Yeh object sab commissions ke categories ka name rakhega
 			window.commissionCategories = {
 				@foreach($commissions as $commission)
-																																					  "{{ $commission->id }}": {
+																																																  "{{ $commission->id }}": {
 					@foreach($commission->categories as $cat)
 						  "{{ $cat->id }}": "{{ addslashes($cat->name) }}",
 					@endforeach
-																																					  },
+																																																  },
 				@endforeach
-																																	  };
+																																												  };
 
-
+			// test series script
 			document.addEventListener('DOMContentLoaded', function () {
 				const commissionTabs = document.querySelectorAll('#commissionTabs .nav-link');
 				const subCategoryTabsContainer = document.getElementById('subCategoryTabs');
@@ -3761,10 +3736,10 @@
 						const allTabLi = document.createElement('li');
 						allTabLi.className = 'nav-item';
 						allTabLi.innerHTML = `
-																																			<button class="btn btn-outline-secondary btn-sm11 active" data-category="all">
-																																			  All
-																																			</button>
-																																		  `;
+																																														<button class="btn btn-outline-secondary btn-sm11 active" data-category="all">
+																																														  All
+																																														</button>
+																																													  `;
 						subCategoryTabsContainer.appendChild(allTabLi);
 
 						// Categories collect karo (unique)
@@ -3784,10 +3759,10 @@
 							const li = document.createElement('li');
 							li.className = 'nav-item';
 							li.innerHTML = `
-																																		<button class="btn btn-outline-secondary btn-sm11" data-category="${catId}">
-																																		  ${categoryName}
-																																		</button>
-																																	  `;
+																																													<button class="btn btn-outline-secondary btn-sm11" data-category="${catId}">
+																																													  ${categoryName}
+																																													</button>
+																																												  `;
 							subCategoryTabsContainer.appendChild(li);
 						});
 
@@ -3849,101 +3824,6 @@
 				}
 			});
 
-			document.addEventListener('DOMContentLoaded', function () {
-				const commissionTabs = document.querySelectorAll('#commissionTabsCourses .nav-link');
-				const subCategoryTabsContainer = document.getElementById('subCategoryTabsCourses');
-				const allCards = document.querySelectorAll('.edu-course-card');
-
-				commissionTabs.forEach(tab => {
-					tab.addEventListener('shown.bs.tab', function () {
-						const commissionId = this.getAttribute('data-commission-id').toLowerCase();
-						subCategoryTabsContainer.innerHTML = '';
-
-						// All Courses tab
-						const allTabLi = document.createElement('li');
-						allTabLi.className = 'nav-item';
-						allTabLi.innerHTML = `
-																																			<button class="btn btn-outline-secondary btn-sm11 active" data-category="all">
-																																			  All Courses
-																																			</button>
-																																		  `;
-						subCategoryTabsContainer.appendChild(allTabLi);
-
-						// Categories collect with names from data-attribute
-						const categoryMap = new Map();
-						allCards.forEach(card => {
-							if (card.getAttribute('data-commission') === commissionId) {
-								const catId = card.getAttribute('data-category');
-								const catName = card.getAttribute('data-category-name') || `Category ${catId}`;
-								if (catId && catId !== 'all') {
-									categoryMap.set(catId, catName);
-								}
-							}
-						});
-
-						// Buttons banao
-						categoryMap.forEach((catName, catId) => {
-							const li = document.createElement('li');
-							li.className = 'nav-item';
-							li.innerHTML = `
-																																			  <button class="btn btn-outline-secondary btn-sm11" data-category="${catId}">
-																																				${catName}
-																																			  </button>
-																																			`;
-							subCategoryTabsContainer.appendChild(li);
-						});
-
-						// All tab trigger
-						allTabLi.querySelector('button').click();
-					});
-				});
-
-				// Filter + active class
-				subCategoryTabsContainer.addEventListener('click', function (e) {
-					if (e.target.tagName === 'BUTTON') {
-						subCategoryTabsContainer.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
-						e.target.classList.add('active');
-
-						const selectedCategory = e.target.getAttribute('data-category');
-						const activeTab = document.querySelector('#commissionTabsCourses .nav-link.active');
-						const commissionId = activeTab?.getAttribute('data-commission-id')?.toLowerCase();
-
-						let count = 0;
-
-						allCards.forEach(card => {
-							const cardComm = card.getAttribute('data-commission');
-							const cardCat = card.getAttribute('data-category');
-
-							if (cardComm === commissionId) {
-
-								if ((selectedCategory === 'all' || cardCat === selectedCategory) && count < 6) {
-									card.style.display = 'block';
-									count++;
-								} else {
-									card.style.display = 'none';
-								}
-
-							} else {
-								card.style.display = 'none';
-							}
-						});
-						checkNoDataCourses();
-					}
-				});
-
-				// Force trigger for first tab on page load
-				if (commissionTabs.length > 0) {
-					const firstTab = commissionTabs[0];
-					const bsTab = new bootstrap.Tab(firstTab);
-					bsTab.show();
-
-					// manually dispatch event so logic runs
-					firstTab.dispatchEvent(new Event('shown.bs.tab'));
-				}
-			});
-
-		</script>
-		<script>
 			document.addEventListener('DOMContentLoaded', () => {
 				const commissionView = document.getElementById('commission-view');
 				const contentView = document.getElementById('content-view');
@@ -4005,8 +3885,103 @@
 					}
 				});
 			});
-		</script>
-		<script>
+
+
+
+			// course script
+			document.addEventListener('DOMContentLoaded', function () {
+				const commissionTabs = document.querySelectorAll('#commissionTabsCourses .nav-link');
+				const subCategoryTabsContainer = document.getElementById('subCategoryTabsCourses');
+				const allCards = document.querySelectorAll('.edu-course-card');
+
+				commissionTabs.forEach(tab => {
+					tab.addEventListener('shown.bs.tab', function () {
+						const commissionId = this.getAttribute('data-commission-id').toLowerCase();
+						subCategoryTabsContainer.innerHTML = '';
+
+						// All Courses tab
+						const allTabLi = document.createElement('li');
+						allTabLi.className = 'nav-item';
+						allTabLi.innerHTML = `
+																																														<button class="btn btn-outline-secondary btn-sm11 active" data-category="all">
+																																														  All Courses
+																																														</button>
+																																													  `;
+						subCategoryTabsContainer.appendChild(allTabLi);
+
+						// Categories collect with names from data-attribute
+						const categoryMap = new Map();
+						allCards.forEach(card => {
+							if (card.getAttribute('data-commission') === commissionId) {
+								const catId = card.getAttribute('data-category');
+								const catName = card.getAttribute('data-category-name') || `Category ${catId}`;
+								if (catId && catId !== 'all') {
+									categoryMap.set(catId, catName);
+								}
+							}
+						});
+
+						// Buttons banao
+						categoryMap.forEach((catName, catId) => {
+							const li = document.createElement('li');
+							li.className = 'nav-item';
+							li.innerHTML = `
+																																														  <button class="btn btn-outline-secondary btn-sm11" data-category="${catId}">
+																																															${catName}
+																																														  </button>
+																																														`;
+							subCategoryTabsContainer.appendChild(li);
+						});
+
+						// All tab trigger
+						allTabLi.querySelector('button').click();
+					});
+				});
+
+				// Filter + active class
+				subCategoryTabsContainer.addEventListener('click', function (e) {
+					if (e.target.tagName === 'BUTTON') {
+						subCategoryTabsContainer.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
+						e.target.classList.add('active');
+
+						const selectedCategory = e.target.getAttribute('data-category');
+						const activeTab = document.querySelector('#commissionTabsCourses .nav-link.active');
+						const commissionId = activeTab?.getAttribute('data-commission-id')?.toLowerCase();
+
+						let count = 0;
+
+						allCards.forEach(card => {
+							const cardComm = card.getAttribute('data-commission');
+							const cardCat = card.getAttribute('data-category');
+
+							if (cardComm === commissionId) {
+
+								if ((selectedCategory === 'all' || cardCat === selectedCategory) && count < 6) {
+									card.style.display = 'block';
+									count++;
+								} else {
+									card.style.display = 'none';
+								}
+
+							} else {
+								card.style.display = 'none';
+							}
+						});
+						checkNoDataCourses();
+					}
+				});
+
+				// Force trigger for first tab on page load
+				if (commissionTabs.length > 0) {
+					const firstTab = commissionTabs[0];
+					const bsTab = new bootstrap.Tab(firstTab);
+					bsTab.show();
+
+					// manually dispatch event so logic runs
+					firstTab.dispatchEvent(new Event('shown.bs.tab'));
+				}
+			});
+
 			document.addEventListener('DOMContentLoaded', () => {
 				// ── Courses specific ────────────────────────────────────────
 				const commissionViewCourses = document.getElementById('commission-view-courses');
@@ -4075,74 +4050,173 @@
 					}
 				});
 			});
-		</script>
-		<script>
+
+
 			// ── Study Materials specific ────────────────────────────────────────
-			const commissionViewStudy = document.getElementById('commission-view-study');
-			const contentViewStudy = document.getElementById('content-view-study');
-			const breadcrumbStudy = document.getElementById('commission-breadcrumb-study');
-			const selectedNameStudy = document.getElementById('selected-commission-name-study');
-			const backBtnStudy = document.getElementById('back-to-commission-study');
+			document.addEventListener('DOMContentLoaded', function () {
+				const commissionTabs = document.querySelectorAll('#matMainPills .nav-link');
+				const subCategoryTabsContainer = document.getElementById('subCategoryTabsStudy');
+				const allCards = document.querySelectorAll('.edu-course-card');
 
-			const isMobile = () => window.innerWidth < 992;
+				commissionTabs.forEach(tab => {
+					tab.addEventListener('shown.bs.tab', function () {
+						const commissionId = this.getAttribute('data-commission-id').toLowerCase();
+						subCategoryTabsContainer.innerHTML = '';
 
-			// Mobile initial state
-			if (isMobile()) {
-				if (contentViewStudy) contentViewStudy.classList.add('d-none');
-				if (breadcrumbStudy) breadcrumbStudy.style.display = 'none';
-			}
+						// All Courses tab
+						const allTabLi = document.createElement('li');
+						allTabLi.className = 'nav-item';
+						allTabLi.innerHTML = `
+																																														<button class="btn btn-outline-secondary btn-sm11 active" data-category="all">
+																																														  All Study Material
+																																														</button>
+																																													  `;
+						subCategoryTabsContainer.appendChild(allTabLi);
 
-			// Back button for Study
-			if (backBtnStudy) {
-				backBtnStudy.addEventListener('click', () => {
-					if (isMobile()) {
-						contentViewStudy.classList.add('d-none');
-						commissionViewStudy.classList.remove('d-none');
-						breadcrumbStudy.style.display = 'none';
-						// Optional: agar category filter reset karna ho to yahan call karo
+						// Categories collect with names from data-attribute
+						const categoryMap = new Map();
+						allCards.forEach(card => {
+							if (card.getAttribute('data-commission') === commissionId) {
+								const catId = card.getAttribute('data-category');
+								const catName = card.getAttribute('data-category-name') || `Category ${catId}`;
+								if (catId && catId !== 'all') {
+									categoryMap.set(catId, catName);
+								}
+							}
+						});
+
+						// Buttons banao
+						categoryMap.forEach((catName, catId) => {
+							const li = document.createElement('li');
+							li.className = 'nav-item';
+							li.innerHTML = `
+																																														  <button class="btn btn-outline-secondary btn-sm11" data-category="${catId}">
+																																															${catName}
+																																														  </button>
+																																														`;
+							subCategoryTabsContainer.appendChild(li);
+						});
+
+						// All tab trigger
+						allTabLi.querySelector('button').click();
+					});
+				});
+
+				// Filter + active class
+				subCategoryTabsContainer.addEventListener('click', function (e) {
+					if (e.target.tagName === 'BUTTON') {
+						subCategoryTabsContainer.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
+						e.target.classList.add('active');
+
+						const selectedCategory = e.target.getAttribute('data-category');
+						const activeTab = document.querySelector('#matMainPills .nav-link.active');
+						const commissionId = activeTab?.getAttribute('data-commission-id')?.toLowerCase();
+
+						let count = 0;
+
+						allCards.forEach(card => {
+							const cardComm = card.getAttribute('data-commission');
+							const cardCat = card.getAttribute('data-category');
+
+							if (cardComm === commissionId) {
+
+								if ((selectedCategory === 'all' || cardCat === selectedCategory) && count < 6) {
+									card.style.display = 'block';
+									count++;
+								} else {
+									card.style.display = 'none';
+								}
+
+							} else {
+								card.style.display = 'none';
+							}
+						});
+						checkNoDataStudy();
 					}
 				});
-			}
 
-			// Commission button clicks for Study Materials
-			document.querySelectorAll('#matMainPills .mat-category-btn').forEach(btn => {
-				btn.addEventListener('click', function () {
-					// ── Yahan tumhara existing logic (tab-pane show, category load etc.) already chal raha hoga ──
+				// Force trigger for first tab on page load
+				if (commissionTabs.length > 0) {
+					const firstTab = commissionTabs[0];
+					const bsTab = new bootstrap.Tab(firstTab);
+					bsTab.show();
 
-					// Mobile switch logic
-					if (isMobile()) {
-						commissionViewStudy.classList.add('d-none');
-						contentViewStudy.classList.remove('d-none');
-						if (breadcrumbStudy) {
-							breadcrumbStudy.style.display = 'flex';
-							selectedNameStudy.textContent = this.textContent.trim();
-						}
-
-						// ✅ ADD THIS (show ALL courses again)
-						document.querySelector('.mobile-all-study').style.display = 'block';
-
-						// ✅ REMOVE active state
-						document.querySelectorAll('#matMainPills .nav-link')
-							.forEach(btn => btn.classList.remove('active'));
-					}
-				});
-			});
-
-			// Common resize handler (sab sections cover karega)
-			window.addEventListener('resize', () => {
-				if (!isMobile()) {
-					// Desktop: show both sides
-					[commissionViewStudy, contentViewStudy].forEach(el => el && el.classList.remove('d-none'));
-					[breadcrumbStudy].forEach(el => el && (el.style.display = 'none'));
-				} else if (contentViewStudy && contentViewStudy.classList.contains('d-none') &&
-					commissionViewStudy && commissionViewStudy.classList.contains('d-none')) {
-					commissionViewStudy.classList.remove('d-none');
+					// manually dispatch event so logic runs
+					firstTab.dispatchEvent(new Event('shown.bs.tab'));
 				}
 			});
 
-			document.addEventListener('shown.bs.tab', function () {
-				checkNoDataStudy();
+			document.addEventListener('DOMContentLoaded', () => {
+				// ── Study Materials specific ────────────────────────────────────────
+				const commissionViewStudy = document.getElementById('commission-view-study');
+				const contentViewStudy = document.getElementById('content-view-study');
+				const breadcrumbStudy = document.getElementById('commission-breadcrumb-study');
+				const selectedNameStudy = document.getElementById('selected-commission-name-study');
+				const backBtnStudy = document.getElementById('back-to-commission-study');
+
+				const isMobile = () => window.innerWidth < 992;
+
+				// Mobile pe shuru mein sirf commission dikhao
+				if (isMobile()) {
+					contentViewStudy.classList.add('d-none');
+					if (breadcrumbStudy) breadcrumbStudy.style.display = 'none';
+				}
+
+				// Back button (Courses)
+				if (backBtnStudy) {
+					backBtnStudy.addEventListener('click', () => {
+						if (isMobile()) {
+
+							// existing logic
+							contentViewStudy.classList.add('d-none');
+							commissionViewStudy.classList.remove('d-none');
+							breadcrumbStudy.style.display = 'none';
+
+							// ✅ ADD THIS (show ALL courses again)
+							document.querySelector('.mobile-all-courses').style.display = 'block';
+
+							// ✅ REMOVE active state
+							document.querySelectorAll('#commissionTabsCourses .nav-link')
+								.forEach(btn => btn.classList.remove('active'));
+
+						}
+					});
+				}
+
+				// Commission buttons click (Courses)
+				document.querySelectorAll('#matMainPills .mat-category-btn').forEach(btn => {
+					btn.addEventListener('click', function () {
+						// ── Yahan tumhara existing logic (active class, load sub-categories, filter cards etc.) ──
+
+						// Mobile switch
+						if (isMobile()) {
+							commissionViewStudy.classList.add('d-none');
+							contentViewStudy.classList.remove('d-none');
+							if (breadcrumbStudy) {
+								breadcrumbStudy.style.display = 'flex';
+								selectedNameStudy.textContent = this.textContent.trim();
+							}
+						}
+					});
+				});
+
+				// Resize handler (common for both sections)
+				window.addEventListener('resize', () => {
+					if (!isMobile()) {
+						// Desktop: show both
+						if (commissionViewStudy) commissionViewStudy.classList.remove('d-none');
+						if (contentViewStudy) contentViewStudy.classList.remove('d-none');
+						if (breadcrumbStudy) breadcrumbStudy.style.display = 'none';
+					} else if (contentViewStudy && contentViewStudy.classList.contains('d-none') &&
+						commissionViewStudy && commissionViewStudy.classList.contains('d-none')) {
+						// Fallback: show commission
+						commissionViewStudy.classList.remove('d-none');
+					}
+				});
 			});
+
+
+
 		</script>
 	</body>
 @endsection

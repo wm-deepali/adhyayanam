@@ -393,36 +393,51 @@
             let oldCategory = "{{ old('category_id') }}";
             let oldSubCategory = "{{ old('sub_category_id') }}";
             let oldCommission = "{{ old('examination_commission_id') }}";
+
             let oldSubjects = @json(old('subject_id', []));
+            let oldChapters = @json(old('chapter_id', []));
             let oldTopics = @json(old('topic_id', []));
 
-            // STEP 1: trigger commission
-            if (oldCommission) {
-                $('#examination_commission_id').val(oldCommission).trigger('change');
-            }
+            // =========================================
+            // IMAGE PREVIEW
+            // =========================================
 
+            $('#thumbnail_image').on('change', function () {
 
-            $('#thumbnail_image').on('change', function (e) {
                 let reader = new FileReader();
 
                 reader.onload = function (e) {
-                    $('#thumbnail_preview').attr('src', e.target.result).show();
+                    $('#thumbnail_preview')
+                        .attr('src', e.target.result)
+                        .show();
                 }
 
-                reader.readAsDataURL(this.files[0]);
+                if (this.files[0]) {
+                    reader.readAsDataURL(this.files[0]);
+                }
             });
 
-            $('#banner_image').on('change', function (e) {
+            $('#banner_image').on('change', function () {
+
                 let reader = new FileReader();
 
                 reader.onload = function (e) {
-                    $('#banner_preview').attr('src', e.target.result).show();
+                    $('#banner_preview')
+                        .attr('src', e.target.result)
+                        .show();
                 }
 
-                reader.readAsDataURL(this.files[0]);
+                if (this.files[0]) {
+                    reader.readAsDataURL(this.files[0]);
+                }
             });
+
+            // =========================================
+            // OFFER PRICE CALCULATION
+            // =========================================
 
             function calculateOfferedPrice() {
+
                 let courseFee = parseFloat($('#course_fee').val()) || 0;
                 let discountPercent = parseFloat($('#discount').val()) || 0;
 
@@ -432,280 +447,538 @@
                 }
 
                 let discountAmount = (courseFee * discountPercent) / 100;
+
                 let offeredPrice = courseFee - discountAmount;
 
-                if (offeredPrice < 0) offeredPrice = 0;
+                if (offeredPrice < 0) {
+                    offeredPrice = 0;
+                }
 
                 $('#offered_price').val(Math.round(offeredPrice));
             }
 
-            // Recalculate on input
             $('#course_fee, #discount').on('input', function () {
                 calculateOfferedPrice();
             });
 
+            calculateOfferedPrice();
+
+            // =========================================
+            // CKEDITOR
+            // =========================================
+
             CKEDITOR.replace('detail_content', {
-                filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
+                filebrowserUploadUrl:
+                    "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
                 filebrowserUploadMethod: 'form'
             });
 
             CKEDITOR.replace('course_overview', {
-                filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
+                filebrowserUploadUrl:
+                    "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
                 filebrowserUploadMethod: 'form'
             });
 
             setTimeout(() => {
+
                 if (CKEDITOR.instances.course_overview) {
-                    CKEDITOR.instances.course_overview.setData(`{!! old('course_overview') !!}`);
+                    CKEDITOR.instances.course_overview.setData(
+                        `{!! old('course_overview') !!}`
+                    );
                 }
 
                 if (CKEDITOR.instances.detail_content) {
-                    CKEDITOR.instances.detail_content.setData(`{!! old('detail_content') !!}`);
+                    CKEDITOR.instances.detail_content.setData(
+                        `{!! old('detail_content') !!}`
+                    );
                 }
+
             }, 500);
 
             setInterval(function () {
                 $(document).find(".cke_notifications_area").remove();
             }, 100);
 
+            // =========================================
+            // SELECT2
+            // =========================================
 
             if ($.fn.select2) {
+
                 $('.select2').select2({
                     width: '100%',
                     placeholder: '--Select--',
                     allowClear: true
                 });
+
             } else {
-                console.error("❌ Select2 not loaded!");
+
+                console.error("Select2 not loaded!");
             }
 
+            const examinationCommissionSelect =
+                document.getElementById('examination_commission_id');
 
+            const categorySelect =
+                document.getElementById('category_id');
 
-            const examinationCommissionSelect = document.getElementById('examination_commission_id');
-            const categorySelect = document.getElementById('category_id');
-            const subCategorySelect = document.getElementById('sub_category_id');
+            const subCategorySelect =
+                document.getElementById('sub_category_id');
 
+            // =========================================
+            // FETCH CATEGORIES
+            // =========================================
 
-            // On Subcategory change -> fetch Subjects
-            $('#sub_category_id').on('change', function () {
-                let subCategoryId = $(this).val();
-                if (subCategoryId) {
-                    $.ajax({
-                        url: '/fetch-subject-by-subcategory/' + subCategoryId,
-                        type: 'GET',
-                        dataType: 'json',
-                        success: function (result) {
-                            if (result.success) {
-                                $('#subject_id').html(result.html).trigger('change');
-                                $('#subject_id').select2();
+            function fetchCategories(examinationCommissionId, callback = null) {
 
-                                let oldSubjects = @json(old('subject_id', []));
-                                if (oldSubjects.length) {
-                                    $('#subject_id').val(oldSubjects).trigger('change');
-                                }
-                            } else {
-                                $('#subject_id').html('<option value="">--Select--</option>').trigger('change');
-                            }
-                        }
-                    });
-                } else {
-                    $('#subject_id').html('<option value="">--Select--</option>').trigger('change');
-                    $('#chapter_id').html('<option value="">--Select--</option>').trigger('change');
-                    $('#topic_id').html('<option value="">--Select--</option>').trigger('change');
-                }
-            });
-
-            // On Subject change -> fetch Chapters
-            $('#subject_id').on('change', function () {
-                let subjects = $(this).val();
-                if (subjects && subjects.length > 0) {
-                    $.ajax({
-                        url: '/fetch-chapter-by-subject/' + subjects.join(','),
-                        type: 'GET',
-                        dataType: 'json',
-                        success: function (result) {
-                            if (result.success) {
-                                $('#chapter_id').html(result.html).trigger('change');
-                                $('#chapter_id').select2();
-
-                                let oldChapters = @json(old('chapter_id', []));
-                                if (oldChapters.length) {
-                                    $('#chapter_id').val(oldChapters).trigger('change');
-                                }
-                            } else {
-                                $('#chapter_id').html('<option value="">--Select--</option>').trigger('change');
-                            }
-                        }
-                    });
-                } else {
-                    $('#chapter_id').html('<option value="">--Select--</option>').trigger('change');
-                    $('#topic_id').html('<option value="">--Select--</option>').trigger('change');
-                }
-            });
-
-            // On Chapter change -> fetch Topics
-            $('#chapter_id').on('change', function () {
-                let chapters = $(this).val();
-                if (chapters && chapters.length > 0) {
-                    $.ajax({
-                        url: '/fetch-topic-by-chapter/' + chapters.join(','),
-                        type: 'GET',
-                        dataType: 'json',
-                        success: function (result) {
-                            if (result.success) {
-                                $('#topic_id').html(result.html).trigger('change');
-                                $('#topic_id').select2();
-
-                                let oldTopics = @json(old('topic_id', []));
-                                if (oldTopics.length) {
-                                    $('#topic_id').val(oldTopics).trigger('change');
-                                }
-                            } else {
-                                $('#topic_id').html('<option value="">--Select--</option>').trigger('change');
-                            }
-                        }
-                    });
-                } else {
-                    $('#topic_id').html('<option value="">--Select--</option>').trigger('change');
-                }
-            });
-
-
-            $(document).on('change', '#sub_category_id, #subject_id, #chapter_id, #topic_id', function () {
-                let subCategory = $('#sub_category_id').val();
-                let subjects = $('#subject_id').val() || [];
-                let chapters = $('#chapter_id').val() || [];
-                let topics = $('#topic_id').val() || [];
-
-                let basedOn = '';
-
-                // Helper functions to enable/disable Select2 properly
-                // Helper functions to enable/disable Select2 properly
-                const disableSelect2 = (selector) => {
-                    // Disable native select
-                    $(selector).prop('disabled', true);
-
-                    // Disable select2 interface
-                    $(selector).next(".select2-container").addClass("select2-disabled");
-                    $(selector).select2({ disabled: true });
-
-                    // Visually grey out
-                    $(selector).next('.select2-container').css({
-                        'pointer-events': 'none',
-                        'opacity': '0.6'
-                    });
-                };
-
-                const enableSelect2 = (selector) => {
-                    $(selector).prop('disabled', false);
-                    $(selector).select2({ disabled: false });
-                    $(selector).next('.select2-container').removeClass("select2-disabled");
-                    $(selector).next('.select2-container').css({
-                        'pointer-events': '',
-                        'opacity': ''
-                    });
-                };
-
-
-                // Enable Chapter and Topic initially
-                enableSelect2('#chapter_id');
-                enableSelect2('#topic_id');
-
-                if (subjects.length === 0 && subCategory) {
-                    basedOn = 'Sub Category Based';
-                }
-                else if (subjects.length === 1 && chapters.length === 0) {
-                    basedOn = 'Subject Based';
-                }
-                else if (subjects.length > 1) {
-                    basedOn = 'Combined Subject Based';
-
-                    // Disable Chapter and Topic selects when more than one subject selected
-                    disableSelect2('#chapter_id');
-                    disableSelect2('#topic_id');
-                }
-                else if (chapters.length === 1 && topics.length === 0) {
-                    basedOn = 'Chapter Based';
-                }
-                else if (chapters.length > 1 && topics.length === 0) {
-                    basedOn = 'Combined Chapter Based';
-
-                    // Disable Topic select when more than one chapter selected
-                    disableSelect2('#topic_id');
-                }
-                else if (topics.length >= 1) {
-                    basedOn = (topics.length > 1) ? 'Combined Topic Based' : 'Topic Based';
-                }
-
-                $('#based_on').val(basedOn);
-                if (basedOn) {
-                    $('#based-on-value').text(basedOn);
-                    $('#based-on-text').show();
-                } else {
-                    $('#based-on-text').hide();
-                }
-            });
-
-
-            examinationCommissionSelect.addEventListener('change', function () {
-                const examinationCommissionId = this.value;
-                if (examinationCommissionId) {
-                    fetchCategories(examinationCommissionId);
-                }
-            });
-
-            categorySelect.addEventListener('change', function () {
-                const categoryId = this.value;
-                if (categoryId) {
-                    fetchSubCategories(categoryId);
-                }
-            });
-
-            function fetchCategories(examinationCommissionId) {
                 $.ajax({
+
                     url: `{{ route('settings.categories', '') }}/${examinationCommissionId}`,
+
                     type: 'GET',
+
                     dataType: 'json',
+
                     success: function (response) {
-                        categorySelect.innerHTML = '<option value="" selected disabled>None</option>';
+
+                        categorySelect.innerHTML =
+                            '<option value="" selected disabled>None</option>';
 
                         response.categories.forEach(category => {
-                            categorySelect.innerHTML += `<option value="${category.id}">${category.name}</option>`;
+
+                            categorySelect.innerHTML +=
+                                `<option value="${category.id}">${category.name}</option>`;
                         });
 
-                        let oldCategory = "{{ old('category_id') }}";
-                        if (oldCategory) {
-                            $('#category_id').val(oldCategory).trigger('change');
+                        if (callback) {
+                            callback();
                         }
                     },
+
                     error: function (error) {
                         console.error('Error fetching categories:', error);
                     }
                 });
             }
 
-            function fetchSubCategories(categoryId) {
+            // =========================================
+            // FETCH SUB CATEGORIES
+            // =========================================
+
+            function fetchSubCategories(categoryId, callback = null) {
+
                 $.ajax({
+
                     url: `{{ route('settings.subcategories', '') }}/${categoryId}`,
+
                     type: 'GET',
+
                     dataType: 'json',
+
                     success: function (response) {
-                        subCategorySelect.innerHTML = '<option value="" selected disabled>None</option>';
+
+                        subCategorySelect.innerHTML =
+                            '<option value="" selected disabled>None</option>';
 
                         response.subcategories.forEach(subcategory => {
-                            subCategorySelect.innerHTML += `<option value="${subcategory.id}">${subcategory.name}</option>`;
+
+                            subCategorySelect.innerHTML +=
+                                `<option value="${subcategory.id}">${subcategory.name}</option>`;
                         });
 
-                        let oldSubCategory = "{{ old('sub_category_id') }}";
-                        if (oldSubCategory) {
-                            $('#sub_category_id').val(oldSubCategory).trigger('change');
+                        if (callback) {
+                            callback();
                         }
                     },
+
                     error: function (error) {
                         console.error('Error fetching subcategories:', error);
                     }
                 });
             }
+
+            // =========================================
+            // FETCH SUBJECTS
+            // =========================================
+
+            function fetchSubjects(subCategoryId, callback = null) {
+
+                $.ajax({
+
+                    url: '/fetch-subject-by-subcategory/' + subCategoryId,
+
+                    type: 'GET',
+
+                    dataType: 'json',
+
+                    success: function (result) {
+
+                        if (result.success) {
+
+                            $('#subject_id')
+                                .html(result.html)
+                                .trigger('change');
+
+                            $('#subject_id').select2();
+
+                            if (callback) {
+                                callback();
+                            }
+
+                        } else {
+
+                            $('#subject_id')
+                                .html('<option value="">--Select--</option>')
+                                .trigger('change');
+                        }
+                    }
+                });
+            }
+
+            // =========================================
+            // FETCH CHAPTERS
+            // =========================================
+
+            function fetchChapters(subjects, callback = null) {
+
+                $.ajax({
+
+                    url: '/fetch-chapter-by-subject/' + subjects.join(','),
+
+                    type: 'GET',
+
+                    dataType: 'json',
+
+                    success: function (result) {
+
+                        if (result.success) {
+
+                            $('#chapter_id')
+                                .html(result.html)
+                                .trigger('change');
+
+                            $('#chapter_id').select2();
+
+                            if (callback) {
+                                callback();
+                            }
+
+                        } else {
+
+                            $('#chapter_id')
+                                .html('<option value="">--Select--</option>')
+                                .trigger('change');
+                        }
+                    }
+                });
+            }
+
+            // =========================================
+            // FETCH TOPICS
+            // =========================================
+
+            function fetchTopics(chapters, callback = null) {
+
+                $.ajax({
+
+                    url: '/fetch-topic-by-chapter/' + chapters.join(','),
+
+                    type: 'GET',
+
+                    dataType: 'json',
+
+                    success: function (result) {
+
+                        if (result.success) {
+
+                            $('#topic_id')
+                                .html(result.html)
+                                .trigger('change');
+
+                            $('#topic_id').select2();
+
+                            if (callback) {
+                                callback();
+                            }
+
+                        } else {
+
+                            $('#topic_id')
+                                .html('<option value="">--Select--</option>')
+                                .trigger('change');
+                        }
+                    }
+                });
+            }
+
+            // =========================================
+            // COMMISSION CHANGE
+            // =========================================
+
+            examinationCommissionSelect.addEventListener('change', function () {
+
+                const examinationCommissionId = this.value;
+
+                if (examinationCommissionId) {
+
+                    fetchCategories(examinationCommissionId);
+
+                    $('#category_id').val('').trigger('change');
+                    $('#sub_category_id').html('<option value="">None</option>');
+                }
+            });
+
+            // =========================================
+            // CATEGORY CHANGE
+            // =========================================
+
+            categorySelect.addEventListener('change', function () {
+
+                const categoryId = this.value;
+
+                if (categoryId) {
+
+                    fetchSubCategories(categoryId);
+
+                    $('#sub_category_id').val('').trigger('change');
+                }
+            });
+
+            // =========================================
+            // SUB CATEGORY CHANGE
+            // =========================================
+
+            $('#sub_category_id').on('change', function () {
+
+                let subCategoryId = $(this).val();
+
+                if (subCategoryId) {
+
+                    fetchSubjects(subCategoryId);
+
+                } else {
+
+                    $('#subject_id')
+                        .html('<option value="">--Select--</option>')
+                        .trigger('change');
+
+                    $('#chapter_id')
+                        .html('<option value="">--Select--</option>')
+                        .trigger('change');
+
+                    $('#topic_id')
+                        .html('<option value="">--Select--</option>')
+                        .trigger('change');
+                }
+            });
+
+            // =========================================
+            // SUBJECT CHANGE
+            // =========================================
+
+            $('#subject_id').on('change', function () {
+
+                let subjects = $(this).val();
+
+                if (subjects && subjects.length > 0) {
+
+                    fetchChapters(subjects);
+
+                } else {
+
+                    $('#chapter_id')
+                        .html('<option value="">--Select--</option>')
+                        .trigger('change');
+
+                    $('#topic_id')
+                        .html('<option value="">--Select--</option>')
+                        .trigger('change');
+                }
+            });
+
+            // =========================================
+            // CHAPTER CHANGE
+            // =========================================
+
+            $('#chapter_id').on('change', function () {
+
+                let chapters = $(this).val();
+
+                if (chapters && chapters.length > 0) {
+
+                    fetchTopics(chapters);
+
+                } else {
+
+                    $('#topic_id')
+                        .html('<option value="">--Select--</option>')
+                        .trigger('change');
+                }
+            });
+
+            // =========================================
+            // BASED ON LOGIC
+            // =========================================
+
+            $(document).on(
+                'change',
+                '#sub_category_id, #subject_id, #chapter_id, #topic_id',
+                function () {
+
+                    let subCategory = $('#sub_category_id').val();
+
+                    let subjects = $('#subject_id').val() || [];
+
+                    let chapters = $('#chapter_id').val() || [];
+
+                    let topics = $('#topic_id').val() || [];
+
+                    let basedOn = '';
+
+                    const disableSelect2 = (selector) => {
+
+                        $(selector).prop('disabled', true);
+
+                        $(selector)
+                            .next(".select2-container")
+                            .css({
+                                'pointer-events': 'none',
+                                'opacity': '0.6'
+                            });
+                    };
+
+                    const enableSelect2 = (selector) => {
+
+                        $(selector).prop('disabled', false);
+
+                        $(selector)
+                            .next(".select2-container")
+                            .css({
+                                'pointer-events': '',
+                                'opacity': ''
+                            });
+                    };
+
+                    enableSelect2('#chapter_id');
+                    enableSelect2('#topic_id');
+
+                    if (subjects.length === 0 && subCategory) {
+
+                        basedOn = 'Sub Category Based';
+
+                    } else if (
+                        subjects.length === 1 &&
+                        chapters.length === 0
+                    ) {
+
+                        basedOn = 'Subject Based';
+
+                    } else if (subjects.length > 1) {
+
+                        basedOn = 'Combined Subject Based';
+
+                        disableSelect2('#chapter_id');
+                        disableSelect2('#topic_id');
+
+                    } else if (
+                        chapters.length === 1 &&
+                        topics.length === 0
+                    ) {
+
+                        basedOn = 'Chapter Based';
+
+                    } else if (
+                        chapters.length > 1 &&
+                        topics.length === 0
+                    ) {
+
+                        basedOn = 'Combined Chapter Based';
+
+                        disableSelect2('#topic_id');
+
+                    } else if (topics.length >= 1) {
+
+                        basedOn =
+                            topics.length > 1
+                                ? 'Combined Topic Based'
+                                : 'Topic Based';
+                    }
+
+                    $('#based_on').val(basedOn);
+
+                    if (basedOn) {
+
+                        $('#based-on-value').text(basedOn);
+
+                        $('#based-on-text').show();
+
+                    } else {
+
+                        $('#based-on-text').hide();
+                    }
+                }
+            );
+
+            // =========================================
+            // RESTORE OLD VALUES AFTER VALIDATION
+            // =========================================
+
+            if (oldCommission) {
+
+                $('#examination_commission_id')
+                    .val(oldCommission);
+
+                fetchCategories(oldCommission, function () {
+
+                    if (oldCategory) {
+
+                        $('#category_id')
+                            .val(oldCategory);
+
+                        fetchSubCategories(oldCategory, function () {
+
+                            if (oldSubCategory) {
+
+                                $('#sub_category_id')
+                                    .val(oldSubCategory);
+
+                                fetchSubjects(oldSubCategory, function () {
+
+                                    if (oldSubjects.length) {
+
+                                        $('#subject_id')
+                                            .val(oldSubjects)
+                                            .trigger('change');
+
+                                        fetchChapters(oldSubjects, function () {
+
+                                            if (oldChapters.length) {
+
+                                                $('#chapter_id')
+                                                    .val(oldChapters)
+                                                    .trigger('change');
+
+                                                fetchTopics(oldChapters, function () {
+
+                                                    if (oldTopics.length) {
+
+                                                        $('#topic_id')
+                                                            .val(oldTopics)
+                                                            .trigger('change');
+                                                    }
+                                                });
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+            }
+
         });
+
+
     </script>
 @endsection

@@ -76,10 +76,43 @@
     #counterclockwise {
       rotate: -90;
     }
+
+    .watermark {
+      position: fixed;
+      top: 35%;
+      left: 0;
+      right: 0;
+      text-align: center;
+      z-index: -1;
+    }
+
+    .watermark img {
+      width: 250px;
+      opacity: 0.08;
+      transform: rotate(-30deg);
+    }
+
+    .watermark-text {
+      font-size: 50px;
+      color: rgba(0, 0, 0, 0.08);
+      transform: rotate(-30deg);
+      font-weight: bold;
+    }
   </style>
 </head>
 
 <body onload="window.print();"><!-- window.print() -->
+
+  {{-- WATERMARK --}}
+  @if($logoBase64)
+    <div class="watermark">
+      <img src="{{ $logoBase64 }}" alt="Watermark Logo">
+    </div>
+  @else
+    <div class="watermark watermark-text">
+      {{ config('app.name') }}
+    </div>
+  @endif
 
   <caption>
     <center>
@@ -104,7 +137,13 @@
               <td colspan="8">
                 <div class="company-details">
                   <div class="company-logo">
-                    <img src="https://test.netiias.com/images/Neti-logo.svg#full" />
+                    @if($logoBase64)
+                      <img src="{{ $logoBase64 }}" style="height:60px;">
+                    @else
+                      <div style="font-size:22px;font-weight:bold;">
+                        {{ config('app.name') }}
+                      </div>
+                    @endif
                   </div>
                   <div class="company-name">Adhyayanam</div>
                   <div class="company-address">Viaspir, Post Basahiya, Atrouliya, Azamgarh,Uttar Pradesh, India

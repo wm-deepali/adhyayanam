@@ -575,7 +575,7 @@
               {!! $studyMaterial->detail_content !!}
             @else
               <div class="preview-blur">
-                {{ Str::limit(strip_tags($studyMaterial->detail_content), 1200) }}
+                {!!  Str::limit($studyMaterial->detail_content, 1500) !!}
               </div>
               <div class="unlock-box text-center py-5 mt-5">
                 <h4 class="text-muted mb-4">Full Content is Locked</h4>

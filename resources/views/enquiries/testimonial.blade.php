@@ -54,21 +54,21 @@
                                     <td>{{ $loop->iteration }}</td>
 
                                     {{-- IMAGE --}}
-                                  <td>
-    <div class="d-flex align-items-center gap-2">
+                                    <td>
+                                        <div class="d-flex align-items-center gap-2">
 
-        <img src="{{ url('uploads/feed-photos/'.$feed->photo) }}"
-             style="width:50px;height:50px;border-radius:50%;object-fit:cover;">
+                                            <img src="{{ url('uploads/feed-photos/' . $feed->photo) }}"
+                                                style="width:50px;height:50px;border-radius:50%;object-fit:cover;">
 
-        <div>
-            <strong>{{ $feed->username }}</strong><br>
-            <small class="text-muted">
-                {{ $feed->designation ?? 'Student' }}
-            </small>
-        </div>
+                                            <div>
+                                                <strong>{{ $feed->username }}</strong><br>
+                                                <small class="text-muted">
+                                                    {{ $feed->designation ?? 'Student' }}
+                                                </small>
+                                            </div>
 
-    </div>
-</td>
+                                        </div>
+                                    </td>
 
                                     <td>
                                         @if($feed->rating)
@@ -118,26 +118,61 @@
 
                                     {{-- ACTIONS --}}
                                     <td>
-                                        <div class="d-flex gap-2">
 
-                                            {{-- VIEW --}}
-                                            <a href="{{ route('feed.show', $feed->id) }}" title="View Testimonial">
-                                                <i class="fa fa-eye"></i>
-                                            </a>
+                                        <div class="dropdown">
 
-                                            {{-- DELETE --}}
-                                            @if(\App\Helpers\Helper::canAccess('manage_feedback_delete'))
-                                                <form action="{{ route('feed.delete', $feed->id) }}" method="POST"
-                                                    onsubmit="return confirm('Are you sure you want to delete this testimonial?');">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-link p-0 text-danger" title="Delete">
-                                                        <i class="fa fa-trash" style="color:#dc3545!important"></i>
-                                                    </button>
-                                                </form>
-                                            @endif
+                                            <button class="btn btn-sm btn-primary dropdown-toggle" type="button"
+                                                data-bs-toggle="dropdown" aria-expanded="false">
+
+                                                Actions
+
+                                            </button>
+
+                                            <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
+
+                                                {{-- View Testimonial --}}
+                                                <li>
+                                                    <a href="{{ route('feed.show', $feed->id) }}"
+                                                        class="dropdown-item d-flex align-items-center gap-2">
+
+                                                        <i class="fa fa-eye text-primary"></i>
+
+                                                        View Testimonial
+
+                                                    </a>
+                                                </li>
+
+
+                                                {{-- Delete --}}
+                                                @if(\App\Helpers\Helper::canAccess('manage_feedback_delete'))
+
+                                                    <li>
+
+                                                        <form action="{{ route('feed.delete', $feed->id) }}" method="POST"
+                                                            onsubmit="return confirm('Are you sure you want to delete this testimonial?');">
+
+                                                            @csrf
+                                                            @method('DELETE')
+
+                                                            <button type="submit"
+                                                                class="dropdown-item d-flex align-items-center gap-2 text-danger">
+
+                                                                <i class="fa fa-trash"></i>
+
+                                                                Delete
+
+                                                            </button>
+
+                                                        </form>
+
+                                                    </li>
+
+                                                @endif
+
+                                            </ul>
 
                                         </div>
+
                                     </td>
                                 </tr>
                             @empty

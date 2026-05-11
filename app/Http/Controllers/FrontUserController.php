@@ -449,7 +449,18 @@ class FrontUserController extends Controller
             'papers'
         );
 
-        $pdf = Pdf::loadView('front-users.invoice-pdf', $data);
+        $logoPath = public_path('images/Neti-logo.png');
+
+        $logoBase64 = null;
+
+        if (file_exists($logoPath)) {
+            $type = pathinfo($logoPath, PATHINFO_EXTENSION);
+            $data = file_get_contents($logoPath);
+
+            $logoBase64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+        }
+
+        $pdf = Pdf::loadView('front-users.invoice-pdf', compact('data', 'logoBase64'));
 
         return $pdf->download('invoice_' . $order->order_code . '.pdf');
     }

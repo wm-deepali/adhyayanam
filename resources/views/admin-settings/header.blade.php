@@ -109,21 +109,21 @@
                         @enderror
                     </div>
 
-                    <div class="mb-3">
+                    <!-- <div class="mb-3">
                         <label for="address" class="form-label">Company Address</label>
                         <input type="text" class="form-control" name="address" value="{{ $settings->address ?? '' }}">
                         @error('address')
                             <span class="text-danger">{{ $message }}</span>
                         @enderror
-                    </div>
+                    </div> -->
 
-                    <div class="mb-3">
+                    <!-- <div class="mb-3">
                         <label for="map_embbed" class="form-label">Embbed Map</label>
                         <textarea class="form-control" name="map_embbed">{{ $settings->map_embbed ?? '' }}</textarea>
                         @error('map_embbed')
                             <span class="text-danger">{{ $message }}</span>
                         @enderror
-                    </div>
+                    </div> -->
 
                     <div class="mb-3">
                         <label for="whatsapp_number" class="form-label">WhatsApp Number</label>

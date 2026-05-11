@@ -70,6 +70,37 @@
                         @endif
                     </div>
 
+                    <!-- Thumbnail Image -->
+                    <div class="mb-3">
+                        <label for="image" class="form-label">Upload Image</label>
+
+                        <input type="file" class="form-control" id="image" name="image" accept="image/*">
+
+                        <small class="text-muted">
+                            Recommended size: 800x600px
+                        </small>
+
+                        {{-- Preview --}}
+                        <div class="mt-3">
+                            <img id="image-preview" src="" alt="Preview" style="
+                    display:none;
+                    width:220px;
+                    height:140px;
+                    object-fit:cover;
+                    border-radius:12px;
+                    border:1px solid #ddd;
+                    padding:4px;
+                    background:#fff;
+                ">
+                        </div>
+
+                        @if ($errors->has('image'))
+                            <span class="text-danger text-left">
+                                {{ $errors->first('image') }}
+                            </span>
+                        @endif
+                    </div>
+
                     <!-- Status -->
                     <div class="mb-3">
                         <label for="status" class="form-label">Status</label>
@@ -98,4 +129,21 @@
             });
         });
     </script>
+    <script>
+    document.getElementById('image').addEventListener('change', function (e) {
+
+        const file = e.target.files[0];
+        const preview = document.getElementById('image-preview');
+
+        if (file) {
+
+            preview.src = URL.createObjectURL(file);
+            preview.style.display = 'block';
+
+        } else {
+
+            preview.style.display = 'none';
+        }
+    });
+</script>
 @endsection

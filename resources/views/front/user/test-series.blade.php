@@ -542,7 +542,7 @@
                           <div class="newtestseries-feature-row d-flex justify-content-between py-2 border-bottom">
                             <span class="newtestseries-label">Current Affairs</span>
                             <span class="newtestseries-value fw-medium">
-                              {{ $data->testseries->where('type_name', 'Current Affairs')->count() }}
+                              {{ $data->testseries->where('type_name', 'Current Affair')->count() }}
                             </span>
                           </div>
                           <div class="newtestseries-feature-row d-flex justify-content-between py-2">
@@ -554,7 +554,7 @@
                         </div>
                         <!-- View Button -->
                         <div class="mt-auto">
-                          <a href="{{ route('test-series-detail', $data->slug) }}"
+                          <a href="{{ route('test-series-detail', ['slug' => $data->slug, 'id' => $data->id]) }}"
                             class="newtestseries-view-btn btn w-100 py-2 fw-medium d-flex align-items-center justify-content-center gap-2">
                             <i class="bi bi-arrow-right-circle"></i>
                             View Test Series
@@ -828,7 +828,7 @@
                           <div class="newtestseries-feature-row d-flex justify-content-between py-2 border-bottom">
                             <span class="newtestseries-label">Current Affairs</span>
                             <span class="newtestseries-value fw-medium">
-                              {{ $data->testseries->where('type_name', 'Current Affairs')->count() }}
+                              {{ $data->testseries->where('type_name', 'Current Affair')->count() }}
                             </span>
                           </div>
                           <div class="newtestseries-feature-row d-flex justify-content-between py-2">
@@ -840,7 +840,7 @@
                         </div>
                         <!-- View Button -->
                         <div class="mt-auto">
-                          <a href="{{ route('test-series-detail', $data->slug) }}"
+                          <a href="{{ route('test-series-detail',['slug' => $data->slug, 'id' => $data->id]) }}"
                             class="newtestseries-view-btn btn w-100 py-2 fw-medium d-flex align-items-center justify-content-center gap-2">
                             <i class="bi bi-arrow-right-circle"></i>
                             View Test Series

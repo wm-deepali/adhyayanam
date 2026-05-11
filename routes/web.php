@@ -33,6 +33,7 @@ use App\Http\Controllers\CMS\InstituteFeatureController;
 use App\Http\Controllers\CMS\InstituteHighlightController;
 use App\Http\Controllers\CMS\HomeSectionController;
 use App\Http\Controllers\PaperController;
+use App\Http\Controllers\OfficeAddressController;
 
 /*
 |--------------------------------------------------------------------------
@@ -65,7 +66,7 @@ Route::get('/about', function () {
 
 Route::get('pyq-papers/{examid?}/{catid?}/{subcat?}', [FrontController::class, 'pyqPapers'])->name('pyq-papers');
 Route::get('test-series-list/{examid?}/{catid?}/{subcat?}', [FrontController::class, 'testseriesIndex'])->name('test-series-list');
-Route::get('test-series/details/{slug}', [FrontController::class, 'testseriesDetail'])->name('test-series-detail');
+Route::get('test-series/details/{slug}/{id}', [FrontController::class, 'testseriesDetail'])->name('test-series-detail');
 
 Route::get('/test/download/{id}', [FrontController::class, 'testDownload'])->name('test.download');
 Route::get('/test-instruction/{id}', [LiveTestController::class, 'testInstruction'])->name('test.instruction');
@@ -208,7 +209,7 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
 
             Route::post('live/{id}/solution-upload', [TeacherController::class, 'uploadSolution'])
                 ->name('live.solution.upload');
-    
+
             Route::post('live/{id}/assignment-toggle', [TeacherController::class, 'toggleAssignment'])
                 ->name('live.assignment.toggle');
 
@@ -521,7 +522,7 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
             Route::get('/edit/{id}', [ContentManagementController::class, 'dailyBoostEdit'])->name('edit')->middleware('custom.permission:manage_daily_booster_edit');
             Route::post('/update/{id}', [ContentManagementController::class, 'dailyBoostUpdate'])->name('update')->middleware('custom.permission:manage_daily_booster_edit');
             Route::delete('/delete/{id}', [ContentManagementController::class, 'dailyBoostDelete'])->name('delete')->middleware('custom.permission:manage_daily_booster_delete');
-            Route::post('/approve/{id}', [ContentManagementController::class, 'approveDailyBooster']) ->name('approve');
+            Route::post('/approve/{id}', [ContentManagementController::class, 'approveDailyBooster'])->name('approve');
         });
         // Bulk delete
         Route::get('booster/bulk-delete', [ContentManagementController::class, 'boosterBulkDelete'])->name('booster.bulk-delete')->middleware('custom.permission:manage_daily_booster_delete');
@@ -838,6 +839,27 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
             /* ---------------- HEADER SETTINGS ---------------- */
             Route::get('/header-settings', [ContentManagementController::class, 'headerSettingsIndex'])->name('settings.header.index')->middleware('custom.permission:manage_header');
             Route::post('/header-settings/store', [ContentManagementController::class, 'headerSettingsStore'])->name('settings.header.store')->middleware('custom.permission:manage_header_add');
+
+            Route::prefix('office-address')->group(function () {
+
+                Route::get('/', [OfficeAddressController::class, 'index'])
+                    ->name('office-address.index');
+
+                Route::get('/create', [OfficeAddressController::class, 'create'])
+                    ->name('office-address.create');
+
+                Route::post('/store', [OfficeAddressController::class, 'store'])
+                    ->name('office-address.store');
+
+                Route::get('/edit/{id}', [OfficeAddressController::class, 'edit'])
+                    ->name('office-address.edit');
+
+                Route::post('/update/{id}', [OfficeAddressController::class, 'update'])
+                    ->name('office-address.update');
+
+                Route::delete('/delete/{id}', [OfficeAddressController::class, 'delete'])
+                    ->name('office-address.delete');
+            });
 
             /* ---------------- SOCIAL MEDIA ---------------- */
             Route::get('/social-media', [ContentManagementController::class, 'socialMediaIndex'])->name('settings.social.index')->middleware('custom.permission:manage_social');

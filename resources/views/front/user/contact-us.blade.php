@@ -1,250 +1,460 @@
 @extends('front.partials.app')
+
 @section('header')
-  <title>Contact Us</title>
+    <title>Contact Us</title>
 @endsection
+
 @section('content')
 
-  <body class="hidden-bar-wrapper">
+<body class="hidden-bar-wrapper">
+
     <!-- Page Title -->
     <section class="page-title">
-      <div class="auto-container">
-        <h2>Adhyayanam</h2>
-        <ul class="bread-crumb clearfix">
-          <li><a href="index.html">Home</a></li>
-          <li>Contact Us</li>
-        </ul>
-      </div>
+        <div class="auto-container">
+
+            <h2>Adhyayanam</h2>
+
+            <ul class="bread-crumb clearfix">
+                <li>
+                    <a href="{{ url('/') }}">
+                        Home
+                    </a>
+                </li>
+
+                <li>
+                    Contact Us
+                </li>
+            </ul>
+
+        </div>
     </section>
     <!-- End Page Title -->
-    <!-- Contact Page Section -->
+
+
+    <!-- Contact Page -->
     <section class="contact-page-section">
-      <div class="auto-container">
-        <div class="row clearfix">
-          <!-- Form Column -->
-          <div class="form-column col-lg-8 col-md-12 col-sm-12">
-            <div class="inner-column">
 
-              @if(session('success'))
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                  {{ session('success') }}
-                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
-                  </button>
+        <div class="auto-container">
+
+            <div class="row clearfix">
+
+                <!-- Form Column -->
+                <div class="form-column col-lg-7 col-md-12 col-sm-12">
+
+                    <div class="inner-column contact-form-card">
+
+                        <div class="sec-title mb-4">
+
+                            <h2>
+                                Get In Touch
+                            </h2>
+
+                            <div class="text">
+                                Have questions? Our team will get back to you shortly.
+                            </div>
+
+                        </div>
+
+
+                        {{-- Success --}}
+                        @if(session('success'))
+
+                            <div class="alert alert-success alert-dismissible fade show">
+
+                                {{ session('success') }}
+
+                                <button type="button"
+                                        class="btn-close"
+                                        data-bs-dismiss="alert">
+                                </button>
+
+                            </div>
+
+                        @endif
+
+
+                        {{-- Error --}}
+                        @if($errors->any())
+
+                            <div class="alert alert-danger alert-dismissible fade show">
+
+                                <ul class="mb-0">
+
+                                    @foreach($errors->all() as $error)
+
+                                        <li>{{ $error }}</li>
+
+                                    @endforeach
+
+                                </ul>
+
+                                <button type="button"
+                                        class="btn-close"
+                                        data-bs-dismiss="alert">
+                                </button>
+
+                            </div>
+
+                        @endif
+
+
+                        <div class="comment-form contact-form">
+
+                            <form method="POST"
+                                  action="{{ route('contact.inquiry.store') }}">
+
+                                @csrf
+
+                                <div class="row clearfix">
+
+                                    {{-- Name --}}
+                                    <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+
+                                        <input type="text"
+                                               name="name"
+                                               value="{{ old('name') }}"
+                                               placeholder="Your Name *"
+                                               required>
+
+                                    </div>
+
+
+                                    {{-- Email --}}
+                                    <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+
+                                        <input type="email"
+                                               name="email"
+                                               value="{{ old('email') }}"
+                                               placeholder="Email Address *"
+                                               required>
+
+                                    </div>
+
+
+                                    {{-- Subject --}}
+                                    <div class="col-lg-12 col-md-12 col-sm-12 form-group">
+
+                                        <input type="text"
+                                               name="subject"
+                                               value="{{ old('subject') }}"
+                                               placeholder="Subject">
+
+                                    </div>
+
+
+                                    {{-- Message --}}
+                                    <div class="col-lg-12 col-md-12 col-sm-12 form-group">
+
+                                        <textarea name="message"
+                                                  placeholder="Write your message">{{ old('message') }}</textarea>
+
+                                    </div>
+
+
+                                    {{-- Button --}}
+                                    <div class="col-lg-12 col-md-12 col-sm-12 form-group">
+
+                                        <button class="theme-btn submit-btn">
+
+                                            Send Message
+
+                                        </button>
+
+                                    </div>
+
+                                </div>
+
+                            </form>
+
+                        </div>
+
+                    </div>
+
                 </div>
-              @endif
 
-              @if(session('error'))
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                  {{ session('error') }}
-                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
-                  </button>
+
+                <!-- Info Column -->
+                <div class="info-column col-lg-5 col-md-12 col-sm-12">
+
+                    <div class="inner-column">
+
+                        {{-- Office Addresses --}}
+                        @foreach($officeAddresses as $office)
+
+                            <div class="office-card">
+
+                                <div class="office-header">
+
+                                    <span class="office-icon flaticon-placeholder"></span>
+
+                                    <h4>
+                                        {{ $office->office_type }}
+                                    </h4>
+
+                                </div>
+
+
+                                <div class="office-address">
+
+                                    {!! nl2br(e($office->address)) !!}
+
+                                </div>
+
+
+                                @if($office->phone)
+
+                                    <div class="office-contact-item">
+
+                                        <span class="flaticon-phone-call-2"></span>
+
+                                        <a href="tel:{{ $office->phone }}">
+
+                                            {{ $office->phone }}
+
+                                        </a>
+
+                                    </div>
+
+                                @endif
+
+
+                                @if($office->email)
+
+                                    <div class="office-contact-item">
+
+                                        <span class="flaticon-message"></span>
+
+                                        <a href="mailto:{{ $office->email }}">
+
+                                            {{ $office->email }}
+
+                                        </a>
+
+                                    </div>
+
+                                @endif
+
+                            </div>
+
+                        @endforeach
+
+
+                        {{-- Social Media --}}
+                        <div class="office-card">
+
+                            <div class="office-header">
+
+                                <span class="office-icon flaticon-share"></span>
+
+                                <h4>
+                                    Follow Us
+                                </h4>
+
+                            </div>
+
+                            <div class="social-icons-wrap">
+
+                                <a href="{{ $socialMedia->facebook ?? 'javascript:void(0)' }}"
+                                   target="_blank"
+                                   class="flaticon-facebook">
+                                </a>
+
+                                <a href="{{ $socialMedia->instagram ?? 'javascript:void(0)' }}"
+                                   target="_blank"
+                                   class="flaticon-instagram">
+                                </a>
+
+                                <a href="{{ $socialMedia->twitter ?? 'javascript:void(0)' }}"
+                                   target="_blank"
+                                   class="flaticon-twitter">
+                                </a>
+
+                                <a href="{{ $socialMedia->youtube ?? 'javascript:void(0)' }}"
+                                   target="_blank"
+                                   class="flaticon-youtube">
+                                </a>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
                 </div>
-              @endif
-
-              @if($errors->any())
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-
-                  <ul class="mb-0">
-
-                    @foreach($errors->all() as $error)
-
-                      <li>{{ $error }}</li>
-
-                    @endforeach
-
-                  </ul>
-
-                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
-                  </button>
-
-                </div>
-              @endif
-
-              <div class="comment-form contact-form">
-
-                <form method="post" action="{{ route('contact.inquiry.store') }}" id="contact-form">
-
-                  @csrf
-
-                  <div class="row clearfix">
-
-                    {{-- NAME --}}
-                    <div class="col-lg-6 col-md-6 col-sm-12 form-group">
-
-                      <input type="text" name="name" value="{{ old('name') }}" placeholder="Your name*"
-                        class="@error('name') is-invalid @enderror" required>
-
-                      @error('name')
-                        <div class="text-danger mt-1">
-                          {{ $message }}
-                        </div>
-                      @enderror
-
-                    </div>
-
-                    {{-- EMAIL --}}
-                    <div class="col-lg-6 col-md-6 col-sm-12 form-group">
-
-                      <input type="email" name="email" value="{{ old('email') }}" placeholder="Email Address*"
-                        class="@error('email') is-invalid @enderror" required>
-
-                      @error('email')
-                        <div class="text-danger mt-1">
-                          {{ $message }}
-                        </div>
-                      @enderror
-
-                    </div>
-
-                    {{-- SUBJECT --}}
-                    <div class="col-lg-12 col-md-12 col-sm-12 form-group">
-
-                      <input type="text" name="subject" value="{{ old('subject') }}" placeholder="Subject"
-                        class="@error('subject') is-invalid @enderror">
-
-                      @error('subject')
-                        <div class="text-danger mt-1">
-                          {{ $message }}
-                        </div>
-                      @enderror
-
-                    </div>
-
-                    {{-- MESSAGE --}}
-                    <div class="col-lg-12 col-md-12 col-sm-12 form-group">
-
-                      <textarea name="message" placeholder="Enter your message"
-                        class="@error('message') is-invalid @enderror">{{ old('message') }}</textarea>
-
-                      @error('message')
-                        <div class="text-danger mt-1">
-                          {{ $message }}
-                        </div>
-                      @enderror
-
-                    </div>
-
-                    {{-- BUTTON --}}
-                    <div class="col-lg-12 col-md-12 col-sm-12 form-group">
-
-                      <div class="button-box">
-
-                        <button class="theme-btn submit-btn">
-
-                          Send Message
-
-                        </button>
-
-                      </div>
-
-                    </div>
-
-                  </div>
-
-                </form>
-
-              </div>
-
 
             </div>
-          </div>
-          <!-- Info Column -->
-          <div class="info-column col-lg-4 col-md-12 col-sm-12">
-            <div class="inner-column">
-              <!-- Contact List -->
-              <ul class="contact-list">
-                <li>
-                  <span class="icon flaticon-placeholder"></span>
-                  <strong>Find Us:</strong>
-                  {{$header->address ?? ''}}
-                </li>
-                <li>
-                  <span class="icon flaticon-phone-call-2"></span>
-                  <strong>Call us</strong>
-                  <a href="tel:{{$header->contact_number ?? ""}}">{{$header->contact_number ?? ""}}</a>
-                </li>
-                <li>
-                  <span class="icon flaticon-message"></span>
-                  <strong>Write to Us</strong>
-                  <a href="mailto:{{$header->email_id ?? ""}}">{{$header->email_id ?? ""}}</a>
-                </li>
-                <li>
-                  <span class="icon flaticon-message"></span>
-                  <strong>Follow us on</strong>
-                  <div class="s-icons">
+
+
+            {{-- Maps --}}
+            @if($officeAddresses->count())
+
+                <div class="office-maps-section">
+
+                    <div class="sec-title text-center mb-5">
+
+                        <h2>
+                            Our Locations
+                        </h2>
+
+                    </div>
 
                     <div class="row">
 
-                      <div class="col-3 col-sm-4 col-md-3">
+                        @foreach($officeAddresses as $office)
 
-                        <a href="{{ !empty($socialMedia->facebook)
-    ? $socialMedia->facebook
-    : 'javascript:void(0)' }}" target="_blank" class="flaticon-facebook">
-                        </a>
+                            @if($office->map_embbed)
 
-                      </div>
+                                <div class="col-lg-6 mb-4">
 
-                      <div class="col-3 col-sm-4 col-md-3">
+                                    <div class="map-card">
 
-                        <a href="{{ !empty($socialMedia->instagram)
-    ? $socialMedia->instagram
-    : 'javascript:void(0)' }}" target="_blank" class="flaticon-instagram">
-                        </a>
+                                        <h4 class="map-title">
 
-                      </div>
+                                            {{ $office->office_type }}
 
-                      <div class="col-3 col-sm-4 col-md-3">
+                                        </h4>
 
-                        <a href="{{ !empty($socialMedia->twitter)
-    ? $socialMedia->twitter
-    : 'javascript:void(0)' }}" target="_blank" class="flaticon-twitter">
-                        </a>
+                                        <div class="map-box">
 
-                      </div>
+                                            {!! $office->map_embbed !!}
 
-                      <div class="col-3 col-sm-4 col-md-3">
+                                        </div>
 
-                        <a href="{{ !empty($socialMedia->linkedin)
-    ? $socialMedia->linkedin
-    : 'javascript:void(0)' }}" target="_blank" class="flaticon-link">
+                                    </div>
 
-                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24"
-                            height="24">
+                                </div>
 
-                            <path
-                              d="M20.5 2h-17A1.5 1.5 0 002 3.5v17A1.5 1.5 0 003.5 22h17a1.5 1.5 0 001.5-1.5v-17A1.5 1.5 0 0020.5 2zM8 19H5v-9h3zM6.5 8.25A1.75 1.75 0 118.3 6.5a1.78 1.78 0 01-1.8 1.75zM19 19h-3v-4.74c0-1.42-.6-1.93-1.38-1.93A1.74 1.74 0 0013 14.19a.66.66 0 000 .14V19h-3v-9h2.9v1.3a3.11 3.11 0 012.7-1.4c1.55 0 3.36.86 3.36 3.66z">
-                            </path>
+                            @endif
 
-                          </svg>
-
-                        </a>
-
-                      </div>
-
-                      <div class="col-3 col-sm-4 col-md-3">
-
-                        <a href="{{ !empty($socialMedia->youtube)
-    ? $socialMedia->youtube
-    : 'javascript:void(0)' }}" target="_blank" class="flaticon-youtube">
-                        </a>
-
-                      </div>
+                        @endforeach
 
                     </div>
 
-                  </div>
-                </li>
-              </ul>
+                </div>
 
-            </div>
-          </div>
+            @endif
+
         </div>
 
-        <!-- Map Box -->
-        <div class="map-box">
-          {!!$header->map_embbed!!}
-        </div>
-
-      </div>
     </section>
-  </body>
+
+
+    <style>
+
+        .contact-form-card{
+            background: #fff;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 35px rgba(0,0,0,0.06);
+        }
+
+        .office-card{
+            background: #fff;
+            padding: 28px;
+            border-radius: 18px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+
+        .office-header{
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 18px;
+        }
+
+        .office-header h4{
+            margin: 0;
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .office-icon{
+            font-size: 30px;
+            color: #0d6efd;
+        }
+
+        .office-address{
+            line-height: 1.9;
+            color: #4b5563;
+            margin-bottom: 18px;
+        }
+
+        .office-contact-item{
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .office-contact-item span{
+            color: #0d6efd;
+        }
+
+        .social-icons-wrap{
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+        }
+
+        .social-icons-wrap a{
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            background: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #111827;
+            transition: 0.3s;
+        }
+
+        .social-icons-wrap a:hover{
+            background: #0d6efd;
+            color: #fff;
+        }
+
+        .office-maps-section{
+            margin-top: 70px;
+        }
+
+        .map-card{
+            background: #fff;
+            padding: 20px;
+            border-radius: 18px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+
+        .map-title{
+            margin-bottom: 18px;
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .map-box iframe{
+            width: 100%;
+            height: 350px;
+            border: 0;
+            border-radius: 14px;
+        }
+
+        @media(max-width:768px){
+
+            .contact-form-card{
+                padding: 25px;
+            }
+
+            .office-card{
+                padding: 22px;
+            }
+
+            .map-box iframe{
+                height: 250px;
+            }
+        }
+
+    </style>
+
+</body>
+
 @endsection

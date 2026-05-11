@@ -36,7 +36,7 @@ class StudentController extends Controller
             'videos' => $student->videoProgress()->with('video')->latest()->limit(5)->get(),
         ]);
     }
-    
+
     public function studentChangePassword($id)
     {
         $data['id'] = $id;
@@ -249,9 +249,9 @@ class StudentController extends Controller
                 DB::raw('COUNT(DISTINCT vup.user_id) as total_students')
             )
             ->leftJoin('video_user_progress as vup', function ($join) use ($studentId) {
+
                 $join->on('vup.video_id', '=', 'videos.id');
 
-                // ✅ MAIN FILTER HERE
                 if ($studentId) {
                     $join->where('vup.user_id', $studentId);
                 }
@@ -261,7 +261,8 @@ class StudentController extends Controller
                 'videos.id',
                 'videos.title',
                 'videos.course_id',
-                'videos.teacher_id'
+                'videos.teacher_id',
+                'videos.access_till'
             );
 
         // SEARCH

@@ -28,6 +28,9 @@
                             <th class="text-center">
                                 <input type="checkbox" class="group_check checkbox">
                             </th>
+
+                            <th scope="col">Image</th>
+
                             <th scope="col" width="15%">Date & Time</th>
                             <th scope="col">Title</th>
                             <th scope="col">Start Date</th>
@@ -60,7 +63,7 @@
                 buttons: {
                     buttons: [
                         @if(\App\Helpers\Helper::canAccess('manage_test_planner_delete'))
-                                                        {
+                                                                {
                                 className: 'btn bg-red color-palette btn-flat hidden delete_btn pull-left',
                                 text: 'Bulk Delete',
                                 action: function (e, dt, node, config) {
@@ -90,6 +93,9 @@
                 },
                 columns: [
                     { data: 'checkbox', name: 'checkbox', orderable: false, searchable: false },
+
+                    { data: 'image', name: 'image', orderable: false, searchable: false },
+
                     { data: 'created_at', name: 'created_at' },
                     { data: 'title', name: 'title' },
                     { data: 'start_date', name: 'start_date' },

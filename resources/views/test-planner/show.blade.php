@@ -71,6 +71,28 @@
                     </div>
                 </div>
 
+                <div class="col-md-6 mb-3">
+                    <label class="form-label font-weight-bold">Image:</label><br>
+
+                    @if ($testPlanner->image)
+
+                            <img src="{{ asset('storage/' . $testPlanner->image) }}" alt="{{ $testPlanner->title }}" style="
+                            width:220px;
+                            height:140px;
+                            object-fit:cover;
+                            border-radius:12px;
+                            border:1px solid #ddd;
+                            padding:4px;
+                            background:#fff;
+                        ">
+
+                    @else
+
+                        <span class="text-muted">No Image Uploaded</span>
+
+                    @endif
+                </div>
+
                 <div class="mb-3">
                     <label class="form-label font-weight-bold">Short Description:</label>
                     <div class="border rounded p-2 bg-white">

@@ -15,6 +15,7 @@ class TestPlanner extends Model
         'short_description',
         'detail_content',
         'pdf',
+        'image',
         'status',
         'approval_status',
         'created_at'

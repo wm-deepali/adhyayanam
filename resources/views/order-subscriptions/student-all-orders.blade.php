@@ -80,8 +80,9 @@
 
                                     {{-- PAYMENT STATUS --}}
                                     <td>
-                                        <span class="badge 
-                                                        {{ $res->payment_status == 'PAID' ? 'bg-success' : 'bg-warning' }}">
+                                        <span
+                                            class="badge 
+                                                                {{ $res->payment_status == 'PAID' ? 'bg-success' : 'bg-warning' }}">
                                             {{ ucfirst($res->payment_status) }}
                                         </span>
                                     </td>
@@ -91,33 +92,72 @@
 
                                     {{-- ACTIONS --}}
                                     <td>
-                                        <div class="d-flex gap-2">
+                                        <div class="dropdown">
 
-                                            {{-- View Order --}}
-                                            @if(\App\Helpers\Helper::canAccess('manage_students'))
-                                                <a href="{{ route('students.student-order-detail', $res->id) }}" title="View Order">
-                                                    <i class="fa fa-eye"></i>
-                                                </a>
-                                            @endif
+                                            <button class="btn btn-sm btn-primary dropdown-toggle" type="button"
+                                                data-bs-toggle="dropdown" aria-expanded="false">
 
-                                            {{-- View Student Profile --}}
-                                            @if(
-                                                    \App\Helpers\Helper::canAccess('manage_students') &&
-                                                    !empty($res->student) &&
-                                                    !empty($res->student->id)
-                                                )
-                                                <a href="{{ route('students.student-profile-detail', $res->student->id) }}"
-                                                    title="View Student Profile">
-                                                    <i class="fa fa-user-graduate"></i>
-                                                </a>
-                                            @endif
+                                                Actions
 
-                                            {{-- Download Invoice --}}
-                                            @if(\App\Helpers\Helper::canAccess('manage_students'))
-                                                <a href="{{ route('students.generate-pdf', $res->id) }}" title="Download Invoice">
-                                                    <i class="fa fa-download"></i>
-                                                </a>
-                                            @endif
+                                            </button>
+
+                                            <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
+
+                                                {{-- View Order --}}
+                                                @if(\App\Helpers\Helper::canAccess('manage_students'))
+
+                                                    <li>
+                                                        <a class="dropdown-item d-flex align-items-center gap-2"
+                                                            href="{{ route('students.student-order-detail', $res->id) }}">
+
+                                                            <i class="fa fa-eye text-primary"></i>
+
+                                                            View Order
+
+                                                        </a>
+                                                    </li>
+
+                                                @endif
+
+
+                                                {{-- View Student Profile --}}
+                                                @if(
+                                                        \App\Helpers\Helper::canAccess('manage_students') &&
+                                                        !empty($res->student) &&
+                                                        !empty($res->student->id)
+                                                    )
+
+                                                    <li>
+                                                        <a class="dropdown-item d-flex align-items-center gap-2"
+                                                            href="{{ route('students.student-profile-detail', $res->student->id) }}">
+
+                                                            <i class="fa fa-user-graduate text-success"></i>
+
+                                                            Student Profile
+
+                                                        </a>
+                                                    </li>
+
+                                                @endif
+
+
+                                                {{-- Download Invoice --}}
+                                                @if(\App\Helpers\Helper::canAccess('manage_students'))
+
+                                                    <li>
+                                                        <a class="dropdown-item d-flex align-items-center gap-2"
+                                                            href="{{ route('students.generate-pdf', $res->id) }}">
+
+                                                            <i class="fa fa-download text-danger"></i>
+
+                                                            Download Invoice
+
+                                                        </a>
+                                                    </li>
+
+                                                @endif
+
+                                            </ul>
 
                                         </div>
                                     </td>

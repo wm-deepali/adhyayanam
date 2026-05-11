@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="utf-8">
     <title>Study Material PDF</title>
@@ -67,10 +68,75 @@
             margin: 0 0 8px 0;
             font-size: 14px;
         }
+
+        .watermark {
+            position: fixed;
+            top: 35%;
+            left: 0;
+            right: 0;
+            text-align: center;
+            z-index: -1;
+        }
+
+        .watermark img {
+            width: 300px;
+            opacity: 0.08;
+            transform: rotate(-30deg);
+        }
+
+        .watermark-text {
+            font-size: 60px;
+            color: rgba(0, 0, 0, 0.08);
+            transform: rotate(-30deg);
+            font-weight: bold;
+        }
+
+        .pdf-footer {
+            position: fixed;
+            bottom: 10px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 10px;
+            color: #555;
+        }
+
+        .pdf-header {
+            margin-bottom: 20px;
+        }
+
+        .pdf-header img {
+            height: 45px;
+        }
+
+        .site-name {
+            font-size: 18px;
+            font-weight: bold;
+        }
     </style>
 </head>
 
 <body>
+
+    {{-- WATERMARK --}}
+    @if($logoBase64)
+        <div class="watermark">
+            <img src="{{ $logoBase64 }}" alt="Watermark Logo">
+        </div>
+    @else
+        <div class="watermark watermark-text">
+            {{ config('app.name') }}
+        </div>
+    @endif
+
+    {{-- HEADER --}}
+    <div class="pdf-header">
+        @if($logoBase64)
+            <img src="{{ $logoBase64 }}" alt="Logo">
+        @else
+            <div class="site-name">{{ config('app.name') }}</div>
+        @endif
+    </div>
 
     {{-- HEADER --}}
     <div class="header">
@@ -119,7 +185,7 @@
         <div class="row">
             <span class="label">Material Type:</span>
             <span class="value">
-                {{ $material->based_on ?? ucwords(str_replace('_',' ',$material->material_type)) }}
+                {{ $material->based_on ?? ucwords(str_replace('_', ' ', $material->material_type)) }}
             </span>
         </div>
 
@@ -194,5 +260,11 @@
         @endforeach
     @endif
 
+    {{-- FOOTER --}}
+    <div class="pdf-footer">
+        © {{ date('Y') }} {{ config('app.name') }} | All Rights Reserved
+    </div>
+
 </body>
+
 </html>

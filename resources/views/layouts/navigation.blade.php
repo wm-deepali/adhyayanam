@@ -650,6 +650,20 @@
                     </li>
                 @endif
 
+                <li class="nav-item">
+
+                    <a class="nav-link" href="{{ route('office-address.index') }}">
+
+                        <svg class="nav-icon">
+                            <use xlink:href="{{ asset('icons/coreui.svg#cil-location-pin') }}"></use>
+                        </svg>
+
+                        Office Addresses
+
+                    </a>
+
+                </li>
+
             </ul>
         </li>
     @endif
@@ -970,15 +984,15 @@
                 @endif
 
                 <!-- @if(Helper::canAccess('manage_users'))
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{route('users.index')}}" target="_top">
-                                    <svg class="nav-icon">
-                                        <use xlink:href="{{ asset('icons/coreui.svg#cil-user') }}"></use>
-                                    </svg>
-                                    {{ __('Users') }}
-                                </a>
-                            </li>
-                        @endif -->
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{route('users.index')}}" target="_top">
+                                        <svg class="nav-icon">
+                                            <use xlink:href="{{ asset('icons/coreui.svg#cil-user') }}"></use>
+                                        </svg>
+                                        {{ __('Users') }}
+                                    </a>
+                                </li>
+                            @endif -->
 
                 @if(Helper::canAccess('manage_seo'))
                     <li class="nav-item">
@@ -1014,37 +1028,37 @@
                 @endif
 
                 <!-- @if(Helper::canAccess('manage_banner'))
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{route('settings.banner.index')}}" target="_top">
-                                <svg class="nav-icon">
-                                    <use xlink:href="{{ asset('icons/coreui.svg#cil-header') }}"></use>
-                                </svg>
-                                Banner Settings
-                            </a>
-                        </li>
-                    @endif -->
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{route('settings.banner.index')}}" target="_top">
+                                    <svg class="nav-icon">
+                                        <use xlink:href="{{ asset('icons/coreui.svg#cil-header') }}"></use>
+                                    </svg>
+                                    Banner Settings
+                                </a>
+                            </li>
+                        @endif -->
 
                 <!-- @if(Helper::canAccess('manage_programme_feature'))
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{route('settings.programme_feature.index')}}" target="_top">
-                                <svg class="nav-icon">
-                                    <use xlink:href="{{ asset('icons/coreui.svg#cil-header') }}"></use>
-                                </svg>
-                                Programme Feature Settings
-                            </a>
-                        </li>
-                    @endif -->
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{route('settings.programme_feature.index')}}" target="_top">
+                                    <svg class="nav-icon">
+                                        <use xlink:href="{{ asset('icons/coreui.svg#cil-header') }}"></use>
+                                    </svg>
+                                    Programme Feature Settings
+                                </a>
+                            </li>
+                        @endif -->
 
                 <!-- @if(Helper::canAccess('manage_marquee'))
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{route('settings.marquee.index')}}" target="_top">
-                                <svg class="nav-icon">
-                                    <use xlink:href="{{ asset('icons/coreui.svg#cil-header') }}"></use>
-                                </svg>
-                                Marquee Settings
-                            </a>
-                        </li>
-                    @endif -->
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{route('settings.marquee.index')}}" target="_top">
+                                    <svg class="nav-icon">
+                                        <use xlink:href="{{ asset('icons/coreui.svg#cil-header') }}"></use>
+                                    </svg>
+                                    Marquee Settings
+                                </a>
+                            </li>
+                        @endif -->
 
                 @if(Helper::canAccess('manage_popup'))
                     <li class="nav-item">
@@ -1058,15 +1072,15 @@
                 @endif
 
                 <!-- @if(Helper::canAccess('manage_feature'))
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{route('settings.feature.index')}}" target="_top">
-                                <svg class="nav-icon">
-                                    <use xlink:href="{{ asset('icons/coreui.svg#cil-header') }}"></use>
-                                </svg>
-                                Feature Settings
-                            </a>
-                        </li>
-                    @endif -->
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{route('settings.feature.index')}}" target="_top">
+                                    <svg class="nav-icon">
+                                        <use xlink:href="{{ asset('icons/coreui.svg#cil-header') }}"></use>
+                                    </svg>
+                                    Feature Settings
+                                </a>
+                            </li>
+                        @endif -->
 
             </ul>
         </li>

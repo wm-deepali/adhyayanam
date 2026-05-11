@@ -952,7 +952,7 @@
                     2 => 'Subject Wise',
                     3 => 'Chapter Wise',
                     4 => 'Topic Wise',
-                    5 => 'Current Affairs',
+                    5 => 'Current Affair',
                     6 => 'PYQ'
                 ];
 

@@ -57,17 +57,28 @@
         /* ========================= */
         /* 🔹 ADDED (Watermark) */
         /* ========================= */
-        .watermark {
-            position: fixed;
-            top: 40%;
-            left: 0;
-            right: 0;
-            text-align: center;
-            font-size: 60px;
-            color: rgba(0, 0, 0, 0.08);
-            transform: rotate(-30deg);
-            z-index: -1;
-        }
+
+   .watermark {
+    position: fixed;
+    top: 35%;
+    left: 0;
+    right: 0;
+    text-align: center;
+    z-index: -1;
+}
+
+.watermark img {
+    width: 300px;
+    opacity: 0.08;
+    transform: rotate(-30deg);
+}
+
+.watermark-text {
+    font-size: 60px;
+    color: rgba(0, 0, 0, 0.08);
+    transform: rotate(-30deg);
+    font-weight: bold;
+}
 
         /* ========================= */
         /* 🔹 ADDED (Footer) */
@@ -106,16 +117,26 @@
     <!-- ========================= -->
     <!-- 🔹 ADDED: WATERMARK ONLY -->
     <!-- ========================= -->
-    <div class="watermark">{{ config('app.name') }}</div>
+
+    @if($logoBase64)
+    <div class="watermark">
+        <img src="{{ $logoBase64 }}" alt="Watermark Logo">
+    </div>
+@else
+    <div class="watermark watermark-text">
+        {{ config('app.name') }}
+    </div>
+@endif
 
     <!-- ========================= -->
     <!-- 🔹 ADDED: LOGO + WEBSITE NAME -->
     <!-- ========================= -->
     <div class="pdf-header">
-        @if($logoBase64)
-    <img src="{{ $logoBase64 }}" style="height:45px;">
-@endif
+    @if($logoBase64)
+        <img src="{{ $logoBase64 }}" style="height:45px;">
+    @else
         <div class="site-name">{{ config('app.name') }}</div>
+    @endif
     </div>
 
     <!-- 🟩 EXISTING HEADER (UNCHANGED) -->

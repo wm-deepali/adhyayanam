@@ -301,7 +301,7 @@
                     </div>
 
                     <div class="row">
-                        <div class="col-md-6">
+                        <!-- <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="banner_image" class="form-label">Upload Banner</label>
                                 <input type="file" class="form-control" name="banner_image" id="banner_image"
@@ -315,7 +315,7 @@
                                     <span class="text-danger text-left">{{ $errors->first('banner_image') }}</span>
                                 @endif
                             </div>
-                        </div>
+                        </div> -->
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="youtube_url" class="form-label">Youtube Video Url</label>
@@ -417,20 +417,20 @@
                 }
             });
 
-            $('#banner_image').on('change', function () {
+            // $('#banner_image').on('change', function () {
 
-                let reader = new FileReader();
+            //     let reader = new FileReader();
 
-                reader.onload = function (e) {
-                    $('#banner_preview')
-                        .attr('src', e.target.result)
-                        .show();
-                }
+            //     reader.onload = function (e) {
+            //         $('#banner_preview')
+            //             .attr('src', e.target.result)
+            //             .show();
+            //     }
 
-                if (this.files[0]) {
-                    reader.readAsDataURL(this.files[0]);
-                }
-            });
+            //     if (this.files[0]) {
+            //         reader.readAsDataURL(this.files[0]);
+            //     }
+            // });
 
             // =========================================
             // OFFER PRICE CALCULATION

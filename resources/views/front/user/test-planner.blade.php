@@ -8,7 +8,27 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 @endsection
+<style>
+    .test-plan-image-wrapper{
+    width: 100%;
+    height: 220px;
+    overflow: hidden;
+    border-radius: 18px;
+    margin-bottom: 20px;
+    background: #f5f5f5;
+}
 
+.test-plan-image{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: all 0.4s ease;
+}
+
+.test-plan-card:hover .test-plan-image{
+    transform: scale(1.08);
+}
+</style>
 @section('content')
     <body class="hidden-bar-wrapper bg-light">
 
@@ -37,10 +57,17 @@
                         <div class="col-xl-3 col-lg-4 col-md-6">
                             <div class="card test-plan-card h-100 border-0 shadow-sm rounded-4 overflow-hidden transition-all">
                                 <div class="card-body d-flex flex-column p-4 text-center">
-                                    <!-- Icon -->
-                                    <div class="mb-4">
-                                        <i class="fas fa-calendar-check fa-4x text-primary opacity-75"></i>
-                                    </div>
+                                   <!-- Image -->
+<div class="test-plan-image-wrapper">
+
+    <img 
+        src="{{ $data->image 
+            ? asset('storage/' . $data->image) 
+            : asset('front/images/default-user.png') }}"
+        alt="{{ $data->title }}"
+        class="test-plan-image">
+
+</div>
 
                                     <!-- Title -->
                                     <h5 class="card-title fw-bold mb-3 line-clamp-2" style="min-height: 50px;">

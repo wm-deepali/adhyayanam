@@ -5,138 +5,172 @@
 @endsection
 
 @section('content')
-<div class="bg-light rounded p-2">
-    <div class="card">
-        <div class="card-body">
+    <div class="bg-light rounded p-2">
+        <div class="card">
+            <div class="card-body">
 
-            {{-- HEADER --}}
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <div>
-                    <h5 class="card-title mb-0">Failed Payments</h5>
-                    <h6 class="card-subtitle text-muted">
-                        Manage failed payments here.
-                    </h6>
+                {{-- HEADER --}}
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <h5 class="card-title mb-0">Failed Payments</h5>
+                        <h6 class="card-subtitle text-muted">
+                            Manage failed payments here.
+                        </h6>
+                    </div>
+
+                    <a href="{{ url()->previous() }}" class="btn btn-secondary btn-sm">
+                        ← Back
+                    </a>
                 </div>
 
-                <a href="{{ url()->previous() }}" class="btn btn-secondary btn-sm">
-                    ← Back
-                </a>
-            </div>
+                {{-- SEARCH --}}
+                <div class="mb-3">
+                    <form method="GET" action="{{ route('order.student-failed-transactions') }}"
+                        class="d-flex align-items-center gap-2">
 
-            {{-- SEARCH --}}
-            <div class="mb-3">
-                <form method="GET"
-                      action="{{ route('order.student-failed-transactions') }}"
-                      class="d-flex align-items-center gap-2">
+                        <input type="text" name="search" value="{{ request('search') }}"
+                            class="form-control form-control-sm" placeholder="Search by order, student, mobile..."
+                            style="width:260px;">
 
-                    <input type="text"
-                           name="search"
-                           value="{{ request('search') }}"
-                           class="form-control form-control-sm"
-                           placeholder="Search by order, student, mobile..."
-                           style="width:260px;">
+                        <button type="submit" class="btn btn-danger btn-sm">
+                            Search
+                        </button>
 
-                    <button type="submit" class="btn btn-danger btn-sm">
-                        Search
-                    </button>
+                        <a href="{{ route('order.student-failed-transactions') }}" class="btn btn-outline-secondary btn-sm">
+                            Clear
+                        </a>
+                    </form>
+                </div>
 
-                    <a href="{{ route('order.student-failed-transactions') }}"
-                       class="btn btn-outline-secondary btn-sm">
-                        Clear
-                    </a>
-                </form>
-            </div>
+                {{-- Messages --}}
+                <div class="mb-2">
+                    @include('layouts.includes.messages')
+                </div>
 
-            {{-- Messages --}}
-            <div class="mb-2">
-                @include('layouts.includes.messages')
-            </div>
-
-            {{-- TABLE --}}
-            <div class="table-responsive">
-                <table class="table table-striped table-bordered align-middle">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Date & Time</th>
-                            <th>Order ID</th>
-                            <th>Student Name</th>
-                            <th>Mobile</th>
-                            <th>Billed Amount</th>
-                            <th>Paid Amount</th>
-                            <th>Payment Method</th>
-                            <th>Status</th>
-                            <th width="12%">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($transactions as $res)
+                {{-- TABLE --}}
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered align-middle">
+                        <thead>
                             <tr>
-                                <td>
-                                    {{ ($transactions->currentPage() - 1) * $transactions->perPage() + $loop->iteration }}
-                                </td>
-                                <td>{{ $res->created_at->format('d M Y, h:i A') }}</td>
-                                <td>{{ $res->order_code ?? '-' }}</td>
-                                <td>{{ $res->student->name ?? '-' }}</td>
-                                <td>{{ $res->student->mobile ?? '-' }}</td>
-                                <td>₹ {{ $res->billed_amount ?? '0' }}</td>
-                                <td>₹ {{ $res->paid_amount ?? '0' }}</td>
-                                <td>{{ ucfirst($res->payment_method ?? '-') }}</td>
-                                <td>
-                                    <span class="badge bg-danger">
-                                        Failed
-                                    </span>
-                                </td>
-                                <td>
-                                    <div class="d-flex gap-2">
-
-                                        {{-- View Order --}}
-                                        @if(\App\Helpers\Helper::canAccess('manage_students'))
-                                            <a href="{{ route('students.student-order-detail', $res->id) }}"
-                                               title="View Order">
-                                                <i class="fa fa-eye"></i>
-                                            </a>
-                                        @endif
-
-                                        {{-- View Student Profile (only if exists) --}}
-                                        @if(
-                                            \App\Helpers\Helper::canAccess('manage_students') &&
-                                            optional($res->student)->id
-                                        )
-                                            <a href="{{ route('students.student-profile-detail', $res->student->id) }}"
-                                               title="View Student Profile">
-                                                <i class="fa fa-user-graduate"></i>
-                                            </a>
-                                        @endif
-
-                                        {{-- Download Invoice --}}
-                                        @if(\App\Helpers\Helper::canAccess('manage_students'))
-                                            <a href="{{ route('students.generate-pdf', $res->id) }}"
-                                               title="Download Invoice">
-                                                <i class="fa fa-download"></i>
-                                            </a>
-                                        @endif
-
-                                    </div>
-                                </td>
+                                <th>#</th>
+                                <th>Date & Time</th>
+                                <th>Order ID</th>
+                                <th>Student Name</th>
+                                <th>Mobile</th>
+                                <th>Billed Amount</th>
+                                <th>Paid Amount</th>
+                                <th>Payment Method</th>
+                                <th>Status</th>
+                                <th width="12%">Actions</th>
                             </tr>
-                        @empty
-                            <tr>
-                                <td colspan="10" class="text-center text-muted">
-                                    No failed payments found.
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
+                        </thead>
+                        <tbody>
+                            @forelse($transactions as $res)
+                                <tr>
+                                    <td>
+                                        {{ ($transactions->currentPage() - 1) * $transactions->perPage() + $loop->iteration }}
+                                    </td>
+                                    <td>{{ $res->created_at->format('d M Y, h:i A') }}</td>
+                                    <td>{{ $res->order_code ?? '-' }}</td>
+                                    <td>{{ $res->student->name ?? '-' }}</td>
+                                    <td>{{ $res->student->mobile ?? '-' }}</td>
+                                    <td>₹ {{ $res->billed_amount ?? '0' }}</td>
+                                    <td>₹ {{ $res->paid_amount ?? '0' }}</td>
+                                    <td>{{ ucfirst($res->payment_method ?? '-') }}</td>
+                                    <td>
+                                        <span class="badge bg-danger">
+                                            Failed
+                                        </span>
+                                    </td>
+                                    <td>
 
-            {{-- PAGINATION --}}
-            <div class="d-flex justify-content-end mt-3">
-                {{ $transactions->appends(request()->query())->links() }}
-            </div>
+                                        <div class="dropdown">
 
+                                            <button class="btn btn-sm btn-primary dropdown-toggle" type="button"
+                                                data-bs-toggle="dropdown" aria-expanded="false">
+
+                                                Actions
+
+                                            </button>
+
+                                            <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
+
+                                                {{-- View Order --}}
+                                                @if(\App\Helpers\Helper::canAccess('manage_students'))
+
+                                                    <li>
+                                                        <a href="{{ route('students.student-order-detail', $res->id) }}"
+                                                            class="dropdown-item d-flex align-items-center gap-2">
+
+                                                            <i class="fa fa-eye text-primary"></i>
+
+                                                            View Order
+
+                                                        </a>
+                                                    </li>
+
+                                                @endif
+
+
+                                                {{-- View Student Profile --}}
+                                                @if(
+                                                        \App\Helpers\Helper::canAccess('manage_students') &&
+                                                        optional($res->student)->id
+                                                    )
+
+                                                    <li>
+                                                        <a href="{{ route('students.student-profile-detail', $res->student->id) }}"
+                                                            class="dropdown-item d-flex align-items-center gap-2">
+
+                                                            <i class="fa fa-user-graduate text-success"></i>
+
+                                                            Student Profile
+
+                                                        </a>
+                                                    </li>
+
+                                                @endif
+
+
+                                                {{-- Download Invoice --}}
+                                                @if(\App\Helpers\Helper::canAccess('manage_students'))
+
+                                                    <li>
+                                                        <a href="{{ route('students.generate-pdf', $res->id) }}"
+                                                            class="dropdown-item d-flex align-items-center gap-2">
+
+                                                            <i class="fa fa-download text-danger"></i>
+
+                                                            Download Invoice
+
+                                                        </a>
+                                                    </li>
+
+                                                @endif
+
+                                            </ul>
+
+                                        </div>
+
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="10" class="text-center text-muted">
+                                        No failed payments found.
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+
+                {{-- PAGINATION --}}
+                <div class="d-flex justify-content-end mt-3">
+                    {{ $transactions->appends(request()->query())->links() }}
+                </div>
+
+            </div>
         </div>
     </div>
-</div>
 @endsection

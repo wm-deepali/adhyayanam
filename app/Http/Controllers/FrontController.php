@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Teacher;
 use Validator;
 use Carbon\Carbon;
 use App\Models\SEO;
@@ -47,16 +48,25 @@ use App\Models\StudyMaterialCategory;
 use App\Models\ExaminationCommission;
 use App\Models\UserMobiileVerification;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Models\OfficeAddress;
+
 class FrontController extends Controller
 {
     public function index()
     {
         $data['commissions'] = ExaminationCommission::with('categories')->where('status', 1)->get();
-        $data['courses'] = Course::with('examinationCommission')->where('feature', 'on')->orderBy('created_at', 'DESC')->get();
+        $data['courses'] = Course::with('examinationCommission')->orderBy('created_at', 'DESC')->get();
         $data['topics'] = Topic::with('currentAffair')->get();
         $data['testSeries'] = TestSeries::with('commission')->get();
         $data['dailyBoosts'] = DailyBooster::take(8)->get();
         $data['teams'] = Team::all();
+
+        // ADD THIS
+        $data['teachers'] = Teacher::where('status', 1)
+            ->latest()
+            ->take(8)
+            ->get();
+
         $data['upcomingExams'] = UpcomingExam::with('exam_commission')->orderBy('created_at', 'DESC')->limit('5')->get();
         $data['blogs'] = Blog::with('user')->get();
         $data['testimonials'] = FeedTestimonial::where('type', 2)->where('status', 2)->orderBy('created_at', 'DESC')->limit(10)->get();
@@ -65,9 +75,7 @@ class FrontController extends Controller
         $data['features'] = InstituteFeature::where('status', 1)->get();
         $data['sliders'] = HomeSlider::where('status', 1)->get();
         $data['faqs'] = Faq::where('show_on_home', 1)->get();
-        $data['studyMaterial'] = StudyMaterial::with('commission')
-            ->where('status', 'Active')
-            ->get();
+        $data['studyMaterial'] = StudyMaterial::with('commission')->get();
 
         // Check if the popup has been shown in this session
         if (!session()->has('popup_shown')) {
@@ -404,7 +412,13 @@ class FrontController extends Controller
     public function contactUsIndex()
     {
         $data['header'] = HeaderSetting::first();
+
         $data['socialMedia'] = SocialMedia::first();
+
+        $data['officeAddresses'] = OfficeAddress::where('status', 1)
+            ->orderBy('sort_order')
+            ->get();
+
         return view('front.user.contact-us', $data);
     }
 
@@ -596,7 +610,7 @@ class FrontController extends Controller
 
     public function testPlannerIndex()
     {
-        $data['testPlans'] = TestPlanner::all();
+        $data['testPlans'] = TestPlanner::latest()->get();
         return view('front.user.test-planner', $data);
     }
 
@@ -1054,14 +1068,15 @@ class FrontController extends Controller
         return view('front.user.test-series', $data);
     }
 
-    public function testseriesDetail($slug)
+    public function testseriesDetail($slug, $id)
     {
 
-        $testseries = TestSeries::where('slug', $slug)->withCount([
-            'orders as orders_count' => function ($q) {
-                $q->where('order_status', 'PAID');
-            }
-        ])->first();
+        $testseries = TestSeries::where('id', $id)
+            ->where('slug', $slug)->withCount([
+                    'orders as orders_count' => function ($q) {
+                        $q->where('order_status', 'PAID');
+                    }
+                ])->first();
 
         $data['testseries'] = $testseries;
         $data['relatedtestseries'] = TestSeries::where('exam_com_id', $testseries->exam_com_id)->where('id', '!=', $testseries->id)->get();

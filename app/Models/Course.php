@@ -29,7 +29,7 @@ class Course extends Model
         'course_overview',
         'detail_content',
         'thumbnail_image',
-        'banner_image',
+        // 'banner_image',
         'youtube_url',
         'meta_title',
         'meta_keyword',

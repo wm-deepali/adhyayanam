@@ -1966,6 +1966,96 @@
 		}
 	}
 </style>
+<style>
+	.teacher-section {
+		background: linear-gradient(to bottom, #f8fbff, #ffffff);
+	}
+
+	.teacher-card {
+		position: relative;
+		background: #fff;
+		border-radius: 22px;
+		overflow: hidden;
+		transition: all 0.35s ease;
+		box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+		height: 100%;
+		border: 1px solid #eef2f7;
+	}
+
+	.teacher-card:hover {
+		transform: translateY(-10px);
+		box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
+	}
+
+	/* Top Banner */
+	.teacher-banner {
+		height: 110px;
+		background: linear-gradient(135deg, #045279, #0d6efd);
+	}
+
+	/* Image */
+	.teacher-image-wrapper {
+		margin-top: -55px;
+		text-align: center;
+		position: relative;
+		z-index: 2;
+	}
+
+	.teacher-image {
+		width: 110px;
+		height: 110px;
+		border-radius: 50%;
+		object-fit: cover;
+		border: 5px solid #fff;
+		background: #fff;
+		box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+	}
+
+	/* Content */
+	.teacher-content {
+		padding: 20px 22px 28px;
+		text-align: center;
+	}
+
+	.teacher-name {
+		font-size: 22px;
+		font-weight: 700;
+		margin-bottom: 6px;
+		color: #1f2937;
+	}
+
+	.teacher-qualification {
+		color: #6b7280;
+		font-size: 14px;
+		margin-bottom: 16px;
+		min-height: 40px;
+	}
+
+	/* Experience */
+	.teacher-exp {
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		background: #eef6ff;
+		color: #045279;
+		padding: 10px 18px;
+		border-radius: 50px;
+		font-size: 14px;
+		font-weight: 600;
+		margin-bottom: 18px;
+	}
+
+	/* Responsive */
+	@media(max-width:768px) {
+		.teacher-name {
+			font-size: 20px;
+		}
+
+		.teacher-content {
+			padding: 18px;
+		}
+	}
+</style>
 
 @section('content')
 
@@ -2115,8 +2205,8 @@
 						<p class="text">{!!  $intro->description !!}</p>
 
 						<div class="cta-btn-group1">
-							<a href="#" class="cta-btn1 buyer">Get Started</a>
-							<a href="#" class="cta-btn1 seller">Join Now</a>
+							<a href="{{ route('test-series-list') }}" class="cta-btn1 buyer">Get Started</a>
+							<a href="{{ route('student.login') }}" class="cta-btn1 seller">Join Now</a>
 						</div>
 
 					</div>
@@ -2579,7 +2669,7 @@
 																class="newtestseries-feature-row d-flex justify-content-between py-2 border-bottom">
 																<span class="newtestseries-label">Current Affairs</span>
 																<span class="newtestseries-value fw-medium">
-																	{{ $data->testseries->where('type_name', 'Current Affairs')->count() }}
+																	{{ $data->testseries->where('type_name', 'Current Affair')->count() }}
 																</span>
 															</div>
 															<div
@@ -2592,7 +2682,7 @@
 														</div>
 														<!-- View Button -->
 														<div class="mt-auto">
-															<a href="{{ route('test-series-detail', $data->slug) }}"
+															<a href="{{ route('test-series-detail', ['slug' => $data->slug, 'id' => $data->id]) }}"
 																class="newtestseries-view-btn btn w-100 py-2 fw-medium d-flex align-items-center justify-content-center gap-2">
 																<i class="bi bi-arrow-right-circle"></i>
 																View Test Series
@@ -2687,7 +2777,7 @@
 															class="newtestseries-feature-row d-flex justify-content-between py-2 border-bottom">
 															<span class="newtestseries-label">Current Affairs</span>
 															<span class="newtestseries-value fw-medium">
-																{{ $data->testseries->where('type_name', 'Current Affairs')->count() }}
+																{{ $data->testseries->where('type_name', 'Current Affair')->count() }}
 															</span>
 														</div>
 														<div
@@ -2700,7 +2790,7 @@
 													</div>
 													<!-- View Button -->
 													<div class="mt-auto">
-														<a href="{{ route('test-series-detail', $data->slug) }}"
+														<a href="{{ route('test-series-detail', ['slug' => $data->slug, 'id' => $data->id]) }}"
 															class="newtestseries-view-btn btn w-100 py-2 fw-medium d-flex align-items-center justify-content-center gap-2">
 															<i class="bi bi-arrow-right-circle"></i>
 															View Test Series
@@ -2882,7 +2972,7 @@
 
 																				<div class="edu-price">
 																					{{ $material->IsPaid ? '₹' . $material->price : 'Free'
-																																																																																																												}}
+																																																																																																																																				}}
 																				</div>
 																			</div>
 																			<p class="commission-name">
@@ -3077,6 +3167,7 @@
 		</section>
 		<!-- End Team Section -->
 
+
 		<!-- Start Testimonial Section -->
 		<section class="newupdate-testimonials py-5 " style="background:#f8fbff;">
 			<div class="auto-container">
@@ -3125,6 +3216,74 @@
 			</div>
 		</section>
 		<!-- End Testimonial Section -->
+
+
+		{{-- =========================
+		OUR TEACHERS SECTION
+		========================= --}}
+		<section class="teacher-section py-5">
+			<div class="container">
+
+				{{-- Heading --}}
+				<div class="text-center mb-5">
+					<h2 class="main-heading">
+						{{ $pageContent['teachers'] ?? 'Meet Our Expert Teachers' }}
+					</h2>
+
+					<p class="sub-heading">
+						{{ $pageSubContent['teachers'] ?? 'Learn from India’s best educators and experienced mentors.' }}
+					</p>
+				</div>
+
+				<div class="row">
+
+					@foreach($teachers as $teacher)
+								<div class="col-xl-3 col-lg-4 col-md-6 mb-4">
+
+									<div class="teacher-card">
+
+										{{-- Top Banner --}}
+										<div class="teacher-banner"></div>
+
+										{{-- Teacher Image --}}
+										<div class="teacher-image-wrapper">
+
+											<img src="{{ $teacher->profile_picture
+						? asset('storage/' . $teacher->profile_picture)
+						: asset('images/default-user.png') }}" alt="{{ $teacher->full_name }}" class="teacher-image">
+
+										</div>
+
+										{{-- Content --}}
+										<div class="teacher-content">
+
+											<h4 class="teacher-name">
+												{{ $teacher->full_name }}
+											</h4>
+
+											<p class="teacher-qualification">
+												{{ $teacher->highest_qualification }}
+											</p>
+
+											{{-- Experience --}}
+											<div class="teacher-exp">
+												<i class="fas fa-briefcase"></i>
+												{{ $teacher->total_experience ?? 0 }}+ Years Experience
+											</div>
+
+
+										</div>
+
+									</div>
+
+								</div>
+					@endforeach
+
+				</div>
+
+			</div>
+		</section>
+
 
 		<!-- start institute highlight Section -->
 		@php
@@ -3185,7 +3344,7 @@
 													style="background: {{ $bgColors[$index % count($bgColors)] }};">
 
 													<div class="newprog-number-circle {{ $circleColors[$index % count($circleColors)] }} text-white
-																																																																																																																																																																																															rounded-circle d-flex align-items-center justify-content-center"
+																																																																																																																																																																																																											rounded-circle d-flex align-items-center justify-content-center"
 														style="width:40px;height:40px;font-size:1.2rem;font-weight:bold;">
 														{{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}
 													</div>
@@ -3213,7 +3372,7 @@
 									Let's find the perfect service for your goals
 								</h4>
 
-								<a href="#"
+								<a href="{{ route('enquiry.direct') }}"
 									class="newprog-cta-pill btn rounded-pill px-5 py-3 fw-medium d-flex align-items-center gap-2 shadow"
 									style="background: linear-gradient(90deg, #10b981, #34d399); color: white; border: none;">
 									Book Your Free Consultation
@@ -3712,13 +3871,13 @@
 			// Yeh object sab commissions ke categories ka name rakhega
 			window.commissionCategories = {
 				@foreach($commissions as $commission)
-																																																  "{{ $commission->id }}": {
+																																																			  "{{ $commission->id }}": {
 					@foreach($commission->categories as $cat)
 						  "{{ $cat->id }}": "{{ addslashes($cat->name) }}",
 					@endforeach
-																																																  },
+																																																			  },
 				@endforeach
-																																												  };
+																																															  };
 
 			// test series script
 			document.addEventListener('DOMContentLoaded', function () {
@@ -3736,10 +3895,10 @@
 						const allTabLi = document.createElement('li');
 						allTabLi.className = 'nav-item';
 						allTabLi.innerHTML = `
-																																														<button class="btn btn-outline-secondary btn-sm11 active" data-category="all">
-																																														  All
-																																														</button>
-																																													  `;
+																																																	<button class="btn btn-outline-secondary btn-sm11 active" data-category="all">
+																																																	  All
+																																																	</button>
+																																																  `;
 						subCategoryTabsContainer.appendChild(allTabLi);
 
 						// Categories collect karo (unique)
@@ -3759,10 +3918,10 @@
 							const li = document.createElement('li');
 							li.className = 'nav-item';
 							li.innerHTML = `
-																																													<button class="btn btn-outline-secondary btn-sm11" data-category="${catId}">
-																																													  ${categoryName}
-																																													</button>
-																																												  `;
+																																																<button class="btn btn-outline-secondary btn-sm11" data-category="${catId}">
+																																																  ${categoryName}
+																																																</button>
+																																															  `;
 							subCategoryTabsContainer.appendChild(li);
 						});
 
@@ -3903,10 +4062,10 @@
 						const allTabLi = document.createElement('li');
 						allTabLi.className = 'nav-item';
 						allTabLi.innerHTML = `
-																																														<button class="btn btn-outline-secondary btn-sm11 active" data-category="all">
-																																														  All Courses
-																																														</button>
-																																													  `;
+																																																	<button class="btn btn-outline-secondary btn-sm11 active" data-category="all">
+																																																	  All Courses
+																																																	</button>
+																																																  `;
 						subCategoryTabsContainer.appendChild(allTabLi);
 
 						// Categories collect with names from data-attribute
@@ -3926,10 +4085,10 @@
 							const li = document.createElement('li');
 							li.className = 'nav-item';
 							li.innerHTML = `
-																																														  <button class="btn btn-outline-secondary btn-sm11" data-category="${catId}">
-																																															${catName}
-																																														  </button>
-																																														`;
+																																																	  <button class="btn btn-outline-secondary btn-sm11" data-category="${catId}">
+																																																		${catName}
+																																																	  </button>
+																																																	`;
 							subCategoryTabsContainer.appendChild(li);
 						});
 
@@ -4067,10 +4226,10 @@
 						const allTabLi = document.createElement('li');
 						allTabLi.className = 'nav-item';
 						allTabLi.innerHTML = `
-																																														<button class="btn btn-outline-secondary btn-sm11 active" data-category="all">
-																																														  All Study Material
-																																														</button>
-																																													  `;
+																																																	<button class="btn btn-outline-secondary btn-sm11 active" data-category="all">
+																																																	  All Study Material
+																																																	</button>
+																																																  `;
 						subCategoryTabsContainer.appendChild(allTabLi);
 
 						// Categories collect with names from data-attribute
@@ -4090,10 +4249,10 @@
 							const li = document.createElement('li');
 							li.className = 'nav-item';
 							li.innerHTML = `
-																																														  <button class="btn btn-outline-secondary btn-sm11" data-category="${catId}">
-																																															${catName}
-																																														  </button>
-																																														`;
+																																																	  <button class="btn btn-outline-secondary btn-sm11" data-category="${catId}">
+																																																		${catName}
+																																																	  </button>
+																																																	`;
 							subCategoryTabsContainer.appendChild(li);
 						});
 

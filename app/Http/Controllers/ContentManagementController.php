@@ -1622,7 +1622,7 @@ class ContentManagementController extends Controller
                 })
                 ->addColumn('image', function ($row) {
 
-                    $imagePath = $row->thumbnail_image ?? $row->banner_image;
+                    $imagePath = $row->thumbnail_image;
 
                     if ($imagePath) {
                         return '<img src="' . asset('storage/' . $imagePath) . '" 
@@ -1811,7 +1811,7 @@ class ContentManagementController extends Controller
             'detail_content' => 'required|string',
 
             'thumbnail_image' => 'required|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
-            'banner_image' => 'required|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
+            // 'banner_image' => 'required|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
 
             'youtube_url' => 'nullable|url',
             'meta_title' => 'nullable|string|max:255',
@@ -1829,8 +1829,8 @@ class ContentManagementController extends Controller
         $thumbnailImagePath = $request->file('thumbnail_image')
             ->store('courses/thumbnails', 'public');
 
-        $bannerImagePath = $request->file('banner_image')
-            ->store('courses/banners', 'public');
+        // $bannerImagePath = $request->file('banner_image')
+        //     ->store('courses/banners', 'public');
 
         /* ------------------------------------
          | Secure Price Calculation (BACKEND)
@@ -1876,7 +1876,7 @@ class ContentManagementController extends Controller
         $course->detail_content = $request->detail_content;
 
         $course->thumbnail_image = $thumbnailImagePath;
-        $course->banner_image = $bannerImagePath;
+        // $course->banner_image = $bannerImagePath;
 
         $course->youtube_url = $request->youtube_url;
         $course->meta_title = $request->meta_title;
@@ -2034,7 +2034,7 @@ class ContentManagementController extends Controller
 
             // Images optional on update
             'thumbnail_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2',
-            'banner_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
+            // 'banner_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
 
             'youtube_url' => 'nullable|url',
             'meta_title' => 'nullable|string|max:255',
@@ -2105,10 +2105,10 @@ class ContentManagementController extends Controller
                 ->store('courses/thumbnails', 'public');
         }
 
-        if ($request->hasFile('banner_image')) {
-            $course->banner_image = $request->file('banner_image')
-                ->store('courses/banners', 'public');
-        }
+        // if ($request->hasFile('banner_image')) {
+        //     $course->banner_image = $request->file('banner_image')
+        //         ->store('courses/banners', 'public');
+        // }
 
         $course->save();
 
@@ -2268,7 +2268,7 @@ class ContentManagementController extends Controller
     {
         $topic = Topic::with(['creator', 'currentAffair'])->findOrFail($id);
 
-        return view('current-affairs.topicview', compact('topic'));
+        return view('current-affairs.topic-view', compact('topic'));
     }
 
     public function topicStore(Request $request)
@@ -2809,10 +2809,20 @@ class ContentManagementController extends Controller
             | Generate PDF directly
             |--------------------------------------------------------------------------
             */
+            $logoPath = public_path('images/Neti-logo.png');
+
+            $logoBase64 = null;
+
+            if (file_exists($logoPath)) {
+                $type = pathinfo($logoPath, PATHINFO_EXTENSION);
+                $data = file_get_contents($logoPath);
+
+                $logoBase64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+            }
 
             $pdf = Pdf::loadView(
                 'study-material.pdf',
-                compact('material')
+                compact('material', 'logoBase64')
             )->setPaper('a4', 'portrait');
 
             /*
@@ -3303,6 +3313,25 @@ class ContentManagementController extends Controller
                 ->addColumn('created_at', function ($row) {
                     return $row->created_at ? $row->created_at->format('d M Y, h:i A') : '--';
                 })
+                ->addColumn('image', function ($row) {
+
+                    if ($row->image) {
+
+                        return '
+            <img 
+                src="' . asset('storage/' . $row->image) . '"
+                width="70"
+                height="50"
+                style="
+                    object-fit:cover;
+                    border-radius:8px;
+                    border:1px solid #ddd;
+                ">
+        ';
+                    }
+
+                    return '-';
+                })
                 ->addColumn('checkbox', function ($row) {
                     return '<input type="checkbox" class="column_checkbox career_checkbox" id="' . $row->id . '" name="career_checkbox[]" />';
                 })
@@ -3396,7 +3425,14 @@ class ContentManagementController extends Controller
             </ul>
         </div>';
                 })
-                ->rawColumns(['checkbox', 'created_at', 'status', 'action', 'created_by'])
+                ->rawColumns([
+                    'checkbox',
+                    'created_at',
+                    'status',
+                    'action',
+                    'created_by',
+                    'image'
+                ])
                 ->make(true);
         }
 
@@ -3436,6 +3472,9 @@ class ContentManagementController extends Controller
             'short_description' => 'required|string',
             'detail_content' => 'required',
             'pdf' => 'required|mimes:pdf|max:2048',
+
+            'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+
             'status' => 'required|integer',
         ]);
 
@@ -3447,11 +3486,19 @@ class ContentManagementController extends Controller
             'status'
         ]);
 
+
         $data['created_by'] = auth()->id();
 
         if ($request->hasFile('pdf')) {
             $data['pdf'] = $request->file('pdf')->store('pdfs', 'public');
         }
+
+        if ($request->hasFile('image')) {
+
+            $data['image'] = $request->file('image')
+                ->store('test-planner-images', 'public');
+        }
+
         $data['approval_status'] = Helper::requiresApproval('manage_test_planner')
             ? 'pending'
             : 'approved';
@@ -3471,20 +3518,46 @@ class ContentManagementController extends Controller
     public function testPlannerUpdate(Request $request, $id)
     {
         $testPlanner = TestPlanner::findOrFail($id);
+
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'start_date' => 'required|date',
+            'short_description' => 'required|string',
+            'detail_content' => 'required',
+
+            'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+
+            'pdf' => 'nullable|mimes:pdf|max:2048',
+            'status' => 'required|integer',
+        ]);
+
         $testPlanner->title = $request->input('title');
         $testPlanner->start_date = $request->input('start_date');
         $testPlanner->short_description = $request->input('short_description');
         $testPlanner->detail_content = $request->input('detail_content');
         $testPlanner->status = $request->input('status');
 
+        // PDF Upload
         if ($request->hasFile('pdf')) {
-            $testPlanner->pdf = $request->file('pdf')->store('pdfs', 'public');
+
+            $testPlanner->pdf = $request->file('pdf')
+                ->store('pdfs', 'public');
+        }
+
+        // Image Upload
+        if ($request->hasFile('image')) {
+
+            $testPlanner->image = $request->file('image')
+                ->store('test-planner-images', 'public');
         }
 
         $testPlanner->save();
 
-        return redirect()->route('test.planner.index')->with('success', 'Test Planner updated successfully');
+        return redirect()
+            ->route('test.planner.index')
+            ->with('success', 'Test Planner updated successfully');
     }
+
     public function testPlannerDelete($id)
     {
         $test = TestPlanner::findOrFail($id);

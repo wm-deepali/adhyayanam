@@ -485,7 +485,7 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-    <script src="https://cdn.ckeditor.com/4.16.2/full/ckeditor.js"></script>
+    <script src="https://cdn.ckeditor.com/4.22.1/full-all/ckeditor.js"></script>
     <script>
         $(document).ready(function () {
 
@@ -493,11 +493,11 @@
             $(document).on('click', '.add-feature', function () {
 
                 $('#feature-wrapper').append(`
-                <div class="d-flex mb-2 feature-row">
-                    <input type="text" name="key_features[]" class="form-control" placeholder="Enter Feature">
-                    <button type="button" class="btn btn-danger remove-feature ms-2">-</button>
-                </div>
-            `);
+                    <div class="d-flex mb-2 feature-row">
+                        <input type="text" name="key_features[]" class="form-control" placeholder="Enter Feature">
+                        <button type="button" class="btn btn-danger remove-feature ms-2">-</button>
+                    </div>
+                `);
 
             });
 
@@ -523,6 +523,9 @@
         $(document).ready(function () {
             $('.editor').each(function () {
                 CKEDITOR.replace(this, {
+                    extraPlugins: 'mathjax',
+                    mathJaxLib: 'https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS_HTML',
+                    removePlugins: 'easyimage,cloudservices',
                     filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
                     filebrowserUploadMethod: 'form'
                 });

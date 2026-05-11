@@ -302,20 +302,20 @@
 
                     <div class="row">
                         <!-- <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="banner_image" class="form-label">Upload Banner</label>
-                                <input type="file" class="form-control" name="banner_image" id="banner_image"
-                                    accept="image/*">
-                                <small class="text-muted">
-                                    Max size: 2MB | JPG, PNG, WEBP
-                                    If form fails, please re-upload image
-                                </small>
-                                <img id="banner_preview" style="max-width:150px; margin-top:10px; display:none;">
-                                @if ($errors->has('banner_image'))
-                                    <span class="text-danger text-left">{{ $errors->first('banner_image') }}</span>
-                                @endif
-                            </div>
-                        </div> -->
+                                <div class="mb-3">
+                                    <label for="banner_image" class="form-label">Upload Banner</label>
+                                    <input type="file" class="form-control" name="banner_image" id="banner_image"
+                                        accept="image/*">
+                                    <small class="text-muted">
+                                        Max size: 2MB | JPG, PNG, WEBP
+                                        If form fails, please re-upload image
+                                    </small>
+                                    <img id="banner_preview" style="max-width:150px; margin-top:10px; display:none;">
+                                    @if ($errors->has('banner_image'))
+                                        <span class="text-danger text-left">{{ $errors->first('banner_image') }}</span>
+                                    @endif
+                                </div>
+                            </div> -->
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="youtube_url" class="form-label">Youtube Video Url</label>
@@ -385,7 +385,7 @@
         integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU=" crossorigin="anonymous"></script>
     <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
 
-    <script src="https://cdn.ckeditor.com/4.16.2/full/ckeditor.js"></script>
+    <script src="https://cdn.ckeditor.com/4.22.1/full-all/ckeditor.js"></script>
     <script>
 
         $(document).ready(function () {
@@ -468,12 +468,18 @@
             // =========================================
 
             CKEDITOR.replace('detail_content', {
+                extraPlugins: 'mathjax',
+                mathJaxLib: 'https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS_HTML',
+                removePlugins: 'easyimage,cloudservices',
                 filebrowserUploadUrl:
                     "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
                 filebrowserUploadMethod: 'form'
             });
 
             CKEDITOR.replace('course_overview', {
+                extraPlugins: 'mathjax',
+                mathJaxLib: 'https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS_HTML',
+                removePlugins: 'easyimage,cloudservices',
                 filebrowserUploadUrl:
                     "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
                 filebrowserUploadMethod: 'form'

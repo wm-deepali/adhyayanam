@@ -62,7 +62,7 @@
             </div>
         </div>
     </div>
-    <script src="https://cdn.ckeditor.com/4.16.2/full/ckeditor.js"></script>
+    <script src="https://cdn.ckeditor.com/4.22.1/full-all/ckeditor.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             CKEDITOR.replace('editor', {

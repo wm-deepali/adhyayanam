@@ -2,9 +2,9 @@
 <html>
 
 <head>
-    
+
     <title>{{ $test->name }} - Instructions</title>
-     <link rel="shortcut icon" href="{{url('images/fav.ico')}}" type="image/x-icon">
+    <link rel="shortcut icon" href="{{url('images/fav.ico')}}" type="image/x-icon">
     <link rel="icon" href="{{url('images/fav.ico')}}" type="image/x-icon">
 
     <style>
@@ -99,20 +99,20 @@
 
         <h3>Instructions</h3>
 
-      @if($continueTest)
+        @if($continueTest)
 
-    <div style="background:#ffe5e5;color:#b30000;padding:12px;border-radius:6px;margin-bottom:15px;">
-        You already have an active test in progress.
+            <div style="background:#ffe5e5;color:#b30000;padding:12px;border-radius:6px;margin-bottom:15px;">
+                You already have an active test in progress.
 
-        <div style="margin-top:10px;">
-            <a href="{{ route('live-test', $continueTest) }}"
-               style="display:inline-block;background:#004085;color:#fff;padding:8px 15px;border-radius:5px;text-decoration:none;">
-                ▶ Continue Previous Test
-            </a>
-        </div>
-    </div>
+                <div style="margin-top:10px;">
+                    <a href="{{ route('live-test', $continueTest) }}"
+                        style="display:inline-block;background:#004085;color:#fff;padding:8px 15px;border-radius:5px;text-decoration:none;">
+                        ▶ Continue Previous Test
+                    </a>
+                </div>
+            </div>
 
-@endif
+        @endif
 
         @if($test->test_instruction)
 
@@ -149,6 +149,17 @@
 
     </div>
 
+
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)']],
+                displayMath: [['\\[', '\\]']]
+            }
+        };
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </body>
 
 </html>

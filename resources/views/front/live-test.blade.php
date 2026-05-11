@@ -13,7 +13,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js"
         integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF"
         crossorigin="anonymous"></script>
-         <link rel="shortcut icon" href="{{url('images/fav.ico')}}" type="image/x-icon">
+    <link rel="shortcut icon" href="{{url('images/fav.ico')}}" type="image/x-icon">
     <link rel="icon" href="{{url('images/fav.ico')}}" type="image/x-icon">
 
     <style>
@@ -518,6 +518,16 @@
 
     </div>
 
+   <script>
+window.MathJax = {
+    tex: {
+        inlineMath: [['\\(', '\\)']],
+        displayMath: [['\\[', '\\]']]
+    }
+};
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>
 
         let answers = [];
@@ -673,6 +683,8 @@
 
             $("#question-text").html(q.question);
 
+MathJax.typesetPromise();
+
             const form = $("#answer-form");
             form.html("");
 
@@ -697,6 +709,10 @@
 
             states[index].visited = true;
             updatePanel();
+
+            setTimeout(() => {
+    MathJax.typesetPromise();
+}, 100);
         }
 
         //===================== UI MCQ Loader =====================

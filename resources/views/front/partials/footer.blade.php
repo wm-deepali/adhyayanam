@@ -243,7 +243,14 @@ $socialMediaSettings = App\Models\SocialMedia::first();
 <script src="{{url('assets/js/jquery-ui.js')}}"></script>
 <script src="{{url('assets/js/script.js')}}"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 <script>
+	 window.MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)']],
+                displayMath: [['\\[', '\\]']]
+            }
+        };
  document.addEventListener('DOMContentLoaded', function() {
     const otpInputs = document.querySelectorAll('.otp-input');
 

@@ -347,7 +347,7 @@
 </form>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-<script src="https://cdn.ckeditor.com/4.16.2/full/ckeditor.js"></script>
+<script src="https://cdn.ckeditor.com/4.22.1/full-all/ckeditor.js"></script>
 <script>
 
 
@@ -360,6 +360,9 @@
             }
             if (!CKEDITOR.instances[this.id]) {
                 CKEDITOR.replace(this.id, {
+                    extraPlugins: 'mathjax',
+                    mathJaxLib: 'https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS_HTML',
+                    removePlugins: 'easyimage,cloudservices',
                     filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
                     filebrowserUploadMethod: 'form'
                 });
@@ -644,19 +647,19 @@
 
                         $.each(errors, function (field, messages) {
 
-    // 🔥 remove .0, .1, etc
-    let cleanField = field.replace(/\.\d+/g, '');
+                            // 🔥 remove .0, .1, etc
+                            let cleanField = field.replace(/\.\d+/g, '');
 
-    // find input
-    let input = $('[name="' + cleanField + '[]"]');
+                            // find input
+                            let input = $('[name="' + cleanField + '[]"]');
 
-    // show error
-    $('#' + cleanField + '-err').html(messages[0]);
+                            // show error
+                            $('#' + cleanField + '-err').html(messages[0]);
 
-    // highlight
-    input.addClass('is-invalid');
+                            // highlight
+                            input.addClass('is-invalid');
 
-});
+                        });
 
                         // 🔥 scroll to first error
                         if (firstError) {

@@ -465,7 +465,7 @@
               <!--  Science & Technology-->
               <!--</button>-->
               <!-- Science & Technology -->
-              @foreach($commissions->take(3) as $commission)
+              @foreach($commissions as $commission)
 
                 <button
                   class="category-btn fw-semibold text-start w-100 py-3 px-4 rounded-3 mb-3 border-0 d-flex align-items-center justify-content-between"
@@ -479,7 +479,7 @@
 
                 <ul class="sub-list list-unstyled ms-3" id="sub-commission-{{ $commission->id }}">
 
-                  @foreach($commission->categories->take(3) as $category)
+                  @foreach($commission->categories as $category)
 
                               <li class="mb-2">
                                 <a href="{{ route('courses', [
@@ -519,7 +519,7 @@
   <hr>
 
   <!-- Offcanvas body – yahan pura sidebar content jayega -->
-  @foreach($commissions->take(3) as $commission)
+  @foreach($commissions as $commission)
   <button
     class="category-btn fw-semibold text-start w-100 py-3 px-4 rounded-3 mb-3 border-0 d-flex align-items-center justify-content-between"
     type="button"
@@ -533,7 +533,7 @@
 
   <ul class="sub-list list-unstyled ms-3 collapse" 
       id="sub-commission-{{ $commission->id }}">
-    @foreach($commission->categories->take(10) as $category)
+    @foreach($commission->categories as $category)
       <li class="mb-2">
         <a href="{{ route('test-series-list', [
           'exam_id' => $commission->id,
@@ -617,7 +617,7 @@
               @if($subcategories->isNotEmpty())
 
 
-                @foreach($subcategories->take(3) as $sub)
+                @foreach($subcategories as $sub)
 
                           <a href="{{ route('courses', [
                     'exam_id' => request('exam_id'),

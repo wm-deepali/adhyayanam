@@ -424,7 +424,7 @@
     </div>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="https://cdn.ckeditor.com/4.16.2/full/ckeditor.js"></script>
+    <script src="https://cdn.ckeditor.com/4.22.1/full-all/ckeditor.js"></script>
 
     <script>
 
@@ -435,12 +435,18 @@
 
             if ($('#video_content').length && !CKEDITOR.instances.video_content) {
                 CKEDITOR.replace('video_content', {
+                    extraPlugins: 'mathjax',
+                    mathJaxLib: 'https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS_HTML',
+                    removePlugins: 'easyimage,cloudservices',
                     filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
                     filebrowserUploadMethod: 'form'
                 });
             }
             if ($('#live_content').length && !CKEDITOR.instances.live_content) {
                 CKEDITOR.replace('live_content', {
+                    extraPlugins: 'mathjax',
+                    mathJaxLib: 'https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS_HTML',
+                    removePlugins: 'easyimage,cloudservices',
                     filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
                     filebrowserUploadMethod: 'form'
                 });

@@ -337,7 +337,7 @@
             </div>
         </div>
     </div>
-    <script src="https://cdn.ckeditor.com/4.16.2/full/ckeditor.js"></script>
+    <script src="https://cdn.ckeditor.com/4.22.1/full-all/ckeditor.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <script>
@@ -500,6 +500,9 @@
                 }
 
                 CKEDITOR.replace(el.id, {
+                    extraPlugins: 'mathjax',
+                    mathJaxLib: 'https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS_HTML',
+                    removePlugins: 'easyimage,cloudservices',
                     filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
                     filebrowserUploadMethod: 'form',
                     allowedContent: true

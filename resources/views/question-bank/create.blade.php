@@ -15,8 +15,8 @@
                     </div>
                     <div class="justify-content-end">
                         <a href="{{ url()->previous() }}" class="btn btn-secondary">
-                    ← Back
-                </a>
+                            ← Back
+                        </a>
                     </div>
                 </div>
                 <div class="mt-2">
@@ -322,7 +322,8 @@
                                 </div>
                                 <div id="question-clone"></div>
                                 <div class="col-md-12 d-flex justify-content-end mt-2" id="add-more-btn-dv">
-                                    <button type="button" id="add-more" class="btn btn-secondary mb-3" style="display:none;">Add More</button>
+                                    <button type="button" id="add-more" class="btn btn-secondary mb-3"
+                                        style="display:none;">Add More</button>
                                 </div>
                             </div>
                             <hr>
@@ -333,7 +334,7 @@
             </div>
         </div>
     </div>
-    <script src="https://cdn.ckeditor.com/4.16.2/full/ckeditor.js"></script>
+    <script src="https://cdn.ckeditor.com/4.22.1/full-all/ckeditor.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <script>
@@ -495,8 +496,17 @@
                 }
 
                 CKEDITOR.replace(el.id, {
+
+                    extraPlugins: 'mathjax',
+
+                    mathJaxLib: 'https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS_HTML',
+
+                    removePlugins: 'easyimage,cloudservices',
+
                     filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
+
                     filebrowserUploadMethod: 'form',
+
                     allowedContent: true
                 });
             }

@@ -110,8 +110,8 @@
 
                     <div class="mb-3">
                         <label for="detail_content" class="form-label">Detail Content</label>
-                        <textarea id="editor" name="detail_content"
-                            style="height: 200px;" required>{!! old('detail_content') !!}</textarea>
+                        <textarea id="editor" name="detail_content" style="height: 200px;"
+                            required>{!! old('detail_content') !!}</textarea>
                         @error('detail_content') <span class="text-danger text-left">{{ $message }}</span> @enderror
                     </div>
 
@@ -223,7 +223,7 @@
         </div>
     </div>
 
-    <script src="https://cdn.ckeditor.com/4.16.2/full/ckeditor.js"></script>
+    <script src="https://cdn.ckeditor.com/4.22.1/full-all/ckeditor.js"></script>
 
     {{-- In your Blade file or master layout --}}
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -245,6 +245,9 @@
             }
 
             CKEDITOR.replace('editor', {
+                extraPlugins: 'mathjax',
+                mathJaxLib: 'https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS_HTML',
+                removePlugins: 'easyimage,cloudservices',
                 filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
                 filebrowserUploadMethod: 'form'
             });
@@ -540,23 +543,23 @@
                 var offeredPrice = mrp - (mrp * (discount / 100));
                 $('#offered-price').val(offeredPrice.toFixed(2));
             });
-       
-       setTimeout(() => {
 
-    if (oldSubjects && oldSubjects.length) {
-        $('#subject_id').val(oldSubjects).trigger('change.select2');
-    }
+            setTimeout(() => {
 
-    if (oldChapters && oldChapters.length) {
-        $('#chapter_id').val(oldChapters).trigger('change.select2');
-    }
+                if (oldSubjects && oldSubjects.length) {
+                    $('#subject_id').val(oldSubjects).trigger('change.select2');
+                }
 
-    if (oldTopics && oldTopics.length) {
-        $('#topic_id').val(oldTopics).trigger('change.select2');
-    }
+                if (oldChapters && oldChapters.length) {
+                    $('#chapter_id').val(oldChapters).trigger('change.select2');
+                }
 
-}, 1200);
-       
+                if (oldTopics && oldTopics.length) {
+                    $('#topic_id').val(oldTopics).trigger('change.select2');
+                }
+
+            }, 1200);
+
         });
 
         let descEditorCount = $('.description-editor').length;
@@ -567,6 +570,9 @@
 
                 if (!CKEDITOR.instances[id]) {
                     CKEDITOR.replace(id, {
+                        extraPlugins: 'mathjax',
+                        mathJaxLib: 'https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS_HTML',
+                        removePlugins: 'easyimage,cloudservices',
                         filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
                         filebrowserUploadMethod: 'form'
                     });
@@ -584,19 +590,19 @@
             const newEditorId = `desc-editor-${descEditorCount}`;
 
             const newGroup = `
-                                                                        <div class="title-description-group mb-2 border rounded p-2">
-                                                                            <div class="row">
-                                                                                <div class="col-md-12 mb-2">
-                                                                                    <input type="text" class="form-control" name="titles[]" placeholder="Title" required>
-                                                                                </div>
-                                                                                <div class="col-md-12 mb-2">
-                                                                                    <textarea class="form-control description-editor" id="${newEditorId}" name="descriptions[]" placeholder="Description" rows="3" required></textarea>
-                                                                                </div>
-                                                                                <div class="col-md-1 d-flex align-items-center">
-                                                                                                         <button type="button" class="btn btn-danger btn-sm remove-group">Remove</button>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>`;
+                                                                                <div class="title-description-group mb-2 border rounded p-2">
+                                                                                    <div class="row">
+                                                                                        <div class="col-md-12 mb-2">
+                                                                                            <input type="text" class="form-control" name="titles[]" placeholder="Title" required>
+                                                                                        </div>
+                                                                                        <div class="col-md-12 mb-2">
+                                                                                            <textarea class="form-control description-editor" id="${newEditorId}" name="descriptions[]" placeholder="Description" rows="3" required></textarea>
+                                                                                        </div>
+                                                                                        <div class="col-md-1 d-flex align-items-center">
+                                                                                                                 <button type="button" class="btn btn-danger btn-sm remove-group">Remove</button>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>`;
 
             $('#title-description-wrapper').append(newGroup);
 

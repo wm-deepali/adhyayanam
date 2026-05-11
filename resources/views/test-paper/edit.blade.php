@@ -134,10 +134,10 @@
                         <h6 class="card-subtitle mb-2 text-muted">Edit Question section here.</h6>
                     </div>
                     <div class="justify-content-end">
-                         {{-- BACK BUTTON --}}
-                <a href="{{ url()->previous() }}" class="btn btn-secondary">
-                    ⬅ Back
-                </a>
+                        {{-- BACK BUTTON --}}
+                        <a href="{{ url()->previous() }}" class="btn btn-secondary">
+                            ⬅ Back
+                        </a>
                     </div>
                 </div>
                 <div class="mt-2">
@@ -399,10 +399,10 @@
                             </div>
                             <div class="form-row">
                                 <!--div class="form-group col-md-4">
-                                                                    <label for="per_question_marks">Per Question Marks </label>
-                                                                        <input type="text" class="form-control" placeholder="Enter in no." name="per_question_marks" id="per_question_marks" >
-                                                                        <div class="text-danger validation-err" id="per_question_marks-err"></div>
-                                                                    </div-->
+                                                                        <label for="per_question_marks">Per Question Marks </label>
+                                                                            <input type="text" class="form-control" placeholder="Enter in no." name="per_question_marks" id="per_question_marks" >
+                                                                            <div class="text-danger validation-err" id="per_question_marks-err"></div>
+                                                                        </div-->
                                 <div class="form-group col-md-6">
                                     <label for="inputPassword4">Question Selections </label>
                                     <select id="question_generated_by" name="question_generated_by" class="form-control">
@@ -666,7 +666,7 @@
             </div>
         </div>
     </div>
-   <script src="https://cdn.ckeditor.com/4.16.2/full/ckeditor.js"></script>
+    <script src="https://cdn.ckeditor.com/4.22.1/full-all/ckeditor.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const testType = document.getElementById('test_type');
@@ -720,13 +720,16 @@
         });
 
 
-    var testInstructionEditor = CKEDITOR.replace('test_instruction', {
-    filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
-    filebrowserUploadMethod: 'form'
-});
+        var testInstructionEditor = CKEDITOR.replace('test_instruction', {
+            extraPlugins: 'mathjax',
+            mathJaxLib: 'https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS_HTML',
+            removePlugins: 'easyimage,cloudservices',
+            filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
+            filebrowserUploadMethod: 'form'
+        });
 
 
-  
+
         $(document).on('change', '#subject', function (event) {
             $('#question_generated_by').val("").trigger('change');
             $('#chapter_id').val("").trigger('change');
@@ -801,10 +804,10 @@
             const additionalInputContainer = document.getElementById('additionalInputContainer');
             if (negativeMarkingSelect.value === 'yes') {
                 additionalInputContainer.innerHTML = `
-                                <label for="negative_marks_per_question">Negative Mark (%)</label>
-                <input type="number" id="negative_marks_per_question" name="negative_marks_per_question" min="0" max="100" step="0.01" value="{{ old('negative_marks_per_question', $paper->negative_marks_per_question ?? '') }}">
-                <small>Enter negative marking as a percentage of the positive mark per question.</small>
-                        `;
+                                    <label for="negative_marks_per_question">Negative Mark (%)</label>
+                    <input type="number" id="negative_marks_per_question" name="negative_marks_per_question" min="0" max="100" step="0.01" value="{{ old('negative_marks_per_question', $paper->negative_marks_per_question ?? '') }}">
+                    <small>Enter negative marking as a percentage of the positive mark per question.</small>
+                            `;
             } else {
                 additionalInputContainer.innerHTML = '';
             }
@@ -820,9 +823,9 @@
 
             if (negativeMarkingSelect.value === 'yes') {
                 additionalInputContainer.innerHTML = `
-                                                            <label for="number_of_re_attempt_allowed">Number of Time</label>
-                                                            <input type="number" id="number_of_re_attempt_allowed" name="number_of_re_attempt_allowed" min="0" step="0.01" required  value="${prefillValue}">
-                                                        `;
+                                                                <label for="number_of_re_attempt_allowed">Number of Time</label>
+                                                                <input type="number" id="number_of_re_attempt_allowed" name="number_of_re_attempt_allowed" min="0" step="0.01" required  value="${prefillValue}">
+                                                            `;
             } else {
                 additionalInputContainer.innerHTML = '';
             }

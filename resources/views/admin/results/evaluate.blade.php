@@ -60,125 +60,146 @@
 
 
         {{--================== TEST DETAILS ==================--}}
-        <div class="block-card">
-            <div class="box-heading">Test Details</div>
 
-            <table class="table table-bordered mt-2">
+@php
+    $test = $attempt->test;
+@endphp
+<div class="block-card">
+    <div class="box-heading">Test Details</div>
 
-                <tr>
-                    <th>Examination Commission</th>
-                    <td>{{ $attempt->test->commission->name ?? '-' }}</td>
+    @if(!$test)
 
-                    <th>Examination Category</th>
-                    <td>{{ $attempt->test->category->name ?? '-' }}</td>
+        <div class="alert alert-warning mt-3">
+            <strong>Test Deleted</strong><br>
+            This attempt is linked to a test that no longer exists.
+        </div>
 
-                    <th>Sub Category</th>
-                    <td>{{ $attempt->test->subcategory->name ?? '-' }}</td>
-                </tr>
+    @else
 
-                <tr>
-                    <th>Test Name</th>
-                    <td>
-                        {{ $attempt->test->name }}
-                        @if($attempt->test->test_code)
-                            <span style="color:blue;font-weight:bold;">
-                                ({{ $attempt->test->test_code }})
-                            </span>
-                        @endif
-                    </td>
+        <table class="table table-bordered mt-2">
 
-                    <th>Paper Type</th>
-                    <td>
-                        @php
-                            $paperType = $attempt->test->paper_type;
-                            $typeName = match ($paperType) {
-                                1 => 'Previous Year',
-                                2 => 'Current Affair',
-                                default => (
-                                    is_null($attempt->test->topic_id) && is_null($attempt->test->subject_id) && is_null($attempt->test->chapter_id)
+            <tr>
+                <th>Examination Commission</th>
+                <td>{{ $test->commission->name ?? '-' }}</td>
+
+                <th>Examination Category</th>
+                <td>{{ $test->category->name ?? '-' }}</td>
+
+                <th>Sub Category</th>
+                <td>{{ $test->subcategory->name ?? '-' }}</td>
+            </tr>
+
+            <tr>
+                <th>Test Name</th>
+                <td>
+                    {{ $test->name ?? '-' }}
+
+                    @if($test->test_code)
+                        <span style="color:blue;font-weight:bold;">
+                            ({{ $test->test_code }})
+                        </span>
+                    @endif
+                </td>
+
+                <th>Paper Type</th>
+                <td>
+                    @php
+                        $paperType = $test->paper_type;
+
+                        $typeName = match ($paperType) {
+                            1 => 'Previous Year',
+                            2 => 'Current Affair',
+                            default => (
+                                is_null($test->topic_id) &&
+                                is_null($test->subject_id) &&
+                                is_null($test->chapter_id)
                                     ? 'Full Test'
-                                    : (!is_null($attempt->test->subject_id) && is_null($attempt->test->chapter_id)
+                                    : (!is_null($test->subject_id) &&
+                                       is_null($test->chapter_id)
                                         ? 'Subject Wise'
-                                        : (!is_null($attempt->test->chapter_id) && is_null($attempt->test->topic_id)
+                                        : (!is_null($test->chapter_id) &&
+                                           is_null($test->topic_id)
                                             ? 'Chapter Wise'
-                                            : (!is_null($attempt->test->topic_id)
+                                            : (!is_null($test->topic_id)
                                                 ? 'Topic Wise'
                                                 : '-'
                                             )
                                         )
                                     )
-                                )
-                            };
-                        @endphp
+                            )
+                        };
+                    @endphp
 
-                        {{ $typeName }} ({{ ucfirst($attempt->test->test_paper_type) }})
-                    </td>
+                    {{ $typeName }}
+                    ({{ ucfirst($test->test_paper_type ?? '-') }})
+                </td>
 
-                    <th>Test Mode</th>
-                    <td>{{ $attempt->test->mrp > 0 ? 'Paid' : 'Free' }}</td>
-                </tr>
+                <th>Test Mode</th>
+                <td>{{ ($test->mrp ?? 0) > 0 ? 'Paid' : 'Free' }}</td>
+            </tr>
 
-                <tr>
-                    <th>Total Marks</th>
-                    <td>{{ $attempt->test->total_marks ?? '0' }}</td>
+            <tr>
+                <th>Total Marks</th>
+                <td>{{ $test->total_marks ?? 0 }}</td>
 
-                    <th>Duration</th>
-                    <td>{{ $attempt->test->duration }} Minutes</td>
+                <th>Duration</th>
+                <td>{{ $test->duration ?? 0 }} Minutes</td>
 
-                    <th>Has Negative Marks</th>
-                    <td>
-                        @if($attempt->test->has_negative_marks)
-                            Yes ({{ $attempt->test->negative_marks_per_question }}%)
-                        @else
-                            No
-                        @endif
-                    </td>
-                </tr>
+                <th>Has Negative Marks</th>
+                <td>
+                    @if($test->has_negative_marks)
+                        Yes ({{ $test->negative_marks_per_question }}%)
+                    @else
+                        No
+                    @endif
+                </td>
+            </tr>
 
-                <tr>
-                    <th>Questions Attempted</th>
-                    <td>{{ $attempt->attempted_count ?? 0 }}</td>
+            <tr>
+                <th>Questions Attempted</th>
+                <td>{{ $attempt->attempted_count ?? 0 }}</td>
 
-                    <th>Questions Skipped</th>
-                    <td>{{ $attempt->not_attempted ?? 0 }}</td>
+                <th>Questions Skipped</th>
+                <td>{{ $attempt->not_attempted ?? 0 }}</td>
 
-                    <th>Test Attempted On</th>
-                    <td>{{ $attempt->created_at->format('d M, Y h:i A') }}</td>
-                </tr>
+                <th>Test Attempted On</th>
+                <td>{{ $attempt->created_at->format('d M, Y h:i A') }}</td>
+            </tr>
 
-                <tr>
-                    <th>Time Taken</th>
-                    <td>{{ gmdate('H:i:s', $attempt->time_taken ?? 0) }}</td>
+            <tr>
+                <th>Time Taken</th>
+                <td>{{ gmdate('H:i:s', $attempt->time_taken ?? 0) }}</td>
 
-                    <th>Marks Obtained</th>
-                    <td>
-                        @if($attempt->status === 'published')
-                            <span class="text-success fw-bold">
-                                {{ $attempt->final_score }}
-                            </span>
-                        @else
-                            <span class="text-danger fw-bold">
-                                Pending
-                            </span>
-                        @endif
-                    </td>
-
-                    <th>Result Status</th>
-                    <td>
-                        @php $status = strtolower($attempt->status) @endphp
-
-                        <span class="fw-bold 
-                    {{ $status == 'published' ? 'text-success' :
-        ($status == 'pending' ? 'text-warning' : 'text-primary') }}">
-                            {{ ucfirst($status) }}
+                <th>Marks Obtained</th>
+                <td>
+                    @if($attempt->status === 'published')
+                        <span class="text-success fw-bold">
+                            {{ $attempt->final_score }}
                         </span>
-                    </td>
-                </tr>
+                    @else
+                        <span class="text-danger fw-bold">
+                            Pending
+                        </span>
+                    @endif
+                </td>
 
-            </table>
-        </div>
+                <th>Result Status</th>
+                <td>
+                    @php $status = strtolower($attempt->status) @endphp
 
+                    <span class="fw-bold
+                        {{ $status == 'published' ? 'text-success' :
+                           ($status == 'pending' ? 'text-warning' : 'text-primary') }}">
+                        {{ ucfirst($status) }}
+                    </span>
+                </td>
+            </tr>
 
+        </table>
+
+    @endif
+
+</div>
         {{-- ================= SUMMARY SECTION ================= --}}
         @if(!empty($summary))
             <div class="block-card">

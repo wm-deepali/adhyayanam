@@ -13,7 +13,7 @@ Create|Category
                     <h5 class="card-title">Create</h5>
                     <h6 class="card-subtitle mb-2 text-muted"> Add Category here.</h6>
                 </div>
-                <a href="{{ route('manage-teachers.index') }}" class="btn btn-secondary" style="height: fit-content;">← Back</a>
+                <a href="{{ route('cm.category') }}" class="btn btn-secondary" style="height: fit-content;">← Back</a>
             </div>
             <div class="mt-2">
                 @include('layouts.includes.messages')

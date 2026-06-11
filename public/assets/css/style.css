@@ -7100,4 +7100,124 @@ height: 200px;
     .main-header .logo .logo-lg .light-logo{
         display:none;
     }
+    .course-page-section {
+    position: relative;
+    padding: 0px 0px 70px;
+    background-color: #ffffff;
+}
+.carrer-page {
+    padding: 30px 0;
+}
+.main-footer .footer-bottom{
+    flex-direction:column !important;
+}
+.wd-social-icons{
+    display:none !important;
+}
+.faq-section{
+    padding: 30px 0;
+}
+.blog-page-section{
+    padding: 30px 0;
+}
+.sidebar-page-container{
+     padding: 30px 0;
+}
+
+.mobile-all-courses {
+    padding: 1.5rem 0px !important;
+}
+
+.edu-card-body .edu-btn {
+    justify-content: center;
+    margin: auto;
+}
+
+#content-view-courses .p-4.bg-white {
+ padding: 1.5rem 0px !important;
+}
+
+.mobile-all-courses h5{
+        padding-left: 14px
+}
+
+.edu-description {
+     height: auto; 
+ 
+}
+
+.edu-title {
+  height: auto; 
+}
+
+#commission-view-courses .p-4 {
+padding: 1.5rem 0px !important;
+}
+
+div#commissionTabsCourses {
+    padding: 0px 10px;
+}
+
+#commission-view-courses h5.fw-bold.mb-4.text-start.text-black {
+ padding: 0px 10px;
+}
+
+.courses-section .container {
+    padding-left: 10px;
+    padding-right: 10px;
+}
+#commission-view p-4 {
+  padding-left: 10px;
+    padding-right: 10px;
+}
+
+.mat-study-materials .container {
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+}
+
+
+
+#commission-view-study .mobile-all-study {
+    padding: 1.5rem 0px !important;
+}
+
+
+#commission-view .mobile-all-testseries {
+padding: 1.5rem 0px !important;
+}
+
+
+.mobile-all-testseries h5 {
+ padding: 0px 10px;
+}
+
+.main-slider-carousel .slide {
+    min-height: 250px;
+    height: 250px;
+    max-height: 250px;
+}
+
+.mobilemargin {
+    margin-top: 18px;
+}
+
+ul.header-megamenu.nav {
+    display: none!IMPORTANT;
+}
+
+.main-header .logo-box {
+    border-right: 1px solid rgba(95, 99, 121, 0);
+    display: none !IMPORTANT;
+}
+
+ul.header-megamenu.nav {
+    display: none;
+}
+
+.main-header > div .logo {
+   
+    display: none;
+}
+
 }

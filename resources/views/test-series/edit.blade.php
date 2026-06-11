@@ -121,7 +121,7 @@
             <div class="card-body">
                 <div class="d-flex">
                     <div class="col">
-                        <h5 class="card-title">Create</h5>
+                        <h5 class="card-title">Edit</h5>
                         <h6 class="card-subtitle mb-2 text-muted"> Update Test Series here.</h6>
                     </div>
                 </div>
@@ -403,20 +403,18 @@
                                                                                                 <span class="question-text">
                                                                                                     {{ $testDetail->test->name ?? '' }}
                                                                                                     <small class="text-muted d-block">
-                                                                                                        @if($testDetail->test->subject)
-                                                                                                            Subject:
-                                                                                                            {{ $testDetail->test->subject->name }}
-                                                                                                        @endif
+                                                                                                        @if(optional($testDetail->test)->subject)
+    Subject: {{ optional($testDetail->test->subject)->name }}
+@endif
 
-                                                                                                        @if($testDetail->test->subjectchapter)
-                                                                                                            | Chapter:
-                                                                                                            {{ $testDetail->test->chapter->name }}
-                                                                                                        @endif
+@if(optional($testDetail->test)->chapter)
+    | Chapter: {{ optional($testDetail->test->chapter)->name }}
+@endif
 
-                                                                                                        @if($testDetail->test->subject->topic)
-                                                                                                            | Topic:
-                                                                                                            {{ $testDetail->test->topic->name }}
-                                                                                                        @endif
+@if(optional($testDetail->test)->topic)
+    | Topic: {{ optional($testDetail->test->topic)->name }}
+@endif
+                                                                                                        
                                                                                                     </small>
                                                                                                 </span>
                                                                                             </span>

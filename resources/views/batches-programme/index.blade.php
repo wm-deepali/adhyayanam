@@ -68,7 +68,7 @@
                                      style="width:40px">
                             </td>
 
-                            <td>{{ $data->batch_heading }}</td>
+                            <td><strong>{{ $data->name }}</strong> </BR> {{ $data->batch_heading }}</td>
                             <td>{{ $data->start_date }}</td>
                             <td>{{ $data->mrp }}</td>
                             <td>{{ $data->discount }}</td>

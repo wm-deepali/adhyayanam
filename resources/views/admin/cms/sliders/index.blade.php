@@ -97,7 +97,7 @@
 
         <!-- Image -->
         <div class="mb-3">
-            <label class="form-label">Image *</label>
+            <label class="form-label">Image * (Recommended Size: 880 × 390 px) </label>
             <input type="file" name="image" id="imageInput" class="form-control">
             <img id="previewImage" class="mt-2 rounded"
                  style="max-width:150px; display:none;">

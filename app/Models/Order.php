@@ -31,17 +31,16 @@ class Order extends Model
         'created_at',
         'updated_at',
     ];
+    
     public function transaction()
     {
-        return $this->belongsTo(Transaction::class, 'transaction_id');
+        return $this->belongsTo(Transaction::class, 'transaction_id', 'transaction');
     }
+    
     public function student()
     {
         return $this->belongsTo(User::class, 'student_id');
     }
-
-   
-
 
 }
 

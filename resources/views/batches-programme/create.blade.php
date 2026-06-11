@@ -140,7 +140,7 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label class="form-label">Meta Title</label>
+                                <label class="form-label">Meta Title (Max 60 Character)</label>
                                 <input type="text" class="form-control" name="meta_title" required>
                             </div>
                         </div>
@@ -156,7 +156,7 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label class="form-label">Meta Description</label>
+                                <label class="form-label">Meta Description (Maximum 120 Character)</label>
                                 <input type="text" class="form-control" name="meta_description" required>
                             </div>
                         </div>

@@ -84,7 +84,7 @@ class FrontController extends Controller
         } else {
             $data['popup'] = null;
         }
-
+// dd($data['upcomingExams']->toArray());
         return view('front.user.index', $data);
     }
 

@@ -72,6 +72,7 @@ class ContentManagementController extends Controller
         $data['faqs'] = Faq::all();
         return view('content-management.about', $data);
     }
+    
     public function aboutStore(Request $request)
     {
         $request->validate([
@@ -2033,7 +2034,7 @@ class ContentManagementController extends Controller
             'detail_content' => 'required|string',
 
             // Images optional on update
-            'thumbnail_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2',
+            'thumbnail_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
             // 'banner_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
 
             'youtube_url' => 'nullable|url',
@@ -2798,11 +2799,15 @@ class ContentManagementController extends Controller
     {
         try {
 
+ini_set('memory_limit', '2048M'); // 2 GB
+set_time_limit(300);
+    
             $material = StudyMaterial::with([
                 'commission',
                 'category',
                 'subcategory',
             ])->findOrFail($id);
+
 
             /*
             |--------------------------------------------------------------------------
@@ -2824,6 +2829,7 @@ class ContentManagementController extends Controller
                 'study-material.pdf',
                 compact('material', 'logoBase64')
             )->setPaper('a4', 'portrait');
+            // dd($pdf)
 
             /*
             |--------------------------------------------------------------------------
@@ -2834,6 +2840,7 @@ class ContentManagementController extends Controller
             return $pdf->download(
                 'study_material_' . $material->id . '.pdf'
             );
+           
 
         } catch (\Exception $e) {
 

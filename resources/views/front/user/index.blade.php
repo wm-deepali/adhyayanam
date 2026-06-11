@@ -45,7 +45,7 @@
 		border: 5px solid #ffffff;
 		border-radius: 20px;
 		overflow: hidden;
-		object-fit: cover;
+		object-fit: fill;
 		display: block;
 		transition: transform 0.4s ease;
 	}
@@ -171,9 +171,9 @@
 
 	/* Responsive adjustments */
 	@media (max-width: 640px) {
-		.edu-thumbnail {
-			height: 180px;
-		}
+		/*.edu-thumbnail {*/
+		/*	height: 180px;*/
+		/*}*/
 
 		.edu-title {
 			font-size: 1.25rem;
@@ -373,9 +373,23 @@
 	.banner-img {
 		width: 100%;
 		height: 100%;
-		object-fit: cover;
+		object-fit: fill;
 	}
 
+
+.main-slider-carousel .slide {
+    min-height: 390px;
+    height: 390px;
+    max-height: 390px;
+}
+
+.main-slider-carousel .owl-dots {
+    margin-top: 10px;
+}
+
+.main-slider-carousel .owl-nav {
+    display: none;
+}
 	.notice-box {
 		border-radius: 10px !important;
 		overflow: hidden;
@@ -395,7 +409,7 @@
 	}
 
 	.notice-scroll {
-		height: 360px;
+		height: 100%;
 		overflow: hidden;
 		padding: 15px;
 		background: #f8fbff;
@@ -501,6 +515,12 @@
 		border-radius: 14px;
 		box-shadow: 0 6px 20px rgba(0, 0, 0, 0.07);
 	}
+	
+	.intro-left-card img {
+   width: 100%;
+    height: 100%;
+    object-fit: fill;
+}
 
 	/* RIGHT CARD (COL-8) */
 	.intro-right-card {
@@ -513,6 +533,8 @@
 		justify-content: space-between;
 		gap: 30px;
 	}
+	
+
 
 	/* INNER LEFT IN COL-8 */
 	.right-content {
@@ -1259,7 +1281,7 @@
 
 	.boost-thumbnail {
 		/*transition: transform 0.4s ease;*/
-		object-fit: cover;
+		object-fit: fill;
 		height: 220px;
 		/* fixed height for uniformity */
 	}
@@ -1721,8 +1743,9 @@
 
 	.t-img img {
 		width: 100%;
-		height: 230px !important;
+		height: 280px !important;
 		border-radius: 8px;
+		    object-fit: fill;
 	}
 
 	.faq-section {
@@ -2044,6 +2067,14 @@
 		font-weight: 600;
 		margin-bottom: 18px;
 	}
+	
+
+
+
+	
+/*	.card.notice-box.shadow.rounded-card {*/
+/*    height: 100%;*/
+/*}*/
 
 	/* Responsive */
 	@media(max-width:768px) {
@@ -2079,7 +2110,8 @@
 		<!-- Main Slider Section Start -->
 		<section class="home-section ">
 			<div class="container">
-				<div class="row  row g-0 g-md-3 align-items-stretch">
+				<!--<div class="row  row g-0 g-md-3 align-items-stretch">-->
+				<div class="row  row g-0 g-md-3 ">
 
 					<!-- Banner Slider Box -->
 					<div class="col-12 col-md-8" style="padding-right:0px;">
@@ -2521,53 +2553,59 @@
 							<!-- Card List -->
 							<!-- Card List -->
 							<div class="p-3 d-flex flex-column gap-3">
-								@foreach($upcomingExams as $data) <!-- assuming you have $upcomingExams collection -->
-									<div
-										class="upcoming-card position-relative bg-light-subtle rounded-3 p-3 hover-lift border-start border-4 border-primary">
-										<a href="{{ asset('storage/' . $data->pdf) }}" target="_blank"
-											class="stretched-link text-decoration-none d-block h-100">
+							@foreach($upcomingExams as $data)
+    <div class="upcoming-card position-relative bg-light-subtle rounded-3 p-3 hover-lift border-start border-4 border-primary">
 
-											<!-- Title (2 lines max) -->
-											<h5 class="fw-bold mb-2 text-dark lh-base"
-												style="line-height: 1.3; max-height: 3em; overflow: hidden;">
-												{{ Str::limit($data->examination_name, 60, '...') }}
-											</h5>
+        @if(!empty($data->pdf))
+            <a href="{{ asset('storage/' . $data->pdf) }}" target="_blank"
+                class="stretched-link text-decoration-none d-block h-100">
+        @else
+            <div class="d-block h-100">
+        @endif
 
-											<!-- Short Description -->
-											<p class="mb-3 small text-muted lh-sm" style="max-height: 3em; overflow: hidden;">
-												{{ Str::limit($data->description ?? 'Important government exam notification with complete details.', 100, '...') }}
-											</p>
+                <h5 class="fw-bold mb-2 text-dark lh-base"
+                    style="line-height: 1.3; max-height: 3em; overflow: hidden;">
+                    {{ Str::limit($data->examination_name, 60, '...') }}
+                </h5>
 
-											<!-- Dates – neatly aligned -->
-											<div class="upcoming-dates small text-muted mb-3">
-												<div
-													class="d-flex justify-content-between py-1 border-bottom border-1 border-light">
-													<span class="fw-medium">Advertisement Date:</span>
-													<span>{{ $data->advertisement_date ?? 'N/A' }}</span>
-												</div>
-												<div
-													class="d-flex justify-content-between py-1 border-bottom border-1 border-light">
-													<span class="fw-medium">Exam Date:</span>
-													<span>{{ $data->examination_date ?? 'TBA' }}</span>
-												</div>
-												<div
-													class="d-flex justify-content-between py-1 border-bottom border-1 border-light">
-													<span class="fw-medium">Last Date to Apply:</span>
-													<span
-														class="text-danger fw-semibold">{{ $data->submission_last_date ?? 'N/A' }}</span>
-												</div>
-												@if($data->form_distribution_date)
-													<div class="d-flex justify-content-between py-1">
-														<span class="fw-medium">Form Available From:</span>
-														<span>{{ $data->form_distribution_date }}</span>
-													</div>
-												@endif
-											</div>
+                <p class="mb-3 small text-muted lh-sm" style="max-height: 3em; overflow: hidden;">
+                    {{ Str::limit($data->description ?? 'Important government exam notification with complete details.', 100, '...') }}
+                </p>
 
+                <div class="upcoming-dates small text-muted mb-3">
+                    <div class="d-flex justify-content-between py-1 border-bottom border-1 border-light">
+                        <span class="fw-medium">Advertisement Date:</span>
+                        <span>{{ $data->advertisement_date ?? 'N/A' }}</span>
+                    </div>
 
-										</a>
-									</div>
-								@endforeach
+                    <div class="d-flex justify-content-between py-1 border-bottom border-1 border-light">
+                        <span class="fw-medium">Exam Date:</span>
+                        <span>{{ $data->examination_date ?? 'TBA' }}</span>
+                    </div>
+
+                    <div class="d-flex justify-content-between py-1 border-bottom border-1 border-light">
+                        <span class="fw-medium">Last Date to Apply:</span>
+                        <span class="text-danger fw-semibold">
+                            {{ $data->submission_last_date ?? 'N/A' }}
+                        </span>
+                    </div>
+
+                    @if($data->form_distribution_date)
+                        <div class="d-flex justify-content-between py-1">
+                            <span class="fw-medium">Form Available From:</span>
+                            <span>{{ $data->form_distribution_date }}</span>
+                        </div>
+                    @endif
+                </div>
+
+        @if(!empty($data->pdf))
+            </a>
+        @else
+            </div>
+        @endif
+
+    </div>
+@endforeach
 							</div>
 
 							<!-- Footer hint (optional) -->

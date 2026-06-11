@@ -43,30 +43,41 @@
                             </td>
 
                             <td>
-                                @php
-                                    $paperType = $attempt->test->paper_type;
-                                    $typeName = match ($paperType) {
-                                        1 => 'Previous Year',
-                                        2 => 'Current Affair',
-                                        default => (
-                                            is_null($attempt->test->topic_id) && is_null($attempt->test->subject_id) && is_null($attempt->test->chapter_id)
-                                            ? 'Full Test'
-                                            : (!is_null($attempt->test->subject_id) && is_null($attempt->test->chapter_id)
-                                                ? 'Subject Wise'
-                                                : (!is_null($attempt->test->chapter_id) && is_null($attempt->test->topic_id)
-                                                    ? 'Chapter Wise'
-                                                    : (!is_null($attempt->test->topic_id)
-                                                        ? 'Topic Wise'
-                                                        : '-'
-                                                    )
-                                                )
-                                            )
-                                        )
-                                    };
-                                @endphp
+    @if($attempt->test)
 
-                                {{ $typeName }} ({{ ucfirst($attempt->test->test_paper_type) }})
-                            </td>
+        @php
+            $paperType = $attempt->test->paper_type;
+
+            $typeName = match ($paperType) {
+                1 => 'Previous Year',
+                2 => 'Current Affair',
+                default => (
+                    is_null($attempt->test->topic_id) &&
+                    is_null($attempt->test->subject_id) &&
+                    is_null($attempt->test->chapter_id)
+                        ? 'Full Test'
+                        : (!is_null($attempt->test->subject_id) &&
+                           is_null($attempt->test->chapter_id)
+                            ? 'Subject Wise'
+                            : (!is_null($attempt->test->chapter_id) &&
+                               is_null($attempt->test->topic_id)
+                                ? 'Chapter Wise'
+                                : (!is_null($attempt->test->topic_id)
+                                    ? 'Topic Wise'
+                                    : '-'
+                                )
+                            )
+                        )
+                )
+            };
+        @endphp
+
+        {{ $typeName }} ({{ ucfirst($attempt->test->test_paper_type) }})
+
+    @else
+        <span class="text-danger">Test Deleted</span>
+    @endif
+</td>
 
                             <td>
                                 @if($attempt->status == 'published')
@@ -146,16 +157,17 @@
                                 @endif
 
                                 {{-- ASSIGN TEACHER (pending + not MCQ + permission) --}}
-                                @if(
-                                        $attempt->status == 'pending' &&
-                                        strtolower($attempt->test->test_paper_type) != 'mcq' &&
-                                        \App\Helpers\Helper::canAccess('manage_test_attempts_edit')
-                                    )
-                                    <button class="btn btn-sm btn-warning mb-1"
-                                        onclick="openAssignTeacherModal('{{ $attempt->id }}')">
-                                        Assign Teacher
-                                    </button>
-                                @endif
+                              @if(
+    $attempt->status == 'pending' &&
+    $test &&
+    strtolower($test->test_paper_type ?? '') != 'mcq' &&
+    \App\Helpers\Helper::canAccess('manage_test_attempts_edit')
+)
+    <button class="btn btn-sm btn-warning mb-1"
+        onclick="openAssignTeacherModal('{{ $attempt->id }}')">
+        Assign Teacher
+    </button>
+@endif
 
                                 {{-- DELETE ATTEMPT --}}
                                 @if(\App\Helpers\Helper::canAccess('manage_test_attempts_delete'))

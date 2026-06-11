@@ -260,7 +260,7 @@
     border: 5px solid #ffffff;
     border-radius: 20px;
     overflow: hidden;
-    object-fit: cover;
+    object-fit: fill;
     display: block;
     transition: transform 0.4s ease;
   }

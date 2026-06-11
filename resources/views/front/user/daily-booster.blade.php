@@ -41,7 +41,7 @@
                                     <img src="{{ url('storage/' . $data->thumbnail) }}" 
                                          alt="{{ $data->title }}" 
                                          class="card-img-top" 
-                                         style="height: 200px; object-fit: cover;">
+                                         style="height: 200px; object-fit: fill;">
                                     
                                     <!-- Play Button Overlay -->
                                     <div class="play-overlay position-absolute top-50 start-50 translate-middle">

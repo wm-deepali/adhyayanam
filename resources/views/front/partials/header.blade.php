@@ -23,7 +23,7 @@
         display: none;
         position: fixed;
         left: 0;
-        top: 60px;
+        top: 100px;
         /* fallback 107px */
         width: 100vw;
         background: #fff;
@@ -34,11 +34,37 @@
 
 
 
-    .mega-menu-left {
-        width: 20%;
-        background: #f9f9f9;
-        border-right: 1px solid #ddd;
-    }
+  .mega-menu-left {
+    width: 20%;
+    background: #f9f9f9;
+    border-right: 1px solid #ddd;
+    overflow-y: auto;
+    height: 100vh;
+
+    /* Firefox */
+    scrollbar-width: thin;
+    scrollbar-color: #999 #f1f1f1;
+    padding-bottom: 20px
+}
+
+/* Chrome, Edge, Safari */
+.mega-menu-left::-webkit-scrollbar {
+    width: 6px;
+}
+
+.mega-menu-left::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.mega-menu-left::-webkit-scrollbar-thumb {
+    background: #999;
+    border-radius: 10px;
+}
+
+.mega-menu-left::-webkit-scrollbar-thumb:hover {
+    background: #777;
+}
+    
 
     .mega-menu-tab {
         padding: 15px 20px;
@@ -238,7 +264,7 @@
                                             class="flaticon-add-user"></i> Dashboard</span></a>
                             @else
                                 <a href="{{route('student.login')}}" class="theme-btn btn-style-one"><span
-                                        class="txt"><i class="flaticon-add-user"></i> Sign In / Sign Up</span></a>
+                                        class="txt"><i class="flaticon-add-user"></i> LogIn / Sign Up</span></a>
                             @endif
                         </div>
                     </div>
@@ -264,7 +290,7 @@
                                             class="flaticon-add-user"></i> Dashboard</span></a>
                             @else
                                 <a href="{{route('student.login')}}" class="theme-btn btn-style-one"><span
-                                        class="txt"><i class="flaticon-add-user"></i> Sign Up / Sign Up</span></a>
+                                        class="txt"><i class="flaticon-add-user"></i> LogIn / Sign Up</span></a>
                             @endif
                         </div>
                         <div class="mobile-nav-toggler"> <span class="icon flaticon-menu"></span></div>
@@ -286,26 +312,35 @@
                             <div class="navbar-collapse collapse clearfix" id="navbarSupportedContent">
                                 <ul class="navigation clearfix">
                                     <li><a href="{{url('/')}}">Home</a></li>
+                                    <!--<li class="dropdown">-->
+                                    <!--    <a href="#">Our Institute </a>-->
+                                    <!--    <div class="mega-menu-container">-->
+                                    <!--        <div class="mega-menu-left">-->
+                                    <!--            <div class="mega-menu-tab active" data-tab="tab-institute-1">Institute-->
+                                    <!--                Info</div>-->
+                                    <!--        </div>-->
+                                    <!--        <div class="mega-menu-right">-->
+                                    <!--            <div class="mega-menu-panel active" id="tab-institute-1">-->
+                                    <!--                <h5>Institute Details</h5>-->
+                                    <!--                <ul>-->
+                                    <!--                    <li><a href="{{route('about')}}">About Us</a></li>-->
+                                    <!--                    <li><a href="{{route('our.team.index')}}">Our Team</a></li>-->
+                                    <!--                    <li><a href="{{route('vision.mission')}}">Vision & Mission</a>-->
+                                    <!--                    </li>-->
+                                    <!--                </ul>-->
+                                    <!--            </div>-->
+                                    <!--        </div>-->
+                                    <!--    </div>-->
+                                    <!--</li>-->
+                                    
                                     <li class="dropdown">
-                                        <a href="#">Our Institute </a>
-                                        <div class="mega-menu-container">
-                                            <div class="mega-menu-left">
-                                                <div class="mega-menu-tab active" data-tab="tab-institute-1">Institute
-                                                    Info</div>
-                                            </div>
-                                            <div class="mega-menu-right">
-                                                <div class="mega-menu-panel active" id="tab-institute-1">
-                                                    <h5>Institute Details</h5>
-                                                    <ul>
-                                                        <li><a href="{{route('about')}}">About Us</a></li>
-                                                        <li><a href="{{route('our.team.index')}}">Our Team</a></li>
-                                                        <li><a href="{{route('vision.mission')}}">Vision & Mission</a>
-                                                        </li>
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </li>
+                            <a href="#">About Us</a>
+                            <ul>
+                                <li><a href="{{route('about')}}">About Us</a></li>
+                                <li><a href="{{route('our.team.index')}}">Our Team</a></li>
+                                <li><a href="{{route('vision.mission')}}">Vision & Mission</a></li>
+                            </ul>
+                        </li>
 
                                     <!-- Courses Dropdown -->
                                     <li class="dropdown">
@@ -431,24 +466,26 @@
                                     </li>
 
                                     <!-- Current Affairs Dropdown -->
-                                    <li class="dropdown">
-                                        <a href="#">Current Affairs</a>
-                                        <div class="mega-menu-container">
-                                            <div class="mega-menu-left">
-                                                <div class="mega-menu-tab active" data-tab="tab-current-affairs">Current
-                                                    Affairs</div>
-                                            </div>
-                                            <div class="mega-menu-right">
-                                                <div class="mega-menu-panel active" id="tab-current-affairs">
-                                                    <h5>Current Affairs</h5>
-                                                    <ul>
-                                                        <li><a href="{{route('current.index')}}">View Current
-                                                                Affairs</a></li>
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </li>
+                                    <!--<li class="dropdown">-->
+                                    <!--    <a href="#">Current Affairs</a>-->
+                                    <!--    <div class="mega-menu-container">-->
+                                    <!--        <div class="mega-menu-left">-->
+                                    <!--            <div class="mega-menu-tab active" data-tab="tab-current-affairs">Current-->
+                                    <!--                Affairs</div>-->
+                                    <!--        </div>-->
+                                    <!--        <div class="mega-menu-right">-->
+                                    <!--            <div class="mega-menu-panel active" id="tab-current-affairs">-->
+                                    <!--                <h5>Current Affairs</h5>-->
+                                    <!--                <ul>-->
+                                    <!--                    <li><a href="{{route('current.index')}}">View Current-->
+                                    <!--                            Affairs</a></li>-->
+                                    <!--                </ul>-->
+                                    <!--            </div>-->
+                                    <!--        </div>-->
+                                    <!--    </div>-->
+                                    <!--</li>-->
+                                    
+                                     <li><a href="{{route('current.index')}}"> Current Affairs</a></li>
 
                                     <!-- PYQ Dropdown -->
                                     <li class="dropdown">
@@ -527,26 +564,35 @@
                                     </li>
 
                                     <!-- Student Corner Dropdown -->
-                                    <li class="dropdown">
-                                        <a href="#">Student Corner</a>
-                                        <div class="mega-menu-container">
-                                            <div class="mega-menu-left">
-                                                <div class="mega-menu-tab active" data-tab="tab-student-corner">Student
-                                                    Resources</div>
-                                            </div>
-                                            <div class="mega-menu-right">
-                                                <div class="mega-menu-panel active" id="tab-student-corner">
-                                                    <h5>Resources</h5>
-                                                    <ul>
-                                                        <li><a href="{{route('daily.boost.front')}}">Daily Booster</a>
-                                                        </li>
-                                                        <li><a href="{{route('test.planner.front')}}">Test Planner</a>
-                                                        </li>
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </li>
+                                    <!--<li class="dropdown">-->
+                                    <!--    <a href="#">Student Corner</a>-->
+                                    <!--    <div class="mega-menu-container">-->
+                                    <!--        <div class="mega-menu-left">-->
+                                    <!--            <div class="mega-menu-tab active" data-tab="tab-student-corner">Student-->
+                                    <!--                Resources</div>-->
+                                    <!--        </div>-->
+                                    <!--        <div class="mega-menu-right">-->
+                                    <!--            <div class="mega-menu-panel active" id="tab-student-corner">-->
+                                    <!--                <h5>Resources</h5>-->
+                                    <!--                <ul>-->
+                                    <!--                    <li><a href="{{route('daily.boost.front')}}">Daily Booster</a>-->
+                                    <!--                    </li>-->
+                                    <!--                    <li><a href="{{route('test.planner.front')}}">Test Planner</a>-->
+                                    <!--                    </li>-->
+                                    <!--                </ul>-->
+                                    <!--            </div>-->
+                                    <!--        </div>-->
+                                    <!--    </div>-->
+                                    <!--</li>-->
+                                    
+                                      <li class="dropdown">
+                            <a href="#">Student Corner</a>
+                            <ul>
+                                <li><a href="{{route('daily.boost.front')}}">Daily Booster</a></li>
+                                <li><a href="{{route('test.planner.front')}}">Test Planner</a></li>
+                                <li><a href="{{route('batches.index')}}">Batches & Program</a></li>
+                            </ul>
+                        </li>
                                 </ul>
                             </div>
                         </nav>
@@ -573,7 +619,7 @@
                                             class="flaticon-add-user"></i> Dashboard</span></a>
                             @else
                                 <a href="{{route('student.login')}}" class="theme-btn btn-style-one"><span
-                                        class="txt"><i class="flaticon-add-user"></i> Sign Up / Sign Up</span></a>
+                                        class="txt"><i class="flaticon-add-user"></i> LogIn / Sign Up</span></a>
                             @endif
                         </div>
                 <div class="mobile-nav-toggler"><span class="icon flaticon-menu"></span></div>

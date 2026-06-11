@@ -1,3 +1,20 @@
+<style>
+    @media only screen and (max-width: 767px) {
+
+ul.header-megamenu.nav {
+    display: none;
+}
+.main-header > div .logo {
+   
+    display: none;
+}
+
+}
+</style>
+
+
+
+
 <header class="main-header">
 	<div class="d-flex align-items-center logo-box justify-content-start">	
 		<!-- Logo -->

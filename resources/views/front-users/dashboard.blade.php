@@ -6,9 +6,271 @@
 
 @section('content')
 	<section class="content">
-		<div class="row">
+<style>
+    /* Show/hide based on screen width via media query */
+    @media (max-width: 767.98px) {
+        .desktop-only-dashboard {
+            display: none !important;
+        }
+        .mobile-only-dashboard {
+            display: block !important;
+        }
+        
+        .fixed .content-wrapper {
+            margin-top: 60px; 
+        }
+
+        .box-body > *:last-child {
+            margin-bottom: 0;
+            justify-content: center;
+        }
+
+        .box-body {
+            text-align: center;
+        }
+        .content {
+            min-height: 250px;
+            padding: 1.5rem 0px; 
+        }
+        
+        .text-overflow {
+
+    white-space: inherit;
+}
+    }
+    
+    @media (min-width: 768px) {
+        .mobile-only-dashboard {
+            display: none !important;
+        }
+    }
+
+    /* Styling for the custom dashboard layout on mobile view */
+    .mobile-only-dashboard .dashboard-card-container {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        text-align: center !important;
+        text-decoration: none !important;
+    }
+
+    .mobile-only-dashboard .dashboard-card {
+        width: 65px !important;
+        height: 65px !important;
+        border-radius: 18px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        box-shadow: none !important;
+        transition: transform 0.2s ease !important;
+        border: none !important;
+        outline: none !important;
+    }
+    
+    .mobile-only-dashboard .dashboard-card:active {
+        transform: scale(0.92) !important;
+    }
+    
+    .mobile-only-dashboard .dashboard-card-label {
+        font-size: 11px !important;
+        font-weight: 500 !important;
+        color: #4a5060 !important;
+        margin-top: 8px !important;
+        line-height: 1.3 !important;
+        white-space: normal !important;
+        display: -webkit-box !important;
+        -webkit-line-clamp: 2 !important;
+        -webkit-box-orient: vertical !important;
+        overflow: hidden !important;
+    }
+    
+    /* Horizontal scrolling for tab navigation on mobile */
+    html body .mobile-only-dashboard .custom-dashboard-tabs {
+        border: none !important;
+        background-color: #f1f3f5 !important;
+        padding: 4px !important;
+        border-radius: 30px !important;
+        display: flex !important;
+        flex-wrap: nowrap !important;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        scrollbar-width: none !important; /* Firefox */
+        -ms-overflow-style: none !important;  /* IE and Edge */
+    }
+    
+    html body .mobile-only-dashboard .custom-dashboard-tabs::-webkit-scrollbar {
+        display: none !important; /* Chrome, Safari and Opera */
+    }
+    
+    html body .mobile-only-dashboard .custom-dashboard-tabs .nav-item {
+        flex: 0 0 auto !important;
+    }
+    
+    html body .mobile-only-dashboard .custom-dashboard-tabs .nav-link {
+        color: #7f839a !important;
+        background: transparent !important;
+        border: none !important;
+        outline: none !important;
+        box-shadow: none !important;
+        font-size: 13px !important;
+        font-weight: 600 !important;
+        padding: 8px 20px !important;
+        border-radius: 30px !important;
+        transition: all 0.2s ease !important;
+        white-space: nowrap !important;
+        display: inline-block !important;
+    }
+    
+    html body .mobile-only-dashboard .custom-dashboard-tabs .nav-link.active {
+        color: #023896 !important;
+        background: #ffffff !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+        border: none !important;
+        outline: none !important;
+    }
+    
+    html body .mobile-only-dashboard .last-border-none:last-child {
+        border-bottom: none !important;
+    }
+
+    .mobile-only-dashboard .premium-mobile-card {
+        background: #ffffff !important;
+        border-radius: 20px !important;
+        padding: 20px !important;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03) !important;
+        border: 1px solid rgba(0, 0, 0, 0.03) !important;
+        margin-bottom: 20px !important;
+    }
+
+    .mobile-only-dashboard .progress-bar-container {
+        margin-bottom: 20px !important;
+    }
+
+    .mobile-only-dashboard .progress-info {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        margin-bottom: 8px !important;
+    }
+
+    .mobile-only-dashboard .progress-title {
+        font-size: 14px !important;
+        font-weight: 600 !important;
+        color: #2b3040 !important;
+    }
+
+    .mobile-only-dashboard .progress-value {
+        font-size: 12px !important;
+        font-weight: 500 !important;
+        color: #8a90a0 !important;
+    }
+
+    .mobile-only-dashboard .custom-progress {
+        height: 8px !important;
+        background-color: #f1f3f5 !important;
+        border-radius: 4px !important;
+        overflow: hidden !important;
+    }
+
+    .mobile-only-dashboard .custom-progress-bar {
+        height: 100% !important;
+        border-radius: 4px !important;
+    }
+
+    .mobile-only-dashboard .premium-list-item {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        padding: 15px 0 !important;
+        border-bottom: 1px solid #f8f9fa !important;
+        transition: transform 0.2s ease !important;
+    }
+
+    .mobile-only-dashboard .premium-list-item:last-child {
+        border-bottom: none !important;
+    }
+
+    .mobile-only-dashboard .course-avatar {
+        width: 46px !important;
+        height: 46px !important;
+        border-radius: 12px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        font-weight: 700 !important;
+        font-size: 16px !important;
+        flex-shrink: 0 !important;
+    }
+
+    .mobile-only-dashboard .course-details {
+        display: flex !important;
+        flex-direction: column !important;
+        margin-left: 14px !important;
+        flex-grow: 1 !important;
+        overflow: hidden !important;
+        text-align: left !important;
+    }
+
+    .mobile-only-dashboard .course-title {
+        font-size: 14px !important;
+        font-weight: 600 !important;
+        color: #1a1e2d !important;
+        margin-bottom: 2px !important;
+        white-space: nowrap !important;
+        text-overflow: ellipsis !important;
+        overflow: hidden !important;
+        text-align: left !important;
+    }
+
+    .mobile-only-dashboard .course-price {
+        font-size: 12px !important;
+        font-weight: 500 !important;
+        color: #0ad076 !important;
+        text-align: left !important;
+    }
+
+    .mobile-only-dashboard .premium-view-btn {
+        background-color: #fdf5e6 !important;
+        color: #ff9f00 !important;
+        font-weight: 600 !important;
+        font-size: 12px !important;
+        padding: 6px 16px !important;
+        border-radius: 20px !important;
+        text-decoration: none !important;
+        border: none !important;
+        transition: all 0.2s ease !important;
+        display: inline-block !important;
+    }
+
+    .mobile-only-dashboard .premium-view-btn:active {
+        background-color: #ff9f00 !important;
+        color: white !important;
+    }
+
+    .mobile-only-dashboard .notice-board-scroll {
+        max-height: 250px !important;
+        overflow: auto !important;
+        padding-right: 5px !important;
+    }
+    
+    .mobile-only-dashboard .notice-board-scroll::-webkit-scrollbar {
+        width: 4px !important;
+        height: 4px !important;
+    }
+    
+    .mobile-only-dashboard .notice-board-scroll::-webkit-scrollbar-track {
+        background: #f1f3f5 !important;
+        border-radius: 4px !important;
+    }
+    
+    .mobile-only-dashboard .notice-board-scroll::-webkit-scrollbar-thumb {
+        background: #ced4da !important;
+        border-radius: 4px !important;
+    }
+</style>
+		<div class="row desktop-only-dashboard">
 			<div class="col-xl-9 col-12">
-				<div class="box bg-success">
+				<div class="box bg-success asdsadsa">
 					<div class="box-body d-flex p-0">
 						<div class="flex-grow-1 p-30 flex-grow-1 bg-img bg-none-md"
 							style="background-position: right bottom; background-size: auto 100%; background-image: url(https://edulearn-lms-admin-template.multipurposethemes.com/images/svg-icon/color-svg/custom-30.svg)">
@@ -488,6 +750,331 @@
 			</div>
 			<!-- notice board end -->
 
+		</div><!-- /Desktop View -->
+
+		<!-- Mobile View -->
+		<div class="d-block d-md-none mobile-only-dashboard">
+			<!-- Mobile Header -->
+		
+
+			<!-- 1st Row Cards -->
+			<div class="row g-3 mb-4">
+				<!-- My Orders -->
+				<div class="col-3">
+					<a href="{{ route('user.orders') }}" class="dashboard-card-container">
+						<div class="dashboard-card" style="background-color: #e6f0fa;">
+							<i data-feather="shopping-cart" style="color: #007bff; width: 24px; height: 24px;"></i>
+						</div>
+						<div class="dashboard-card-label">My Orders</div>
+					</a>
+				</div>
+				<!-- Test Series -->
+				<div class="col-3">
+					<a href="{{ route('user.test-series') }}" class="dashboard-card-container">
+						<div class="dashboard-card" style="background-color: #fdf5e6;">
+							<i data-feather="pie-chart" style="color: #ff9f00; width: 24px; height: 24px;"></i>
+						</div>
+						<div class="dashboard-card-label">Test Series</div>
+					</a>
+				</div>
+				<!-- Courses -->
+				<div class="col-3">
+					<a href="{{ route('user.mycourses') }}" class="dashboard-card-container">
+						<div class="dashboard-card" style="background-color: #e6f7f5;">
+							<i data-feather="book" style="color: #00bfa5; width: 24px; height: 24px;"></i>
+						</div>
+						<div class="dashboard-card-label">Courses</div>
+					</a>
+				</div>
+				<!-- Study Material -->
+				<div class="col-3">
+					<a href="{{ route('user.study-material') }}" class="dashboard-card-container">
+						<div class="dashboard-card" style="background-color: #fbebee;">
+							<i data-feather="file-text" style="color: #e91e63; width: 24px; height: 24px;"></i>
+						</div>
+						<div class="dashboard-card-label">Study Material</div>
+					</a>
+				</div>
+			</div>
+
+			<!-- Green Banner (from dashboard desktop view) -->
+			<div class="box bg-success rounded-4 mb-4 overflow-hidden shadow-sm border-0">
+				<div class="box-body p-3">
+					<h4 class="fw-bold text-white mb-2 fs-18">Learn Effectively With Us!</h4>
+					<p class="text-white-80 fs-13 mb-3">Get 30% off every course on january.</p>
+					<div class="d-flex gap-4">
+						<div class="d-flex align-items-center gap-2">
+							<div class="bg-danger rounded-circle d-flex align-items-center justify-content-center border border-white" style="width: 32px; height: 32px;">
+								<i class="fa fa-graduation-cap text-white fs-14"></i>
+							</div>
+							<div>
+								<div class="fs-13 fw-bold text-white mb-0">{{ number_format($studentCount) }}+</div>
+								<div class="fs-10 text-white-70">Students</div>
+							</div>
+						</div>
+						<div class="d-flex align-items-center gap-2">
+							<div class="bg-warning rounded-circle d-flex align-items-center justify-content-center border border-white" style="width: 32px; height: 32px;">
+								<i class="fa fa-user text-white fs-14"></i>
+							</div>
+							<div>
+								<div class="fs-13 fw-bold text-white mb-0">{{ number_format($teacherCount) }}+</div>
+								<div class="fs-10 text-white-70">Mentors</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- 2nd Row Cards -->
+			<div class="row g-3 mb-4">
+				<!-- Test Papers -->
+				<div class="col-3">
+					<a href="{{ route('user.test-series') }}" class="dashboard-card-container">
+						<div class="dashboard-card" style="background-color: #f5ebfa;">
+							<i data-feather="file" style="color: #a020f0; width: 24px; height: 24px;"></i>
+						</div>
+						<div class="dashboard-card-label">Test Papers</div>
+					</a>
+				</div>
+				<!-- PYQ -->
+				<div class="col-3">
+					<a href="{{ route('user.my-pyq-papers') }}" class="dashboard-card-container">
+						<div class="dashboard-card" style="background-color: #eafbe7;">
+							<i data-feather="archive" style="color: #2e7d32; width: 24px; height: 24px;"></i>
+						</div>
+						<div class="dashboard-card-label">PYQ</div>
+					</a>
+				</div>
+				<!-- Test Results -->
+				<div class="col-3">
+					<a href="{{ route('user.test-papers') }}" class="dashboard-card-container">
+						<div class="dashboard-card" style="background-color: #e0f7fa;">
+							<i data-feather="award" style="color: #00838f; width: 24px; height: 24px;"></i>
+						</div>
+						<div class="dashboard-card-label">Test Results</div>
+					</a>
+				</div>
+				<!-- My Wallet -->
+				<div class="col-3">
+					<a href="{{ route('student.wallet') }}" class="dashboard-card-container">
+						<div class="dashboard-card" style="background-color: #fff3e0;">
+							<i data-feather="credit-card" style="color: #ef6c00; width: 24px; height: 24px;"></i>
+						</div>
+						<div class="dashboard-card-label">My Wallet</div>
+					</a>
+				</div>
+			</div>
+
+			<!-- Notice Board -->
+			<div class="box mb-4 shadow-sm border-0 rounded-3">
+				<div class="box-header no-border px-3 py-3 border-bottom d-flex align-items-center justify-content-between">
+					<h4 class="fw-bold text-dark mb-0 fs-18">Notice Board</h4>
+					<a href="{{ url('/') }}" class="text-primary fs-14 text-decoration-none fw-bold">View All</a>
+				</div>
+				<div class="box-body p-3">
+					<div class="notice-board-scroll">
+						<div class="media-list">
+							@forelse($notices as $notice)
+								@php
+									$icon = 'fa-bell';
+									$bg = 'bg-primary-light';
+									$textColor = 'text-primary';
+
+									if ($notice->type == 'pdf') {
+										$icon = 'fa-file-pdf-o';
+										$bg = 'bg-danger-light';
+										$textColor = 'text-danger';
+									} elseif ($notice->type == 'link') {
+										$icon = 'fa-link';
+										$bg = 'bg-info-light';
+										$textColor = 'text-info';
+									} elseif ($notice->type == 'page') {
+										$icon = 'fa-file-text-o';
+										$bg = 'bg-warning-light';
+										$textColor = 'text-warning';
+									}
+								@endphp
+								<div class="d-flex align-items-center gap-3 py-2 border-bottom last-border-none">
+									<div class="avatar avatar-md rounded d-flex align-items-center justify-content-center {{ $bg }}" style="width: 42px; height: 42px; flex-shrink: 0;">
+										<i class="fa {{ $icon }} {{ $textColor }} fs-18"></i>
+									</div>
+									<div class="flex-grow-1 overflow-hidden">
+										@if($notice->type == 'pdf' && $notice->file)
+											<a class="text-dark hover-primary fs-15 text-overflow fw-500 text-decoration-none" href="{{ asset('storage/' . $notice->file) }}" target="_blank">
+												{{ $notice->title }}
+											</a>
+										@elseif($notice->type == 'link' && $notice->url)
+											<a class="text-dark hover-primary fs-15 text-overflow fw-500 text-decoration-none" href="{{ $notice->url }}" target="_blank">
+												{{ $notice->title }}
+											</a>
+										@elseif($notice->type == 'page')
+											<a class="text-dark hover-primary fs-15 text-overflow fw-500 text-decoration-none" href="{{ route('notice.show', $notice->id) }}">
+												{{ $notice->title }}
+											</a>
+										@endif
+									</div>
+								</div>
+							@empty
+								<div class="text-center py-3 text-fade">No notices available</div>
+							@endforelse
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Tabs -->
+			<div class="mb-4">
+				<ul class="nav nav-pills custom-dashboard-tabs mb-3 d-flex justify-content-between p-1 bg-light rounded-pill" role="tablist">
+					<li class="nav-item flex-grow-1 text-center" role="presentation">
+						<a class="nav-link active rounded-pill py-2 px-1  text-center" id="pills-test-tab" data-toggle="pill" data-target="#pills-test" data-bs-toggle="pill" data-bs-target="#pills-test" href="#pills-test" role="tab" aria-controls="pills-test" aria-selected="true">
+							Test Progress
+						</a>
+					</li>
+					<li class="nav-item flex-grow-1 text-center" role="presentation">
+						<a class="nav-link rounded-pill py-2 px-1  text-center" id="pills-classes-tab" data-toggle="pill" data-target="#pills-classes" data-bs-toggle="pill" data-bs-target="#pills-classes" href="#pills-classes" role="tab" aria-controls="pills-classes" aria-selected="false">
+							Live Classes
+						</a>
+					</li>
+					<li class="nav-item flex-grow-1 text-center" role="presentation">
+						<a class="nav-link rounded-pill py-2 px-1  text-center" id="pills-instructors-tab" data-toggle="pill" data-target="#pills-instructors" data-bs-toggle="pill" data-bs-target="#pills-instructors" href="#pills-instructors" role="tab" aria-controls="pills-instructors" aria-selected="false">
+							Instructors
+						</a>
+					</li>
+				</ul>
+				
+				<div class="tab-content" id="pills-tabContent">
+					<!-- Tab 1: Test Completions -->
+					<div class="tab-pane fade show active" id="pills-test" role="tabpanel" aria-labelledby="pills-test-tab">
+						<div class="premium-mobile-card">
+							<h5 class="fw-bold mb-4 fs-16 text-dark text-start">Test Completions</h5>
+							<!-- In Progress -->
+							<div class="progress-bar-container">
+								<div class="progress-info">
+									<span class="progress-title text-primary">In Progress</span>
+									<span class="progress-value">{{ $inProgressPercent }}% ({{ $inProgressTests }} Tests)</span>
+								</div>
+								<div class="custom-progress">
+									<div class="custom-progress-bar bg-primary" role="progressbar" style="width: {{ $inProgressPercent }}%"></div>
+								</div>
+							</div>
+							<!-- Completed -->
+							<div class="progress-bar-container">
+								<div class="progress-info">
+									<span class="progress-title text-success">Completed</span>
+									<span class="progress-value">{{ $completedPercent }}% ({{ $completedTests }} Tests)</span>
+								</div>
+								<div class="custom-progress">
+									<div class="custom-progress-bar bg-success" role="progressbar" style="width: {{ $completedPercent }}%"></div>
+								</div>
+							</div>
+							<!-- Inactive -->
+							<div class="progress-bar-container mb-0">
+								<div class="progress-info">
+									<span class="progress-title text-warning">Inactive</span>
+									<span class="progress-value">{{ $inactivePercent }}% ({{ $inactiveTests }} Tests)</span>
+								</div>
+								<div class="custom-progress">
+									<div class="custom-progress-bar bg-warning" role="progressbar" style="width: {{ $inactivePercent }}%"></div>
+								</div>
+							</div>
+						</div>
+					</div>
+					
+					<!-- Tab 2: Upcoming Classes -->
+					<div class="tab-pane fade" id="pills-classes" role="tabpanel" aria-labelledby="pills-classes-tab">
+						<div class="premium-mobile-card">
+							<h5 class="fw-bold mb-3 fs-16 text-dark text-start">Upcoming Classes</h5>
+							<div>
+								@forelse($upcomingClasses as $class)
+									@php
+										$colors = ['warning', 'primary', 'danger', 'info'];
+										$color = $colors[$loop->index % count($colors)];
+									@endphp
+									<div class="premium-list-item">
+										<div class="d-flex align-items-center flex-grow-1 overflow-hidden">
+											<div class="course-avatar bg-{{ $color }}-light text-{{ $color }}">
+												<i class="fa fa-book fs-16"></i>
+											</div>
+											<div class="course-details">
+												<span class="course-title text-dark fw-bold">{{ $class->title ?? 'Live Class' }}</span>
+												<span class="text-fade fs-11 text-start">
+													{{ $class->teacher->full_name ?? 'Instructor' }},
+													{{ \Carbon\Carbon::parse($class->schedule_date)->format('d M') }} at {{ $class->start_time }}
+												</span>
+											</div>
+										</div>
+										<a href="{{ $class->live_link ?? '#' }}" target="_blank" class="premium-view-btn">
+											Join
+										</a>
+									</div>
+								@empty
+									<div class="text-center py-3 text-fade">No Upcoming Classes</div>
+								@endforelse
+							</div>
+						</div>
+					</div>
+					
+					<!-- Tab 3: Best Instructors -->
+					<div class="tab-pane fade" id="pills-instructors" role="tabpanel" aria-labelledby="pills-instructors-tab">
+						<div class="premium-mobile-card">
+							<h5 class="fw-bold mb-3 fs-16 text-dark text-start">Best Instructors</h5>
+							<div>
+								@forelse($teachers as $teacher)
+									<div class="premium-list-item">
+										<div class="d-flex align-items-center flex-grow-1 overflow-hidden">
+											<img src="{{ $teacher->profile_picture ? asset('storage/' . $teacher->profile_picture) : url('src/images/avatar/avatar-1.png') }}"
+												 class="avatar rounded-circle border" alt="Instructor" style="width: 44px; height: 44px; object-fit: cover; flex-shrink: 0;">
+											<div class="course-details">
+												<span class="course-title text-dark fw-bold">{{ $teacher->full_name }}</span>
+												<span class="text-fade fs-11 text-start">{{ $teacher->total_experience ?? 0 }} Years Experience</span>
+											</div>
+										</div>
+										<a href="#" class="premium-view-btn">
+											Profile
+										</a>
+									</div>
+								@empty
+									<div class="text-center py-3 text-fade">No instructors available</div>
+								@endforelse
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Popular Courses -->
+			<div class="premium-mobile-card mb-4">
+				<div class="d-flex align-items-center justify-content-between mb-3">
+					<h4 class="fw-bold text-dark mb-0 fs-18">Popular Courses</h4>
+					<a href="{{ route('courses') }}" class="text-primary fs-14 text-decoration-none fw-bold">All Courses</a>
+				</div>
+				<div>
+					@forelse($courses as $course)
+						@php   
+							$colors = ['warning', 'danger', 'success', 'primary'];
+							$color = $colors[$loop->index % count($colors)];
+						@endphp
+						<div class="premium-list-item">
+							<div class="d-flex align-items-center flex-grow-1 overflow-hidden">
+								<div class="course-avatar bg-{{ $color }}-light text-{{ $color }}">
+									{{ strtoupper(substr($course->title ?? $course->name, 0, 1)) }}
+								</div>
+								<div class="course-details">
+									<a href="{{ route('courses.detail', $course->id) }}" class="course-title text-decoration-none">
+										{{ $course->title ?? $course->name }}
+									</a>
+									<span class="course-price">₹{{ $course->offered_price ?? 0 }}</span>
+								</div>
+							</div>
+							<a href="{{ route('courses.detail', $course->id) }}" class="premium-view-btn">
+								View
+							</a>
+						</div>
+					@empty
+						<div class="text-center py-3 text-fade">No courses available</div>
+					@endforelse
+				</div>
+			</div>
 		</div>
 	</section>
 	<!-- /.content -->

@@ -418,52 +418,49 @@ class FrontUserController extends Controller
         ));
     }
 
-    public function generatePdf($id)
-    {
-        $order = Order::with('student', 'transaction')->findOrFail($id);
+ public function generatePdf($id)
+{
+    $order = Order::with('student', 'transaction')->findOrFail($id);
 
-        $course = null;
-        $studyMaterial = null;
-        $testSeries = null;
-        $papers = null;
+    $course = null;
+    $studyMaterial = null;
+    $testSeries = null;
+    $papers = null;
 
-        if ($order->order_type == 'Course') {
-            $course = Course::find($order->package_id);
-        } elseif ($order->order_type == 'Study Material') {
-            $studyMaterial = StudyMaterial::find($order->package_id);
-        } elseif ($order->order_type == 'Test Series') {
-            $testSeries = TestSeries::find($order->package_id);
-        } elseif ($order->order_type == 'Paper') {
-
-            $ids = explode(',', $order->package_id);
-
-            $papers = Test::whereIn('id', $ids)->get();
-
-        }
-
-        $data = compact(
-            'order',
-            'course',
-            'studyMaterial',
-            'testSeries',
-            'papers'
-        );
-
-        $logoPath = public_path('images/Neti-logo.png');
-
-        $logoBase64 = null;
-
-        if (file_exists($logoPath)) {
-            $type = pathinfo($logoPath, PATHINFO_EXTENSION);
-            $data = file_get_contents($logoPath);
-
-            $logoBase64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
-        }
-
-        $pdf = Pdf::loadView('front-users.invoice-pdf', compact('data', 'logoBase64'));
-
-        return $pdf->download('invoice_' . $order->order_code . '.pdf');
+    if ($order->order_type == 'Course') {
+        $course = Course::find($order->package_id);
+    } elseif ($order->order_type == 'Study Material') {
+        $studyMaterial = StudyMaterial::find($order->package_id);
+    } elseif ($order->order_type == 'Test Series') {
+        $testSeries = TestSeries::find($order->package_id);
+    } elseif ($order->order_type == 'Paper') {
+        $ids = explode(',', $order->package_id);
+        $papers = Test::whereIn('id', $ids)->get();
     }
+
+    $logoPath = public_path('images/Neti-logo.png');
+    $logoBase64 = null;
+
+    if (file_exists($logoPath)) {
+        $type = pathinfo($logoPath, PATHINFO_EXTENSION);
+        $imageData = file_get_contents($logoPath);
+
+        $logoBase64 = 'data:image/' . $type . ';base64,' . base64_encode($imageData);
+    }
+
+ini_set('memory_limit', '2048M'); // 2 GB
+set_time_limit(300);
+
+    $pdf = Pdf::loadView('front-users.invoice-pdf', [
+        'order' => $order,
+        'course' => $course,
+        'studyMaterial' => $studyMaterial,
+        'testSeries' => $testSeries,
+        'papers' => $papers,
+        'logoBase64' => $logoBase64,
+    ]);
+    return $pdf->download('invoice_' . $order->order_code . '.pdf');
+}
 
     public function myCourses()
     {

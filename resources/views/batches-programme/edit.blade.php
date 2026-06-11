@@ -151,7 +151,7 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="meta_title" class="form-label">Meta Title</label>
+                                <label for="meta_title" class="form-label">Meta Title (Max 60 Character)</label>
                                 <input type="text" class="form-control" name="meta_title"
                                     value="{{ old('meta_title', $batch->meta_title) }}">
                             </div>
@@ -168,7 +168,7 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="meta_description" class="form-label">Meta Description</label>
+                                <label for="meta_description" class="form-label">Meta Description (Max 120 Character)</label>
                                 <input type="text" class="form-control" name="meta_description"
                                     value="{{ old('meta_description', $batch->meta_description) }}">
                             </div>

@@ -29,7 +29,7 @@
 							
 								<h2>{{$vision->heading1}}</h2>
 							</div>
-							<div class="text">{{$vision->description1}}</div>
+							<div class="text">{!! $vision->description1 !!}</div>
 						
 						</div>
 					</div>
@@ -59,7 +59,7 @@
 							
 								<h2>{{$vision->heading2}}</h2>
 							</div>
-							<div class="text">{{$vision->description2}}</div>
+							<div class="text">{!! $vision->description2 !!}</div>
 						
 						</div>
 					</div>

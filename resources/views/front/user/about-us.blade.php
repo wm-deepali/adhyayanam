@@ -1,13 +1,13 @@
 @extends('front.partials.app')
 @section('header')
-	<title>{{$seo->title?? $about->heading1}}</title>
-	<meta name="description" content="{{ $seo->description ?? 'Default Description' }}">
+    <title>{{$seo->title ?? $heroSection->heading }}</title>
+    <meta name="description" content="{{ $seo->description ?? 'Default Description' }}">
     <meta name="keywords" content="{{ $seo->keywords ?? 'default, keywords' }}">
     <link rel="canonical" href="{{ $seo->canonical ?? url()->current() }}">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
-    
-     <style>
+
+    <style>
         /* Scoped variables & design tokens */
         :root {
             --font-primary: 'Inter', sans-serif;
@@ -774,771 +774,331 @@
 @section('content')
 
 
-<body class="hidden-bar-wrapper">
-	<!-- Page Title -->
-	<section class="page-title">
-		<div class="auto-container">
-			<h2>Adhyayanam IAS</h2>
-			<ul class="bread-crumb clearfix">
-				<li><a href="{{url('/')}}">Home</a></li>
-				<li>About us</li>
-			</ul>
-		</div>
-	</section>
-	<!-- End Page Title -->
-
-	<!-- Choose Section Two -->
-	<section class="choose-section-two">
-		<div class="icon-one" style="background-image: url(images/icons/icon-1.png)"></div>
-		<div class="icon-two" style="background-image: url(images/icons/icon-1.png)"></div>
-		<div class="icon-three" style="background-image: url(images/icons/icon-6.png)"></div>
-		<div class="auto-container">
-			<div class="row clearfix">
-				<div class="col-12">
-					@php
-    $youtubeUrl = $about->youtube_url;
-
-    preg_match(
-        '/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&]+)/',
-        $youtubeUrl,
-        $matches
-    );
-
-    $videoId = $matches[1] ?? '';
-@endphp
-
-@if($videoId)
-    <iframe
-        width="100%"
-        height="500"
-        src="https://www.youtube.com/embed/{{ $videoId }}"
-        title="YouTube video player"
-        frameborder="0"
-        allowfullscreen>
-    </iframe>
-@endif
-				</div>
-
-				<!-- Content Column -->
-				<div class="col-12">
-					<div class="contents mt-40">
-						
-						{!!$about->description1!!}
-					</div>
-				</div>
-
-			</div>
-		</div>
-	</section>
-	<!-- End Choose Section Two -->
-
-	<!-- Featured Section / Style Two -->
-	<section class="featured-section style-two">
-		<div class="auto-container">
-			<div class="inner-container">
-				<div class="pattern-layer" style="background-image: url(images/background/pattern-5.png)"></div>
-				<div class="row clearfix">
-
-					<!-- Feature Block -->
-					<div class="feature-block col-lg-4 col-md-6 col-sm-12">
-						<div class="inner-box wow fadeInLeft" data-wow-delay="0ms" data-wow-duration="1500ms">
-							<div class="icon flaticon-book"></div>
-							<h4><a href="course-detail.html">100% Graduate course</a></h4>
-							<div class="text">100+ Video Course inside</div>
-						</div>
-					</div>
-
-					<!-- Feature Block -->
-					<div class="feature-block col-lg-4 col-md-6 col-sm-12">
-						<div class="inner-box wow fadeInUp" data-wow-delay="0ms" data-wow-duration="1500ms">
-							<div class="icon flaticon-identification"></div>
-							<h4><a href="course-detail.html">Learn with experts</a></h4>
-							<div class="text">Learn our course with Expert</div>
-						</div>
-					</div>
-
-					<!-- Feature Block -->
-					<div class="feature-block col-lg-4 col-md-6 col-sm-12">
-						<div class="inner-box wow fadeInRight" data-wow-delay="0ms" data-wow-duration="1500ms">
-							<div class="icon flaticon-certificate"></div>
-							<h4><a href="course-detail.html">Online degrees</a></h4>
-							<div class="text">Get Online Degree certificate</div>
-						</div>
-					</div>
-
-				</div>
-			</div>
-		</div>
-	</section>
-	<!-- End Featured Section / Style Two -->
-
-	<!-- Counter Boxed -->
-	<section class="counter-section">
-		<div class="auto-container">
-			<div class="inner-container">
-				<div class="row clearfix">
-
-					<!-- Counter Column -->
-					<div class="counter-block col-lg-4 col-md-6 col-sm-12">
-						<div class="inner-box">
-							<span class="icon osdx"><img src="images/stu.png" alt="" /></span>
-							<div class="counter"><span class="odometer" data-count="415"></span> +</div>
-							<div class="counter-text">Students Enrolled</div>
-						</div>
-					</div>
-
-					<!-- Counter Column -->
-					<div class="counter-block col-lg-4 col-md-6 col-sm-12">
-						<div class="inner-box">
-							<span class="icon osdx"><img src="images/class-c.png" alt="" /></span>
-							<div class="counter"><span class="odometer" data-count="5"></span> k+</div>
-							<div class="counter-text">Class Completed</div>
-						</div>
-					</div>
-
-					<!-- Counter Column -->
-					<div class="counter-block col-lg-4 col-md-6 col-sm-12">
-						<div class="inner-box">
-							<span class="icon osdx"><img src="images/skins.png" alt="" /></span>
-							<div class="counter"><span class="odometer" data-count="20"></span> +</div>
-							<div class="counter-text">Skilled Instructors</div>
-						</div>
-					</div>
-
-				</div>
-			</div>
-		</div>
-	</section>
-	<!-- End Counter Boxed -->
+    <body class="hidden-bar-wrapper">
 
 
-	<!-- Join Section -->
-	<section class="join-section">
-		<div class="icon-one" style="background-image: url(images/icons/icon-1.png)"></div>
-		<div class="icon-two" style="background-image: url(images/icons/icon-2.png)"></div>
-		<div class="auto-container">
-			<div class="row clearfix">
+        <div class="hidden-bar-wrapper">
+            <!-- Scoped About Page Wrapper -->
+            <div class="adhy-about-wrapper">
 
-				<!-- Image Column -->
-				<div class="image-column col-lg-6 col-md-12 col-sm-12">
-					<div class="inner-column">
-						<div class="pattern-layer" style="background-image: url(images/background/pattern-7.png)"></div>
-						<div class="pattern-layer-two" style="background-image: url(images/background/pattern-8.png)"></div>
-						<div class="image titlt" data-tilt data-tilt-max="4">
-							<img src="images/resource/join.jpg" alt="" />
-						</div>
-					</div>
-				</div>
+                <!-- Creative Hero Section (Curved Background & Glow) -->
+                <section class="about-hero-creative">
+                    <div class="glow-spot glow-spot-1"></div>
+                    <div class="glow-spot glow-spot-2"></div>
+                    <div class="container">
+                        <div class="row align-items-center">
+                            <div class="col-lg-7 text-left">
+                                <div class="creative-breadcrumb">
+                                    <a href="/">Home</a>
+                                    <span class="sep"><i class="fa-solid fa-angle-right arrow"></i></span>
+                                    <span class="current">About Us</span>
+                                </div>
+                                <h1>{{ $heroSection->heading ?? '' }}</h1>
 
-				<!-- Content Column -->
-				<div class="content-column col-lg-6 col-md-12 col-sm-12">
-					<div class="inner-column">
-						<!-- Sec Title -->
-						<div class="sec-title">
-							<div class="title">Join us</div>
-							<h2>Come join us as we <br> spread knowledge.</h2>
-							<div class="text">Create online courses and coaching services.t is a long established fact that a reader
-								will be distracted by the readable content of a page when looking at its layout. </div>
-						</div>
-						<div class="button-box">
-							<a href="./career.html" class="theme-btn btn-style-three"><span class="txt">Teaching Now</span></a>
-						</div>
-					</div>
-				</div>
-
-			</div>
-		</div>
-	</section>
-	<!-- End Join Section -->
-
-	<!-- Testimonial Section Two -->
-	<section class="testimonial-section-two">
-		<div class="icon-layer-one" style="background-image: url(images/icons/icon-7.png)"></div>
-		<div class="auto-container">
-			<!-- Sec Title -->
-			<div class="sec-title">
-				<!-- <div class="title">Student Review</div> -->
-				<h2>Our Students <br> Review</h2>
-			</div>
-			<div class="two-item-carousel owl-carousel owl-theme">
-
-				<!-- Testimonial Block -->
-				<div class="testimonial-block">
-					<div class="inner-box">
-						<div class="text">Very good training, help me to understand the basics. The training contains a lot of
-							pract information lorem you need to be the best runway looks from new york lorem </div>
-						<!-- Author Box -->
-						<div class="author-box">
-							<div class="box-inner">
-								<div class="author-image">
-									<img src="images/resource/author-7.jpg" alt="" />
-								</div>
-								<strong>Prashant Yadav</strong>
-								CA Student
-								<span class="quote-icon"><img src="images/icons/quote-icon.png" alt="" /></span>
-							</div>
-						</div>
-					</div>
-				</div>
-
-				<!-- Testimonial Block -->
-				<div class="testimonial-block">
-					<div class="inner-box">
-						<div class="text">Very good training, help me to understand the basics. The training contains a lot of
-							pract information lorem you need to be the best runway looks from new york lorem </div>
-						<!-- Author Box -->
-						<div class="author-box">
-							<div class="box-inner">
-								<div class="author-image">
-									<img src="images/resource/author-8.jpg" alt="" />
-								</div>
-								<strong>Prashant Yadav</strong>
-								CA Student
-								<span class="quote-icon"><img src="images/icons/quote-icon.png" alt="" /></span>
-							</div>
-						</div>
-					</div>
-				</div>
-
-				<!-- Testimonial Block -->
-				<div class="testimonial-block">
-					<div class="inner-box">
-						<div class="text">Very good training, help me to understand the basics. The training contains a lot of
-							pract information lorem you need to be the best runway looks from new york lorem </div>
-						<!-- Author Box -->
-						<div class="author-box">
-							<div class="box-inner">
-								<div class="author-image">
-									<img src="images/resource/author-7.jpg" alt="" />
-								</div>
-								<strong>Prashant Yadav</strong>
-								CA Student
-								<span class="quote-icon"><img src="images/icons/quote-icon.png" alt="" /></span>
-							</div>
-						</div>
-					</div>
-				</div>
-
-				<!-- Testimonial Block -->
-				<div class="testimonial-block">
-					<div class="inner-box">
-						<div class="text">Very good training, help me to understand the basics. The training contains a lot of
-							pract information lorem you need to be the best runway looks from new york lorem </div>
-						<!-- Author Box -->
-						<div class="author-box">
-							<div class="box-inner">
-								<div class="author-image">
-									<img src="images/resource/author-8.jpg" alt="" />
-								</div>
-								<strong>Prashant Yadav</strong>
-								Online Lecturer and businees
-								<span class="quote-icon"><img src="images/icons/quote-icon.png" alt="" /></span>
-							</div>
-						</div>
-					</div>
-				</div>
-
-				<!-- Testimonial Block -->
-				<div class="testimonial-block">
-					<div class="inner-box">
-						<div class="text">Very good training, help me to understand the basics. The training contains a lot of
-							pract information lorem you need to be the best runway looks from new york lorem </div>
-						<!-- Author Box -->
-						<div class="author-box">
-							<div class="box-inner">
-								<div class="author-image">
-									<img src="images/resource/author-7.jpg" alt="" />
-								</div>
-								<strong>Prashant Yadav</strong>
-								Online Lecturer and businees
-								<span class="quote-icon"><img src="images/icons/quote-icon.png" alt="" /></span>
-							</div>
-						</div>
-					</div>
-				</div>
-
-				<!-- Testimonial Block -->
-				<div class="testimonial-block">
-					<div class="inner-box">
-						<div class="text">Very good training, help me to understand the basics. The training contains a lot of
-							pract information lorem you need to be the best runway looks from new york lorem </div>
-						<!-- Author Box -->
-						<div class="author-box">
-							<div class="box-inner">
-								<div class="author-image">
-									<img src="images/resource/author-8.jpg" alt="" />
-								</div>
-								<strong>Prashant Yadav</strong>
-								Online Lecturer and businees
-								<span class="quote-icon"><img src="images/icons/quote-icon.png" alt="" /></span>
-							</div>
-						</div>
-					</div>
-				</div>
-
-			</div>
-		</div>
-	</section>
-	<!-- End Testimonial Section Two -->
-	<section class="faq-section osd">
-		<div class="auto-container">
-			<!-- Title Box -->
-			<div class="title-box">
-				<h3>FAQ's</h3>
-			</div>
-			<div class="inner-container">
-
-				<!-- Accordion Box -->
-				<ul class="accordion-box">
-
-					@foreach($faqs as $index => $faq)
-					<li class="accordion block">
-						<div class="acc-btn {{ $index === 0 ? 'active' : '' }}">
-							<div class="icon-outer"><span class="icon icon-plus flaticon-plus-sign"></span> <span
-									class="icon icon-minus flaticon-minus-1"></span></div>{{$faq->question}}</div>
-						<div class="acc-content {{ $index === 0 ? 'current' : '' }}">
-							<div class="content">
-								<div class="text">{{$faq->answer}}</div>
-							</div>
-						</div>
-					</li>
-					@endforeach
-
-				</ul>
-
-			</div>
-		</div>
-	</section>
-	
-	<div class="hidden-bar-wrapper">
-    <!-- Scoped About Page Wrapper -->
-    <div class="adhy-about-wrapper">
-
-        <!-- Creative Hero Section (Curved Background & Glow) -->
-        <section class="about-hero-creative">
-            <div class="glow-spot glow-spot-1"></div>
-            <div class="glow-spot glow-spot-2"></div>
-            <div class="container">
-                <div class="row align-items-center">
-                    <div class="col-lg-7 text-left">
-                        <div class="creative-breadcrumb">
-                            <a href="/">Home</a>
-                            <span class="sep"><i class="fa-solid fa-angle-right arrow"></i></span>
-                            <span class="current">About Us</span>
-                        </div>
-                        <h1>About Adhyayanam IAS</h1>
-                        <div class="subtitle">Shaping future leaders through academic excellence, research-driven
-                            curriculum, and holistic mentorship.</div>
-                    </div>
-                    <div class="col-lg-5">
-                        <div class="hero-showcase">
-                            <!-- Background Image under floating cards -->
-                            <img src="https://images.unsplash.com/photo-1515187029135-18ee286d815b?q=80&w=800"
-                                alt="Students mentoring background" class="hero-showcase-bg-img">
-
-                            <!-- Showcase Card 1 (Main) -->
-                            <div class="showcase-card showcase-card-main">
-                                <span class="showcase-badge">Premium focus</span>
-                                <h5 class="fw-bold mb-2">Elite Mentorship</h5>
-                                <p class="small text-white-100 mb-0">Learn directly from retired bureaucrats and domain
-                                    experts.</p>
+                                <div class="subtitle">
+                                    {{ $heroSection->extra_data['sub_heading'] ?? '' }}
+                                </div>
                             </div>
-                            <!-- Showcase Card 2 (Sub) -->
-                            <div class="showcase-card showcase-card-sub">
-                                <span class="showcase-badge showcase-badge-gold">Selection Rate</span>
-                                <h5 class="fw-bold mb-2">95% Success Rate</h5>
-                                <p class="small text-white-100 mb-0">Continuous test tracking with state-of-the-art
-                                    results.</p>
+                            <div class="col-lg-5">
+                                <div class="hero-showcase">
+                                    <!-- Background Image under floating cards -->
+                                    <img src="https://images.unsplash.com/photo-1515187029135-18ee286d815b?q=80&w=800"
+                                        alt="Students mentoring background" class="hero-showcase-bg-img">
+
+                                    <!-- Showcase Card 1 (Main) -->
+                                    <div class="showcase-card showcase-card-main">
+                                        <span class="showcase-badge">Premium focus</span>
+                                        <h5 class="fw-bold mb-2">Elite Mentorship</h5>
+                                        <p class="small text-white-100 mb-0">Learn directly from retired bureaucrats and
+                                            domain
+                                            experts.</p>
+                                    </div>
+                                    <!-- Showcase Card 2 (Sub) -->
+                                    <div class="showcase-card showcase-card-sub">
+                                        <span class="showcase-badge showcase-badge-gold">Selection Rate</span>
+                                        <h5 class="fw-bold mb-2">95% Success Rate</h5>
+                                        <p class="small text-white-100 mb-0">Continuous test tracking with state-of-the-art
+                                            results.</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-        </section>
+                </section>
 
-        <!-- Stats Strip (Floating Overlapping the Hero) -->
-        <section class="stats-strip-wrapper">
-            <div class="container">
-                <div class="stats-dashboard">
-                    <div class="row g-4 justify-content-center">
-                        <div class="col-6 col-md-3">
-                            <div class="stat-card">
-                                <div class="value">415+</div>
-                                <div class="label">Students Enrolled</div>
-                            </div>
-                        </div>
-                        <div class="col-6 col-md-3">
-                            <div class="stat-card">
-                                <div class="value">5,000+</div>
-                                <div class="label">Classes Completed</div>
-                            </div>
-                        </div>
-                        <div class="col-6 col-md-3">
-                            <div class="stat-card">
-                                <div class="value">20+</div>
-                                <div class="label">Expert Faculty</div>
-                            </div>
-                        </div>
-                        <div class="col-6 col-md-3">
-                            <div class="stat-card">
-                                <div class="value">95%</div>
-                                <div class="label">Success Rate</div>
+                <!-- Stats Strip (Floating Overlapping the Hero) -->
+                <section class="stats-strip-wrapper">
+                    <div class="container">
+                        <div class="stats-dashboard">
+                            <div class="row g-4 justify-content-center">
+                                @foreach($counters as $counter)
+                                    <div class="col-6 col-md-3">
+                                        <div class="stat-card">
+                                            <div class="value">{{ $counter->value }}</div>
+                                            <div class="label">{{ $counter->label }}</div>
+                                        </div>
+                                    </div>
+                                @endforeach
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-        </section>
+                </section>
 
-        <!-- Introduction Section -->
-        <section class="intro-section">
-            <div class="container">
-                <div class="row g-5 align-items-center">
-                    <div class="col-lg-6">
-                        <div class="mb-4 text-left">
-                            <span class="section-badge">Who We Are</span>
-                            <h2 class="section-title">Empowering Aspirants, <br>Transforming Lives</h2>
-                        </div>
-                        <p class="text-muted-custom mb-3 text-left">
-                            <strong>Adhyayanam IAS</strong> is one of India's leading research and training institutes
-                            dedicated to empowering aspirants preparing for Civil Services, Judicial Services, State
-                            PCS, and various competitive examinations across the country.
-                        </p>
-                        <p class="text-muted-custom mb-4 text-left">
-                            Our mission is to transform aspirations into achievements through an integrated learning
-                            approach that combines expert guidance, innovative teaching methods, technology-driven
-                            learning, and personalized mentorship.
-                        </p>
-                    </div>
+                <!-- Introduction Section -->
+                <section class="intro-section">
+                    <div class="container">
+                        <div class="row g-5 align-items-center">
+                            <div class="col-lg-6">
+                                <div class="mb-4 text-left">
+                                    <span class="section-badge">
+                                        {{ $whoWeAre->sub_title ?? '' }}
+                                    </span>
 
-                    <div class="col-lg-6">
-                        <div class="intro-image-block">
-                            <!-- Premium Educational Image -->
-                            <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=800"
-                                alt="Students learning together in Adhyayanam IAS">
+                                    <h2 class="section-title">
+                                        {!!  $whoWeAre->heading ?? '' !!}
+                                    </h2>
+                                </div>
+                                {!! $whoWeAre->description ?? '' !!}
+                            </div>
+
+                            <div class="col-lg-6">
+                                <div class="intro-image-block">
+                                    <!-- Premium Educational Image -->
+                                    <img src="{{ asset('storage/' . $whoWeAre->image) }}">
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </div>
-        </section>
+                </section>
 
-        <!-- Features & Highlights (Cards on Left, Image on Right) -->
-        <section class="features-section">
-            <div class="container">
-                <div class="row g-5 align-items-center">
-                    <!-- Cards Grid (Left side) -->
-                    <div class="col-lg-7">
-                        <div class="mb-5 text-left">
-                            <span class="section-badge section-badge-amber">Academy Highlights</span>
-                            <h2 class="section-title">Designed For Elite Academic Performance</h2>
-                            <p class="text-muted-custom">Explore our comprehensive training programs and support
-                                features built to help you excel.</p>
+                <!-- Features & Highlights (Cards on Left, Image on Right) -->
+                <section class="features-section">
+                    <div class="container">
+                        <div class="row g-5 align-items-center">
+                            <!-- Cards Grid (Left side) -->
+                            <div class="col-lg-7">
+                                <div class="mb-5 text-left">
+                                    <span class="section-badge section-badge-amber">
+                                        {{ $academicHighlights->sub_title ?? '' }}
+                                    </span>
+
+                                    <h2 class="section-title">
+                                        {{ $academicHighlights->heading ?? '' }}
+                                    </h2>
+
+                                    <p class="text-muted-custom">
+                                        {{ $academicHighlights->description ?? '' }}
+                                    </p>
+                                </div>
+
+                                <div class="row g-4">
+                                    @foreach($highlights as $highlight)
+                                        <div class="col-sm-6 text-left">
+                                            <div class="features-card">
+                                                <div class="icon-box">
+                                                    <i class="{{ $highlight->icon }}"></i>
+                                                </div>
+
+                                                <h4>{{ $highlight->heading }}</h4>
+
+                                                <p>{{ $highlight->short_description }}</p>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+
+                            <!-- Right Column (Featured Image) -->
+                            <div class="col-lg-5">
+                                <div class="intro-image-block">
+                                    <img src="{{ asset('storage/' . $academicHighlights->extra_data['image_1']) }}">
+
+                                </div>
+                                <div class="intro-image-block">
+                                    <img src="{{ asset('storage/' . $academicHighlights->extra_data['image_2']) }}">
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Vision & Mission Section (2 cards Left and Right) -->
+                <section class="vision-mission-section">
+                    <div class="container">
+                        <div class="text-center mb-5">
+                            <span class="section-badge">Our Directives</span>
+                            <h2 class="section-title">Vision & Mission</h2>
+                        </div>
+                        <div class="row g-4 text-left">
+                            <!-- Vision Card -->
+                            <div class="col-lg-6">
+                                <div class="vm-card vm-card-blue">
+                                    <div class="vm-card-img-wrap">
+                                        <img src="{{asset('storage/' . $vision->image1) }}" alt="Our Vision and Commitment">
+                                    </div>
+                                    <div class="large-icon">
+                                        <i class="fa-solid fa-eye"></i>
+                                    </div>
+                                    <h3>{{ $vision->heading1 }}</h3>
+
+                                    {!! $vision->description1 !!}
+
+                                </div>
+                            </div>
+
+                            <!-- Mission Card -->
+                            <div class="col-lg-6">
+                                <div class="vm-card vm-card-amber">
+                                    <div class="vm-card-img-wrap">
+                                        <img src="{{ asset('storage/' . $vision->image2) }}" alt="Our Mission and Approach">
+                                    </div>
+                                    <div class="large-icon">
+                                        <i class="fa-solid fa-bullseye"></i>
+                                    </div>
+                                    <h3>{{ $vision->heading2 }}</h3>
+
+                                    {!! $vision->description2 !!}
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Why Choose Us Strengths List Section -->
+                <section class="choose-section">
+                    <div class="container">
+                        <div class="row g-5 align-items-center">
+                            <div class="col-lg-5 text-left">
+                                <div class="mb-4">
+                                    <span class="section-badge section-badge-amber">{{ $whyChooseUs->sub_title }}</span>
+                                    <h2 class="section-title">{{ $whyChooseUs->heading }}</h2>
+                                </div>
+                                <p class="text-muted-custom mb-4">
+                                    {!! $whyChooseUs->description !!}
+                                </p>
+
+                                <!-- Mini Quote card -->
+                                <div class="p-4 bg-light border-start border-warning border-4 rounded-3 text-left">
+                                    <p class="font-italic text-dark mb-0" style="font-size: 14.5px;">
+                                        {{ $whyChooseUs->extra_data['quote'] ?? '' }}
+                                    </p>
+                                </div>
+
+                                <!-- Visual representation of planning/success -->
+                                <div class="mt-4 text-left">
+                                    <img src="{{ asset('storage/' . $whyChooseUs->extra_data['image']) }}"
+                                        class="img-fluid rounded-4 shadow-sm border" alt="Planning and study organization"
+                                        style="max-height: 200px; width: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <div class="col-lg-7">
+                                <h4 class="mb-4 text-dark font-weight-bold text-left">Our Key Strengths</h4>
+                                <div class="row g-3 text-left">
+                                    @foreach($strengths as $strength)
+                                        <div class="col-md-6">
+                                            <div class="strength-card">
+                                                <i class="fa-solid fa-circle-check chk-icon"></i>
+                                                <h5>{{ $strength->title }}</h5>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Our Commitment Section -->
+                <section class="commitment-section">
+                    <div class="container">
+                        <div class="commitment-banner text-left">
+                            <div class="row align-items-center g-4">
+                                <div class="col-lg-8">
+                                    <h3>{{ $commitments->heading }}</h3>
+
+                                    {!! $commitments->description !!}
+
+                                </div>
+                                <div class="col-lg-4 text-center text-lg-end">
+                                    <img src="{{ asset('storage/' . $commitments->image) }}"
+                                        class="img-fluid rounded-4 border border-white-10" alt="Dedication and support"
+                                        style="max-height: 180px; object-fit: cover; opacity: 0.85; filter: contrast(110%);">
+                                </div>
+                            </div>
                         </div>
 
+                        <!-- 4 Core Pillars Row -->
                         <div class="row g-4">
-                            <!-- Card 1 -->
-                            <div class="col-sm-6 text-left">
-                                <div class="features-card">
-                                    <div class="icon-box"><i class="fa-solid fa-landmark"></i></div>
-                                    <h4>UPSC Civil Services</h4>
-                                    <p>Complete preparation for Prelims, Mains, and Interview stages with current
-                                        affairs.</p>
+                            <div class="col-sm-6 col-lg-3">
+                                <div class="pillar-card">
+                                    <div class="icon-wrap"><i class="fa-solid fa-bullseye"></i></div>
+                                    <h5>100% Student Focused Approach</h5>
                                 </div>
                             </div>
-                            <!-- Card 2 -->
-                            <div class="col-sm-6 text-left">
-                                <div class="features-card">
-                                    <div class="icon-box"><i class="fa-solid fa-map"></i></div>
-                                    <h4>State PCS Exams</h4>
-                                    <p>State Public Service Commission papers with specialized localized course modules.
-                                    </p>
+                            <div class="col-sm-6 col-lg-3">
+                                <div class="pillar-card">
+                                    <div class="icon-wrap"><i class="fa-solid fa-headset"></i></div>
+                                    <h5>24×7 Academic Support</h5>
                                 </div>
                             </div>
-                            <!-- Card 3 -->
-                            <div class="col-sm-6 text-left">
-                                <div class="features-card">
-                                    <div class="icon-box"><i class="fa-solid fa-scale-balanced"></i></div>
-                                    <h4>Judicial Services</h4>
-                                    <p>Focused coaching covering local procedural law papers and extensive mock
-                                        sessions.</p>
+                            <div class="col-sm-6 col-lg-3">
+                                <div class="pillar-card">
+                                    <div class="icon-wrap"><i class="fa-solid fa-globe"></i></div>
+                                    <h5>Online + Offline Ecosystem</h5>
                                 </div>
                             </div>
-                            <!-- Card 4 -->
-                            <div class="col-sm-6 text-left">
-                                <div class="features-card">
-                                    <div class="icon-box"><i class="fa-solid fa-school"></i></div>
-                                    <h4>CUET Entrance</h4>
-                                    <p>Structured coaching to help you get selected in prestigious Central Universities.
-                                    </p>
+                            <div class="col-sm-6 col-lg-3">
+                                <div class="pillar-card">
+                                    <div class="icon-wrap"><i class="fa-solid fa-magnifying-glass-chart"></i></div>
+                                    <h5>Research Based Preparation</h5>
                                 </div>
                             </div>
                         </div>
                     </div>
+                </section>
 
-                    <!-- Right Column (Featured Image) -->
-                    <div class="col-lg-5">
-                        <div class="intro-image-block">
-                            <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=800">
+                <!-- Join Us CTA Section -->
+                <section class="join-section">
+                    <div class="container">
+                        <div class="join-cta-card text-left">
+                            <div class="row align-items-center">
+                                <div class="col-lg-8">
+                                    <h2>{{ $joinUs->heading }}</h2>
 
-                        </div>
-                        <div class="intro-image-block">
-                            <img src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=800">
+                                    {!! $joinUs->description !!}
+                                    <div class="d-flex flex-wrap gap-3">
+                                        <a href="{{ $joinUs->extra_data['button_1_link'] ?? '#' }}"
+                                            class="btn-join-primary">
+                                            {{ $joinUs->extra_data['button_1_name'] ?? 'Button 1' }}<i
+                                                class="fa-solid fa-arrow-right"></i>
+                                        </a>
 
+                                        <a href="{{ $joinUs->extra_data['button_2_link'] ?? '#' }}"
+                                            class="btn-join-secondary">{{ $joinUs->extra_data['button_2_name'] ?? 'Button 2' }}
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4 text-center text-lg-end mt-4 mt-lg-0">
+                                    @if(!empty($joinUs->image))
+                                        <img src="{{ asset('storage/' . $joinUs->image) }}" class="img-fluid rounded-4 mb-3"
+                                            alt="{{ $joinUs->heading }}"
+                                            style="max-height: 140px; width: 100%; object-fit: cover; border: 1px solid rgba(255, 255, 255, 0.1); opacity: 0.9;">
+                                    @endif
+                                    <div class="team-signature">
+                                        <div>Your Success Begins Here.</div>
+                                        <div class="mt-2 text-white opacity-75">Team Adhyayanam IAS</div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </section>
+
             </div>
-        </section>
+        </div>
 
-        <!-- Vision & Mission Section (2 cards Left and Right) -->
-        <section class="vision-mission-section">
-            <div class="container">
-                <div class="text-center mb-5">
-                    <span class="section-badge">Our Directives</span>
-                    <h2 class="section-title">Vision & Mission</h2>
-                </div>
-                <div class="row g-4 text-left">
-                    <!-- Vision Card -->
-                    <div class="col-lg-6">
-                        <div class="vm-card vm-card-blue">
-                            <div class="vm-card-img-wrap">
-                                <img src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=600"
-                                    alt="Our Vision and Commitment">
-                            </div>
-                            <div class="large-icon">
-                                <i class="fa-solid fa-eye"></i>
-                            </div>
-                            <h3>Our Vision & Commitment</h3>
-                            <p>
-                                Our vision is to nurture knowledgeable, ethical, and visionary leaders who contribute
-                                meaningfully to society and public administration.
-                            </p>
-                            <p>
-                                Through continuous research, innovative teaching methodologies, and exam-oriented
-                                preparation strategies, we strive to provide students with the most relevant and
-                                effective learning experience.
-                            </p>
-                            <p>
-                                From your first day of preparation to your final selection, Adhyayanam IAS remains your
-                                trusted academic partner.
-                            </p>
-                        </div>
-                    </div>
-
-                    <!-- Mission Card -->
-                    <div class="col-lg-6">
-                        <div class="vm-card vm-card-amber">
-                            <div class="vm-card-img-wrap">
-                                <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=600"
-                                    alt="Our Mission and Approach">
-                            </div>
-                            <div class="large-icon">
-                                <i class="fa-solid fa-bullseye"></i>
-                            </div>
-                            <h3>Our Mission & Approach</h3>
-                            <p>
-                                We do not simply prepare students for examinations; we help them build confidence,
-                                analytical thinking, leadership qualities, and decision-making skills that are essential
-                                for public service and professional success.
-                            </p>
-                            <p>
-                                We continuously research and develop effective learning resources that align with
-                                evolving examination patterns, creating a student-centric ecosystem designed to help
-                                candidates perform at their highest potential.
-                            </p>
-                            <p>
-                                Join Adhyayanam IAS and take the first step towards a successful career in Civil
-                                Services, Judicial Services, and Competitive Examinations.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Why Choose Us Strengths List Section -->
-        <section class="choose-section">
-            <div class="container">
-                <div class="row g-5 align-items-center">
-                    <div class="col-lg-5 text-left">
-                        <div class="mb-4">
-                            <span class="section-badge section-badge-amber">Why Choose Us</span>
-                            <h2 class="section-title">A Student-Centric Learning Ecosystem</h2>
-                        </div>
-                        <p class="text-muted-custom mb-4">
-                            At Adhyayanam IAS, we believe every aspirant deserves the right guidance, resources, and
-                            support to achieve success. Our ecosystem is built to maximize potential.
-                        </p>
-
-                        <!-- Mini Quote card -->
-                        <div class="p-4 bg-light border-start border-warning border-4 rounded-3 text-left">
-                            <p class="font-italic text-dark mb-0" style="font-size: 14.5px;">
-                                "We do not simply prepare students for examinations; we help them build confidence,
-                                analytical thinking, leadership qualities, and decision-making skills that are essential
-                                for public service and professional success."
-                            </p>
-                        </div>
-
-                        <!-- Visual representation of planning/success -->
-                        <div class="mt-4 text-left">
-                            <img src="https://images.unsplash.com/photo-1506784983877-45594efa4cbe?q=80&w=600"
-                                class="img-fluid rounded-4 shadow-sm border" alt="Planning and study organization"
-                                style="max-height: 200px; width: 100%; object-fit: cover;">
-                        </div>
-                    </div>
-
-                    <div class="col-lg-7">
-                        <h4 class="mb-4 text-dark font-weight-bold text-left">Our Key Strengths</h4>
-                        <div class="row g-3 text-left">
-                            <div class="col-md-6">
-                                <div class="strength-card">
-                                    <i class="fa-solid fa-circle-check chk-icon"></i>
-                                    <h5>High-quality Online & Offline Courses</h5>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="strength-card">
-                                    <i class="fa-solid fa-circle-check chk-icon"></i>
-                                    <h5>Comprehensive Materials & Notes</h5>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="strength-card">
-                                    <i class="fa-solid fa-circle-check chk-icon"></i>
-                                    <h5>Regular Performance Analysis</h5>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="strength-card">
-                                    <i class="fa-solid fa-circle-check chk-icon"></i>
-                                    <h5>Personal Mentorship & Guidance</h5>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="strength-card">
-                                    <i class="fa-solid fa-circle-check chk-icon"></i>
-                                    <h5>Flexible Adaptive Environment</h5>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="strength-card">
-                                    <i class="fa-solid fa-circle-check chk-icon"></i>
-                                    <h5>Daily Current Affairs PDFs & Videos</h5>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="strength-card">
-                                    <i class="fa-solid fa-circle-check chk-icon"></i>
-                                    <h5>The Hindu & Indian Express Editorials</h5>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="strength-card">
-                                    <i class="fa-solid fa-circle-check chk-icon"></i>
-                                    <h5>Daily Quizzes & Answer Writing</h5>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Our Commitment Section -->
-        <section class="commitment-section">
-            <div class="container">
-                <div class="commitment-banner text-left">
-                    <div class="row align-items-center g-4">
-                        <div class="col-lg-8">
-                            <h3>Our Commitment</h3>
-                            <p class="mb-3">
-                                We continuously research and develop effective learning resources that align with
-                                evolving examination patterns. Our goal is not only to help students clear examinations
-                                but also to build confidence, analytical thinking, and leadership qualities essential
-                                for public service careers.
-                            </p>
-                            <p>
-                                Whether you are preparing for UPSC, State PCS, Judicial Services, or other competitive
-                                examinations, Adhyayanam IAS provides the guidance, strategy, and support needed to
-                                achieve your goals.
-                            </p>
-                        </div>
-                        <div class="col-lg-4 text-center text-lg-end">
-                            <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=600"
-                                class="img-fluid rounded-4 border border-white-10" alt="Dedication and support"
-                                style="max-height: 180px; object-fit: cover; opacity: 0.85; filter: contrast(110%);">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 4 Core Pillars Row -->
-                <div class="row g-4">
-                    <div class="col-sm-6 col-lg-3">
-                        <div class="pillar-card">
-                            <div class="icon-wrap"><i class="fa-solid fa-bullseye"></i></div>
-                            <h5>100% Student Focused Approach</h5>
-                        </div>
-                    </div>
-                    <div class="col-sm-6 col-lg-3">
-                        <div class="pillar-card">
-                            <div class="icon-wrap"><i class="fa-solid fa-headset"></i></div>
-                            <h5>24×7 Academic Support</h5>
-                        </div>
-                    </div>
-                    <div class="col-sm-6 col-lg-3">
-                        <div class="pillar-card">
-                            <div class="icon-wrap"><i class="fa-solid fa-globe"></i></div>
-                            <h5>Online + Offline Ecosystem</h5>
-                        </div>
-                    </div>
-                    <div class="col-sm-6 col-lg-3">
-                        <div class="pillar-card">
-                            <div class="icon-wrap"><i class="fa-solid fa-magnifying-glass-chart"></i></div>
-                            <h5>Research Based Preparation</h5>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Join Us CTA Section -->
-        <section class="join-section">
-            <div class="container">
-                <div class="join-cta-card text-left">
-                    <div class="row align-items-center">
-                        <div class="col-lg-8">
-                            <h2>Join the Adhyayanam IAS Family</h2>
-                            <p>
-                                Take the first step toward a successful career in public service. Let us guide you on a
-                                transformative learning journey that goes beyond traditional coaching methods and
-                                prepares you for excellence.
-                            </p>
-                            <p class="opacity-75 mb-4" style="font-size: 14.5px;">
-                                Connect with our academic counselors today to find the right program for your goals,
-                                access premium sample materials, and schedule a free mentorship session.
-                            </p>
-                            <div class="d-flex flex-wrap gap-3">
-                                <a href="/" class="btn-join-primary">Explore Courses <i
-                                        class="fa-solid fa-arrow-right"></i></a>
-                                <a href="Javascript:void(0);" class="btn-join-secondary">Talk to Counselor</a>
-                            </div>
-                        </div>
-                        <div class="col-lg-4 text-center text-lg-end mt-4 mt-lg-0">
-                            <img src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=600"
-                                class="img-fluid rounded-4 mb-3" alt="Students celebrating success"
-                                style="max-height: 140px; width: 100%; object-fit: cover; border: 1px solid rgba(255, 255, 255, 0.1); opacity: 0.9;">
-                            <div class="team-signature">
-                                <div>Your Success Begins Here.</div>
-                                <div class="mt-2 text-white opacity-75">Team Adhyayanam IAS</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-    </div>
-    </div>
-
-</body>
+    </body>
 @endsection

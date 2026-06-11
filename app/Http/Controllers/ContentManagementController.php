@@ -66,37 +66,6 @@ use App\Helpers\Helper;
 
 class ContentManagementController extends Controller
 {
-    public function aboutUs()
-    {
-        $data['about'] = Page::first();
-        $data['faqs'] = Faq::all();
-        return view('content-management.about', $data);
-    }
-    
-    public function aboutStore(Request $request)
-    {
-        $request->validate([
-            'heading1' => 'required|string|max:255',
-            'description1' => 'required|string',
-            'youtube_url' => 'nullable|url',
-            'image1' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
-        ]);
-
-        $data = $request->only(['heading1', 'description1', 'youtube_url']);
-
-        $data['updated_by'] = auth()->id();
-
-        if ($request->hasFile('image1')) {
-            $imagePath = $request->file('image1')->store('images', 'public');
-            $data['image1'] = $imagePath;
-        }
-        Page::updateOrCreate(
-            ['id' => 1], // Condition to match existing record
-            $data
-        );
-        return redirect()->route('cm.about')->with('success', 'About us updated successfully!');
-
-    }
     public function termAndCondition()
     {
         $data['term'] = Page::skip(1)->first();

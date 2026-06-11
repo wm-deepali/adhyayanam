@@ -49,6 +49,10 @@ use App\Models\ExaminationCommission;
 use App\Models\UserMobiileVerification;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\OfficeAddress;
+use App\Models\AboutPageSection;
+use App\Models\AboutPageCounter;
+use App\Models\AboutPageHighlight;
+use App\Models\AboutPageStrength;
 
 class FrontController extends Controller
 {
@@ -84,7 +88,7 @@ class FrontController extends Controller
         } else {
             $data['popup'] = null;
         }
-// dd($data['upcomingExams']->toArray());
+        // dd($data['upcomingExams']->toArray());
         return view('front.user.index', $data);
     }
 
@@ -102,11 +106,32 @@ class FrontController extends Controller
         return view('front.user.news_detail', compact('news'));
     }
 
+
     public function aboutIndex()
     {
-        $data['about'] = Page::first();
-        $data['faqs'] = Faq::all();
-        $data['seo'] = SEO::where('page', $data['about']->heading1 . ' ' . $data['about']->heading2 ?? '')->first();
+        $data['heroSection'] = AboutPageSection::where('section_key', 'hero')->first();
+
+        $data['whoWeAre'] = AboutPageSection::where('section_key', 'who_we_are')->first();
+
+        $data['academicHighlights'] = AboutPageSection::where('section_key', 'academic_highlights')->first();
+
+        $data['whyChooseUs'] = AboutPageSection::where('section_key', 'why_choose_us')->first();
+
+        $data['commitments'] = AboutPageSection::where('section_key', 'commitments')->first();
+
+        $data['joinUs'] = AboutPageSection::where('section_key', 'join_us')->first();
+
+        $data['counters'] = AboutPageCounter::orderBy('sort_order')->get();
+
+        $data['highlights'] = AboutPageHighlight::orderBy('sort_order')->get();
+
+        $data['strengths'] = AboutPageStrength::orderBy('sort_order')->get();
+
+        $seoTitle = $data['heroSection']->heading ?? 'About Us';
+
+        $data['seo'] = SEO::where('page', $seoTitle)->first();
+        $data['vision'] = Page::skip(5)->first();
+
         return view('front.user.about-us', $data);
     }
 
@@ -198,6 +223,8 @@ class FrontController extends Controller
             ->oldest('id')
             ->first();
         $data['relatedBlogs'] = $relatedBlogs;
+
+
         return view('front.user.blog-detail', $data);
     }
 
@@ -962,6 +989,14 @@ class FrontController extends Controller
     {
         $data['batches'] = BatchProgramme::paginate(10);
         return view('front.user.batches-and-online-programme', $data);
+    }
+
+    public function batchDetail($id)
+    {
+        $batch = BatchProgramme::where('id', $id)
+            ->firstOrFail();
+
+        return view('front.user.batch-detail', compact('batch'));
     }
 
     public function pyqPapers($examid = null, $catid = null, $subcat = null)

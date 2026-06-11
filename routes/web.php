@@ -34,6 +34,7 @@ use App\Http\Controllers\CMS\InstituteHighlightController;
 use App\Http\Controllers\CMS\HomeSectionController;
 use App\Http\Controllers\PaperController;
 use App\Http\Controllers\OfficeAddressController;
+use App\Http\Controllers\Admin\AboutPageController;
 
 /*
 |--------------------------------------------------------------------------
@@ -122,6 +123,7 @@ Route::get('user/adhyayanam-corner', [FrontController::class, 'netiCornerIndex']
 Route::get('user/feed-back-testimonial', [FrontController::class, 'feedBackIndex'])->name('feed.back.index');
 Route::post('user/feed-back-testimonial/store', [FrontController::class, 'feedBackStore'])->name('feed.back.store');
 Route::get('user/batches-and-programme', [FrontController::class, 'batchesIndex'])->name('batches.index');
+Route::get('user/batches-and-programme/{id}', [FrontController::class, 'batchDetail'])->name('batches.detail');
 Route::get('user/syllabus/{examid?}/{catid?}/{subcat?}', [FrontController::class, 'syllabusIndex'])->name('syllabus.front');
 /**
  * Auth Routes
@@ -291,12 +293,28 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
     Route::middleware(['auth', 'isAdmin'])->group(function () {
         Route::get('admin-login', [App\Http\Controllers\HomeController::class, 'index'])->name('dashboard');
 
+        Route::prefix('about-page')->group(function () {
+
+            Route::get('/', [AboutPageController::class, 'index'])->name('about.index')->middleware('custom.permission:manage_about');
+            Route::get('/hero', [AboutPageController::class, 'hero'])->name('about.hero');
+            Route::post('/hero', [AboutPageController::class, 'storeHero'])->name('about.hero.store')->middleware('custom.permission:manage_about_edit');
+            Route::get('/counter', [AboutPageController::class, 'counter'])->name('about.counter');
+            Route::post('/counter', [AboutPageController::class, 'storeCounter'])->name('about.counter.store')->middleware('custom.permission:manage_about_edit');
+            Route::get('/who-we-are', [AboutPageController::class, 'whoWeAre'])->name('about.who-we-are');
+            Route::post('/who-we-are', [AboutPageController::class, 'storeWhoWeAre'])->name('about.who-we-are.store')->middleware('custom.permission:manage_about_edit');
+            Route::get('/academic-highlights', [AboutPageController::class, 'academicHighlights'])->name('about.academic-highlights');
+            Route::post('/academic-highlights', [AboutPageController::class, 'storeAcademicHighlights'])->name('about.academic-highlights.store')->middleware('custom.permission:manage_about_edit');
+            Route::get('/why-choose-us', [AboutPageController::class, 'whyChooseUs'])->name('about.why-choose-us');
+            Route::post('/why-choose-us', [AboutPageController::class, 'storeWhyChooseUs'])->name('about.why-choose-us.store')->middleware('custom.permission:manage_about_edit');
+            Route::get('/commitments', [AboutPageController::class, 'commitments'])->name('about.commitments');
+            Route::post('/commitments', [AboutPageController::class, 'storeCommitments'])->name('about.commitments.store')->middleware('custom.permission:manage_about_edit');
+            Route::get('/join-us', [AboutPageController::class, 'joinUs'])->name('about.join-us');
+            Route::post('/join-us', [AboutPageController::class, 'storeJoinUs'])->name('about.join-us.store')->middleware('custom.permission:manage_about_edit');
+        });
+
         //Content Management
         Route::prefix('content-management')->group(function () {
-            //About Us
-            Route::get('/about', [ContentManagementController::class, 'aboutUs'])->name('cm.about')->middleware('custom.permission:manage_about');
-            Route::post('/about/store', [ContentManagementController::class, 'aboutStore'])->name('about.store')->middleware('custom.permission:manage_about_edit');
-
+            
             // Privacy Policies
             Route::get('/privacy-policies', [ContentManagementController::class, 'privacyPolicies'])->name('cm.privacy.policy')->middleware('custom.permission:manage_privacy');
             Route::post('/privacy-policies/store', [ContentManagementController::class, 'privacyStore'])->name('privacy.policies.store')->middleware('custom.permission:manage_privacy_edit');

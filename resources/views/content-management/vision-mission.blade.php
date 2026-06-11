@@ -36,7 +36,7 @@
 
                     <div class="mb-3">
                         <label for="description1" class="form-label">Description 1</label>
-                        <textarea class="form-control" name="description1" placeholder="Description 1"
+                        <textarea id="editor" class="form-control" name="description1" placeholder="Description 1"
                             required>{{ $vision->description1 ?? "" }}</textarea>
 
                         @if ($errors->has('description1'))
@@ -75,7 +75,7 @@
 
                     <div class="mb-3">
                         <label for="description2" class="form-label">Description 2</label>
-                        <textarea class="form-control" name="description2" placeholder="Description 2"
+                        <textarea id="editor1" class="form-control" name="description2" placeholder="Description 2"
                             required>{{ $vision->description2 ?? "" }}</textarea>
 
                         @if ($errors->has('description2'))
@@ -120,4 +120,18 @@
             </div>
         </div>
     </div>
+
+   <script src="https://cdn.ckeditor.com/4.22.1/full-all/ckeditor.js"></script>
+
+<script>
+    CKEDITOR.replace('editor1', {
+        filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
+        filebrowserUploadMethod: 'form'
+    });
+
+    CKEDITOR.replace('editor2', {
+        filebrowserUploadUrl: "{{ route('ckeditor.upload', ['_token' => csrf_token()]) }}",
+        filebrowserUploadMethod: 'form'
+    });
+</script>
 @endsection

@@ -56,7 +56,7 @@
                   <p>{{ Illuminate\Support\Str::limit($data->batch_heading, 50) }}</p>
                 </div>
                 <div class="news-block osdn">
-                  <a class="more-post" href="#">Read more</a>
+                  <a class="more-post" href="{{ route('batches.detail', $data->id) }}">Read more</a>
                 </div>
               </div>
 

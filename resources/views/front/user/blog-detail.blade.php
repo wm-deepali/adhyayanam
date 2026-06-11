@@ -64,13 +64,6 @@
                                 </a>
                             </div>
                         </div>
-                    @else
-                        <div class="new-post">
-                            <div class="prev-arrow flaticon-left-arrow-2"></div>
-                            <div class="post-inner">
-                                <span><h6>No previous blog</h6></span>
-                            </div>
-                        </div>
                     @endif
 
                     @if($nextBlog)
@@ -80,13 +73,6 @@
                                 <a href="{{ route('blog.details', $nextBlog->id) }}">
                                     {!! nl2br(e(Illuminate\Support\Str::limit(wordwrap($nextBlog->heading, 20, "\n", true), 45))) !!}
                                 </a>
-                            </div>
-                        </div>
-                    @else
-                        <div class="new-post">
-                            <div class="next-arrow flaticon-right-arrow"></div>
-                            <div class="post-inner">
-                                <span><h6>No next blog</h6></span>
                             </div>
                         </div>
                     @endif

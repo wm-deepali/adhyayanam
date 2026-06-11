@@ -465,7 +465,7 @@
 
                 @if(Helper::canAccess('manage_about'))
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('cm.about') }}" target="_top">
+                        <a class="nav-link" href="{{ route('about.index') }}" target="_top">
                             <svg class="nav-icon">
                                 <use xlink:href="{{ asset('icons/coreui.svg#cil-bug') }}"></use>
                             </svg>

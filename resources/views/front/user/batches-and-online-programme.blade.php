@@ -41,7 +41,7 @@
         <div class="course-block-two style-two col-xl-4 col-lg-6 col-md-6 col-sm-12">
           <div class="inner-box">
             <div class="image">
-              <a href="course-detail.html"><img src="{{url('storage/'.$data->thumbnail_image)}}" alt="{{$data->image_alt_tag}}"></a>
+              <a href="{{ route('batches.detail', $data->id) }}"><img src="{{url('storage/'.$data->thumbnail_image)}}" alt="{{$data->image_alt_tag}}"></a>
             </div>
             <div class="lower-content">
               <div class="content">

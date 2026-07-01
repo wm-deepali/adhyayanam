@@ -58,16 +58,27 @@
                         <h5 class="modal-title">Change Password for <span id="teacherName"></span></h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label>New Password</label>
-                            <input type="password" name="password" class="form-control" required minlength="6">
-                        </div>
-                        <div class="mb-3">
-                            <label>Confirm Password</label>
-                            <input type="password" name="password_confirmation" class="form-control" required minlength="6">
-                        </div>
-                    </div>
+                   <div class="modal-body">
+    <div class="mb-3">
+        <label>New Password</label>
+        <div class="input-group">
+            <input type="password" name="password" class="form-control password-field" required minlength="6">
+            <button type="button" class="btn btn-outline-secondary toggle-password">
+                <i class="fa fa-eye"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label>Confirm Password</label>
+        <div class="input-group">
+            <input type="password" name="password_confirmation" class="form-control password-field" required minlength="6">
+            <button type="button" class="btn btn-outline-secondary toggle-password">
+                <i class="fa fa-eye"></i>
+            </button>
+        </div>
+    </div>
+</div>
                     <div class="modal-footer">
                         <button type="submit" class="btn btn-primary">Update Password</button>
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -82,6 +93,7 @@
 
 
 @push('after-scripts')
+
     <script type="text/javascript">
         $(function () {
             var table = $("#teachersTable").DataTable({
@@ -206,6 +218,21 @@
                 });
             });
         });
+
+        // Show / Hide Password
+$(document).on('click', '.toggle-password', function () {
+    let input = $(this).siblings('input');
+    let icon = $(this).find('i');
+
+    if (input.attr('type') === 'password') {
+        input.attr('type', 'text');
+        icon.removeClass('fa-eye').addClass('fa-eye-slash');
+    } else {
+        input.attr('type', 'password');
+        icon.removeClass('fa-eye-slash').addClass('fa-eye');
+    }
+});
+
     </script>
 
 @endpush

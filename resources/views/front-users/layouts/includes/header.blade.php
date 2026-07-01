@@ -25,7 +25,7 @@ ul.header-megamenu.nav {
 			  <span class="dark-logo"><img src="https://netiias.com/design/images/Neti-logo.svg" alt="logo"></span> -->
 		  </div>
 		  <div class="logo-lg">
-			  <span class="light-logo"><img src="{{ url('images/Neti-logo.png')}}" alt="logo"></span>
+			  <!--<span class="light-logo"><img src="{{ url('images/Neti-logo.png')}}" alt="logo"></span>-->
 			  <!-- <span class="dark-logo"><img src="https://netiias.com/design/images/Neti-logo.svg" alt="logo"></span> -->
 		  </div>
 		</a>	
@@ -40,20 +40,20 @@ ul.header-megamenu.nav {
 					<img src="{{ url('images/Neti-logo.png')}}" alt="logo" style="width:100px; padding-bottom:10px;">
 			    </a>
 			</li>
-			<li class="btn-group d-lg-inline-flex d-none">
-				<div class="app-menu">
-					<div class="search-bx mx-5">
-						<form>
-							<div class="input-group">
-							  <input type="search" class="form-control" placeholder="Search">
-							  <div class="input-group-append">
-								<button class="btn" type="submit" id="button-addon3"><i class="icon-Search"><span class="path1"></span><span class="path2"></span></i></button>
-							  </div>
-							</div>
-						</form>
-					</div>
-				</div>
-			</li>
+			<!--<li class="btn-group d-lg-inline-flex d-none">-->
+			<!--	<div class="app-menu">-->
+			<!--		<div class="search-bx mx-5">-->
+			<!--			<form>-->
+			<!--				<div class="input-group">-->
+			<!--				  <input type="search" class="form-control" placeholder="Search">-->
+			<!--				  <div class="input-group-append">-->
+			<!--					<button class="btn" type="submit" id="button-addon3"><i class="icon-Search"><span class="path1"></span><span class="path2"></span></i></button>-->
+			<!--				  </div>-->
+			<!--				</div>-->
+			<!--			</form>-->
+			<!--		</div>-->
+			<!--	</div>-->
+			<!--</li>-->
 		</ul> 
 	  </div>
 		

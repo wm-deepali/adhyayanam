@@ -234,7 +234,7 @@
             letter-spacing: -0.03em;
             background: #045279;
             -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            /*-webkit-text-fill-color: transparent;*/
         }
 
         .adhy-about-wrapper .stat-card .label {
@@ -243,6 +243,7 @@
             color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 0.08em;
+            margin-top: 10px;
         }
 
         .adhy-about-wrapper .stat-card:hover {
@@ -709,6 +710,14 @@
             .adhy-about-wrapper .join-cta-card h2 {
                 font-size: 28px;
             }
+            
+            /* Section Padding Reductions for Tablets/Small Desktops */
+            .adhy-about-wrapper .intro-section { padding: 40px 0 50px; }
+            .adhy-about-wrapper .features-section { padding: 50px 0; }
+            .adhy-about-wrapper .vision-mission-section { padding: 50px 0; }
+            .adhy-about-wrapper .choose-section { padding: 50px 0; }
+            .adhy-about-wrapper .commitment-section { padding: 0px 0 40px;}
+            .adhy-about-wrapper .join-section { padding: 0 0 50px; }
         }
 
         @media (max-width: 576px) {
@@ -729,6 +738,19 @@
             .adhy-about-wrapper .btn-join-secondary {
                 width: 100%;
                 justify-content: center;
+            }
+            
+            /* Section Padding Reductions for Mobile Phones */
+            .adhy-about-wrapper .intro-section { padding: 30px 0 40px; }
+            .adhy-about-wrapper .features-section { padding: 40px 0; }
+            .adhy-about-wrapper .vision-mission-section { padding: 40px 0; }
+            .adhy-about-wrapper .choose-section { padding: 40px 0; }
+            .adhy-about-wrapper .commitment-section { padding: 40px 0; }
+            .adhy-about-wrapper .join-section { padding: 0 0 40px; }
+            
+              /* Glassmorphic Stats Strip (Overlaps Hero bottom) */
+           .adhy-about-wrapper .stats-strip-wrapper {
+             margin-bottom: 0px;
             }
         }
 
@@ -768,6 +790,17 @@
 
         .adhy-about-wrapper .vm-card:hover .vm-card-img-wrap img {
             transform: scale(1.05);
+        }
+        
+        @media (max-width: 576px) {
+         .adhy-about-wrapper .stats-strip-wrapper {
+    
+    margin-bottom: 0px;
+}
+.adhy-about-wrapper h4 {
+    margin-top: 20px;
+}
+            
         }
     </style>
 @endsection
@@ -847,7 +880,7 @@
                 <!-- Introduction Section -->
                 <section class="intro-section">
                     <div class="container">
-                        <div class="row g-5 align-items-center">
+                        <div class="row align-items-center gx-0 gy-0 gx-md-5 gy-md-5">
                             <div class="col-lg-6">
                                 <div class="mb-4 text-left">
                                     <span class="section-badge">
@@ -874,7 +907,7 @@
                 <!-- Features & Highlights (Cards on Left, Image on Right) -->
                 <section class="features-section">
                     <div class="container">
-                        <div class="row g-5 align-items-center">
+                        <div class="row align-items-center gx-0 gy-0 gx-md-5 gy-md-5">
                             <!-- Cards Grid (Left side) -->
                             <div class="col-lg-7">
                                 <div class="mb-5 text-left">
@@ -969,7 +1002,7 @@
                 <!-- Why Choose Us Strengths List Section -->
                 <section class="choose-section">
                     <div class="container">
-                        <div class="row g-5 align-items-center">
+                        <div class="row align-items-center gx-0 gy-0 gx-md-5 gy-md-5">
                             <div class="col-lg-5 text-left">
                                 <div class="mb-4">
                                     <span class="section-badge section-badge-amber">{{ $whyChooseUs->sub_title }}</span>

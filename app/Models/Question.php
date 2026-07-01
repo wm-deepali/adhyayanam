@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Question extends Model
 {
     use HasFactory;
+
     protected $table = 'question';
 
     protected $fillable = [
@@ -26,7 +27,6 @@ class Question extends Model
         'instruction',
         'has_option_e',
         'show_on_pyq',
-        // 'question_bank_id',
         'question',
         'answer',
         'option_a',
@@ -46,10 +46,68 @@ class Question extends Model
         'rejected_by'
     ];
 
-    // public function questionBank()
-    // {
-    //     return $this->belongsTo(QuestionBank::class, 'question_bank_id');
-    // }
+    /**
+     * Remove inline color styles from HTML.
+     */
+    protected function cleanHtml($value)
+    {
+        if (empty($value)) {
+            return $value;
+        }
+
+        return preg_replace('/color\s*:\s*[^;"]+;?/i', '', $value);
+    }
+
+    /**
+     * Automatically clean HTML when reading.
+     */
+    public function getQuestionAttribute($value)
+    {
+        return $this->cleanHtml($value);
+    }
+
+    public function getOptionAAttribute($value)
+    {
+        return $this->cleanHtml($value);
+    }
+
+    public function getOptionBAttribute($value)
+    {
+        return $this->cleanHtml($value);
+    }
+
+    public function getOptionCAttribute($value)
+    {
+        return $this->cleanHtml($value);
+    }
+
+    public function getOptionDAttribute($value)
+    {
+        return $this->cleanHtml($value);
+    }
+
+    public function getOptionEAttribute($value)
+    {
+        return $this->cleanHtml($value);
+    }
+
+    public function getInstructionAttribute($value)
+    {
+        return $this->cleanHtml($value);
+    }
+
+    public function getSolutionAttribute($value)
+    {
+        return $this->cleanHtml($value);
+    }
+
+    public function getAnswerFormatAttribute($value)
+    {
+        return $this->cleanHtml($value);
+    }
+
+    // Relationships
+
     public function chapter()
     {
         return $this->belongsTo(Chapter::class, 'chapter_id');
@@ -60,11 +118,11 @@ class Question extends Model
         return $this->belongsTo(User::class, 'rejected_by');
     }
 
-
     public function subject()
     {
         return $this->belongsTo(Subject::class, 'subject_id');
     }
+
     public function category()
     {
         return $this->belongsTo(Category::class, 'category_id');
@@ -90,7 +148,6 @@ class Question extends Model
         return $this->hasMany(QuestionDetail::class, 'question_id');
     }
 
-    // 🔹 Polymorphic added_by relationship
     public function addedBy()
     {
         return $this->morphTo(__FUNCTION__, 'added_by_type', 'added_by_id');

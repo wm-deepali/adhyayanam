@@ -267,6 +267,19 @@
         background: #ced4da !important;
         border-radius: 4px !important;
     }
+    
+    .box-body .btn.btn-sm {
+    margin: 0px;
+    padding: 6px 0px;
+    display: flex;
+    width: 80px;
+    justify-content: center;
+}
+
+.box-body .d-flex.flex-column.fw-500 .text-fade {
+    color: #222223 !important;
+    font-size: 10px;
+}
 </style>
 		<div class="row desktop-only-dashboard">
 			<div class="col-xl-9 col-12">
@@ -487,9 +500,9 @@
 
 									<!-- RIGHT -->
 									<div class="d-flex align-items-center">
-										<a href="#" class="waves-effect waves-light btn btn-sm btn-secondary ms-10">
-											View Profile
-										</a>
+										<!--<a href="#" class="waves-effect waves-light btn btn-sm btn-secondary ms-10">-->
+										<!--	View Profile-->
+										<!--</a>-->
 									</div>
 								</div>
 							</div>
@@ -662,7 +675,7 @@
 										<a href="{{  $class->live_link ?? '#' }}" target="_blank"
 											class="btn btn-sm btn-{{ $color }} ms-10">
 											Join Now
-											<span class="icon-Arrow-right fs-24"></span>
+											<!--<span class="icon-Arrow-right fs-24"></span>-->
 										</a>
 
 									</div>
@@ -744,7 +757,8 @@
 						</div>
 					</div>
 					<div class="box-footer text-center p-20">
-						<a href="{{ url('/') }}" class="btn w-p100 btn-primary-light p-5">View all</a>
+						<!--<a href="{{ url('/') }}" class="btn w-p100 btn-primary-light p-5">View all</a>-->
+						<a href="https://netiias.com/design/courses.html" class="btn w-p100 btn-primary-light p-5">View all</a>
 					</div>
 				</div>
 			</div>

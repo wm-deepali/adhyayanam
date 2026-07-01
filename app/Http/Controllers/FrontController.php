@@ -1100,6 +1100,7 @@ class FrontController extends Controller
         // Pagination
         $data['testPackages'] = $testSeriesQuery->paginate(9)->withQueryString();
 
+// dd($data['testPackages']->toArray());
         return view('front.user.test-series', $data);
     }
 

@@ -2700,7 +2700,7 @@
 																class="newtestseries-feature-row d-flex justify-content-between py-2 border-bottom">
 																<span class="newtestseries-label">Chapter Test</span>
 																<span class="newtestseries-value fw-medium">
-																	{{ $data->testseries->where('type_name', 'Chapter Test')->count() }}
+																	{{ $data->testseries->where('type_name', 'Chapter Wise')->count() }}
 																</span>
 															</div>
 															<div
@@ -2714,7 +2714,7 @@
 																class="newtestseries-feature-row d-flex justify-content-between py-2">
 																<span class="newtestseries-label">Subject Test</span>
 																<span class="newtestseries-value fw-medium">
-																	{{ $data->testseries->where('type_name', 'Subject Wise')->count() }}
+																	 {{ $data->testseries->where('type_name', 'Subject Wise')->count() }}
 																</span>
 															</div>
 														</div>
@@ -2808,7 +2808,7 @@
 															class="newtestseries-feature-row d-flex justify-content-between py-2 border-bottom">
 															<span class="newtestseries-label">Chapter Test</span>
 															<span class="newtestseries-value fw-medium">
-																{{ $data->testseries->where('type_name', 'Chapter Test')->count() }}
+																{{ $data->testseries->where('type_name', 'Chapter Wise')->count() }}
 															</span>
 														</div>
 														<div

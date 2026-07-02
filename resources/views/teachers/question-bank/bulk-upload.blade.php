@@ -72,15 +72,6 @@
                                             @endforeach
                                         </select>
                                     </div>
-                                    <div class="mb-3" id="passage_type_div" style="display:none;">
-                                        <label>Passage Question Type</label>
-                                        <select class="form-control" name="passage_question_type"
-                                            id="passage_question_type">
-                                            <option value="" selected>Select Type</option>
-                                            <option value="multiple_choice">Multiple Choice</option>
-                                            <option value="reasoning_subjective">Reasoning/Subjective</option>
-                                        </select>
-                                    </div>
                                     <div class="mb-3">
                                         <label>Fee Type</label>
                                         <select id="fee-type" class="form-control" name="fee_type">
@@ -334,25 +325,18 @@
             var mcqquestionType = document.getElementById('multiple_choice_div');
             var storyquestionType = document.getElementById('story_based_div');
             var subjectivequestionType = document.getElementById('subjective_div');
-            var passageType = document.getElementById('passage_type_div');
             if (this.value == 'MCQ') {
                 mcqquestionType.style.display = 'block';
                 storyquestionType.style.display = 'none';
                 subjectivequestionType.style.display = 'none';
-                passageType.style.display = 'none';
-                document.getElementById('passage_question_type').required = false;
             }
             else if (this.value == 'Subjective') {
                 subjectivequestionType.style.display = 'block';
                 storyquestionType.style.display = 'none';
                 mcqquestionType.style.display = 'none';
-                passageType.style.display = 'none';
-                document.getElementById('passage_question_type').required = false;
             }
             else if (this.value == 'Story Based') {
                 storyquestionType.style.display = 'block';
-                passageType.style.display = 'block';
-                document.getElementById('passage_question_type').required = true;
                 mcqquestionType.style.display = 'none';
                 subjectivequestionType.style.display = 'none';
             }

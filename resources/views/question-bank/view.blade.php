@@ -247,13 +247,6 @@
 
                         @if($question->question_type == 'Story Based')
 
-
-                            @if(strip_tags($question->answer_format) != "")
-                                <div class="col-md-12">
-                                    <p><strong>Answer Format</strong> {!! $question->answer_format ?? "" !!}</p>
-                                </div>
-                            @endif
-
                             @if(isset($question->questionDeatils) && count($question->questionDeatils) > 0)
                                 @foreach($question->questionDeatils as $details)
                                     <div class="col-md-12" style="display:flex;">

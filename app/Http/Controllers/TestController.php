@@ -46,6 +46,8 @@ use Illuminate\Support\Arr;
 use Maatwebsite\Excel\Concerns\Importable;
 use Maatwebsite\Excel\HeadingRowImport;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Mpdf\Mpdf;
+
 class TestController extends Controller
 {
     public function testPaperCreate()
@@ -858,10 +860,12 @@ class TestController extends Controller
         }
     }
 
+
+
     public function download($id)
     {
-        set_time_limit(120); // 🔥 increase execution time
-        ini_set('memory_limit', '256M');
+        set_time_limit(120);
+        ini_set('memory_limit', '512M');
 
         $paper = Test::with([
             'category:id,name',
@@ -872,25 +876,55 @@ class TestController extends Controller
             'chapter:id,name',
             'testDetails.question'
         ])->findOrFail($id);
-        $logoPath = public_path('images/Neti-logo.png');
 
+        $logoPath = public_path('images/Neti-logo.png');
         $logoBase64 = null;
 
         if (file_exists($logoPath)) {
             $type = pathinfo($logoPath, PATHINFO_EXTENSION);
             $data = file_get_contents($logoPath);
-
             $logoBase64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
         }
 
-        $pdf = PDF::loadView('test-paper.pdf-view', compact('paper', 'logoBase64'))
-            ->setOptions([
-                'dpi' => 72,
-                'isHtml5ParserEnabled' => true,
-                'isRemoteEnabled' => true
-            ]);
+        $html = view('test-paper.pdf-view', compact('paper', 'logoBase64'))->render();
 
-        return $pdf->stream($paper->name . '.pdf');
+        $mpdf = new Mpdf([
+            'mode' => 'utf-8',
+            'format' => 'A4',
+            'margin_top' => 10,
+            'margin_bottom' => 20,   // leaves room for the fixed footer
+            'margin_left' => 12,
+            'margin_right' => 12,
+             'fontDir' => array_merge(
+                (new \Mpdf\Config\ConfigVariables())->getDefaults()['fontDir'],
+                [storage_path('fonts')]
+            ),
+            'fontdata' => array_merge(
+                (new \Mpdf\Config\FontVariables())->getDefaults()['fontdata'],
+                [
+                    'notodevanagari' => [
+                        'R' => 'NotoSansDevanagari-Regular.ttf',
+                    ],
+                ]
+            ),
+            'default_font' => 'notodevanagari',
+        ]);
+
+        // ---- WATERMARK ----
+        if ($logoPath && file_exists($logoPath)) {
+            // SetWatermarkImage($src, $alpha, $size, $pos)
+            $mpdf->SetWatermarkImage($logoPath, 0.06, [140, 140], 'P'); // 'P' = centered per page
+            $mpdf->showWatermarkImage = true;
+        } else {
+            $mpdf->SetWatermarkText(config('app.name'), 0.06);
+            $mpdf->showWatermarkText = true;
+        }
+
+        $mpdf->WriteHTML($html);
+
+        return response($mpdf->Output($paper->name . '.pdf', 'S'), 200)
+            ->header('Content-Type', 'application/pdf')
+            ->header('Content-Disposition', 'inline; filename="' . $paper->name . '.pdf"');
     }
 
 

@@ -21,7 +21,7 @@
                 <td style="width:12%;">
                     {{ date('d/m/Y', strtotime($data->created_at))}}<br />{{ date('g:i A', strtotime($data->created_at))}}
                 </td>
-                <td>{{ Helper::limitTextChars(strip_tags($data->question), 80) }}
+                <td>{!! \Illuminate\Support\Str::limit(html_entity_decode(strip_tags($data->question)), 80) !!}
                     <br /><span class="badge badge-success">{{$data->question_type ?? ""}}</span>
                 </td>
                 <td>{{$data->topics->name ?? "_"}}<br /><span

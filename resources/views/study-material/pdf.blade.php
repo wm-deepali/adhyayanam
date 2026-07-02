@@ -1,256 +1,227 @@
 <!DOCTYPE html>
 <html>
-
 <head>
     <meta charset="utf-8">
     <title>Study Material PDF</title>
-
     <style>
         body {
-            font-family: DejaVu Sans, sans-serif;
-            font-size: 12px;
+            font-family: 'notodevanagari', sans-serif;
+            font-size: 11px;
             line-height: 1.6;
+            color: #222;
         }
 
-        .header {
+        /* ---- Top brand bar ---- */
+        .brand-header {
             text-align: center;
-            margin-bottom: 25px;
-            border-bottom: 1px solid #ccc;
-            padding-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #1e3a5f;
+            margin-bottom: 10px;
         }
-
-        .header h2 {
-            margin: 0;
-            font-size: 20px;
-        }
-
-        .details {
-            margin-top: 15px;
-        }
-
-        .row {
-            margin-bottom: 8px;
-        }
-
-        .label {
+        .brand-header img { height: 55px; margin-bottom: 4px; }
+        .brand-header .tagline {
+            font-size: 11px;
+            letter-spacing: 2px;
+            color: #1e3a5f;
             font-weight: bold;
-            display: inline-block;
-            width: 160px;
+        }
+
+        .ref-row {
+            font-size: 10px;
+            color: #555;
+            margin-bottom: 12px;
+            overflow: hidden;
+        }
+        .ref-row .ref { float: left; }
+        .ref-row .date { float: right; }
+
+        .doc-title {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+        .doc-title-rule {
+            border-bottom: 1px solid #ccc;
+            margin-bottom: 14px;
+        }
+
+        /* ---- Details table ---- */
+        table.details-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        table.details-table td {
+            padding: 6px 8px;
+            border-bottom: 1px solid #e0e0e0;
             vertical-align: top;
         }
-
-        .value {
-            display: inline-block;
-            width: calc(100% - 170px);
+        table.details-table tr:nth-child(even) { background-color: #f4f7fa; }
+        table.details-table td.label {
+            font-weight: bold;
+            width: 150px;
+            color: #1e3a5f;
         }
 
-        .section-title {
-            margin-top: 25px;
-            font-size: 15px;
+        /* ---- Section header bars ---- */
+        .section-bar {
+            background-color: #1e3a5f;
+            color: #fff;
             font-weight: bold;
-            border-bottom: 1px solid #999;
-            padding-bottom: 4px;
+            font-size: 12px;
+            letter-spacing: 1px;
+            padding: 6px 10px;
+            margin-top: 18px;
+            margin-bottom: 0;
         }
 
         .content-box {
-            margin-top: 8px;
-            padding: 10px;
             border: 1px solid #ddd;
+            border-left: 4px solid #1e3a5f;
+            background-color: #fafbfc;
+            padding: 12px;
+            margin-bottom: 10px;
         }
 
         .section-box {
-            margin-top: 15px;
-            padding: 10px;
-            border: 1px solid #ccc;
+            border: 1px solid #ddd;
+            border-left: 4px solid #1e3a5f;
+            background-color: #fafbfc;
+            padding: 12px;
+            margin-top: 10px;
         }
-
         .section-box h4 {
             margin: 0 0 8px 0;
-            font-size: 14px;
+            font-size: 13px;
+            color: #1e3a5f;
         }
+        .section-box img { max-width: 200px; }
 
-        .watermark {
-            position: fixed;
-            top: 35%;
-            left: 0;
-            right: 0;
-            text-align: center;
-            z-index: -1;
-        }
-
-        .watermark img {
-            width: 300px;
-            opacity: 0.08;
-            transform: rotate(-30deg);
-        }
-
-        .watermark-text {
-            font-size: 60px;
-            color: rgba(0, 0, 0, 0.08);
-            transform: rotate(-30deg);
-            font-weight: bold;
-        }
-
+        /* ---- Footer ---- */
         .pdf-footer {
             position: fixed;
-            bottom: 10px;
+            bottom: -20px;
             left: 0;
             right: 0;
-            text-align: center;
-            font-size: 10px;
-            color: #555;
+            font-size: 9px;
+            color: #777;
+            border-top: 1px solid #ccc;
+            padding-top: 4px;
+            overflow: hidden;
         }
-
-        .pdf-header {
-            margin-bottom: 20px;
-        }
-
-        .pdf-header img {
-            height: 45px;
-        }
-
-        .site-name {
-            font-size: 18px;
-            font-weight: bold;
-        }
+        .pdf-footer .left { float: left; }
+        .pdf-footer .right { float: right; }
     </style>
 </head>
-
 <body>
 
-    {{-- WATERMARK --}}
-    @if($logoBase64)
-        <div class="watermark">
-            <img src="{{ $logoBase64 }}" alt="Watermark Logo">
-        </div>
-    @else
-        <div class="watermark watermark-text">
-            {{ config('app.name') }}
-        </div>
-    @endif
-
-    {{-- HEADER --}}
-    <div class="pdf-header">
+    {{-- BRAND HEADER --}}
+    <div class="brand-header">
         @if($logoBase64)
-            <img src="{{ $logoBase64 }}" alt="Logo">
-        @else
-            <div class="site-name">{{ config('app.name') }}</div>
+            <img src="{{ $logoBase64 }}" alt="Logo"><br>
         @endif
+        <div class="tagline">{{ strtoupper(config('app.name')) }} &bull; STUDY MATERIAL</div>
     </div>
 
-    {{-- HEADER --}}
-    <div class="header">
-        <h2>Study Material Details</h2>
+    {{-- REF / DATE --}}
+    <div class="ref-row">
+        <span class="ref"><strong>Ref:</strong> {{ $material->based_on ?? ucwords(str_replace('_', ' ', $material->material_type)) }}</span>
+        <span class="date"><strong>Date:</strong> {{ now()->format('d-M-Y') }}</span>
     </div>
 
-    {{-- BASIC DETAILS --}}
-    <div class="details">
+    <div class="doc-title">Study Material Details</div>
+    <div class="doc-title-rule"></div>
 
-        <div class="row">
-            <span class="label">Commission:</span>
-            <span class="value">{{ $material->commission->name ?? 'N/A' }}</span>
-        </div>
-
-        <div class="row">
-            <span class="label">Category:</span>
-            <span class="value">{{ $material->category->name ?? 'N/A' }}</span>
-        </div>
-
-        <div class="row">
-            <span class="label">Sub Category:</span>
-            <span class="value">{{ $material->subcategory->name ?? 'N/A' }}</span>
-        </div>
-
+    {{-- DETAILS TABLE --}}
+    <table class="details-table">
+        <tr>
+            <td class="label">Commission:</td>
+            <td>{{ $material->commission->name ?? 'N/A' }}</td>
+        </tr>
+        <tr>
+            <td class="label">Category:</td>
+            <td>{{ $material->category->name ?? 'N/A' }}</td>
+        </tr>
+        <tr>
+            <td class="label">Sub Category:</td>
+            <td>{{ $material->subcategory->name ?? 'N/A' }}</td>
+        </tr>
         @if($material->subjects->count())
-            <div class="row">
-                <span class="label">Subject:</span>
-                <span class="value">{{ $material->subjects->pluck('name')->implode(', ') }}</span>
-            </div>
+        <tr>
+            <td class="label">Subject:</td>
+            <td>{{ $material->subjects->pluck('name')->implode(', ') }}</td>
+        </tr>
         @endif
-
         @if($material->chapters->count())
-            <div class="row">
-                <span class="label">Chapter:</span>
-                <span class="value">{{ $material->chapters->pluck('name')->implode(', ') }}</span>
-            </div>
+        <tr>
+            <td class="label">Chapter:</td>
+            <td>{{ $material->chapters->pluck('name')->implode(', ') }}</td>
+        </tr>
         @endif
-
         @if($material->topics->count())
-            <div class="row">
-                <span class="label">Topic:</span>
-                <span class="value">{{ $material->topics->pluck('name')->implode(', ') }}</span>
-            </div>
+        <tr>
+            <td class="label">Topic:</td>
+            <td>{{ $material->topics->pluck('name')->implode(', ') }}</td>
+        </tr>
         @endif
-
-        <div class="row">
-            <span class="label">Material Type:</span>
-            <span class="value">
-                {{ $material->based_on ?? ucwords(str_replace('_', ' ', $material->material_type)) }}
-            </span>
-        </div>
-
-        <div class="row">
-            <span class="label">Language:</span>
-            <span class="value">{{ ucfirst($material->language) }}</span>
-        </div>
-
-        <div class="row">
-            <span class="label">Title:</span>
-            <span class="value">{{ $material->title }}</span>
-        </div>
-
-        <div class="row">
-            <span class="label">Short Description:</span>
-            <span class="value">{{ $material->short_description }}</span>
-        </div>
-
-        <div class="row">
-            <span class="label">Paid:</span>
-            <span class="value">{{ $material->IsPaid ? 'Yes' : 'No' }}</span>
-        </div>
-
+        <tr>
+            <td class="label">Material Type:</td>
+            <td>{{ $material->based_on ?? ucwords(str_replace('_', ' ', $material->material_type)) }}</td>
+        </tr>
+        <tr>
+            <td class="label">Language:</td>
+            <td>{{ ucfirst($material->language) }}</td>
+        </tr>
+        <tr>
+            <td class="label">Title:</td>
+            <td>{{ $material->title }}</td>
+        </tr>
+        <tr>
+            <td class="label" style="vertical-align:top;">Short Description:</td>
+            <td>{{ $material->short_description }}</td>
+        </tr>
+        <tr>
+            <td class="label">Paid:</td>
+            <td>{{ $material->IsPaid ? 'Yes' : 'No' }}</td>
+        </tr>
         @if($material->IsPaid)
-            <div class="row">
-                <span class="label">MRP:</span>
-                <span class="value">₹ {{ $material->mrp }}</span>
-            </div>
-
-            <div class="row">
-                <span class="label">Discount:</span>
-                <span class="value">{{ $material->discount }}%</span>
-            </div>
-
-            <div class="row">
-                <span class="label">Offered Price:</span>
-                <span class="value">₹ {{ $material->price }}</span>
-            </div>
+        <tr>
+            <td class="label">MRP:</td>
+            <td>₹ {{ $material->mrp }}</td>
+        </tr>
+        <tr>
+            <td class="label">Discount:</td>
+            <td>{{ $material->discount }}%</td>
+        </tr>
+        <tr>
+            <td class="label">Offered Price:</td>
+            <td>₹ {{ $material->price }}</td>
+        </tr>
         @endif
-
-        <div class="row">
-            <span class="label">Status:</span>
-            <span class="value">{{ $material->status }}</span>
-        </div>
-
-        <div class="row">
-            <span class="label">PDF Downloadable:</span>
-            <span class="value">{{ $material->is_pdf_downloadable ? 'Yes' : 'No' }}</span>
-        </div>
-
-        <div class="row">
-            <span class="label">Created At:</span>
-            <span class="value">{{ $material->created_at->format('d M, Y H:i A') }}</span>
-        </div>
-    </div>
+        <tr>
+            <td class="label">Status:</td>
+            <td>{{ $material->status }}</td>
+        </tr>
+        <tr>
+            <td class="label">PDF Downloadable:</td>
+            <td>{{ $material->is_pdf_downloadable ? 'Yes' : 'No' }}</td>
+        </tr>
+        <tr>
+            <td class="label">Created At:</td>
+            <td>{{ $material->created_at->format('d M, Y H:i A') }}</td>
+        </tr>
+    </table>
 
     {{-- DETAIL CONTENT --}}
-    <div class="section-title">Detail Content</div>
+    <div class="section-bar">DETAIL CONTENT</div>
     <div class="content-box">
         {!! $material->detail_content !!}
     </div>
 
     {{-- SECTIONS --}}
     @if(!empty($material->sections) && count($material->sections))
-        <div class="section-title">Sections</div>
+        <div class="section-bar">SECTIONS</div>
 
         @foreach($material->sections as $index => $section)
             <div class="section-box">
@@ -262,9 +233,9 @@
 
     {{-- FOOTER --}}
     <div class="pdf-footer">
-        © {{ date('Y') }} {{ config('app.name') }} | All Rights Reserved
+        <span class="left">© {{ date('Y') }} {{ config('app.name') }}. All Rights Reserved.</span>
+        <span class="right">Confidential Study Document</span>
     </div>
 
 </body>
-
 </html>

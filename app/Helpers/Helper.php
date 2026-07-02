@@ -201,4 +201,16 @@ class Helper
 
         return isset($permissions[$moduleKey . '_approval']);
     }
+
+    public static function cleanFontStyle($html)
+{
+    if (empty($html)) {
+        return $html;
+    }
+
+    // Remove any font-family declaration from inline style="" attributes
+    $html = preg_replace('/font-family\s*:\s*[^;"]+;?/i', '', $html);
+
+    return $html;
+}
 }

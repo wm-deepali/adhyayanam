@@ -1043,7 +1043,7 @@
                             <a class="enroll-now theme-btn" href="Javascript:void(0);">Already Enrolled!</a>
                             @endif
                             @else
-                            <a class="enroll-now theme-btn" href="{{route('student.login')}}">Enroll Now !</a>
+                            <a class="enroll-now theme-btn" href="{{route('student.login', ['redirect' => url()->full()] )}}">Enroll Now !</a>
                             @endif
 
                         </div>
@@ -1075,7 +1075,7 @@
                         <a class="enroll-btn disabled" href="Javascript:void(0);">Already Enrolled</a>
                         @endif
                         @else
-                        <a class="enroll-btn" href="{{route('student.login')}}">Enroll Now</a>
+                        <a class="enroll-btn" href="{{route('student.login', ['redirect' => url()->full()] )}}">Enroll Now</a>
                         @endif
                     </div>
                 </div>

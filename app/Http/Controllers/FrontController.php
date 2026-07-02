@@ -53,6 +53,7 @@ use App\Models\AboutPageSection;
 use App\Models\AboutPageCounter;
 use App\Models\AboutPageHighlight;
 use App\Models\AboutPageStrength;
+use Mpdf\Mpdf;
 
 class FrontController extends Controller
 {
@@ -988,6 +989,10 @@ class FrontController extends Controller
     public function batchesIndex()
     {
         $data['batches'] = BatchProgramme::paginate(10);
+        $data['batchMarquees'] = \App\Models\BatchMarquee::where('status', 1)
+            ->latest()
+            ->get();
+
         return view('front.user.batches-and-online-programme', $data);
     }
 
@@ -1100,7 +1105,7 @@ class FrontController extends Controller
         // Pagination
         $data['testPackages'] = $testSeriesQuery->paginate(9)->withQueryString();
 
-// dd($data['testPackages']->toArray());
+        // dd($data['testPackages']->toArray());
         return view('front.user.test-series', $data);
     }
 
@@ -1186,6 +1191,7 @@ class FrontController extends Controller
         ], [
             'otp.exists' => 'Enter Correct Otp'
         ]);
+
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
@@ -1193,21 +1199,12 @@ class FrontController extends Controller
                 'errors' => $validator->errors(),
             ]);
         }
-        $student = UserMobiileVerification::where('mobile_number', $request->mobile_number)->where('otp', $request->otp)->first();
-        if ($student) {
-            $student->update(['verified' => 'yes']);
-            $student1 = User::updateOrCreate(['mobile' => $request->mobile_number, 'type' => 'student'], [
-                'mobile' => $request->mobile_number,
-            ]);
-            Auth::login($student1);
-            $profile = ($student1->email != '' && $student1->type == 'student') ? 1 : 0;
-            \LogActivity::addToLog('Login', $student1);
-            return response()->json([
-                'profile' => $profile,
-                'success' => true,
-                'message' => 'Succesfully Verified Otp',
-            ]);
-        } else {
+
+        $student = UserMobiileVerification::where('mobile_number', $request->mobile_number)
+            ->where('otp', $request->otp)
+            ->first();
+
+        if (!$student) {
             return response()->json([
                 'profile' => 0,
                 'success' => false,
@@ -1215,7 +1212,30 @@ class FrontController extends Controller
             ]);
         }
 
+        $student->update(['verified' => 'yes']);
 
+        $student1 = User::updateOrCreate(
+            [
+                'mobile' => $request->mobile_number,
+                'type' => 'student'
+            ],
+            [
+                'mobile' => $request->mobile_number,
+            ]
+        );
+
+        Auth::login($student1);
+
+        $profile = (!empty($student1->email) && $student1->type == 'student') ? 1 : 0;
+
+        \LogActivity::addToLog('Login', $student1);
+
+        return response()->json([
+            'success' => true,
+            'profile' => $profile,
+            'message' => 'Successfully Verified OTP',
+            'redirect_url' => session('url.intended'),
+        ]);
     }
 
     public function storeHomeEnquiry(Request $request)
@@ -1254,8 +1274,8 @@ class FrontController extends Controller
 
     public function testDownload($id)
     {
-        set_time_limit(120); // 🔥 increase execution time
-        ini_set('memory_limit', '256M');
+        set_time_limit(120);
+        ini_set('memory_limit', '512M');
 
         $paper = Test::with([
             'category:id,name',
@@ -1266,25 +1286,56 @@ class FrontController extends Controller
             'chapter:id,name',
             'testDetails.question'
         ])->findOrFail($id);
-        $logoPath = public_path('images/Neti-logo.png');
 
+
+        $logoPath = public_path('images/Neti-logo.png');
         $logoBase64 = null;
 
         if (file_exists($logoPath)) {
             $type = pathinfo($logoPath, PATHINFO_EXTENSION);
             $data = file_get_contents($logoPath);
-
             $logoBase64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
         }
 
-        $pdf = PDF::loadView('test-paper.pdf-view', compact('paper', 'logoBase64'))
-            ->setOptions([
-                'dpi' => 72,
-                'isHtml5ParserEnabled' => true,
-                'isRemoteEnabled' => true
-            ]);
+        $html = view('test-paper.pdf-view', compact('paper', 'logoBase64'))->render();
 
-        return $pdf->stream($paper->name . '.pdf');
+        $mpdf = new Mpdf([
+            'mode' => 'utf-8',
+            'format' => 'A4',
+            'margin_top' => 10,
+            'margin_bottom' => 20,   // leaves room for the fixed footer
+            'margin_left' => 12,
+            'margin_right' => 12,
+            'fontDir' => array_merge(
+                (new \Mpdf\Config\ConfigVariables())->getDefaults()['fontDir'],
+                [storage_path('fonts')]
+            ),
+            'fontdata' => array_merge(
+                (new \Mpdf\Config\FontVariables())->getDefaults()['fontdata'],
+                [
+                    'notodevanagari' => [
+                        'R' => 'NotoSansDevanagari-Regular.ttf',
+                    ],
+                ]
+            ),
+            'default_font' => 'notodevanagari',
+        ]);
+
+        // ---- WATERMARK ----
+        if ($logoPath && file_exists($logoPath)) {
+            // SetWatermarkImage($src, $alpha, $size, $pos)
+            $mpdf->SetWatermarkImage($logoPath, 0.06, [140, 140], 'P'); // 'P' = centered per page
+            $mpdf->showWatermarkImage = true;
+        } else {
+            $mpdf->SetWatermarkText(config('app.name'), 0.06);
+            $mpdf->showWatermarkText = true;
+        }
+
+        $mpdf->WriteHTML($html);
+
+        return response($mpdf->Output($paper->name . '.pdf', 'S'), 200)
+            ->header('Content-Type', 'application/pdf')
+            ->header('Content-Disposition', 'inline; filename="' . $paper->name . '.pdf"');
     }
 
     public function logout()

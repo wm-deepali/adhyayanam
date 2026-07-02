@@ -35,6 +35,7 @@ use App\Http\Controllers\CMS\HomeSectionController;
 use App\Http\Controllers\PaperController;
 use App\Http\Controllers\OfficeAddressController;
 use App\Http\Controllers\Admin\AboutPageController;
+use App\Http\Controllers\BatchMarqueeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -314,7 +315,7 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
 
         //Content Management
         Route::prefix('content-management')->group(function () {
-            
+
             // Privacy Policies
             Route::get('/privacy-policies', [ContentManagementController::class, 'privacyPolicies'])->name('cm.privacy.policy')->middleware('custom.permission:manage_privacy');
             Route::post('/privacy-policies/store', [ContentManagementController::class, 'privacyStore'])->name('privacy.policies.store')->middleware('custom.permission:manage_privacy_edit');
@@ -785,6 +786,8 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
             Route::put('/{id}', [ContentManagementController::class, 'batchesProgrammeUpdate'])->name('update')->middleware('custom.permission:manage_batches_edit');
             Route::delete('/delete/{id}', [ContentManagementController::class, 'batchesProgrammeDelete'])->name('delete')->middleware('custom.permission:manage_batches_delete');
         });
+
+        Route::resource('batch-marquee', BatchMarqueeController::class);
 
         /** ------------------------
          *  ROLE GROUP MANAGEMENT

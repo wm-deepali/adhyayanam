@@ -20,7 +20,7 @@ return new class extends Migration
 
             $table->string('email')->nullable();
 
-            $table->longText('map_embbed')->nullable();
+            $table->string('map_link')->nullable();
 
             $table->integer('sort_order')->default(0);
 

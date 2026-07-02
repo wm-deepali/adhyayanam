@@ -1,7 +1,18 @@
 @if(isset($question) && !empty($question))
+    @php
+        $questionText = \App\Helpers\Helper::cleanFontStyle($question->question ?? '');
+        $optionA = \App\Helpers\Helper::cleanFontStyle($question->option_a ?? '');
+        $optionB = \App\Helpers\Helper::cleanFontStyle($question->option_b ?? '');
+        $optionC = \App\Helpers\Helper::cleanFontStyle($question->option_c ?? '');
+        $optionD = \App\Helpers\Helper::cleanFontStyle($question->option_d ?? '');
+        $optionE = \App\Helpers\Helper::cleanFontStyle($question->option_e ?? '');
+        $answerText = \App\Helpers\Helper::cleanFontStyle($question->answer ?? '');
+        $answerFormat = \App\Helpers\Helper::cleanFontStyle($question->answer_format ?? '');
+    @endphp
+
     <div class="col-md-12" style="display:flex; justify-content:space-between; align-items:center;">
         <div>
-            {!! 'Q' . $parentIndex . ' (' . $index . ') ' . $question->question !!}
+            {!! 'Q' . $parentIndex . ' (' . $index . ') ' . $questionText !!}
         </div>
 
         {{-- ✅ Show Positive + Negative Marks --}}
@@ -16,33 +27,33 @@
     </div>
 
     {{-- ✅ Options --}}
-    @if(strip_tags($question->option_a) != "")
-        <div class="col-md-12"><p><strong>A)</strong> {!! $question->option_a !!}</p></div>
+    @if(strip_tags($optionA) != "")
+        <div class="col-md-12"><p><strong>A)</strong> {!! $optionA !!}</p></div>
     @endif
-    @if(strip_tags($question->option_b) != "")
-        <div class="col-md-12"><p><strong>B)</strong> {!! $question->option_b !!}</p></div>
+    @if(strip_tags($optionB) != "")
+        <div class="col-md-12"><p><strong>B)</strong> {!! $optionB !!}</p></div>
     @endif
-    @if(strip_tags($question->option_c) != "")
-        <div class="col-md-12"><p><strong>C)</strong> {!! $question->option_c !!}</p></div>
+    @if(strip_tags($optionC) != "")
+        <div class="col-md-12"><p><strong>C)</strong> {!! $optionC !!}</p></div>
     @endif
-    @if(strip_tags($question->option_d) != "")
-        <div class="col-md-12"><p><strong>D)</strong> {!! $question->option_d !!}</p></div>
+    @if(strip_tags($optionD) != "")
+        <div class="col-md-12"><p><strong>D)</strong> {!! $optionD !!}</p></div>
     @endif
-    @if(strip_tags($question->option_e) != "")
-        <div class="col-md-12"><p><strong>E)</strong> {!! $question->option_e !!}</p></div>
+    @if(strip_tags($optionE) != "")
+        <div class="col-md-12"><p><strong>E)</strong> {!! $optionE !!}</p></div>
     @endif
 
     {{-- ✅ Answer --}}
-    @if(strip_tags($question->answer) != "")
+    @if(strip_tags($answerText) != "")
         <div class="col-md-12">
-            <p><strong>Answer:</strong> {!! $question->answer !!}</p>
+            <p><strong>Answer:</strong> {!! $answerText !!}</p>
         </div>
     @endif
 
     {{-- ✅ Subjective Answer Format --}}
-    @if(strip_tags($question->answer_format) != "")
+    @if(strip_tags($answerFormat) != "")
         <div class="col-md-12">
-            <p><strong>Answer Format:</strong> {!! strip_tags($question->answer_format) !!}</p>
+            <p><strong>Answer Format:</strong> {!! strip_tags($answerFormat) !!}</p>
         </div>
     @endif
 @endif

@@ -293,17 +293,18 @@
                                             $studentId = $isLoggedIn ? auth()->id() : null;
 
                                             // Replace this with your actual purchase logic
-                                            $isPurchased = $isLoggedIn && \App\Models\Order::where('package_id', $paper->id)
-                                                ->where('order_type', 'Paper')
+                                            $isPurchased = $isLoggedIn && \App\Models\Order::where('order_type', 'Paper')
                                                 ->where('student_id', $studentId)
+                                                  ->whereRaw('FIND_IN_SET(?, package_id)', [$paper->id])
                                                 ->exists();
                                         @endphp
 
                                         @if(!$isLoggedIn)
 
-                                            <a href="{{ route('student.login') }}" class="attempt-btn">
-                                                Login to Continue
-                                            </a>
+                                      <a href="{{ route('student.login', ['redirect' => url()->full()]) }}"
+   class="attempt-btn">
+    Login to Continue
+</a>
 
                                         @else
 

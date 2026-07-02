@@ -397,12 +397,12 @@
                                             <hr>
 
                                             {{-- Assign Marks ONLY for subjective child --}}
-                                            @if($isSubjective && \App\Helpers\Helper::canAccess('manage_test_attempts_edit'))
-                                                <button type="button" class="btn btn-dark w-100"
-                                                    onclick="openMarksModal('{{ $child->id }}','{{ $child->positive_mark }}','{{ $child->obtained_marks }}')">
-                                                    Assign Marks
-                                                </button>
-                                            @endif
+@if($isSubjective && $child->attempt_status == 'attempted' && \App\Helpers\Helper::canAccess('manage_test_attempts_edit'))
+    <button type="button" class="btn btn-dark w-100"
+        onclick="openMarksModal('{{ $child->id }}','{{ $child->positive_mark }}','{{ $child->obtained_marks }}')">
+        Assign Marks
+    </button>
+@endif
 
 
                                             {{-- For MCQ show correct answer --}}
@@ -529,15 +529,16 @@
 
                                 <hr>
 
-                                @if(
-                                        $ans->question->question_type == "Subjective" &&
-                                        \App\Helpers\Helper::canAccess('manage_test_attempts_edit')
-                                    )
-                                    <button type="button" class="btn btn-dark w-100"
-                                        onclick="openMarksModal('{{ $ans->id }}', '{{ $ans->positive_mark }}', '{{ $ans->obtained_marks }}')">
-                                        Assign Marks
-                                    </button>
-                                @endif
+                              @if(
+        $ans->question->question_type == "Subjective" &&
+        $ans->attempt_status == 'attempted' &&
+        \App\Helpers\Helper::canAccess('manage_test_attempts_edit')
+    )
+    <button type="button" class="btn btn-dark w-100"
+        onclick="openMarksModal('{{ $ans->id }}', '{{ $ans->positive_mark }}', '{{ $ans->obtained_marks }}')">
+        Assign Marks
+    </button>
+@endif
 
                                 <p class="mt-2">
                                     <strong>Marks:</strong>
@@ -691,6 +692,7 @@
                 .then(res => res.json())
                 .then(data => {
                     if (data.status) {
+                        location.reload(); // Reload the page to reflect changes
                         document.getElementById("marks-display-" + qid).innerText = marks;
 
                         // Close modal

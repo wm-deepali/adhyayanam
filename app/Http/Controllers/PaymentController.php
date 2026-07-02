@@ -10,17 +10,6 @@ use App\Models\StudyMaterial;
 use App\Models\TestSeries;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\Rule;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
-use Illuminate\Support\Arr;
-use App\Helpers\LogActivity;
-use Illuminate\Support\Facades\Hash;
-use App\Helpers\Helper;
 
 
 class PaymentController extends Controller

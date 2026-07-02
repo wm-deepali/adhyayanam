@@ -68,6 +68,34 @@ class LiveTestController extends Controller
 
         $questionList = array_values(array_filter($questionList));
 
+        // ================= QUESTION ORDER (SHUFFLE PER ATTEMPT) =================
+        // A brand new attempt (wasRecentlyCreated) always gets a freshly
+        // shuffled sequence, persisted to `question_order` so that resuming
+        // this same attempt (refresh, tab close/reopen, etc.) doesn't
+        // re-shuffle mid-test. A retake always creates a NEW attempt row,
+        // so it naturally gets its own independent shuffle here — never the
+        // same order as a previous attempt on the same paper.
+        if ($attempt->wasRecentlyCreated) {
+            shuffle($questionList);
+            $attempt->question_order = json_encode($questionList);
+            $attempt->save();
+        } elseif (!empty($attempt->question_order)) {
+            $storedOrder = json_decode($attempt->question_order, true);
+
+            // Guard against stale/mismatched stored order (e.g. test questions
+            // were edited after the attempt started) by falling back to the
+            // DB order if the stored list doesn't match what's currently on the test.
+            if (
+                is_array($storedOrder) && count(array_diff($storedOrder, $questionList)) === 0
+                && count(array_diff($questionList, $storedOrder)) === 0
+            ) {
+                $questionList = $storedOrder;
+            }
+        }
+        // else: legacy in-progress attempt with no stored order yet (predates
+        // this feature) — keep default DB order rather than reshuffling an
+        // attempt already underway.
+
         // ================= ANSWER COUNT =================
         $answeredQuery = StudentTestAnswer::where('attempt_id', $attempt->id)
             ->whereNull('parent_question_id')
@@ -293,8 +321,39 @@ class LiveTestController extends Controller
             $remainingTime = $request->remaining_time ?? 0;
 
             $test = Test::findOrFail($testId);
-            $answers = StudentTestAnswer::where('attempt_id', $attempt->id)->get();
             $testDetails = TestDetail::where('test_id', $testId)->get();
+
+            // ================= BACKFILL UNATTEMPTED QUESTIONS =================
+            // The front-end only POSTs to /save-answer when a question was actually
+            // touched (see saveAnswer() JS in live-test.blade.php — it returns early
+            // if `updated` is false). That means skipped questions never get a
+            // StudentTestAnswer row at all, and later reads from student_test_answers
+            // (here and in viewTestResult()) simply never see them, making the result
+            // page show fewer questions than the test actually has. Ensure every
+            // question defined on the test has a row before we evaluate anything.
+            foreach ($testDetails as $detail) {
+                StudentTestAnswer::firstOrCreate(
+                    [
+                        'attempt_id' => $attempt->id,
+                        'question_id' => $detail->question_id,
+                    ],
+                    [
+                        'parent_question_id' => $detail->parent_question_id,
+                        'answer_key' => null,
+                        'answer_text' => null,
+                        'answer_file' => null,
+                        'obtained_marks' => 0,
+                        'requires_manual_check' => false,
+                        'attempt_status' => 'not_attempted',
+                        'evaluation_status' => 'not_evaluated',
+                        'positive_mark' => $detail->positive_mark ?? 0,
+                        'negative_mark' => $detail->negative_mark ?? 0,
+                        'answered_at' => null,
+                    ]
+                );
+            }
+
+            $answers = StudentTestAnswer::where('attempt_id', $attempt->id)->get();
 
             $totalQuestions = $testDetails->where('parent_question_id', null)->count();
 
@@ -456,17 +515,18 @@ class LiveTestController extends Controller
             //     ->count();
             // $status = $pendingQuestions > 0 ? "pending" : "published";
 
-            $hasSubjectiveQuestions = TestDetail::where('test_id', $testId)
-                ->whereHas('question', function ($q) {
-                    $q->whereIn('question_type', ['Subjective', 'Story Based']);
-                })
+            // Status should reflect what THIS student actually attempted, not
+            // just whether the test contains subjective/story questions.
+            // A test can mix MCQ + Subjective questions, but if the student
+            // only answered the MCQs (or left the subjective ones blank),
+            // there's nothing left needing manual evaluation — it should
+            // publish immediately instead of sitting in "pending" forever.
+            $hasPendingEvaluation = StudentTestAnswer::where('attempt_id', $attempt->id)
+                ->where('attempt_status', 'attempted')
+                ->where('requires_manual_check', true)
                 ->exists();
 
-            if ($hasSubjectiveQuestions) {
-                $status = 'pending';
-            } else {
-                $status = 'published';
-            }
+            $status = $hasPendingEvaluation ? 'pending' : 'published';
 
             $durationSeconds = $test->duration * 60;
             $timeTaken = $durationSeconds - $remainingTime;

@@ -418,49 +418,49 @@ class FrontUserController extends Controller
         ));
     }
 
- public function generatePdf($id)
-{
-    $order = Order::with('student', 'transaction')->findOrFail($id);
+    public function generatePdf($id)
+    {
+        $order = Order::with('student', 'transaction')->findOrFail($id);
 
-    $course = null;
-    $studyMaterial = null;
-    $testSeries = null;
-    $papers = null;
+        $course = null;
+        $studyMaterial = null;
+        $testSeries = null;
+        $papers = null;
 
-    if ($order->order_type == 'Course') {
-        $course = Course::find($order->package_id);
-    } elseif ($order->order_type == 'Study Material') {
-        $studyMaterial = StudyMaterial::find($order->package_id);
-    } elseif ($order->order_type == 'Test Series') {
-        $testSeries = TestSeries::find($order->package_id);
-    } elseif ($order->order_type == 'Paper') {
-        $ids = explode(',', $order->package_id);
-        $papers = Test::whereIn('id', $ids)->get();
+        if ($order->order_type == 'Course') {
+            $course = Course::find($order->package_id);
+        } elseif ($order->order_type == 'Study Material') {
+            $studyMaterial = StudyMaterial::find($order->package_id);
+        } elseif ($order->order_type == 'Test Series') {
+            $testSeries = TestSeries::find($order->package_id);
+        } elseif ($order->order_type == 'Paper') {
+            $ids = explode(',', $order->package_id);
+            $papers = Test::whereIn('id', $ids)->get();
+        }
+
+        $logoPath = public_path('images/Neti-logo.png');
+        $logoBase64 = null;
+
+        if (file_exists($logoPath)) {
+            $type = pathinfo($logoPath, PATHINFO_EXTENSION);
+            $imageData = file_get_contents($logoPath);
+
+            $logoBase64 = 'data:image/' . $type . ';base64,' . base64_encode($imageData);
+        }
+
+        ini_set('memory_limit', '2048M'); // 2 GB
+        set_time_limit(300);
+
+        $pdf = Pdf::loadView('front-users.invoice-pdf', [
+            'order' => $order,
+            'course' => $course,
+            'studyMaterial' => $studyMaterial,
+            'testSeries' => $testSeries,
+            'papers' => $papers,
+            'logoBase64' => $logoBase64,
+        ]);
+        return $pdf->download('invoice_' . $order->order_code . '.pdf');
     }
-
-    $logoPath = public_path('images/Neti-logo.png');
-    $logoBase64 = null;
-
-    if (file_exists($logoPath)) {
-        $type = pathinfo($logoPath, PATHINFO_EXTENSION);
-        $imageData = file_get_contents($logoPath);
-
-        $logoBase64 = 'data:image/' . $type . ';base64,' . base64_encode($imageData);
-    }
-
-ini_set('memory_limit', '2048M'); // 2 GB
-set_time_limit(300);
-
-    $pdf = Pdf::loadView('front-users.invoice-pdf', [
-        'order' => $order,
-        'course' => $course,
-        'studyMaterial' => $studyMaterial,
-        'testSeries' => $testSeries,
-        'papers' => $papers,
-        'logoBase64' => $logoBase64,
-    ]);
-    return $pdf->download('invoice_' . $order->order_code . '.pdf');
-}
 
     public function myCourses()
     {
@@ -677,7 +677,7 @@ set_time_limit(300);
         $purchasedIds = $paidOrders->pluck('package_id')->toArray();
 
         // Fetch Test Series Assignments for Purchased
-        $testSeriesList = TestSeries::with('tests')
+        $testSeriesList = TestSeries::with('tests', 'commission', 'category', 'subcategory')
             ->whereIn('id', $purchasedIds)
             ->get()
             ->keyBy('id');
@@ -687,27 +687,72 @@ set_time_limit(300);
         }
 
         // Fetch FREE Test Series not already purchased
-        $freeSeries = TestSeries::with('tests')
+        $freeSeries = TestSeries::with('tests', 'commission', 'category', 'subcategory')
             ->where('fee_type', 'free')
             ->whereNotIn('id', $purchasedIds)
             ->get();
 
+        // ===== Filter option lists (built separately per section) =====
+        $purchasedCommissions = $testSeriesList->pluck('commission')->filter()->unique('id')->sortBy('name')->values();
+        $purchasedCategories = $testSeriesList->pluck('category')->filter()->unique('id')->sortBy('name')->values();
+        $purchasedSubcategories = $testSeriesList->pluck('subcategory')->filter()->unique('id')->sortBy('name')->values();
+
+        $freeCommissions = $freeSeries->pluck('commission')->filter()->unique('id')->sortBy('name')->values();
+        $freeCategories = $freeSeries->pluck('category')->filter()->unique('id')->sortBy('name')->values();
+        $freeSubcategories = $freeSeries->pluck('subcategory')->filter()->unique('id')->sortBy('name')->values();
+
         // Fetch IDs of completed/attempted test papers by student
         $studentAttempts = StudentTestAttempt::where('student_id', $studentId)
-            ->where('status', '!=', 'in_progress') // ⬅ EXCLUDE IN-PROGRESS TESTS
+            ->where('status', '!=', 'in_progress')
             ->pluck('test_id')
             ->toArray();
 
-
-        return view('front-users.test-series', compact('paidOrders', 'freeSeries', 'studentAttempts'));
+        return view('front-users.test-series', compact(
+            'paidOrders',
+            'freeSeries',
+            'studentAttempts',
+            'purchasedCommissions',
+            'purchasedCategories',
+            'purchasedSubcategories',
+            'freeCommissions',
+            'freeCategories',
+            'freeSubcategories'
+        ));
     }
-
 
     public function testSeriesDetail($slug)
     {
-        $testseries = TestSeries::with('tests', 'testseries')->where('slug', $slug)->firstOrFail();
+        $studentId = auth()->id();
 
-        return view('front-users.test-series-detail', compact('testseries'));
+        $testseries = TestSeries::with([
+            'tests.subject',
+            'tests.chapter',
+            'tests.topic',
+            'testseries'
+        ])
+            ->where('slug', $slug)
+            ->firstOrFail();
+
+        // ===== Attempt status per test (for the logged-in student) =====
+        $testIds = $testseries->tests->pluck('id');
+
+        $attempts = StudentTestAttempt::where('student_id', $studentId)
+            ->whereIn('test_id', $testIds)
+            ->get()
+            ->keyBy('test_id');
+
+        // ===== Filter option lists (Subject / Chapter / Topic) =====
+        $subjects = $testseries->tests->pluck('subject')->filter()->unique('id')->sortBy('name')->values();
+        $chapters = $testseries->tests->pluck('chapter')->filter()->unique('id')->sortBy('name')->values();
+        $topics = $testseries->tests->pluck('topic')->filter()->unique('id')->sortBy('name')->values();
+
+        return view('front-users.test-series-detail', compact(
+            'testseries',
+            'attempts',
+            'subjects',
+            'chapters',
+            'topics'
+        ));
     }
 
     public function listUserTestPapers()

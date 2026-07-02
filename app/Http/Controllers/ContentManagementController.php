@@ -63,6 +63,8 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\WalletTransaction;
 use App\Models\WalletSetting;
 use App\Helpers\Helper;
+use Mpdf\Mpdf;
+
 
 class ContentManagementController extends Controller
 {
@@ -2764,64 +2766,63 @@ class ContentManagementController extends Controller
             ->with('success', 'Study material has been created successfully.');
     }
 
+
     public function downloadPdf($id)
     {
-        try {
+        ini_set('memory_limit', '2048M');
+        set_time_limit(300);
 
-ini_set('memory_limit', '2048M'); // 2 GB
-set_time_limit(300);
-    
-            $material = StudyMaterial::with([
-                'commission',
-                'category',
-                'subcategory',
-            ])->findOrFail($id);
+        $material = StudyMaterial::with([
+            'commission',
+            'category',
+            'subcategory',
+        ])->findOrFail($id);
 
+        $logoPath = public_path('images/Neti-logo.png');
+        $logoBase64 = null;
 
-            /*
-            |--------------------------------------------------------------------------
-            | Generate PDF directly
-            |--------------------------------------------------------------------------
-            */
-            $logoPath = public_path('images/Neti-logo.png');
-
-            $logoBase64 = null;
-
-            if (file_exists($logoPath)) {
-                $type = pathinfo($logoPath, PATHINFO_EXTENSION);
-                $data = file_get_contents($logoPath);
-
-                $logoBase64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
-            }
-
-            $pdf = Pdf::loadView(
-                'study-material.pdf',
-                compact('material', 'logoBase64')
-            )->setPaper('a4', 'portrait');
-            // dd($pdf)
-
-            /*
-            |--------------------------------------------------------------------------
-            | Return direct download
-            |--------------------------------------------------------------------------
-            */
-
-            return $pdf->download(
-                'study_material_' . $material->id . '.pdf'
-            );
-           
-
-        } catch (\Exception $e) {
-
-            \Log::error(
-                'Study Material PDF Error: ' . $e->getMessage()
-            );
-
-            return back()->with(
-                'error',
-                'PDF download failed. Please try again.'
-            );
+        if (file_exists($logoPath)) {
+            $type = pathinfo($logoPath, PATHINFO_EXTENSION);
+            $data = file_get_contents($logoPath);
+            $logoBase64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
         }
+
+        // Render blade to HTML string
+        $html = view('study-material.pdf', compact('material', 'logoBase64'))->render();
+
+        $mpdf = new Mpdf([
+            'mode' => 'utf-8',
+            'format' => 'A4',
+            'fontDir' => array_merge(
+                (new \Mpdf\Config\ConfigVariables())->getDefaults()['fontDir'],
+                [storage_path('fonts')]
+            ),
+            'fontdata' => array_merge(
+                (new \Mpdf\Config\FontVariables())->getDefaults()['fontdata'],
+                [
+                    'notodevanagari' => [
+                        'R' => 'NotoSansDevanagari-Regular.ttf',
+                    ],
+                ]
+            ),
+            'default_font' => 'notodevanagari',
+        ]);
+
+        // ---- WATERMARK ----
+        if ($logoPath && file_exists($logoPath)) {
+            // SetWatermarkImage($src, $alpha, $size, $pos)
+            $mpdf->SetWatermarkImage($logoPath, 0.07, [140, 140], 'P'); // size in mm, 'P' = centered on page
+            $mpdf->showWatermarkImage = true;
+        } else {
+            $mpdf->SetWatermarkText(config('app.name'), 0.07);
+            $mpdf->showWatermarkText = true;
+        }
+
+        $mpdf->WriteHTML($html);
+
+        return response($mpdf->Output('study_material_' . $material->id . '.pdf', 'S'), 200)
+            ->header('Content-Type', 'application/pdf')
+            ->header('Content-Disposition', 'attachment; filename="study_material_' . $material->id . '.pdf"');
     }
 
     public function studyMaterialEdit($id)
@@ -4730,9 +4731,45 @@ set_time_limit(300);
             ->with('success', 'Question updated successfully');
     }
 
+    /**
+     * Safely get inner HTML from a table cell (tr -> td -> p), or fall back to td innerHtml.
+     * Returns null if the row/cell doesn't exist instead of throwing.
+     */
+    private function getCellHtml($table, int $rowIndex, int $colIndex = 1)
+    {
+        $tr = $table->find('tr', $rowIndex);
+        if (!$tr) {
+            return null;
+        }
+        $td = $tr->find('td', $colIndex);
+        if (!$td) {
+            return null;
+        }
+        $p = $td->find('p');
+        if ($p) {
+            return trim($p->innerHtml);
+        }
+        return trim($td->innerHtml);
+    }
+
+    /**
+     * Determine whether a cell's HTML is "empty" (nbsp, blank, or only whitespace after stripping tags).
+     */
+    private function isEmptyCell(?string $html): bool
+    {
+        if ($html === null) {
+            return true;
+        }
+        if ($html === '&nbsp;') {
+            return true;
+        }
+        $decoded = html_entity_decode($html, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $text = trim(str_replace("\xc2\xa0", '', strip_tags($decoded)));
+        return $text === '';
+    }
+
     public function ImportQuestions(Request $request)
     {
-        // dd($request->all());
         $validatedData = $request->validate([
             'language' => 'required',
             'question_category' => 'required',
@@ -4755,16 +4792,29 @@ set_time_limit(300);
                 $time = microtime(true);
                 $outputPath = storage_path('import_' . $time . '.html');
 
-
                 $filename = $request->file->getRealPath();
 
                 // unzip .docx temporarily
                 $zip = new \ZipArchive;
                 if ($zip->open($filename) === TRUE) {
                     $xml = $zip->getFromName('word/document.xml');
-                    // remove Office Math tags
-                    $xml = preg_replace('/<m:oMath[^>]*>.*?<\/m:oMath>/is', '', $xml);
-                    $xml = preg_replace('/<m:oMathPara[^>]*>.*?<\/m:oMathPara>/is', '', $xml);
+
+                    // Convert Office Math (equations) to plain text instead of deleting them.
+                    // Previously these were stripped entirely with preg_replace(..., ''), which
+                    // wiped out simple numeric/percentage expressions (e.g. "2+2=4", "25%") that
+                    // Word had encoded as <m:oMath> equation objects rather than plain text runs.
+                    // That left required cells (like the Answer cell) empty, causing valid
+                    // questions to be rejected with "Question Format Issue".
+                    $xml = preg_replace_callback('/<m:oMathPara[^>]*>(.*?)<\/m:oMathPara>/is', function ($m) {
+                        preg_match_all('/<m:t[^>]*>(.*?)<\/m:t>/is', $m[1], $t);
+                        return implode('', $t[1]);
+                    }, $xml);
+
+                    $xml = preg_replace_callback('/<m:oMath[^>]*>(.*?)<\/m:oMath>/is', function ($m) {
+                        preg_match_all('/<m:t[^>]*>(.*?)<\/m:t>/is', $m[1], $t);
+                        return implode('', $t[1]);
+                    }, $xml);
+
                     $zip->addFromString('word/document.xml', $xml);
                     $zip->close();
                 }
@@ -4777,7 +4827,6 @@ set_time_limit(300);
                 $dom->loadFromFile($outputPath);
 
                 $tables = $dom->find('table');
-
 
                 if ($request->question_type == 'MCQ') {
 
@@ -4798,112 +4847,82 @@ set_time_limit(300);
                         $show_on_pyq = 'no';
 
                         try {
-                            $question = $tables[$i]->find('tr', 0)->find('td', 1)->innerHtml;
-                            if ($tables[$i]->find('tr', 1)->find('td', 1)->find('p')->innerHtml == '&nbsp;') {
-                                $option_a = NULL;
-                            } else {
-                                $option_a = $tables[$i]->find('tr', 1)->find('td', 1)->find('p')->innerHtml;
+                            $qTr = $tables[$i]->find('tr', 0);
+                            $qTd = $qTr ? $qTr->find('td', 1) : null;
+                            $question = $qTd ? $qTd->innerHtml : null;
+
+                            if ($question === null) {
+                                throw new \Exception('Missing question row');
                             }
-                            if ($tables[$i]->find('tr', 2)->find('td', 1)->find('p')->innerHtml == '&nbsp;') {
-                                $option_b = NULL;
-                            } else {
-                                $option_b = $tables[$i]->find('tr', 2)->find('td', 1)->find('p')->innerHtml;
-                            }
-                            if ($tables[$i]->find('tr', 3)->find('td', 1)->find('p')->innerHtml == '&nbsp;') {
-                                $option_c = NULL;
-                            } else {
-                                $option_c = $tables[$i]->find('tr', 3)->find('td', 1)->find('p')->innerHtml;
-                            }
-                            if ($tables[$i]->find('tr', 4)->find('td', 1)->find('p')->innerHtml == '&nbsp;') {
-                                $option_d = NULL;
-                            } else {
-                                $option_d = $tables[$i]->find('tr', 4)->find('td', 1)->find('p')->innerHtml;
-                            }
+
+                            $rawA = $this->getCellHtml($tables[$i], 1);
+                            $option_a = $this->isEmptyCell($rawA) ? null : $rawA;
+
+                            $rawB = $this->getCellHtml($tables[$i], 2);
+                            $option_b = $this->isEmptyCell($rawB) ? null : $rawB;
+
+                            $rawC = $this->getCellHtml($tables[$i], 3);
+                            $option_c = $this->isEmptyCell($rawC) ? null : $rawC;
+
+                            $rawD = $this->getCellHtml($tables[$i], 4);
+                            $option_d = $this->isEmptyCell($rawD) ? null : $rawD;
 
                             $rejectQuestion = false;
                             $rejectNote = '';
 
-                            // Option E (optional)
-                            $tr5 = $tables[$i]->find('tr', 5);
-                            $td5 = $tr5 ? $tr5->find('td', 1) : null;
-                            $p5 = $td5 ? $td5->find('p') : null;
-
-                            $rawHtml = $p5 ? trim($p5->innerHtml) : '';
-                            $textOnly = trim(strip_tags($rawHtml)); // used ONLY for empty check
-
-                            // Check if Option E is actually empty
-                            if ($textOnly === '' || $textOnly === '&nbsp;' || $rawHtml === '&nbsp;') {
+                            // Option E (optional) - ROW 5
+                            $rawE = $this->getCellHtml($tables[$i], 5);
+                            if ($this->isEmptyCell($rawE)) {
                                 $option_e = null;
                                 $has_option_e = false;
                             } else {
-                                // Keep original HTML as required
-                                $option_e = $rawHtml;
+                                $option_e = $rawE;
                                 $has_option_e = true;
                             }
 
-
-                            // Answer (mandatory)
+                            // Answer (mandatory) - ROW 6
                             $tr6 = $tables[$i]->find('tr', 6);
                             $td6 = $tr6 ? $tr6->find('td', 1) : null;
                             $p6 = $td6 ? $td6->find('p') : null;
-                            if ($p6 === null) {
-                                $answer = null;
+                            $span = $p6 ? $p6->find('span') : null;
+                            $answer = $span ? trim(strip_tags($span->innerHtml)) : null;
+
+                            if ($answer === null || $answer === '' || $answer === '&nbsp;') {
                                 $rejectQuestion = true;
-                                $rejectNote = 'Question Format Issue';
-                            } else {
-                                $span = $p6->find('span');
-                                $answer = $span ? $span->innerHtml : null;
-                                if (!$answer) {
-                                    $rejectQuestion = true;
-                                    $rejectNote = 'Question Format Issue';
-                                }
+                                $rejectNote = 'Answer missing or unreadable (Row 6)';
+                                $answer = $answer ?: '';
                             }
 
-                            // Instruction (optional)
-                            $tr7 = $tables[$i]->find('tr', 7);
-                            $td7 = $tr7 ? $tr7->find('td', 1) : null;
-                            $p7 = $td7 ? $td7->find('p') : null;
-                            if ($p7 === null || $p7->innerHtml === '&nbsp;') {
+                            // Instruction (optional) - ROW 7
+                            $rawInstr = $this->getCellHtml($tables[$i], 7);
+                            if ($this->isEmptyCell($rawInstr)) {
                                 $instruction = null;
                                 $has_instruction = false;
                             } else {
-                                $instruction = $td7->innerHtml;
+                                $tr7 = $tables[$i]->find('tr', 7);
+                                $td7 = $tr7 ? $tr7->find('td', 1) : null;
+                                $instruction = $td7 ? $td7->innerHtml : null;
                                 $has_instruction = true;
                             }
 
-                            // Solution (optional) - ROW 8 
-                            $tr8 = $tables[$i]->find('tr', 8);
-                            $td8 = $tr8 ? $tr8->find('td', 1) : null;
-                            $p8 = $td8 ? $td8->find('p') : null;
-
-                            $rawHtml = $p8 ? trim($p8->innerHtml) : '';
-                            $textOnly = trim(strip_tags($rawHtml));
-
-                            if ($textOnly !== '' && $textOnly !== '&nbsp;' && $rawHtml !== '&nbsp;') {
-                                $solution = $rawHtml;   // keep full HTML
+                            // Solution (optional) - ROW 8
+                            $rawSol = $this->getCellHtml($tables[$i], 8);
+                            if (!$this->isEmptyCell($rawSol)) {
+                                $solution = $rawSol;
                                 $has_solution = 'yes';
                             }
 
                             // PYQ (optional) - ROW 9
-                            $tr9 = $tables[$i]->find('tr', 9);
-                            $td9 = $tr9 ? $tr9->find('td', 1) : null;
-                            $p9 = $td9 ? $td9->find('p') : null;
-
-                            $rawPyqHtml = $p9 ? trim($p9->innerHtml) : '';
-                            $textPyq = strtolower(trim(strip_tags($rawPyqHtml)));
-
-                            if ($textPyq === 'yes') {
-                                $show_on_pyq = 'yes';
-                            } else {
-                                $show_on_pyq = 'no';
-                            }
+                            $rawPyq = $this->getCellHtml($tables[$i], 9);
+                            $textPyq = strtolower(trim(strip_tags(html_entity_decode($rawPyq ?? '', ENT_QUOTES | ENT_HTML5, 'UTF-8'))));
+                            $show_on_pyq = ($textPyq === 'yes') ? 'yes' : 'no';
 
                             // Finally, set status once
                             if ($rejectQuestion) {
                                 $questionData['status'] = 'Rejected';
                                 $questionData['note'] = $rejectNote;
                             } else {
-                                $questionData['status'] = 'Done'; // or success after insert
+                                $questionData['status'] = 'Done';
                             }
 
                             $questionData['language'] = $request->language;
@@ -4928,37 +4947,38 @@ set_time_limit(300);
                             $questionData['has_solution'] = $has_solution;
                             $questionData['solution'] = $solution;
                             $questionData['show_on_pyq'] = $show_on_pyq;
-                            $questionData['added_by_id'] = auth()->id(); // Logged in teacher/user
+                            $questionData['added_by_id'] = auth()->id();
                             $questionData['added_by_type'] = 'user';
-                            $que = Question::where('question', $question)->where('commission_id', $request->commission_id)->where('category_id', $request->category_id)
-                                ->where('sub_category_id', $request->sub_category_id)
-                                ->where('subject_id', $request->subject_id);
-                            if ($request->previous_year) {
-                                $que = $que->where('previous_year', $request->previous_year);
+
+                            if (!$rejectQuestion) {
+                                $que = Question::where('question', $question)
+                                    ->where('commission_id', $request->commission_id)
+                                    ->where('category_id', $request->category_id)
+                                    ->where('sub_category_id', $request->sub_category_id)
+                                    ->where('subject_id', $request->subject_id);
+                                if ($request->previous_year) {
+                                    $que = $que->where('previous_year', $request->previous_year);
+                                }
+                                $que = $que->first();
+
+                                if ($que) {
+                                    $questionData['status'] = "Rejected";
+                                    $questionData['note'] = "Already Exists Question.";
+                                }
                             }
-                            $que = $que->first();
 
-                            if ($que) {
-
-                                $questionData['status'] = "Rejected";
-                                $questionData['note'] = "Already Exists Question.";
-                                $qsave = Question::create($questionData);
-
-                            } else {
-
-                                $insert = Question::create($questionData);
-                            }
+                            Question::create($questionData);
                         } catch (\Exception $ex) {
+                            $qTr = $tables[$i]->find('tr', 0);
+                            $qTd = $qTr ? $qTr->find('td', 1) : null;
+                            $question = $qTd ? $qTd->innerHtml : null;
 
-                            $question = $tables[$i]->find('tr', 0)->find('td', 1)->innerHtml ?? NULL;
                             $questionData['status'] = "Rejected";
                             $questionData['question_type'] = $request->question_type;
                             $questionData['question'] = $question;
-                            $questionData['note'] = 'Question Format Issue';
+                            $questionData['note'] = 'Question Format Issue: ' . $ex->getMessage();
                             Question::create($questionData);
-
                         }
-
                     }
                 } elseif ($request->question_type == 'Subjective') {
 
@@ -4979,77 +4999,59 @@ set_time_limit(300);
                         $show_on_pyq = 'no';
 
                         try {
-                            $question = $tables[$i]->find('tr', 0)->find('td', 1)->innerHtml;
-                            if ($tables[$i]->find('tr', 1)->find('td', 1)->find('p')->innerHtml == '&nbsp;') {
+                            $qTr = $tables[$i]->find('tr', 0);
+                            $qTd = $qTr ? $qTr->find('td', 1) : null;
+                            $question = $qTd ? $qTd->innerHtml : null;
+
+                            if ($question === null) {
+                                throw new \Exception('Missing question row');
+                            }
+
+                            // Image (optional) - ROW 1
+                            $tr1 = $tables[$i]->find('tr', 1);
+                            $td1 = $tr1 ? $tr1->find('td', 1) : null;
+                            $p1 = $td1 ? $td1->find('p') : null;
+                            $imageElement = $p1 ? $p1->find('img') : null;
+
+                            if ($imageElement && count($imageElement) > 0) {
+                                $image_64 = $imageElement->src;
+                                $extension = explode('/', explode(':', substr($image_64, 0, strpos($image_64, ';')))[1])[1];
+                                $image = 'question/' . Str::random(40) . '.' . $extension;
+                                Storage::put($image, file_get_contents($image_64));
+                            } else {
                                 $image = NULL;
-                            } else {
-                                $imageElement = $tables[$i]->find('tr', 1)->find('td', 1)->find('p')->find('img');
-
-                                if (count($imageElement) > 0) {
-                                    $image_64 = $tables[$i]->find('tr', 1)->find('td', 1)->find('p')->find('img')->src;
-                                    $extension = explode('/', explode(':', substr($image_64, 0, strpos($image_64, ';')))[1])[1];
-                                    $image = 'question/' . Str::random(40) . '.' . $extension;
-                                    Storage::put($image, file_get_contents($image_64));
-                                } else {
-                                    $image = NULL;
-                                }
-
                             }
 
-                            // answer format - ROW 2
-                            $answer_format = "text input";
-                            if ($tables[$i]->find('tr', 2)->find('td', 1)->find('p')->innerHtml == '&nbsp;') {
-                                $answer_format = "text input";
-                            } else {
-                                $answer_format = $tables[$i]->find('tr', 2)->find('td', 1)->find('p')->innerHtml;
-                            }
+                            // Answer format (mandatory-ish) - ROW 2
+                            $rawFormat = $this->getCellHtml($tables[$i], 2);
+                            $answer_format = $this->isEmptyCell($rawFormat) ? "text input" : $rawFormat;
 
-
-                            // solution (optional) - ROW 3
-                            $tr = $tables[$i]->find('tr', 3);
-                            $td = $tr ? $tr->find('td', 1) : null;
-                            $p = $td ? $td->find('p') : null;
-
-                            // Safely extract HTML
-                            $rawHtml = $p ? trim($p->innerHtml) : '';
-
-                            // Strip HTML to detect real text
-                            $textOnly = trim(strip_tags($rawHtml));
-
-                            // Check if solution is actually empty
-                            if ($rawHtml === '' || $rawHtml === '&nbsp;' || $textOnly === '') {
+                            // Solution (optional) - ROW 3
+                            $rawSol = $this->getCellHtml($tables[$i], 3);
+                            if ($this->isEmptyCell($rawSol)) {
                                 $solution = null;
                                 $has_solution = 'no';
                             } else {
-
-                                $solution = $rawHtml;
+                                $solution = $rawSol;
                                 $has_solution = 'yes';
                             }
 
-                            // instruction (optional) - ROW 4
-                            if ($tables[$i]->find('tr', 4)->find('td', 1)->find('p')->innerHtml == '&nbsp;') {
+                            // Instruction (optional) - ROW 4
+                            $rawInstr = $this->getCellHtml($tables[$i], 4);
+                            if ($this->isEmptyCell($rawInstr)) {
                                 $instruction = NULL;
                                 $has_instruction = false;
                             } else {
-                                $instruction = $tables[$i]->find('tr', 4)->find('td', 1)->innerHtml;
+                                $tr4 = $tables[$i]->find('tr', 4);
+                                $td4 = $tr4 ? $tr4->find('td', 1) : null;
+                                $instruction = $td4 ? $td4->innerHtml : null;
                                 $has_instruction = true;
                             }
 
                             // PYQ (optional) - ROW 5
-                            $tr5 = $tables[$i]->find('tr', 5);
-                            $td5 = $tr5 ? $tr5->find('td', 1) : null;
-                            $p5 = $td5 ? $td5->find('p') : null;
-
-                            $rawPyqHtml = $p5 ? trim($p5->innerHtml) : '';
-                            $textPyq = strtolower(trim(strip_tags($rawPyqHtml)));
-
-                            if ($textPyq === 'yes') {
-                                $show_on_pyq = 'yes';
-                            } else {
-                                $show_on_pyq = 'no';
-                            }
-
-
+                            $rawPyq = $this->getCellHtml($tables[$i], 5);
+                            $textPyq = strtolower(trim(strip_tags(html_entity_decode($rawPyq ?? '', ENT_QUOTES | ENT_HTML5, 'UTF-8'))));
+                            $show_on_pyq = ($textPyq === 'yes') ? 'yes' : 'no';
 
                             $questionData['language'] = $request->language;
                             $questionData['question_category'] = $request->question_category;
@@ -5070,39 +5072,38 @@ set_time_limit(300);
                             $questionData['instruction'] = $instruction;
                             $questionData['has_instruction'] = $has_instruction;
                             $questionData['show_on_pyq'] = $show_on_pyq;
-                            $questionData['added_by_id'] = auth()->id(); // Logged in teacher/user
+                            $questionData['added_by_id'] = auth()->id();
                             $questionData['added_by_type'] = 'user';
 
-                            $que = Question::where('question', $question)->where('commission_id', $request->commission_id)->where('category_id', $request->category_id)
+                            $que = Question::where('question', $question)
+                                ->where('commission_id', $request->commission_id)
+                                ->where('category_id', $request->category_id)
                                 ->where('sub_category_id', $request->sub_category_id)
                                 ->where('subject_id', $request->subject_id);
                             if ($request->previous_year) {
                                 $que = $que->where('previous_year', $request->previous_year);
                             }
                             $que = $que->first();
-                            if (!$answer_format) {
 
+                            if (!$answer_format) {
                                 $questionData['status'] = "Rejected";
                                 $questionData['note'] = "Please enter Answer format";
-                                $qsave = Question::create($questionData);
-
                             } elseif ($que) {
-
                                 $questionData['status'] = "Rejected";
                                 $questionData['note'] = "Already Exists Question.";
-                                $qsave = Question::create($questionData);
                             } else {
                                 $questionData['status'] = 'Done';
-                                $insert = Question::create($questionData);
                             }
 
+                            Question::create($questionData);
                         } catch (\Exception $ex) {
+                            $qTr = $tables[$i]->find('tr', 0);
+                            $qTd = $qTr ? $qTr->find('td', 1) : null;
+                            $question = $qTd ? $qTd->innerHtml : null;
 
-                            $question = $tables[$i]->find('tr', 0)->find('td', 1)->innerHtml;
                             $questionData['question_type'] = $request->question_type;
                             $questionData['question'] = $question;
-                            $questionData['note'] = 'Question Format Issue';
-
+                            $questionData['note'] = 'Question Format Issue: ' . $ex->getMessage();
                             $questionData['status'] = "Rejected";
                             Question::create($questionData);
                         }
@@ -5127,51 +5128,45 @@ set_time_limit(300);
                         throw new \Exception('Invalid Story Based document format');
                     }
 
-                    $question = $tables[1]->find('tr', 0)->find('td', 1)->innerHtml;
-                    if ($tables[1]->find('tr', 1)->find('td', 1)->find('p')->innerHtml == '&nbsp;') {
-                        $image = NULL;
-                    } else {
-                        $imageElement = $tables[1]->find('tr', 1)->find('td', 1)->find('p')->find('img');
+                    $qTr = $tables[1]->find('tr', 0);
+                    $qTd = $qTr ? $qTr->find('td', 1) : null;
+                    $question = $qTd ? $qTd->innerHtml : null;
 
-                        if (count($imageElement) > 0) {
-                            $image_64 = $tables[1]->find('tr', 1)->find('td', 1)->find('p')->find('img')->src;
-                            $extension = explode('/', explode(':', substr($image_64, 0, strpos($image_64, ';')))[1])[1];
-                            $image = 'question/' . Str::random(40) . '.' . $extension;
-                            Storage::put($image, file_get_contents($image_64));
-                        } else {
-                            $image = NULL;
-                        }
+                    // Image (optional) - ROW 1
+                    $tr1 = $tables[1]->find('tr', 1);
+                    $td1 = $tr1 ? $tr1->find('td', 1) : null;
+                    $p1 = $td1 ? $td1->find('p') : null;
+                    $imageElement = $p1 ? $p1->find('img') : null;
+
+                    if ($imageElement && count($imageElement) > 0) {
+                        $image_64 = $imageElement->src;
+                        $extension = explode('/', explode(':', substr($image_64, 0, strpos($image_64, ';')))[1])[1];
+                        $image = 'question/' . Str::random(40) . '.' . $extension;
+                        Storage::put($image, file_get_contents($image_64));
+                    } else {
+                        $image = NULL;
                     }
 
-                    if ($tables[1]->find('tr', 2)->find('td', 1)->find('p')->innerHtml == '&nbsp;') {
+                    // Instruction (optional) - ROW 2
+                    $rawInstr = $this->getCellHtml($tables[1], 2);
+                    if ($this->isEmptyCell($rawInstr)) {
                         $instruction = NULL;
                         $has_instruction = false;
                     } else {
-                        $instruction = $tables[1]->find('tr', 2)->find('td', 1)->innerHtml;
+                        $tr2 = $tables[1]->find('tr', 2);
+                        $td2 = $tr2 ? $tr2->find('td', 1) : null;
+                        $instruction = $td2 ? $td2->innerHtml : null;
                         $has_instruction = true;
                     }
 
-                    // PYQ (Story Based - Passage level) -> ROW 3
-                    $show_on_pyq = 'no';
-
-                    $trPyq = $tables[1]->find('tr', 3);
-                    $tdPyq = $trPyq ? $trPyq->find('td', 1) : null;
-                    $pPyq = $tdPyq ? $tdPyq->find('p') : null;
-
-                    $rawPyqHtml = $pPyq ? trim($pPyq->innerHtml) : '';
-                    $textPyq = strtolower(trim(strip_tags($rawPyqHtml)));
-
-                    if ($textPyq === 'yes') {
-                        $show_on_pyq = 'yes';
-                    } else {
-                        $show_on_pyq = 'no';
-                    }
-
+                    // PYQ (Story Based - Passage level) - ROW 3
+                    $rawPyq = $this->getCellHtml($tables[1], 3);
+                    $textPyq = strtolower(trim(strip_tags(html_entity_decode($rawPyq ?? '', ENT_QUOTES | ENT_HTML5, 'UTF-8'))));
+                    $show_on_pyq = ($textPyq === 'yes') ? 'yes' : 'no';
 
                     $questionData['language'] = $request->language;
                     $questionData['question_category'] = $request->question_category;
                     $questionData['question_type'] = $request->question_type;
-                    $questionData['passage_question_type'] = $request->passage_question_type;
                     $questionData['fee_type'] = $request->fee_type;
                     $questionData['commission_id'] = $request->commission_id;
                     $questionData['previous_year'] = $request->previous_year;
@@ -5187,177 +5182,139 @@ set_time_limit(300);
                     $questionData['instruction'] = $instruction;
                     $questionData['has_instruction'] = $has_instruction;
                     $questionData['show_on_pyq'] = $show_on_pyq;
-                    $questionData['added_by_id'] = auth()->id(); // Logged in teacher/user
+                    $questionData['added_by_id'] = auth()->id();
                     $questionData['added_by_type'] = 'user';
 
-                    $que = Question::where('question', $question)->where('commission_id', $request->commission_id)->where('category_id', $request->category_id)
+                    $que = Question::where('question', $question)
+                        ->where('commission_id', $request->commission_id)
+                        ->where('category_id', $request->category_id)
                         ->where('sub_category_id', $request->sub_category_id)
                         ->where('subject_id', $request->subject_id);
                     if ($request->previous_year) {
                         $que = $que->where('previous_year', $request->previous_year);
                     }
                     $que = $que->first();
+
                     if ($que) {
                         $questionData['status'] = "Rejected";
                         $questionData['note'] = "Already Exists Question.";
-                        $ques = Question::create($questionData);
-
                     } else {
                         $questionData['status'] = 'Done';
-                        $ques = Question::create($questionData);
                     }
+
+                    $ques = Question::create($questionData);
 
                     if ($ques) {
-                        //if($request->passage_question_type == 'reasoning_subjective') {
                         for ($i = 2; $i < count($tables); $i++) {
-                            $tr4 = $tables[$i]->find('tr', 4);
-                            if (!$tr4) {
-                                // ✅ Subjective sub-question
-                                $passage_question = $tables[$i]->find('tr', 0)->find('td', 1)->innerHtml;
+                            try {
+                                $tr4 = $tables[$i]->find('tr', 4);
+                                if (!$tr4) {
+                                    // Subjective sub-question
+                                    $pqTr = $tables[$i]->find('tr', 0);
+                                    $pqTd = $pqTr ? $pqTr->find('td', 1) : null;
+                                    $passage_question = $pqTd ? $pqTd->innerHtml : null;
 
-                                // ---------- ANSWER FORMAT ----------
-                                $passage_answer_format = null;
-                                $afTr = $tables[$i]->find('tr', 1);
-                                $afTd = $afTr ? $afTr->find('td', 1) : null;
+                                    // Answer format - ROW 1
+                                    $rawAf = $this->getCellHtml($tables[$i], 1);
+                                    $passage_answer_format = $this->isEmptyCell($rawAf)
+                                        ? null
+                                        : trim(str_replace("\xc2\xa0", '', strip_tags(html_entity_decode($rawAf, ENT_QUOTES | ENT_HTML5, 'UTF-8'))));
 
-                                if ($afTd) {
-                                    $rawAfHtml = trim($afTd->innerHtml);
-                                    $decoded = html_entity_decode($rawAfHtml, ENT_QUOTES | ENT_HTML5, 'UTF-8');
-                                    $textOnly = trim(str_replace("\xc2\xa0", '', strip_tags($decoded)));
+                                    // Solution - ROW 2
+                                    $rawSol = $this->getCellHtml($tables[$i], 2);
+                                    $detail_solution = $this->isEmptyCell($rawSol) ? null : $rawSol;
 
-                                    if ($textOnly !== '') {
-                                        // ✅ store clean text (NOT <p> node)
-                                        $passage_answer_format = $textOnly; // e.g. "text"
+                                    $question_detail = [
+                                        'question_id' => $ques->id,
+                                        'question' => $passage_question,
+                                        'answer_format' => $passage_answer_format,
+                                        'type' => 'reasoning'
+                                    ];
+
+                                    if ($detail_solution !== null) {
+                                        $question_detail['solution'] = $detail_solution;
                                     }
-                                }
 
-                                // ---------- SOLUTION ----------
-                                $detail_solution = null;
-                                $solTr = $tables[$i]->find('tr', 2);
-                                $solTd = $solTr ? $solTr->find('td', 1) : null;
-
-                                if ($solTd) {
-                                    $rawHtml = trim($solTd->innerHtml);
-                                    $decoded = html_entity_decode($rawHtml, ENT_QUOTES | ENT_HTML5, 'UTF-8');
-                                    $textOnly = trim(str_replace("\xc2\xa0", '', strip_tags($decoded)));
-
-                                    if ($textOnly !== '') {
-                                        $detail_solution = $rawHtml; // keep HTML for solution
-                                    }
-                                }
-
-                                // ---------- SAVE ----------
-                                $question_detail = [
-                                    'question_id' => $ques->id,
-                                    'question' => $passage_question,
-                                    'answer_format' => $passage_answer_format, // ✅ string
-                                    'type' => 'reasoning'
-                                ];
-
-                                if ($detail_solution !== null) {
-                                    $question_detail['solution'] = $detail_solution;
-                                }
-
-                                QuestionDetail::create($question_detail);
-                            } else {
-                                // ✅ MCQ sub-question
-                                $passage_question = $tables[$i]->find('tr', 0)->find('td', 1)->innerHtml;
-                                $option_a = $tables[$i]->find('tr', 1)->find('td', 1)->find('p')->innerHtml;
-                                $option_b = $tables[$i]->find('tr', 2)->find('td', 1)->find('p')->innerHtml;
-                                $option_c = $tables[$i]->find('tr', 3)->find('td', 1)->find('p')->innerHtml;
-                                $option_d = $tables[$i]->find('tr', 4)->find('td', 1)->find('p')->innerHtml;
-
-                                $tr5 = $tables[$i]->find('tr', 5);
-                                $td5 = $tr5 ? $tr5->find('td', 1) : null;
-                                $p5 = $td5 ? $td5->find('p') : null;
-
-                                $rawHtml = $p5 ? trim($p5->innerHtml) : '';
-                                $textOnly = trim(strip_tags($rawHtml)); // used only to detect empty value
-
-                                // If Option E is actually empty
-                                if ($textOnly === '' || $rawHtml === '&nbsp;' || $textOnly === '&nbsp;') {
-                                    $option_e = null;
-                                    $has_option_e = false;
+                                    QuestionDetail::create($question_detail);
                                 } else {
-                                    // KEEP original HTML (as required)
-                                    $option_e = $rawHtml;
-                                    $has_option_e = true;
-                                }
+                                    // MCQ sub-question
+                                    $pqTr = $tables[$i]->find('tr', 0);
+                                    $pqTd = $pqTr ? $pqTr->find('td', 1) : null;
+                                    $passage_question = $pqTd ? $pqTd->innerHtml : null;
 
-                                $passage_answer = $tables[$i]->find('tr', 6)->find('td', 1)->find('p')->innerHtml;
-                                // Try to read per-subquestion solution at row 7 or 8
-                                $detail_solution = null;
+                                    $rawA = $this->getCellHtml($tables[$i], 1);
+                                    $option_a = $this->isEmptyCell($rawA) ? null : $rawA;
 
-                                // ---------- ROW 7 ----------
-                                $solTr = $tables[$i]->find('tr', 7);
-                                $solTd = $solTr ? $solTr->find('td', 1) : null;
+                                    $rawB = $this->getCellHtml($tables[$i], 2);
+                                    $option_b = $this->isEmptyCell($rawB) ? null : $rawB;
 
-                                if ($solTd) {
-                                    $rawHtml = trim($solTd->innerHtml);
-                                    $decoded = html_entity_decode($rawHtml, ENT_QUOTES | ENT_HTML5, 'UTF-8');
-                                    $textOnly = trim(str_replace("\xc2\xa0", '', strip_tags($decoded)));
+                                    $rawC = $this->getCellHtml($tables[$i], 3);
+                                    $option_c = $this->isEmptyCell($rawC) ? null : $rawC;
 
-                                    if ($textOnly !== '') {
-                                        $detail_solution = $rawHtml;
+                                    $rawD = $this->getCellHtml($tables[$i], 4);
+                                    $option_d = $this->isEmptyCell($rawD) ? null : $rawD;
+
+                                    $rawE = $this->getCellHtml($tables[$i], 5);
+                                    if ($this->isEmptyCell($rawE)) {
+                                        $option_e = null;
+                                        $has_option_e = false;
+                                    } else {
+                                        $option_e = $rawE;
+                                        $has_option_e = true;
                                     }
-                                }
 
-                                // ---------- FALLBACK TO ROW 8 ----------
-                                if ($detail_solution === null) {
-                                    $solTr2 = $tables[$i]->find('tr', 8);
-                                    $solTd2 = $solTr2 ? $solTr2->find('td', 1) : null;
+                                    $rawAnswer = $this->getCellHtml($tables[$i], 6);
+                                    $passage_answer = $rawAnswer ?? '';
 
-                                    if ($solTd2) {
-                                        $rawHtml2 = trim($solTd2->innerHtml);
-                                        $decoded2 = html_entity_decode($rawHtml2, ENT_QUOTES | ENT_HTML5, 'UTF-8');
-                                        $textOnly2 = trim(str_replace("\xc2\xa0", '', strip_tags($decoded2)));
-
-                                        if ($textOnly2 !== '') {
-                                            $detail_solution = $rawHtml2;
+                                    // Solution - ROW 7, fallback ROW 8
+                                    $detail_solution = null;
+                                    $rawSol7 = $this->getCellHtml($tables[$i], 7);
+                                    if (!$this->isEmptyCell($rawSol7)) {
+                                        $detail_solution = $rawSol7;
+                                    } else {
+                                        $rawSol8 = $this->getCellHtml($tables[$i], 8);
+                                        if (!$this->isEmptyCell($rawSol8)) {
+                                            $detail_solution = $rawSol8;
                                         }
                                     }
-                                }
 
-                                $question_detail = ([
-                                    'question_id' => $ques->id,
-                                    'question' => $passage_question,
-                                    'answer' => strtoupper(Str::of(strip_tags($passage_answer))->trim()),
-                                    'option_a' => $option_a,
-                                    'option_b' => $option_b,
-                                    'option_c' => $option_c,
-                                    'option_d' => $option_d,
-                                    'option_e' => $option_e,
-                                    'has_option_e' => $has_option_e,
-                                    'type' => 'mcq'
-                                ]);
-                                if ($detail_solution !== NULL) {
-                                    $question_detail['solution'] = $detail_solution;
+                                    $question_detail = [
+                                        'question_id' => $ques->id,
+                                        'question' => $passage_question,
+                                        'answer' => strtoupper(Str::of(strip_tags($passage_answer))->trim()),
+                                        'option_a' => $option_a,
+                                        'option_b' => $option_b,
+                                        'option_c' => $option_c,
+                                        'option_d' => $option_d,
+                                        'option_e' => $option_e,
+                                        'has_option_e' => $has_option_e,
+                                        'type' => 'mcq'
+                                    ];
+                                    if ($detail_solution !== NULL) {
+                                        $question_detail['solution'] = $detail_solution;
+                                    }
+                                    QuestionDetail::create($question_detail);
                                 }
-                                QuestionDetail::create($question_detail);
+                            } catch (\Exception $ex) {
+                                // Log but don't kill the whole passage import over one sub-question
+                                \Log::warning('Story Based sub-question format issue: ' . $ex->getMessage());
                             }
-
                         }
                     }
-
                 }
 
                 DB::commit();
                 return redirect()->route('question.bank.index')->with('success', 'Questions created successfully.');
             } else {
                 $import = new QuestionsImport($request->all());
-
                 $import->import($request->file);
-                // dd($import);
-                $file = $request->file('file');
                 DB::commit();
                 return redirect()->route('question.bank.index')->with('success', 'Questions created successfully.');
             }
         } catch (\Exception $ex) {
             DB::rollback();
-            return redirect()->route('question.bank.bulk-upload')->with('success', 'Something went wrong.');
+            return redirect()->route('question.bank.bulk-upload')->with('error', 'Something went wrong: ' . $ex->getMessage());
         }
-
-
     }
 
     public function questionBankDelete(Request $request, $id)

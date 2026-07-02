@@ -380,7 +380,13 @@
                     </div>
 
                     {{-- Progress --}}
-                    @php $progress = ($attempt->attempted_count / $attempt->total_questions) * 100; @endphp
+                    @php
+                        // Guard against division by zero if total_questions is 0
+                        // (e.g. a corrupted attempt row or an empty test).
+                        $progress = $attempt->total_questions > 0
+                            ? ($attempt->attempted_count / $attempt->total_questions) * 100
+                            : 0;
+                    @endphp
 
                     <div class="progress-area">
 
@@ -450,22 +456,32 @@
         @foreach($mainAnswers as $ans)
             @php
                 $eval = $ans->evaluation_status;
+                $wasAttempted = $ans->attempt_status === 'attempted';
 
-                $statusClass = match ($eval) {
-                    'correct' => 'correct',
-                    'wrong' => 'wrong',
-                    'pending', 'partial' => 'pending',
-                    default => 'pending'
-                };
+                // Only build a status tag if the student actually attempted this
+                // question. Backfilled "not_attempted" rows carry evaluation_status
+                // = 'not_evaluated', which previously rendered a "Not Evaluated" tag
+                // right next to "Not Answered" — redundant and misleading, since
+                // there's nothing pending for a question the student never touched.
+                if ($wasAttempted) {
+                    $statusClass = match ($eval) {
+                        'correct' => 'correct',
+                        'wrong' => 'wrong',
+                        'pending', 'partial' => 'pending',
+                        default => 'pending'
+                    };
 
-                $statusText = match ($eval) {
-                    'correct' => "Correct ({$ans->obtained_marks})",
-                    'wrong' => "Wrong ({$ans->obtained_marks})",
-                    'pending' => "Pending Check",
-                    'partial' => "Partially Correct ({$ans->obtained_marks})",
-                    'not_evaluated' => 'Not Evaluated',
-                    default => 'Attempted'
-                };
+                    $statusText = match ($eval) {
+                        'correct' => "Correct ({$ans->obtained_marks})",
+                        'wrong' => "Wrong ({$ans->obtained_marks})",
+                        'pending' => "Pending Check",
+                        'partial' => "Partially Correct ({$ans->obtained_marks})",
+                        default => 'Attempted'
+                    };
+                } else {
+                    $statusClass = null;
+                    $statusText = null;
+                }
             @endphp
 
             <div class="q-box">
@@ -529,9 +545,11 @@
                             <span style="color:#999;">Not Answered</span>
                         @endif
 
-                        <span class="answer-tag {{ $statusClass }}" style="margin-left:8px;">
-                            {{ $statusText }}
-                        </span>
+                        @if($statusText)
+                            <span class="answer-tag {{ $statusClass }}" style="margin-left:8px;">
+                                {{ $statusText }}
+                            </span>
+                        @endif
                         {{-- ============= SHOW SOLUTION (IF EXISTS) ============= --}}
                         @if(optional($ans->question)->has_solution == 'yes' && $ans->question->solution)
                             <div class="mt-2">
@@ -590,21 +608,26 @@
 
                         @php
                             $childEval = $child->evaluation_status;
+                            $childWasAttempted = $child->attempt_status === 'attempted';
 
-                            $childClass = match ($childEval) {
-                                'correct' => 'correct',
-                                'wrong' => 'wrong',
-                                'pending', 'partial' => 'pending',
-                                default => 'pending'
-                            };
+                            if ($childWasAttempted) {
+                                $childClass = match ($childEval) {
+                                    'correct' => 'correct',
+                                    'wrong' => 'wrong',
+                                    'pending', 'partial' => 'pending',
+                                    default => 'pending'
+                                };
 
-                            $childText = match ($childEval) {
-                                'correct' => "Correct ({$child->obtained_marks})",
-                                'wrong' => "Wrong ({$child->obtained_marks})",
-                                'pending' => "Pending Check",
-                                'not_evaluated' => "Not Evaluated",
-                                default => 'Attempted'
-                            };
+                                $childText = match ($childEval) {
+                                    'correct' => "Correct ({$child->obtained_marks})",
+                                    'wrong' => "Wrong ({$child->obtained_marks})",
+                                    'pending' => "Pending Check",
+                                    default => 'Attempted'
+                                };
+                            } else {
+                                $childClass = null;
+                                $childText = null;
+                            }
 
                             $childQue = optional($child->childQuestion);
                         @endphp
@@ -666,9 +689,11 @@
                                     <span style="color:#777;">Not Answered</span>
                                 @endif
 
-                                <span class="answer-tag {{ $childClass }}" style="margin-left:8px;">
-                                    {{ $childText }}
-                                </span>
+                                @if($childText)
+                                    <span class="answer-tag {{ $childClass }}" style="margin-left:8px;">
+                                        {{ $childText }}
+                                    </span>
+                                @endif
                                 {{-- ============= CHILD SOLUTION (IF EXISTS) ============= --}}
                                 @if(optional($childQue)->has_solution == 'yes' && $childQue->solution)
                                     <div class="mt-2">

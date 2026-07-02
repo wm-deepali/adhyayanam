@@ -655,15 +655,18 @@
                 const container = document.getElementById('story-sub-questions');
                 const clone = container.children[0].cloneNode(true);
 
-                clone.querySelectorAll('textarea, input').forEach(el => el.value = '');
-                clone.querySelectorAll('select').forEach(el => el.selectedIndex = 0);
+                // 🔥 Remove any duplicated CKEditor widget markup from the clone
+                clone.querySelectorAll('.cke').forEach(wrapper => wrapper.remove());
 
-                clone.querySelectorAll('textarea.editor').forEach(el => {
-                    if (el.id && CKEDITOR.instances[el.id]) {
-                        CKEDITOR.instances[el.id].destroy(true);
-                    }
+                // Reset values and strip duplicated ids — DO NOT touch CKEDITOR.instances here,
+                // that belongs to the original block's live editor
+                clone.querySelectorAll('textarea, input').forEach(el => {
+                    el.value = '';
                     el.removeAttribute('id');
+                    el.style.display = ''; // CKEditor hides the original textarea inline; restore visibility
                 });
+
+                clone.querySelectorAll('select').forEach(el => el.selectedIndex = 0);
 
                 container.appendChild(clone);
                 setTimeout(() => initEditorsIn(clone), 50);

@@ -11,7 +11,7 @@ class OfficeAddress extends Model
         'address',
         'phone',
         'email',
-        'map_embbed',
+        'map_link',
         'sort_order',
         'status'
     ];

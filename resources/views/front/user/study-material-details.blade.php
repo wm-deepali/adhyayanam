@@ -552,7 +552,7 @@
                 Buy Now - ₹{{ $studyMaterial->price }}
               </a>
             @else
-              <a class="study-detail-buy-btn" href="{{route('student.login')}}">
+              <a class="study-detail-buy-btn" href="{{route('student.login', ['redirect' => url()->full()])}}">
                 Login to Unlock{{ $studyMaterial->IsPaid ? ' - ₹' . $studyMaterial->price : ''}}
               </a>
             @endif
@@ -586,7 +586,7 @@
                     Unlock Now - ₹{{ $studyMaterial->price }}
                   </a>
                 @else
-                  <a class="study-detail-buy-btn px-5 py-3" href="{{route('student.login')}}">
+                  <a class="study-detail-buy-btn px-5 py-3" href="{{route('student.login', ['redirect' => url()->full()])}}">
                     Login to Unlock{{ $studyMaterial->IsPaid ? ' - ₹' . $studyMaterial->price : ''}}
                   </a>
                 @endif

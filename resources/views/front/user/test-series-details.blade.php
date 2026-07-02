@@ -721,7 +721,7 @@
                     @endif
 
                 @else
-                    <a href="{{route('student.login')}}">
+                    <a href="{{route('student.login', ['redirect' => url()->full()])}}">
                         <button class="buy-btn">
                             Enroll Now
                         </button>
@@ -766,7 +766,7 @@
             @endif
 
         @else
-            <a href="{{route('student.login')}}">
+            <a href="{{route('student.login', ['redirect' => url()->full()])}}">
                 <button class="buy-btn">Enroll Now</button>
             </a>
         @endif
@@ -1045,7 +1045,7 @@ $student = auth()->user();
 
     @else
 
-        <a href="{{ route('student.login') }}" class="unlock-btn">
+        <a href="{{ route('student.login', ['redirect' => url()->full()]) }}" class="unlock-btn">
             <i class="fa fa-lock"></i>
             Unlock
         </a>

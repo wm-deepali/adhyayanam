@@ -84,13 +84,78 @@
             padding: 3px 8px;
             border-radius: 20px;
         }
-         @media (max-width: 740px) {
-    
 
-.content{
-    padding:0px !important;
-}
-}
+        /* ====================== FILTER BAR ====================== */
+        .filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: end;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            padding: 16px;
+            border-radius: 14px;
+            margin-bottom: 20px;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            min-width: 180px;
+        }
+
+        .filter-group label {
+            font-size: 12.5px;
+            font-weight: 600;
+            color: #64748b;
+        }
+
+        .filter-group select {
+            border: 1px solid #d1d5db;
+            border-radius: 10px;
+            padding: 8px 12px;
+            font-size: 14px;
+            background: #fff;
+            color: #1e2937;
+        }
+
+        .filter-reset-btn {
+            border: 1px solid #d1d5db;
+            background: #fff;
+            color: #374151;
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            height: fit-content;
+        }
+
+        .filter-reset-btn:hover {
+            border-color: #ef4444;
+            color: #ef4444;
+        }
+
+        .filter-empty-state {
+            display: none;
+        }
+
+        @media (max-width: 740px) {
+
+            .content {
+                padding: 0px !important;
+            }
+
+            .filter-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .filter-group {
+                min-width: 100%;
+            }
+        }
     </style>
 
     <section class="content py-3">
@@ -102,6 +167,47 @@
                     🎯 Purchased Test Series
                 </h5>
 
+                {{-- =============== PURCHASED FILTER BAR =============== --}}
+                @if($purchasedCommissions->count() || $purchasedCategories->count() || $purchasedSubcategories->count())
+                    <div class="filter-bar" data-section="purchased">
+
+                        <div class="filter-group">
+                            <label>Examination Commission</label>
+                            <select class="filter-select" data-type="commission">
+                                <option value="all">All Commissions</option>
+                                @foreach($purchasedCommissions as $commission)
+                                    <option value="{{ $commission->id }}">{{ $commission->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="filter-group">
+                            <label>Category</label>
+                            <select class="filter-select" data-type="category">
+                                <option value="all">All Categories</option>
+                                @foreach($purchasedCategories as $category)
+                                    <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="filter-group">
+                            <label>Sub Category</label>
+                            <select class="filter-select" data-type="subcategory">
+                                <option value="all">All Sub Categories</option>
+                                @foreach($purchasedSubcategories as $subcategory)
+                                    <option value="{{ $subcategory->id }}">{{ $subcategory->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <button type="button" class="filter-reset-btn" data-reset="purchased">
+                            Reset Filters
+                        </button>
+
+                    </div>
+                @endif
+
                 <!-- Desktop Table -->
                 <div class="d-none d-lg-block">
                     <div class="card shadow-sm">
@@ -110,6 +216,8 @@
                                 <thead class="bg-light">
                                     <tr>
                                         <th>Test Series Name</th>
+                                        <th>Commission</th>
+                                        <th>Category</th>
                                         <th>Total Papers</th>
                                         <th>Attempted</th>
                                         <th>Progress</th>
@@ -128,13 +236,22 @@
                                             $progress = $totalTests > 0 ? round(($attemptedTests / $totalTests) * 100) : 0;
                                         @endphp
                                         @if($testSeries)
-                                        <tr>
+                                        <tr class="purchased-series-row"
+                                            data-commission="{{ $testSeries->exam_com_id ?? 'none' }}"
+                                            data-category="{{ $testSeries->category_id ?? 'none' }}"
+                                            data-subcategory="{{ $testSeries->sub_category_id ?? 'none' }}">
                                             <td class="fw-bold">{{ $testSeries->title }}</td>
+                                            <td>
+                                                <span class="badge bg-secondary">
+                                                    {{ $testSeries->commission->name ?? 'Uncategorized' }}
+                                                </span>
+                                            </td>
+                                            <td>{{ $testSeries->category->name ?? '-' }}</td>
                                             <td>{{ $totalTests }}</td>
                                             <td>{{ $attemptedTests }} / {{ $totalTests }}</td>
                                             <td style="width:180px">
                                                 <div class="progress" style="height:8px;">
-                                                    <div class="progress-bar {{ $progress == 100 ? 'bg-success' : 'bg-primary' }}" 
+                                                    <div class="progress-bar {{ $progress == 100 ? 'bg-success' : 'bg-primary' }}"
                                                          style="width: {{ $progress }}%"></div>
                                                 </div>
                                                 <small class="text-muted">{{ $progress }}% Completed</small>
@@ -148,26 +265,30 @@
                                                 @endif
                                             </td>
                                             <td>
-                                                <a href="{{ route('user.test-series-detail', $testSeries->slug) }}" 
+                                                <a href="{{ route('user.test-series-detail', $testSeries->slug) }}"
                                                    class="btn btn-primary btn-sm">View Details</a>
                                             </td>
                                         </tr>
                                         @endif
                                     @empty
                                         <tr>
-                                            <td colspan="7" class="text-center py-4 text-muted">
+                                            <td colspan="9" class="text-center py-4 text-muted">
                                                 You have not purchased any Test Series yet.
                                             </td>
                                         </tr>
                                     @endforelse
                                 </tbody>
                             </table>
+
+                            <div class="filter-empty-state text-center py-4 text-muted" data-empty="purchased-desktop">
+                                No test series match the selected filters.
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Mobile Card View -->
-                <div class="d-lg-none">
+                <div class="d-lg-none" data-wrap="purchased-mobile">
                     @forelse($paidOrders as $order)
                         @php
                             $testSeries = $order->test_series;
@@ -177,9 +298,18 @@
                             $progress = $totalTests > 0 ? round(($attemptedTests / $totalTests) * 100) : 0;
                         @endphp
                         @if($testSeries)
-                        <div class="test-mobile-card">
+                        <div class="test-mobile-card purchased-series-row"
+                             data-commission="{{ $testSeries->exam_com_id ?? 'none' }}"
+                             data-category="{{ $testSeries->category_id ?? 'none' }}"
+                             data-subcategory="{{ $testSeries->sub_category_id ?? 'none' }}">
                             <div class="test-mobile-header">
                                 <div class="test-title">{{ $testSeries->title }}</div>
+                                <span class="badge bg-secondary">
+                                    {{ $testSeries->commission->name ?? 'Uncategorized' }}
+                                </span>
+                                @if($testSeries->category)
+                                    <span class="badge bg-light text-dark border">{{ $testSeries->category->name }}</span>
+                                @endif
                             </div>
                             <div class="test-mobile-body">
                                 <div class="test-meta">
@@ -208,7 +338,7 @@
                                         <small class="text-muted">Purchased On</small><br>
                                         <strong>{{ $order->created_at?->format('d M, Y') }}</strong>
                                     </div>
-                                    <a href="{{ route('user.test-series-detail', $testSeries->slug) }}" 
+                                    <a href="{{ route('user.test-series-detail', $testSeries->slug) }}"
                                        class="btn btn-primary">
                                         View Details
                                     </a>
@@ -221,6 +351,10 @@
                             You have not purchased any Test Series yet.
                         </div>
                     @endforelse
+
+                    <div class="alert alert-info text-center py-4 filter-empty-state" data-empty="purchased-mobile">
+                        No test series match the selected filters.
+                    </div>
                 </div>
             </div>
 
@@ -230,6 +364,47 @@
                     🆓 Free Test Series
                 </h5>
 
+                {{-- =============== FREE FILTER BAR =============== --}}
+                @if($freeCommissions->count() || $freeCategories->count() || $freeSubcategories->count())
+                    <div class="filter-bar" data-section="free">
+
+                        <div class="filter-group">
+                            <label>Examination Commission</label>
+                            <select class="filter-select" data-type="commission">
+                                <option value="all">All Commissions</option>
+                                @foreach($freeCommissions as $commission)
+                                    <option value="{{ $commission->id }}">{{ $commission->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="filter-group">
+                            <label>Category</label>
+                            <select class="filter-select" data-type="category">
+                                <option value="all">All Categories</option>
+                                @foreach($freeCategories as $category)
+                                    <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="filter-group">
+                            <label>Sub Category</label>
+                            <select class="filter-select" data-type="subcategory">
+                                <option value="all">All Sub Categories</option>
+                                @foreach($freeSubcategories as $subcategory)
+                                    <option value="{{ $subcategory->id }}">{{ $subcategory->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <button type="button" class="filter-reset-btn" data-reset="free">
+                            Reset Filters
+                        </button>
+
+                    </div>
+                @endif
+
                 <!-- Desktop Table -->
                 <div class="d-none d-lg-block">
                     <div class="card shadow-sm">
@@ -238,6 +413,8 @@
                                 <thead class="bg-light">
                                     <tr>
                                         <th>Test Series Name</th>
+                                        <th>Commission</th>
+                                        <th>Category</th>
                                         <th>Total Papers</th>
                                         <th>Attempted</th>
                                         <th>Progress</th>
@@ -253,16 +430,25 @@
                                             $attemptedTests = $tests->whereIn('id', $studentAttempts)->count();
                                             $progress = $totalTests > 0 ? round(($attemptedTests / $totalTests) * 100) : 0;
                                         @endphp
-                                        <tr>
+                                        <tr class="free-series-row"
+                                            data-commission="{{ $series->exam_com_id ?? 'none' }}"
+                                            data-category="{{ $series->category_id ?? 'none' }}"
+                                            data-subcategory="{{ $series->sub_category_id ?? 'none' }}">
                                             <td class="fw-bold">
                                                 {{ $series->title }}
                                                 <span class="badge bg-success ms-2">FREE</span>
                                             </td>
+                                            <td>
+                                                <span class="badge bg-secondary">
+                                                    {{ $series->commission->name ?? 'Uncategorized' }}
+                                                </span>
+                                            </td>
+                                            <td>{{ $series->category->name ?? '-' }}</td>
                                             <td>{{ $totalTests }}</td>
                                             <td>{{ $attemptedTests }} / {{ $totalTests }}</td>
                                             <td style="width:180px">
                                                 <div class="progress" style="height:8px;">
-                                                    <div class="progress-bar {{ $progress == 100 ? 'bg-success' : 'bg-primary' }}" 
+                                                    <div class="progress-bar {{ $progress == 100 ? 'bg-success' : 'bg-primary' }}"
                                                          style="width: {{ $progress }}%"></div>
                                                 </div>
                                                 <small class="text-muted">{{ $progress }}% Completed</small>
@@ -275,25 +461,29 @@
                                                 @endif
                                             </td>
                                             <td>
-                                                <a href="{{ route('user.test-series-detail', $series->slug) }}" 
+                                                <a href="{{ route('user.test-series-detail', $series->slug) }}"
                                                    class="btn btn-outline-success btn-sm">View Details</a>
                                             </td>
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="6" class="text-center py-4 text-muted">
+                                            <td colspan="8" class="text-center py-4 text-muted">
                                                 No free test series available currently.
                                             </td>
                                         </tr>
                                     @endforelse
                                 </tbody>
                             </table>
+
+                            <div class="filter-empty-state text-center py-4 text-muted" data-empty="free-desktop">
+                                No test series match the selected filters.
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Mobile Card View for Free Series -->
-                <div class="d-lg-none">
+                <div class="d-lg-none" data-wrap="free-mobile">
                     @forelse($freeSeries as $series)
                         @php
                             $tests = $series->tests ?? collect([]);
@@ -301,12 +491,21 @@
                             $attemptedTests = $tests->whereIn('id', $studentAttempts)->count();
                             $progress = $totalTests > 0 ? round(($attemptedTests / $totalTests) * 100) : 0;
                         @endphp
-                        <div class="test-mobile-card">
+                        <div class="test-mobile-card free-series-row"
+                             data-commission="{{ $series->exam_com_id ?? 'none' }}"
+                             data-category="{{ $series->category_id ?? 'none' }}"
+                             data-subcategory="{{ $series->sub_category_id ?? 'none' }}">
                             <div class="test-mobile-header bg-success bg-opacity-10">
                                 <div class="test-title">
                                     {{ $series->title }}
                                     <span class="free-badge">FREE</span>
                                 </div>
+                                <span class="badge bg-secondary mt-2">
+                                    {{ $series->commission->name ?? 'Uncategorized' }}
+                                </span>
+                                @if($series->category)
+                                    <span class="badge bg-light text-dark border mt-2">{{ $series->category->name }}</span>
+                                @endif
                             </div>
                             <div class="test-mobile-body">
                                 <div class="test-meta">
@@ -331,7 +530,7 @@
                                 </div>
 
                                 <div class="mt-4">
-                                    <a href="{{ route('user.test-series-detail', $series->slug) }}" 
+                                    <a href="{{ route('user.test-series-detail', $series->slug) }}"
                                        class="btn btn-outline-success w-100">
                                         View Details
                                     </a>
@@ -343,10 +542,67 @@
                             No free test series available currently.
                         </div>
                     @endforelse
+
+                    <div class="alert alert-info text-center py-4 filter-empty-state" data-empty="free-mobile">
+                        No test series match the selected filters.
+                    </div>
                 </div>
             </div>
 
         </div>
     </section>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+
+            function applyFilters(section) {
+                const bar = document.querySelector(`.filter-bar[data-section="${section}"]`);
+                if (!bar) return;
+
+                const selects = bar.querySelectorAll('.filter-select');
+                const filters = {};
+
+                selects.forEach(sel => {
+                    filters[sel.dataset.type] = sel.value;
+                });
+
+                const rowClass = section === 'purchased' ? '.purchased-series-row' : '.free-series-row';
+                const rows = document.querySelectorAll(rowClass);
+                let visibleCount = 0;
+
+                rows.forEach(row => {
+                    const matches =
+                        (filters.commission === 'all' || row.dataset.commission === filters.commission) &&
+                        (filters.category === 'all' || row.dataset.category === filters.category) &&
+                        (filters.subcategory === 'all' || row.dataset.subcategory === filters.subcategory);
+
+                    row.style.display = matches ? '' : 'none';
+                    if (matches) visibleCount++;
+                });
+
+                const emptyDesktop = document.querySelector(`[data-empty="${section}-desktop"]`);
+                const emptyMobile = document.querySelector(`[data-empty="${section}-mobile"]`);
+
+                if (emptyDesktop) emptyDesktop.style.display = (visibleCount === 0 && rows.length > 0) ? 'block' : 'none';
+                if (emptyMobile) emptyMobile.style.display = (visibleCount === 0 && rows.length > 0) ? 'block' : 'none';
+            }
+
+            document.querySelectorAll('.filter-bar').forEach(bar => {
+                const section = bar.dataset.section;
+
+                bar.querySelectorAll('.filter-select').forEach(sel => {
+                    sel.addEventListener('change', () => applyFilters(section));
+                });
+
+                const resetBtn = bar.querySelector('[data-reset]');
+                if (resetBtn) {
+                    resetBtn.addEventListener('click', () => {
+                        bar.querySelectorAll('.filter-select').forEach(sel => sel.value = 'all');
+                        applyFilters(section);
+                    });
+                }
+            });
+        });
+    </script>
 
 @endsection

@@ -25,7 +25,7 @@ ul.header-megamenu.nav {
 			  <span class="dark-logo"><img src="https://netiias.com/design/images/Neti-logo.svg" alt="logo"></span> -->
 		  </div>
 		  <div class="logo-lg">
-			  <!--<span class="light-logo"><img src="{{ url('images/Neti-logo.png')}}" alt="logo"></span>-->
+			  <span class="light-logo"><img src="{{ url('images/Neti-logo.png')}}" alt="logo"></span>
 			  <!-- <span class="dark-logo"><img src="https://netiias.com/design/images/Neti-logo.svg" alt="logo"></span> -->
 		  </div>
 		</a>	

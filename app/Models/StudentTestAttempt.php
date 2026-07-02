@@ -37,12 +37,21 @@ class StudentTestAttempt extends Model
 
         // NEW FIELDS
         'final_file',
-        'assigned_teacher_id'
+        'assigned_teacher_id',
+
+        // Per-attempt shuffled question sequence
+        'question_order'
     ];
 
     protected $dates = [
         'started_at',
         'completed_at'
+    ];
+
+    protected $casts = [
+        // Lets us read/write this as a plain PHP array instead of
+        // manually json_encode/json_decode-ing it everywhere.
+        'question_order' => 'array',
     ];
 
     public function student()

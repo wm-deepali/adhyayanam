@@ -834,24 +834,33 @@ class FrontController extends Controller
         return view('front.user.study-material', $data);
     }
 
-    public function syllabusIndex($commissionId = null, $categoryId = null, $subCategoryId = null, Request $request)
+    public function syllabusIndex(Request $request, $commissionSlug = null, $categorySlug = null, $subCategorySlug = null)
     {
+        // Resolve slugs
+        $commission = $commissionSlug ? ExaminationCommission::where('slug', $commissionSlug)->first() : null;
+        $category = $categorySlug ? Category::where('slug', $categorySlug)->first() : null;
+        $subCategory = $subCategorySlug ? SubCategory::where('slug', $subCategorySlug)->first() : null;
+
+        $selectedCommission = $commission;
+        $selectedCategory = $category;
+        $selectedSubCategory = $subCategory;
+
         // Get subjects for sidebar, optionally filtered by category/subcategory
-        $subjects = Subject::when($categoryId, fn($q) => $q->where('category_id', $categoryId))
-            ->when($subCategoryId, fn($q) => $q->where('sub_category_id', $subCategoryId))
+        $subjects = Subject::when($category, fn($q) => $q->where('category_id', $category->id))
+            ->when($subCategory, fn($q) => $q->where('sub_category_id', $subCategory->id))
             ->get();
 
         // Base query for syllabus
         $syllabusQuery = Syllabus::with(['commission', 'category', 'subcategory']);
 
-        if ($commissionId) {
-            $syllabusQuery->where('commission_id', $commissionId);
+        if ($commission) {
+            $syllabusQuery->where('commission_id', $commission->id);
         }
-        if ($categoryId) {
-            $syllabusQuery->where('category_id', $categoryId);
+        if ($category) {
+            $syllabusQuery->where('category_id', $category->id);
         }
-        if ($subCategoryId) {
-            $syllabusQuery->where('sub_category_id', $subCategoryId);
+        if ($subCategory) {
+            $syllabusQuery->where('sub_category_id', $subCategory->id);
         }
 
         // Optional filter by subject (from query string)
@@ -861,7 +870,13 @@ class FrontController extends Controller
 
         $syllabus = $syllabusQuery->get();
 
-        return view('front.syllabus', compact('subjects', 'syllabus', 'commissionId', 'categoryId', 'subCategoryId'));
+        return view('front.syllabus', compact(
+            'subjects',
+            'syllabus',
+            'selectedCommission',
+            'selectedCategory',
+            'selectedSubCategory'
+        ));
     }
 
 

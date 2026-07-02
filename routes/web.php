@@ -126,7 +126,7 @@ Route::get('user/feed-back-testimonial', [FrontController::class, 'feedBackIndex
 Route::post('user/feed-back-testimonial/store', [FrontController::class, 'feedBackStore'])->name('feed.back.store');
 Route::get('user/batches-and-programme', [FrontController::class, 'batchesIndex'])->name('batches.index');
 Route::get('user/batches-and-programme/{id}', [FrontController::class, 'batchDetail'])->name('batches.detail');
-Route::get('user/syllabus/{examSlug?}/{categorySlug?}/{subCategorySlug?}', [FrontController::class, 'syllabusIndex'])->name('syllabus.front');
+Route::get('user/syllabus/{examSlug?}/{catSlug?}/{subCatSlug?}', [FrontController::class, 'syllabusIndex'])->name('syllabus.front');
 /**
  * Auth Routes
  */

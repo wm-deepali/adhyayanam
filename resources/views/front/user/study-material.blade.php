@@ -7,12 +7,6 @@
   .page-banner {
     padding: 35px 0 35px;
     background: linear-gradient(135deg, #f0f4ff 0%, #e6f5f5 100%);
-    /* light pastel blue-green */
-    /* Alternative pastel options: 
-     #fff0f5 → #ffe4e1 (soft pink)
-     #f0fff4 → #e6fffa (mint)
-     #f3e8ff → #e0d7ff (light purple)
-  */
     position: relative;
     overflow: hidden;
   }
@@ -43,7 +37,6 @@
     font-size: 3.2rem;
     font-weight: 700;
     color: #1a2a44;
-    /* dark slate for contrast */
     margin-bottom: 1.2rem;
     line-height: 1.1;
   }
@@ -51,7 +44,6 @@
   .banner-subtitle {
     font-size: 1.18rem;
     color: #4a5568;
-    /* softer gray */
     line-height: 1.6;
     margin-bottom: 2rem;
   }
@@ -82,7 +74,6 @@
     text-decoration: underline;
   }
 
-  /* Responsive adjustments */
   @media (max-width: 767px) {
     .page-banner {
       padding: 70px 0 50px;
@@ -96,7 +87,6 @@
       font-size: 1.05rem;
     }
   }
-
 
   :root {
     --primary: #4361ee;
@@ -115,54 +105,11 @@
   }
 
   .category-btn {
-    background: var(--pastel);
-    color: var(--primary);
-    border: none;
-    transition: all 0.22s;
-  }
-
-  .category-btn:hover,
-  .category-btn.active {
-    background: var(--primary);
-    color: white;
-  }
-
-  .sub-btn {
-    color: var(--muted);
-    transition: all 0.2s;
-  }
-
-  .sub-btn:hover,
-  .sub-btn.active {
-    background: var(--primary-light);
-    color: var(--primary);
-    font-weight: 600;
-  }
-
-  .category-divider {
-    border: 0;
-    height: 1px;
-    background: #e2e8f0;
-    margin: 1.2rem 0;
-    opacity: 0.5;
-  }
-
-  .course-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12) !important;
-    transition: all 0.3s ease;
-  }
-
-  .tag-pill {
-    font-weight: 600;
-  }
-
-  /* Category button */
-  .category-btn {
     background: #f7f7f7;
     color: #000;
     transition: all 0.25s ease;
     font-size: 15px;
+    border: none;
   }
 
   .category-btn:hover,
@@ -172,7 +119,6 @@
     box-shadow: 0 2px 8px rgba(67, 97, 238, 0.18);
   }
 
-  /* Sub-list items (button style) */
   .sub-btn {
     color: #475569;
     background: white;
@@ -188,7 +134,14 @@
     font-weight: 600;
   }
 
-  /* Dividers inside sub-list */
+  .category-divider {
+    border: 0;
+    height: 1px;
+    background: #e2e8f0;
+    margin: 1.2rem 0;
+    opacity: 0.5;
+  }
+
   .sub-divider {
     border: 0;
     height: 1px;
@@ -197,7 +150,6 @@
     opacity: 0.7;
   }
 
-  /* Hide sub-lists by default */
   .sub-list {
     max-height: 0;
     overflow: hidden;
@@ -206,39 +158,32 @@
 
   .sub-list.show {
     max-height: 500px;
-    /* adjust if you have many items */
   }
-
 
   .category-arrow {
     font-size: 1rem;
     transition: transform 0.35s ease;
     margin-left: auto;
-    /* pushes arrow to right */
     opacity: 0.7;
   }
 
   .category-btn.active .category-arrow {
     transform: rotate(180deg);
-    /* ▼ → ▲ when open */
   }
 
   .category-btn:hover .category-arrow {
     opacity: 1;
     transform: translateY(-1px);
-    /* subtle lift on hover */
   }
 
   .edu-course-card {
     margin-bottom: 2rem;
     perspective: 1000px;
-    /* subtle 3D feel on hover */
   }
 
   .edu-card {
     background: white;
     border-radius: 1rem;
-    /* 16px */
     overflow: hidden;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
     transition: all 0.35s cubic-bezier(0.165, 0.84, 0.44, 1);
@@ -305,7 +250,6 @@
     font-weight: 700;
     font-size: 1.35rem;
     color: #ec4899;
-    /* vibrant price color – change to your brand */
   }
 
   .edu-title {
@@ -384,7 +328,6 @@
     transform: translateY(-2px);
   }
 
-  /* Responsive adjustments */
   @media (max-width: 640px) {
     .edu-thumbnail {
       height: 180px;
@@ -403,10 +346,7 @@
     background: #f8fbff;
     padding: 3px 10px;
     border-radius: 3px;
-
   }
-
-  /* Custom Pagination */
 
   .pagination {
     gap: 6px;
@@ -437,7 +377,7 @@
     background: #e2e8f0;
     color: #94a3b8;
   }
-  
+
 </style>
 
 @section('content')
@@ -453,10 +393,29 @@
             crafted to help you learn, grow, and achieve your goals with confidence.
           </p>
 
-          <!-- Optional: small breadcrumb at bottom -->
           <ul class="bread-crumb clearfix">
-            <li><a href="index.html">Home</a></li>
-            <li>Study Materials</li>
+            <li><a href="{{ url('/') }}">Home</a></li>
+            <li><a href="{{ route('study.material.front') }}">Study Materials</a></li>
+
+            @if(isset($selectedCommission))
+              <li>
+                <a href="{{ route('study.material.front', ['examSlug' => $selectedCommission->slug]) }}">
+                  {{ $selectedCommission->name }}
+                </a>
+              </li>
+            @endif
+
+            @if(isset($selectedCategory))
+              <li>
+                <a href="{{ route('study.material.front', ['examSlug' => $selectedCommission->slug, 'catSlug' => $selectedCategory->slug]) }}">
+                  {{ $selectedCategory->name }}
+                </a>
+              </li>
+            @endif
+
+            @if(isset($selectedSubCategory))
+              <li>{{ $selectedSubCategory->name }}</li>
+            @endif
           </ul>
         </div>
       </div>
@@ -466,49 +425,41 @@
       <div class="container">
         <div class="row g-4">
 
-          <!-- Left Sidebar -->
-          <!-- Left Sidebar -->
-          <div class="col-lg-4 col-xl-3  d-none d-lg-block">
+          <!-- Left Sidebar (desktop) -->
+          <div class="col-lg-4 col-xl-3 d-none d-lg-block">
             <div class="sidebar-categories card border-0 shadow-sm rounded-4 p-4 sticky-top"
               style="top: 100px;height:auto;">
               <h5 class="sidebar-title fw-bold mb-4">Browse Categories</h5>
 
-              <!-- Science & Technology -->
-              <!--<button class="category-btn fw-semibold text-start w-100 py-3 px-4 rounded-3 mb-3 border-0" data-category="science">-->
-              <!--  Science & Technology-->
-              <!--</button>-->
-              <!-- Science & Technology -->
               @foreach($commissions as $commission)
+                @php
+                  $isCommissionActive = isset($selectedCommission) && $selectedCommission->id == $commission->id;
+                @endphp
 
                 <button
-                  class="category-btn fw-semibold text-start w-100 py-3 px-4 rounded-3 mb-3 border-0 d-flex align-items-center justify-content-between"
-                  data-category="commission-{{ $commission->id }}">
+                  class="category-btn fw-semibold text-start w-100 py-3 px-4 rounded-3 mb-3 border-0 d-flex align-items-center justify-content-between {{ $isCommissionActive ? 'active' : '' }}"
+                  data-category="commission-{{ $commission->slug }}">
 
                   <span>{{ $commission->name }}</span>
                   <i class="fas fa-chevron-down category-arrow transition-all"></i>
 
                 </button>
 
-
-                <ul class="sub-list list-unstyled ms-3" id="sub-commission-{{ $commission->id }}">
+                <ul class="sub-list list-unstyled ms-3 {{ $isCommissionActive ? 'show' : '' }}"
+                  id="sub-commission-{{ $commission->slug }}">
 
                   @foreach($commission->categories as $category)
-
-                              <li class="mb-2">
-                                <a href="{{ route('study.material.front', [
-                      'exam_id' => $commission->id,
-                      'category_id' => $category->id
-                    ]) }}"
-                                  class="sub-btn d-block py-2 px-3 rounded-3 text-decoration-none 
-                                                                                                                    {{ request('category_id') == $category->id ? 'active' : '' }}">
-
-                                  {{ $category->name }}
-
-                                </a>
-                              </li>
-
-                              <hr class="sub-divider">
-
+                    <li class="mb-2">
+                      <a href="{{ route('study.material.front', [
+                            'examSlug' => $commission->slug,
+                            'catSlug' => $category->slug
+                          ]) }}"
+                        class="sub-btn d-block py-2 px-3 rounded-3 text-decoration-none
+                              {{ isset($selectedCategory) && $selectedCategory->id == $category->id ? 'active' : '' }}">
+                        {{ $category->name }}
+                      </a>
+                    </li>
+                    <hr class="sub-divider">
                   @endforeach
 
                 </ul>
@@ -520,19 +471,20 @@
 
           <!-- Right Content -->
           <div class="col-lg-8 col-xl-9">
-               <button class="btn btn-outline-primary d-lg-none mb-3 w-100 d-flex align-items-center justify-content-center gap-2" 
-            type="button" data-bs-toggle="offcanvas" data-bs-target="#categoryDrawer">
-      <i class="fas fa-list-ul"></i> Browse Categories
-    </button>
+            <button
+              class="btn btn-outline-primary d-lg-none mb-3 w-100 d-flex align-items-center justify-content-center gap-2"
+              type="button" data-bs-toggle="offcanvas" data-bs-target="#categoryDrawer">
+              <i class="fas fa-list-ul"></i> Browse Categories
+            </button>
 
             <!-- Toolbar -->
             <div class="toolbar card border-0 shadow-sm rounded-4 mb-4 overflow-hidden" style="background: #f7f7f7">
-              <form method="GET" action="{{ route('study.material.front') }}">
-
-                <!-- Keep existing filters -->
-                <input type="hidden" name="exam_id" value="{{ request('exam_id') }}">
-                <input type="hidden" name="category_id" value="{{ request('category_id') }}">
-                <input type="hidden" name="sub_category_id" value="{{ request('sub_category_id') }}">
+              <form method="GET"
+                action="{{ route('study.material.front', array_filter([
+                      'examSlug' => optional($selectedCommission)->slug,
+                      'catSlug' => optional($selectedCategory)->slug,
+                      'subCatSlug' => optional($selectedSubCategory)->slug,
+                    ])) }}">
 
                 <div class="card-body d-flex align-items-center justify-content-between flex-wrap gap-3 p-3 px-4">
 
@@ -568,11 +520,6 @@
                       </option>
 
                     </select>
-
-                    <!-- Search Button -->
-                    <!--<button class="btn btn-primary rounded-pill px-4">-->
-                    <!--  Search-->
-                    <!--</button>-->
                   </div>
 
                 </div>
@@ -584,20 +531,23 @@
 
               @if($subcategories->isNotEmpty())
 
+                <a href="{{ route('study.material.front', [
+                      'examSlug' => $selectedCommission->slug,
+                      'catSlug' => $selectedCategory->slug,
+                    ]) }}"
+                  class="btn {{ !isset($selectedSubCategory) ? 'btn-primary' : 'btn-outline-secondary' }} px-4 py-2">
+                  All
+                </a>
 
                 @foreach($subcategories as $sub)
-
-                          <a href="{{ route('study.material.front', [
-                    'exam_id' => request('exam_id'),
-                    'category_id' => request('category_id'),
-                    'sub_category_id' => $sub->id
-                  ]) }}"
-                            class="btn {{ request('sub_category_id') == $sub->id ? 'btn-primary' : 'btn-outline-secondary' }} px-4 py-2">
-
-                            {{ $sub->name }}
-
-                          </a>
-
+                  <a href="{{ route('study.material.front', [
+                        'examSlug' => $selectedCommission->slug,
+                        'catSlug' => $selectedCategory->slug,
+                        'subCatSlug' => $sub->slug
+                      ]) }}"
+                    class="btn {{ isset($selectedSubCategory) && $selectedSubCategory->id == $sub->id ? 'btn-primary' : 'btn-outline-secondary' }} px-4 py-2">
+                    {{ $sub->name }}
+                  </a>
                 @endforeach
 
               @else
@@ -609,16 +559,16 @@
             </div>
 
             <!-- study material Grid -->
-
             <div class="row g-2">
 
               @if($studyMaterials->count())
-              
+
                 @foreach($studyMaterials as $material)
 
-                  <div class="edu-course-card col-12 col-md-6 col-xl-4" data-commission="{{ $commission->id }}"
+                  <div class="edu-course-card col-12 col-md-6 col-xl-4"
+                    data-commission="{{ $material->commission->slug ?? $material->commission_id }}"
                     data-category="{{ $material->category_id ?? 'all' }}"
-                    data-category-name="{{ addslashes($category->name) }}">
+                    data-category-name="{{ addslashes($material->category->name ?? '') }}">
 
                     <div class="edu-card">
                       <div class="edu-card-image">
@@ -685,122 +635,86 @@
               @endif
             </div>
 
-            {{ $studyMaterials->links('pagination::bootstrap-5') }}
-
-            <!-- Pagination -->
+            {{ $studyMaterials->onEachSide(1)->links('pagination::bootstrap-5') }}
 
           </div>
-          <div class="offcanvas offcanvas-start offcanvas-lg border-0 shadow-sm m-0" 
-     tabindex="-1" 
-     id="categoryDrawer" 
-     aria-labelledby="categoryDrawerLabel">
 
-  <!-- Offcanvas header (mobile pe dikhega) -->
-  <div class="offcanvas-header">
-    <h5 class="offcanvas-title fw-bold" id="categoryDrawerLabel">Browse Categories</h5>
-    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-  </div>
-  <hr>
+          <!-- Left Sidebar – responsive offcanvas -->
+          <div class="offcanvas offcanvas-start offcanvas-lg border-0 shadow-sm m-0" tabindex="-1" id="categoryDrawer"
+            aria-labelledby="categoryDrawerLabel">
 
-  <!-- Offcanvas body – yahan pura sidebar content jayega -->
-                @foreach($commissions as $commission)
+            <div class="offcanvas-header">
+              <h5 class="offcanvas-title fw-bold" id="categoryDrawerLabel">Browse Categories</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <hr>
 
-                <button
-                  class="category-btn fw-semibold text-start w-100 py-3 px-4 rounded-3 mb-3 border-0 d-flex align-items-center justify-content-between"
-                  data-category="commission-{{ $commission->id }}">
+            @foreach($commissions as $commission)
+              @php
+                $isCommissionActiveMobile = isset($selectedCommission) && $selectedCommission->id == $commission->id;
+              @endphp
 
-                  <span>{{ $commission->name }}</span>
-                  <i class="fas fa-chevron-down category-arrow transition-all"></i>
+              <button
+                class="category-btn fw-semibold text-start w-100 py-3 px-4 rounded-3 mb-3 border-0 d-flex align-items-center justify-content-between {{ $isCommissionActiveMobile ? 'active' : '' }}"
+                type="button" data-bs-toggle="collapse" data-bs-target="#sub-commission-mobile-{{ $commission->slug }}"
+                aria-expanded="{{ $isCommissionActiveMobile ? 'true' : 'false' }}"
+                aria-controls="sub-commission-mobile-{{ $commission->slug }}">
+                <span>{{ $commission->name }}</span>
+                <i class="fas fa-chevron-down category-arrow transition-all"></i>
+              </button>
 
-                </button>
+              <ul class="sub-list list-unstyled ms-3 collapse {{ $isCommissionActiveMobile ? 'show' : '' }}"
+                id="sub-commission-mobile-{{ $commission->slug }}">
+                @foreach($commission->categories as $category)
+                  <li class="mb-2">
+                    <a href="{{ route('study.material.front', [
+                          'examSlug' => $commission->slug,
+                          'catSlug' => $category->slug
+                        ]) }}"
+                      class="sub-btn d-block py-2 px-3 rounded-3 text-decoration-none
+                            {{ isset($selectedCategory) && $selectedCategory->id == $category->id ? 'active' : '' }}">
+                      {{ $category->name }}
+                    </a>
+                  </li>
+                  <hr class="sub-divider">
+                @endforeach
+              </ul>
+            @endforeach
+          </div>
 
-
-                <ul class="sub-list list-unstyled ms-3" id="sub-commission-{{ $commission->id }}">
-
-                  @foreach($commission->categories as $category)
-
-                              <li class="mb-2">
-                                <a href="{{ route('study.material.front', [
-                      'exam_id' => $commission->id,
-                      'category_id' => $category->id
-                    ]) }}"
-                                  class="sub-btn d-block py-2 px-3 rounded-3 text-decoration-none 
-                                                                                                                    {{ request('category_id') == $category->id ? 'active' : '' }}">
-
-                                  {{ $category->name }}
-
-                                </a>
-                              </li>
-
-                              <hr class="sub-divider">
-
-                  @endforeach
-
-                </ul>
-
-              @endforeach
-</div>
         </div>
       </div>
     </section>
 
-    <!-- CSS -->
-
-
     <!-- JavaScript -->
-
     <script>
       document.addEventListener("DOMContentLoaded", function () {
+        // Desktop sidebar toggle (mobile offcanvas uses Bootstrap's own collapse JS)
+        document.querySelectorAll('.col-lg-4.d-none .category-btn[data-category]').forEach(btn => {
+          btn.addEventListener('click', function () {
+            const target = this.dataset.category; // e.g. "commission-upsc"
+            const subList = document.getElementById(`sub-${target}`);
+            const isAlreadyActive = this.classList.contains('active');
 
-        const examId = "{{ request('exam_id') }}";
+            document.querySelectorAll('.col-lg-4.d-none .category-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.col-lg-4.d-none .sub-list').forEach(list => list.classList.remove('show'));
 
-        if (examId) {
-
-          const btn = document.querySelector(`[data-category="commission-${examId}"]`);
-          const list = document.getElementById(`sub-commission-${examId}`);
-
-          if (btn && list) {
-            btn.classList.add("active");
-            list.classList.add("show");
-          }
-
-        }
-
-      });
-      document.querySelectorAll('.category-btn').forEach(btn => {
-
-        btn.addEventListener('click', function () {
-
-          const target = this.dataset.category;
-          const subList = document.getElementById(`sub-${target}`);
-
-          const isAlreadyActive = this.classList.contains('active');
-
-          document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
-          document.querySelectorAll('.sub-list').forEach(list => list.classList.remove('show'));
-
-          if (!isAlreadyActive) {
-            this.classList.add('active');
-            subList.classList.add('show');
-          }
-
+            if (!isAlreadyActive && subList) {
+              this.classList.add('active');
+              subList.classList.add('show');
+            }
+          });
         });
-
       });
 
-      
       document.addEventListener("click", function (e) {
-
         if (e.target.closest(".pagination a")) {
           window.scrollTo({
             top: 0,
             behavior: "smooth"
           });
         }
-
       });
-
-
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

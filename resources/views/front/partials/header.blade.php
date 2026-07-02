@@ -34,37 +34,37 @@
 
 
 
-  .mega-menu-left {
-    width: 20%;
-    background: #f9f9f9;
-    border-right: 1px solid #ddd;
-    overflow-y: auto;
-    height: 100vh;
+    .mega-menu-left {
+        width: 20%;
+        background: #f9f9f9;
+        border-right: 1px solid #ddd;
+        overflow-y: auto;
+        height: 100vh;
 
-    /* Firefox */
-    scrollbar-width: thin;
-    scrollbar-color: #999 #f1f1f1;
-    padding-bottom: 20px
-}
+        /* Firefox */
+        scrollbar-width: thin;
+        scrollbar-color: #999 #f1f1f1;
+        padding-bottom: 20px
+    }
 
-/* Chrome, Edge, Safari */
-.mega-menu-left::-webkit-scrollbar {
-    width: 6px;
-}
+    /* Chrome, Edge, Safari */
+    .mega-menu-left::-webkit-scrollbar {
+        width: 6px;
+    }
 
-.mega-menu-left::-webkit-scrollbar-track {
-    background: #f1f1f1;
-}
+    .mega-menu-left::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
 
-.mega-menu-left::-webkit-scrollbar-thumb {
-    background: #999;
-    border-radius: 10px;
-}
+    .mega-menu-left::-webkit-scrollbar-thumb {
+        background: #999;
+        border-radius: 10px;
+    }
 
-.mega-menu-left::-webkit-scrollbar-thumb:hover {
-    background: #777;
-}
-    
+    .mega-menu-left::-webkit-scrollbar-thumb:hover {
+        background: #777;
+    }
+
 
     .mega-menu-tab {
         padding: 15px 20px;
@@ -158,8 +158,6 @@
         -o-transition: all 500ms ease;
         margin-right: 25px;
     }
-    
-  
 </style>
 <link href="{{url('assets/css/bootstrap.css')}}" rel="stylesheet">
 <link href="{{url('assets/css/style.css')}}" rel="stylesheet">
@@ -184,39 +182,42 @@
     .container {
         max-width: 100%;
     }
+
     .mobile-menu .navigation li.dropdown ul {
-    display: none;
-    padding-left: 20px;
-}
-
-.mobile-menu .navigation li.dropdown.open > a {
-    color: orange;
-    font-weight: 600;
-}
-
-.overflow-hidden {
-    overflow: hidden;
-}
-
- @media (min-width: 767px) {
-    .top-header-login1 {
-      display:none;
+        display: none;
+        padding-left: 20px;
     }
 
-    
-  }
- @media (max-width: 767px) {
-    .top-header-login {
-      margin-right:15px;
+    .mobile-menu .navigation li.dropdown.open>a {
+        color: orange;
+        font-weight: 600;
     }
-.btn-style-one{
-    background:#fff !important;
-    color:black !important;
-    border:1px solid gray !important;
-    border-radius:4px;
-}
-    
-  }
+
+    .overflow-hidden {
+        overflow: hidden;
+    }
+
+    @media (min-width: 767px) {
+        .top-header-login1 {
+            display: none;
+        }
+
+
+    }
+
+    @media (max-width: 767px) {
+        .top-header-login {
+            margin-right: 15px;
+        }
+
+        .btn-style-one {
+            background: #fff !important;
+            color: black !important;
+            border: 1px solid gray !important;
+            border-radius: 4px;
+        }
+
+    }
 </style>
 
 <!-- Main Header -->
@@ -263,8 +264,8 @@
                                 <a href="{{route('user.dashboard')}}" class="theme-btn btn-style-one"><span class="txt"><i
                                             class="flaticon-add-user"></i> Dashboard</span></a>
                             @else
-                                <a href="{{route('student.login')}}" class="theme-btn btn-style-one"><span
-                                        class="txt"><i class="flaticon-add-user"></i> LogIn / Sign Up</span></a>
+                                <a href="{{route('student.login')}}" class="theme-btn btn-style-one"><span class="txt"><i
+                                            class="flaticon-add-user"></i> LogIn / Sign Up</span></a>
                             @endif
                         </div>
                     </div>
@@ -282,20 +283,20 @@
                                     style="width:100px;" alt="" title=""></a></div>
                     </div>
                     <div class="nav-outer d-flex align-items-center flex-wrap">
-                        
+
                         <!-- Mobile Navigation Toggler -->
                         <div class="top-header-login top-header-login1">
                             @if(auth()->user() && auth()->user()->type == 'student')
                                 <a href="{{route('user.dashboard')}}" class="theme-btn btn-style-one"><span class="txt"><i
                                             class="flaticon-add-user"></i> Dashboard</span></a>
                             @else
-                                <a href="{{route('student.login')}}" class="theme-btn btn-style-one"><span
-                                        class="txt"><i class="flaticon-add-user"></i> LogIn / Sign Up</span></a>
+                                <a href="{{route('student.login')}}" class="theme-btn btn-style-one"><span class="txt"><i
+                                            class="flaticon-add-user"></i> LogIn / Sign Up</span></a>
                             @endif
                         </div>
                         <div class="mobile-nav-toggler"> <span class="icon flaticon-menu"></span></div>
-                        
-                        
+
+
                         <!-- Main Menu -->
                         <nav class="main-menu show navbar-expand-md">
                             <div class="navbar-header">
@@ -332,15 +333,15 @@
                                     <!--        </div>-->
                                     <!--    </div>-->
                                     <!--</li>-->
-                                    
+
                                     <li class="dropdown">
-                            <a href="#">About Us</a>
-                            <ul>
-                                <li><a href="{{route('about')}}">About Us</a></li>
-                                <li><a href="{{route('our.team.index')}}">Our Team</a></li>
-                                <li><a href="{{route('vision.mission')}}">Vision & Mission</a></li>
-                            </ul>
-                        </li>
+                                        <a href="#">About Us</a>
+                                        <ul>
+                                            <li><a href="{{route('about')}}">About Us</a></li>
+                                            <li><a href="{{route('our.team.index')}}">Our Team</a></li>
+                                            <li><a href="{{route('vision.mission')}}">Vision & Mission</a></li>
+                                        </ul>
+                                    </li>
 
                                     <!-- Courses Dropdown -->
                                     <li class="dropdown">
@@ -366,9 +367,9 @@
                                                                     @foreach($category->subCategories as $subCat)
                                                                                                                         <li>
                                                                                                                             <a href="{{ route('courses', [
-                                                                            'exam_id' => $commission->id,
-                                                                            'category_id' => $category->id,
-                                                                            'sub_category_id' => $subCat->id
+                                                                            'examSlug' => $commission->slug,
+                                                                            'catSlug' => $category->slug,
+                                                                            'subCatSlug' => $subCat->slug
                                                                         ]) }}">
                                                                                                                                 {{ $subCat->name }}
                                                                                                                             </a>
@@ -407,9 +408,9 @@
                                                                     @foreach($category->subCategories as $subCat)
                                                                                                                         <li>
                                                                                                                             <a href="{{ route('test-series-list', [
-                                                                            'exam_id' => $commission->id,
-                                                                            'category_id' => $category->id,
-                                                                            'sub_category_id' => $subCat->id
+                                                                            'examSlug' => $commission->slug,
+                                                                            'catSlug' => $category->slug,
+                                                                            'subCatSlug' => $subCat->slug
                                                                         ]) }}">
                                                                                                                                 {{ $subCat->name }}
                                                                                                                             </a>
@@ -447,10 +448,10 @@
                                                                 <ul>
                                                                     @foreach($category->subCategories as $subCat)
                                                                                                                         <li>
-                                                                                                                              <a href="{{ route('study.material.front', [
-                                                                            'exam_id' => $commission->id,
-                                                                            'category_id' => $category->id,
-                                                                            'sub_category_id' => $subCat->id
+                                                                                                                            <a href="{{ route('study.material.front', [
+                                                                            'examSlug' => $commission->slug,
+                                                                            'catSlug' => $category->slug,
+                                                                            'subCatSlug' => $subCat->slug
                                                                         ]) }}">
                                                                                                                                 {{ $subCat->name }}
                                                                                                                             </a>
@@ -484,8 +485,8 @@
                                     <!--        </div>-->
                                     <!--    </div>-->
                                     <!--</li>-->
-                                    
-                                     <li><a href="{{route('current.index')}}"> Current Affairs</a></li>
+
+                                    <li><a href="{{route('current.index')}}"> Current Affairs</a></li>
 
                                     <!-- PYQ Dropdown -->
                                     <li class="dropdown">
@@ -509,9 +510,15 @@
                                                                 <h5>{{ $category->name }}</h5>
                                                                 <ul>
                                                                     @foreach($category->subCategories as $subCat)
-                                                                        <li><a
-                                                                                href="{{route('pyq-papers', ['examid' => $commission->id, 'catid' => $category->id, 'subcat' => $subCat->id])}}">{{ $subCat->name }}</a>
-                                                                        </li>
+                                                                                                                        <li><a href="{{route(
+                                                                            'pyq-papers',
+                                                                            [
+                                                                                'examSlug' => $commission->slug,
+                                                                                'catSlug' => $category->slug,
+                                                                                'subCatSlug' => $subCat->slug
+                                                                            ]
+                                                                        )}}">{{ $subCat->name }}</a>
+                                                                                                                        </li>
                                                                     @endforeach
                                                                 </ul>
                                                             </div>
@@ -546,9 +553,9 @@
                                                                     @foreach($category->subCategories as $subCat)
                                                                                                                         <li>
                                                                                                                             <a href="{{ route('syllabus.front', [
-                                                                            'examid' => $commission->id,
-                                                                            'catid' => $category->id,
-                                                                            'subcat' => $subCat->id
+                                                                            'examSlug' => $commission->slug,
+                                                                            'catSlug' => $category->slug,
+                                                                            'subCatSlug' => $subCat->slug
                                                                         ]) }}">
                                                                                                                                 {{ $subCat->name }}
                                                                                                                             </a>
@@ -584,15 +591,15 @@
                                     <!--        </div>-->
                                     <!--    </div>-->
                                     <!--</li>-->
-                                    
-                                      <li class="dropdown">
-                            <a href="#">Student Corner</a>
-                            <ul>
-                                <li><a href="{{route('daily.boost.front')}}">Daily Booster</a></li>
-                                <li><a href="{{route('test.planner.front')}}">Test Planner</a></li>
-                                <li><a href="{{route('batches.index')}}">Batches & Program</a></li>
-                            </ul>
-                        </li>
+
+                                    <li class="dropdown">
+                                        <a href="#">Student Corner</a>
+                                        <ul>
+                                            <li><a href="{{route('daily.boost.front')}}">Daily Booster</a></li>
+                                            <li><a href="{{route('test.planner.front')}}">Test Planner</a></li>
+                                            <li><a href="{{route('batches.index')}}">Batches & Program</a></li>
+                                        </ul>
+                                    </li>
                                 </ul>
                             </div>
                         </nav>
@@ -612,19 +619,19 @@
                             alt="Adhyayanam Logo" title=""></a>
                 </div>
                 <nav class="main-menu"></nav>
-                <div class="d-flex  align-items-center" >
-                 <div class="top-header-login top-header-login1">
-                            @if(auth()->user() && auth()->user()->type == 'student')
-                                <a href="{{route('user.dashboard')}}" class="theme-btn btn-style-one"><span class="txt"><i
-                                            class="flaticon-add-user"></i> Dashboard</span></a>
-                            @else
-                                <a href="{{route('student.login')}}" class="theme-btn btn-style-one"><span
-                                        class="txt"><i class="flaticon-add-user"></i> LogIn / Sign Up</span></a>
-                            @endif
-                        </div>
-                <div class="mobile-nav-toggler"><span class="icon flaticon-menu"></span></div>
+                <div class="d-flex  align-items-center">
+                    <div class="top-header-login top-header-login1">
+                        @if(auth()->user() && auth()->user()->type == 'student')
+                            <a href="{{route('user.dashboard')}}" class="theme-btn btn-style-one"><span class="txt"><i
+                                        class="flaticon-add-user"></i> Dashboard</span></a>
+                        @else
+                            <a href="{{route('student.login')}}" class="theme-btn btn-style-one"><span class="txt"><i
+                                        class="flaticon-add-user"></i> LogIn / Sign Up</span></a>
+                        @endif
+                    </div>
+                    <div class="mobile-nav-toggler"><span class="icon flaticon-menu"></span></div>
                 </div>
-               
+
             </div>
         </div>
         <!-- End Sticky Menu -->
@@ -632,180 +639,185 @@
 
         <!-- Mobile Menu -->
         <!-- Mobile Menu -->
-<!-- ==================== MOBILE MENU ==================== -->
-<div class="mobile-menu">
-    <div class="menu-backdrop"></div>
-    <div class="close-btn"><span class="icon flaticon-cancel"></span></div>
-    
-    <nav class="menu-box">
-        <div class="nav-logo">
-            <a href="{{ url('/') }}">
-                <img src="{{ url('images/Neti-logo.png') }}" alt="Logo" style="width: 100px;">
-            </a>
+        <!-- ==================== MOBILE MENU ==================== -->
+        <div class="mobile-menu">
+            <div class="menu-backdrop"></div>
+            <div class="close-btn"><span class="icon flaticon-cancel"></span></div>
+
+            <nav class="menu-box">
+                <div class="nav-logo">
+                    <a href="{{ url('/') }}">
+                        <img src="{{ url('images/Neti-logo.png') }}" alt="Logo" style="width: 100px;">
+                    </a>
+                </div>
+
+                <div class="menu-outer1">
+                    <ul class="navigation clearfix">
+                        <li><a href="{{url('/')}}">Home</a></li>
+
+                        <li class="dropdown">
+                            <a href="#">Our Institute</a>
+                            <ul>
+                                <li><a href="{{route('about')}}">About Us</a></li>
+                                <li><a href="{{route('our.team.index')}}">Our Team</a></li>
+                                <li><a href="{{route('vision.mission')}}">Vision & Mission</a></li>
+                            </ul>
+                        </li>
+
+                        <li class="dropdown">
+                            <a href="#">Courses</a>
+                            <ul>
+                                @foreach($examinationCommission as $commission)
+                                    <li class="dropdown">
+                                        <a href="#">{{$commission->name}}</a>
+                                        <ul>
+                                            @foreach($commission->categories as $category)
+                                                @foreach($category->subCategories as $subCat)
+                                                                                <li>
+                                                                                    <a href="{{ route('courses', [
+                                                        'examSlug' => $commission->slug,
+                                                        'catSlug' => $category->slug,
+                                                        'subCatSlug' => $subCat->slug
+                                                    ]) }}">
+                                                                                        {{ $subCat->name }}
+                                                                                    </a>
+                                                                                </li>
+                                                @endforeach
+                                            @endforeach
+                                        </ul>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        </li>
+
+                        <li class="dropdown">
+                            <a href="#">Test Series</a>
+                            <ul>
+                                @foreach($examinationCommission as $commission)
+                                    <li class="dropdown"> <!-- Yeh inner dropdown hai -->
+                                        <a href="#">{{$commission->name}}</a>
+                                        <ul>
+                                            @foreach($commission->categories as $category)
+                                                <li class="dropdown"> <!-- Yeh bhi inner dropdown -->
+                                                    <a href="#">{{$category->name}}</a>
+                                                    <ul>
+                                                        @foreach($category->subCategories as $subCat)
+                                                                                                <li>
+                                                                                                    <a href="{{ route('test-series-list', [
+                                                                'examSlug' => $commission->slug,
+                                                                'catSlug' => $category->slug,
+                                                                'subCatSlug' => $subCat->slug
+                                                            ]) }}">
+                                                                                                        {{ $subCat->name }}
+                                                                                                    </a>
+                                                                                                </li>
+                                                        @endforeach
+                                                    </ul>
+                                                </li>
+                                            @endforeach
+                                        </ul>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        </li>
+
+                        <li class="dropdown">
+                            <a href="#">Study Material</a>
+                            <ul>
+                                @foreach($examinationCommission as $commission)
+                                    <li class="dropdown">
+                                        <a href="#">{{$commission->name}}</a>
+                                        <ul>
+                                            @foreach($commission->categories as $category)
+                                                @foreach($category->subCategories as $subCat)
+                                                                                <li>
+                                                                                    <a href="{{ route('study.material.front', [
+                                                        'examSlug' => $commission->slug,
+                                                        'catSlug' => $category->slug,
+                                                        'subCatSlug' => $subCat->slug
+                                                    ]) }}">
+                                                                                        {{ $subCat->name }}
+                                                                                    </a>
+                                                                                </li>
+                                                @endforeach
+                                            @endforeach
+                                        </ul>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        </li>
+
+                        <li class="dropdown">
+                            <a href="#">Current Affairs</a>
+                            <ul>
+                                <li><a href="{{route('current.index')}}">View Current Affairs</a></li>
+                            </ul>
+                        </li>
+
+                        <li class="dropdown">
+                            <a href="#">PYQ</a>
+                            <ul>
+                                @foreach($examinationCommission as $commission)
+                                    <li class="dropdown">
+                                        <a href="#">{{$commission->name}}</a>
+                                        <ul>
+                                            @foreach($commission->categories as $category)
+                                                @foreach($category->subCategories as $subCat)
+                                                    <li>
+                                                        <a
+                                                            href="{{route('pyq-papers', [
+                                                            'examSlug' => $commission->slug,
+                                                            'catSlug' => $category->slug,
+                                                            'subCatSlug' => $subCat->slug
+                                                        ])}}">
+                                                            {{ $subCat->name }}
+                                                        </a>
+                                                    </li>
+                                                @endforeach
+                                            @endforeach
+                                        </ul>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        </li>
+
+                        <li class="dropdown">
+                            <a href="#">Syllabus</a>
+                            <ul>
+                                @foreach($examinationCommission as $commission)
+                                    <li class="dropdown">
+                                        <a href="#">{{$commission->name}}</a>
+                                        <ul>
+                                            @foreach($commission->categories as $category)
+                                                @foreach($category->subCategories as $subCat)
+                                                                                <li>
+                                                                                    <a href="{{ route('syllabus.front', [
+                                                                        'examSlug' => $commission->slug,
+                                                                        'catSlug' => $category->slug,
+                                                                        'subCatSlug' => $subCat->slug
+                                                    ]) }}">
+                                                                                        {{ $subCat->name }}
+                                                                                    </a>
+                                                                                </li>
+                                                @endforeach
+                                            @endforeach
+                                        </ul>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        </li>
+
+                        <li class="dropdown">
+                            <a href="#">Student Corner</a>
+                            <ul>
+                                <li><a href="{{route('daily.boost.front')}}">Daily Booster</a></li>
+                                <li><a href="{{route('test.planner.front')}}">Test Planner</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
         </div>
-        
-        <div class="menu-outer1">
-            <ul class="navigation clearfix">
-                <li><a href="{{url('/')}}">Home</a></li>
-                
-                <li class="dropdown">
-                    <a href="#">Our Institute</a>
-                    <ul>
-                        <li><a href="{{route('about')}}">About Us</a></li>
-                        <li><a href="{{route('our.team.index')}}">Our Team</a></li>
-                        <li><a href="{{route('vision.mission')}}">Vision & Mission</a></li>
-                    </ul>
-                </li>
-
-                <li class="dropdown">
-                    <a href="#">Courses</a>
-                    <ul>
-                        @foreach($examinationCommission as $commission)
-                            <li class="dropdown">
-                                <a href="#">{{$commission->name}}</a>
-                                <ul>
-                                    @foreach($commission->categories as $category)
-                                        @foreach($category->subCategories as $subCat)
-                                            <li>
-                                                <a href="{{ route('courses', [
-                                                    'exam_id' => $commission->id,
-                                                    'category_id' => $category->id,
-                                                    'sub_category_id' => $subCat->id
-                                                ]) }}">
-                                                    {{ $subCat->name }}
-                                                </a>
-                                            </li>
-                                        @endforeach
-                                    @endforeach
-                                </ul>
-                            </li>
-                        @endforeach
-                    </ul>
-                </li>
-
-                <li class="dropdown">
-        <a href="#">Test Series</a>
-        <ul>
-            @foreach($examinationCommission as $commission)
-                <li class="dropdown">   <!-- Yeh inner dropdown hai -->
-                    <a href="#">{{$commission->name}}</a>
-                    <ul>
-                        @foreach($commission->categories as $category)
-                            <li class="dropdown">   <!-- Yeh bhi inner dropdown -->
-                                <a href="#">{{$category->name}}</a>
-                                <ul>
-                                    @foreach($category->subCategories as $subCat)
-                                        <li>
-                                            <a href="{{ route('test-series-list', [
-                                                'exam_id' => $commission->id,
-                                                'category_id' => $category->id,
-                                                'sub_category_id' => $subCat->id
-                                            ]) }}">
-                                                {{ $subCat->name }}
-                                            </a>
-                                        </li>
-                                    @endforeach
-                                </ul>
-                            </li>
-                        @endforeach
-                    </ul>
-                </li>
-            @endforeach
-        </ul>
-    </li>
-
-                <li class="dropdown">
-                    <a href="#">Study Material</a>
-                    <ul>
-                        @foreach($examinationCommission as $commission)
-                            <li class="dropdown">
-                                <a href="#">{{$commission->name}}</a>
-                                <ul>
-                                    @foreach($commission->categories as $category)
-                                        @foreach($category->subCategories as $subCat)
-                                            <li>
-                                                <a href="{{ route('study.material.front', [
-                                                    'exam_id' => $commission->id,
-                                                    'category_id' => $category->id,
-                                                    'sub_category_id' => $subCat->id
-                                                ]) }}">
-                                                    {{ $subCat->name }}
-                                                </a>
-                                            </li>
-                                        @endforeach
-                                    @endforeach
-                                </ul>
-                            </li>
-                        @endforeach
-                    </ul>
-                </li>
-
-                <li class="dropdown">
-                    <a href="#">Current Affairs</a>
-                    <ul>
-                        <li><a href="{{route('current.index')}}">View Current Affairs</a></li>
-                    </ul>
-                </li>
-
-                <li class="dropdown">
-                    <a href="#">PYQ</a>
-                    <ul>
-                        @foreach($examinationCommission as $commission)
-                            <li class="dropdown">
-                                <a href="#">{{$commission->name}}</a>
-                                <ul>
-                                    @foreach($commission->categories as $category)
-                                        @foreach($category->subCategories as $subCat)
-                                            <li>
-                                                <a href="{{route('pyq-papers', ['examid' => $commission->id, 'catid' => $category->id, 'subcat' => $subCat->id])}}">
-                                                    {{ $subCat->name }}
-                                                </a>
-                                            </li>
-                                        @endforeach
-                                    @endforeach
-                                </ul>
-                            </li>
-                        @endforeach
-                    </ul>
-                </li>
-
-                <li class="dropdown">
-                    <a href="#">Syllabus</a>
-                    <ul>
-                        @foreach($examinationCommission as $commission)
-                            <li class="dropdown">
-                                <a href="#">{{$commission->name}}</a>
-                                <ul>
-                                    @foreach($commission->categories as $category)
-                                        @foreach($category->subCategories as $subCat)
-                                            <li>
-                                                <a href="{{ route('syllabus.front', [
-                                                    'examid' => $commission->id,
-                                                    'catid' => $category->id,
-                                                    'subcat' => $subCat->id
-                                                ]) }}">
-                                                    {{ $subCat->name }}
-                                                </a>
-                                            </li>
-                                        @endforeach
-                                    @endforeach
-                                </ul>
-                            </li>
-                        @endforeach
-                    </ul>
-                </li>
-
-                <li class="dropdown">
-                    <a href="#">Student Corner</a>
-                    <ul>
-                        <li><a href="{{route('daily.boost.front')}}">Daily Booster</a></li>
-                        <li><a href="{{route('test.planner.front')}}">Test Planner</a></li>
-                    </ul>
-                </li>
-            </ul>
-        </div>
-    </nav>
-</div>
     </div>
 </header>
 
@@ -814,100 +826,100 @@
 
 
 <script>
-$(document).ready(function() {
+    $(document).ready(function () {
 
-    // ==================== MOBILE MENU ====================
-   $('.mobile-nav-toggler').on('click', function() {
-        $('.mobile-menu').addClass('active');
-    });
+        // ==================== MOBILE MENU ====================
+        $('.mobile-nav-toggler').on('click', function () {
+            $('.mobile-menu').addClass('active');
+        });
 
-    $('.mobile-menu .close-btn, .menu-backdrop').on('click', function() {
-        $('.mobile-menu').removeClass('active');
-    });
-
-    // ==================== MOBILE DROPDOWN - FIXED VERSION ====================
-  $(document).on('click', '.mobile-menu .navigation li.dropdown > a', function(e) {
-        e.preventDefault();
-        e.stopImmediatePropagation();   // Yeh line zaroori hai nested ke liye
-
-        var $li = $(this).parent('li');
-
-        // Agar already open hai to close kar do
-        if ($li.hasClass('open')) {
-            $li.removeClass('open');
-            $li.find('ul').first().slideUp(250);
-            return;
-        }
-
-        // Sab open dropdowns close kar do (sirf same level ke)
-        $li.siblings('li.dropdown').removeClass('open').find('ul').slideUp(250);
-
-        // Current ko open kar do
-        $li.addClass('open');
-        $li.find('ul').first().slideDown(250);
-    });
-
-    // Close mobile menu when clicking outside
-    $(document).on('click', function(e) {
-        if (!$(e.target).closest('.mobile-menu, .mobile-nav-toggler').length) {
+        $('.mobile-menu .close-btn, .menu-backdrop').on('click', function () {
             $('.mobile-menu').removeClass('active');
-        }
-    });
+        });
 
-    // Resize handler
-    $(window).on('resize', function() {
-        if ($(window).width() > 991) {
-            $('.mobile-menu').removeClass('active');
-            $('.mobile-menu .navigation li.dropdown').removeClass('open');
-            $('.mobile-menu .navigation li.dropdown ul').hide();
-        }
-    });
+        // ==================== MOBILE DROPDOWN - FIXED VERSION ====================
+        $(document).on('click', '.mobile-menu .navigation li.dropdown > a', function (e) {
+            e.preventDefault();
+            e.stopImmediatePropagation();   // Yeh line zaroori hai nested ke liye
 
-    // ==================== DESKTOP MEGA MENU ====================
-    $('.dropdown').hover(function() {
-        if ($(window).width() > 991) {
-            $('.dropdown').removeClass('active');
+            var $li = $(this).parent('li');
+
+            // Agar already open hai to close kar do
+            if ($li.hasClass('open')) {
+                $li.removeClass('open');
+                $li.find('ul').first().slideUp(250);
+                return;
+            }
+
+            // Sab open dropdowns close kar do (sirf same level ke)
+            $li.siblings('li.dropdown').removeClass('open').find('ul').slideUp(250);
+
+            // Current ko open kar do
+            $li.addClass('open');
+            $li.find('ul').first().slideDown(250);
+        });
+
+        // Close mobile menu when clicking outside
+        $(document).on('click', function (e) {
+            if (!$(e.target).closest('.mobile-menu, .mobile-nav-toggler').length) {
+                $('.mobile-menu').removeClass('active');
+            }
+        });
+
+        // Resize handler
+        $(window).on('resize', function () {
+            if ($(window).width() > 991) {
+                $('.mobile-menu').removeClass('active');
+                $('.mobile-menu .navigation li.dropdown').removeClass('open');
+                $('.mobile-menu .navigation li.dropdown ul').hide();
+            }
+        });
+
+        // ==================== DESKTOP MEGA MENU ====================
+        $('.dropdown').hover(function () {
+            if ($(window).width() > 991) {
+                $('.dropdown').removeClass('active');
+                $(this).addClass('active');
+            }
+        }, function () {
+            if ($(window).width() > 991) {
+                $(this).removeClass('active');
+            }
+        });
+
+        // Mega Menu Tab Switching
+        $('.mega-menu-tab').on('click', function () {
+            var $parent = $(this).closest('.mega-menu-container');
+
+            $parent.find('.mega-menu-tab').removeClass('active');
+            $parent.find('.mega-menu-panel').removeClass('active');
+
             $(this).addClass('active');
-        }
-    }, function() {
-        if ($(window).width() > 991) {
-            $(this).removeClass('active');
-        }
+            $('#' + $(this).data('tab')).addClass('active');
+        });
+
+        // Close mega menu when clicking outside
+        $(document).on('click', function (e) {
+            if (!$(e.target).closest('.dropdown').length) {
+                $('.dropdown').removeClass('active');
+            }
+        });
+
+        // Resize Handler
+        $(window).on('resize', function () {
+            if ($(window).width() > 991) {
+                $('.mobile-menu').removeClass('active');
+                $('body').removeClass('overflow-hidden');
+            }
+        });
+
+        // Close mobile menu on Escape key
+        $(document).on('keydown', function (e) {
+            if (e.key === "Escape") {
+                $('.mobile-menu').removeClass('active');
+                $('body').removeClass('overflow-hidden');
+            }
+        });
+
     });
-
-    // Mega Menu Tab Switching
-    $('.mega-menu-tab').on('click', function() {
-        var $parent = $(this).closest('.mega-menu-container');
-        
-        $parent.find('.mega-menu-tab').removeClass('active');
-        $parent.find('.mega-menu-panel').removeClass('active');
-
-        $(this).addClass('active');
-        $('#' + $(this).data('tab')).addClass('active');
-    });
-
-    // Close mega menu when clicking outside
-    $(document).on('click', function(e) {
-        if (!$(e.target).closest('.dropdown').length) {
-            $('.dropdown').removeClass('active');
-        }
-    });
-
-    // Resize Handler
-    $(window).on('resize', function() {
-        if ($(window).width() > 991) {
-            $('.mobile-menu').removeClass('active');
-            $('body').removeClass('overflow-hidden');
-        }
-    });
-
-    // Close mobile menu on Escape key
-    $(document).on('keydown', function(e) {
-        if (e.key === "Escape") {
-            $('.mobile-menu').removeClass('active');
-            $('body').removeClass('overflow-hidden');
-        }
-    });
-
-});
 </script>

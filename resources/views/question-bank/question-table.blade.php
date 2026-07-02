@@ -31,7 +31,7 @@
 
                 <td>{{$data->show_on_pyq}}</td>
                 <td>Active</td>
-                <td>{{ $data->addedBy->full_name ?? ($data->addedBy->name ?? '-')}}<br>{{ $data->addedBy->email ?? '-' }}
+                <td>{{ $data->addedBy->full_name ?? ($data->addedBy->name ?? '-')}}
                 </td>
                 <td>
                     <div class="dropdown">

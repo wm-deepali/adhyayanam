@@ -47,7 +47,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\StudyMaterialCategory;
 use App\Models\ExaminationCommission;
 use App\Models\UserMobiileVerification;
-use Barryvdh\DomPDF\Facade\Pdf;
+use App\Models\Category;
 use App\Models\OfficeAddress;
 use App\Models\AboutPageSection;
 use App\Models\AboutPageCounter;
@@ -266,40 +266,63 @@ class FrontController extends Controller
         return redirect()->route('career')->with('success', 'Application submitted successfully!');
     }
 
-    public function courseIndex(Request $request)
-    {
-        $exam_id = $request->query('exam_id');
-        $category_id = $request->query('category_id');
-        $sub_category_id = $request->query('sub_category_id');
+    public function courseIndex(
+        Request $request,
+        $examSlug = null,
+        $catSlug = null,
+        $subCatSlug = null
+    ) {
+
         $search = $request->query('search');
         $sort = $request->query('sort');
 
-        // Limit commission, categories, subcategories
+        // Resolve slugs
+        $commission = null;
+        $category = null;
+        $subCategory = null;
+
+        if ($examSlug) {
+            $commission = ExaminationCommission::where('slug', $examSlug)->first();
+        }
+
+        if ($catSlug) {
+            $category = Category::where('slug', $catSlug)->first();
+        }
+
+        if ($subCatSlug) {
+            $subCategory = SubCategory::where('slug', $subCatSlug)->first();
+        }
+
+        $data['selectedCommission'] = $commission;
+        $data['selectedCategory'] = $category;
+        $data['selectedSubCategory'] = $subCategory;
+
         $data['commissions'] = ExaminationCommission::with(['categories.subCategories'])
             ->get();
 
-        // Load subcategories when category selected
         $data['subcategories'] = collect();
 
-        if ($category_id) {
-            $data['subcategories'] = SubCategory::where('category_id', $category_id)
-                ->get();
+        if ($category) {
+            $data['subcategories'] = SubCategory::where(
+                'category_id',
+                $category->id
+            )->get();
         }
 
         // Course query
         $courseQuery = Course::with(['examinationCommission', 'category', 'subCategory']);
 
-        // Filters
-        if ($exam_id) {
-            $courseQuery->where('examination_commission_id', $exam_id);
+        // Filters using IDs resolved from slug
+        if ($commission) {
+            $courseQuery->where('examination_commission_id', $commission->id);
         }
 
-        if ($category_id) {
-            $courseQuery->where('category_id', $category_id);
+        if ($category) {
+            $courseQuery->where('category_id', $category->id);
         }
 
-        if ($sub_category_id) {
-            $courseQuery->where('sub_category_id', $sub_category_id);
+        if ($subCategory) {
+            $courseQuery->where('sub_category_id', $subCategory->id);
         }
 
         // Search
@@ -312,30 +335,25 @@ class FrontController extends Controller
         }
 
         // Sorting
-        if ($sort) {
-
-            if ($sort == 'newest') {
-                $courseQuery->latest();
-            }
-
-            if ($sort == 'price_low') {
-                $courseQuery->orderBy('offered_price', 'asc');
-            }
-
-            if ($sort == 'price_high') {
-                $courseQuery->orderBy('offered_price', 'desc');
-            }
-
+        if ($sort == 'newest') {
+            $courseQuery->latest();
+        } elseif ($sort == 'price_low') {
+            $courseQuery->orderBy('offered_price', 'asc');
+        } elseif ($sort == 'price_high') {
+            $courseQuery->orderBy('offered_price', 'desc');
         } else {
             // Default sorting
             $courseQuery->latest();
         }
 
         // Pagination
-        $data['courses'] = $courseQuery->paginate(9)->withQueryString();
+        $data['courses'] = $courseQuery
+            ->paginate(9)
+            ->appends($request->query());
 
         return view('front.user.courses', $data);
     }
+
 
     public function courseFilter(Request $request, $id)
     {
@@ -647,14 +665,38 @@ class FrontController extends Controller
         $data['data'] = TestPlanner::findOrFail($id);
         return view('front.user.test-planner-details', $data);
     }
-    public function studyMaterialIndex(Request $request)
-    {
 
-        $exam_id = $request->query('exam_id');
-        $category_id = $request->query('category_id');
-        $sub_category_id = $request->query('sub_category_id');
+
+    public function studyMaterialIndex(
+        Request $request,
+        $examid = null,
+        $catid = null,
+        $subcat = null
+    ) {
+
         $search = $request->query('search');
         $sort = $request->query('sort');
+
+        // Resolve slugs
+        $commission = null;
+        $category = null;
+        $subCategory = null;
+
+        if ($examid) {
+            $commission = ExaminationCommission::where('slug', $examid)->first();
+        }
+
+        if ($catid) {
+            $category = Category::where('slug', $catid)->first();
+        }
+
+        if ($subcat) {
+            $subCategory = SubCategory::where('slug', $subcat)->first();
+        }
+
+        $data['selectedCommission'] = $commission;
+        $data['selectedCategory'] = $category;
+        $data['selectedSubCategory'] = $subCategory;
 
         // Limit commission, categories, subcategories
         $data['commissions'] = ExaminationCommission::with(['categories.subCategories'])
@@ -663,57 +705,53 @@ class FrontController extends Controller
         // Load subcategories when category selected
         $data['subcategories'] = collect();
 
-        if ($category_id) {
-            $data['subcategories'] = SubCategory::where('category_id', $category_id)
-                ->get();
+        if ($category) {
+            $data['subcategories'] = SubCategory::where(
+                'category_id',
+                $category->id
+            )->get();
         }
 
         // Study Material Query
         $studyMaterialsQuery = StudyMaterial::with(['commission', 'category', 'subcategory']);
-        // Filters
-        if ($exam_id) {
-            $studyMaterialsQuery->where('commission_id', $exam_id);
+
+        // Filters using IDs resolved from slug
+        if ($commission) {
+            $studyMaterialsQuery->where('commission_id', $commission->id);
         }
 
-        if ($category_id) {
-            $studyMaterialsQuery->where('category_id', $category_id);
+        if ($category) {
+            $studyMaterialsQuery->where('category_id', $category->id);
         }
 
-        if ($sub_category_id) {
-            $studyMaterialsQuery->where('sub_category_id', $sub_category_id);
+        if ($subCategory) {
+            $studyMaterialsQuery->where('sub_category_id', $subCategory->id);
         }
 
         // Search
         if ($search) {
             $studyMaterialsQuery->where(function ($q) use ($search) {
-                $q->Where('title', 'like', "%{$search}%")
+                $q->where('title', 'like', "%{$search}%")
                     ->orWhere('short_description', 'like', "%{$search}%");
             });
         }
 
         // Sorting
-        if ($sort) {
-
-            if ($sort == 'newest') {
-                $studyMaterialsQuery->latest();
-            }
-
-            if ($sort == 'price_low') {
-                $studyMaterialsQuery->orderBy('price', 'asc');
-            }
-
-            if ($sort == 'price_high') {
-                $studyMaterialsQuery->orderBy('price', 'desc');
-            }
-
+        if ($sort == 'newest') {
+            $studyMaterialsQuery->latest();
+        } elseif ($sort == 'price_low') {
+            $studyMaterialsQuery->orderBy('price', 'asc');
+        } elseif ($sort == 'price_high') {
+            $studyMaterialsQuery->orderBy('price', 'desc');
         } else {
             // Default sorting
             $studyMaterialsQuery->latest();
         }
 
         // Pagination
-        $data['studyMaterials'] = $studyMaterialsQuery->paginate(9)->withQueryString();
-
+        $data['studyMaterials'] = $studyMaterialsQuery
+            ->paginate(9)
+            ->appends($request->query());
 
         return view('front.user.study-material', $data);
     }
@@ -1006,106 +1044,130 @@ class FrontController extends Controller
 
     public function pyqPapers($examid = null, $catid = null, $subcat = null)
     {
-        $data['subcat'] = $subcat ? SubCategory::findOrFail($subcat) : null;
+        // Resolve slugs
+        $commission = $examid ? ExaminationCommission::where('slug', $examid)->first() : null;
+        $category = $catid ? Category::where('slug', $catid)->first() : null;
+        $subCategory = $subcat ? SubCategory::where('slug', $subcat)->first() : null;
+
+        $data['selectedCommission'] = $commission;
+        $data['selectedCategory'] = $category;
+        $data['selectedSubCategory'] = $subCategory;
 
         $data['papers'] = Test::where('paper_type', 1)
 
-            ->when($examid, function ($query) use ($examid) {
-                $query->where('competitive_commission_id', $examid);
+            ->when($commission, function ($query) use ($commission) {
+                $query->where('competitive_commission_id', $commission->id);
             })
 
-            ->when($catid, function ($query) use ($catid) {
-                $query->where('exam_category_id', $catid);
+            ->when($category, function ($query) use ($category) {
+                $query->where('exam_category_id', $category->id);
             })
 
-            ->when($subcat, function ($query) use ($subcat) {
-                $query->where('exam_subcategory_id', $subcat);
+            ->when($subCategory, function ($query) use ($subCategory) {
+                $query->where('exam_subcategory_id', $subCategory->id);
             })
 
             ->get();
 
-        $data['subjects'] = Subject::when($subcat, function ($query) use ($subcat) {
-            $query->where('sub_category_id', $subcat);
+        $data['subjects'] = Subject::when($subCategory, function ($query) use ($subCategory) {
+            $query->where('sub_category_id', $subCategory->id);
         })->get();
 
         $data['pyq_content'] = PyqContent::query()
-            ->when($examid, fn($q) => $q->where('commission_id', $examid))
-            ->when($catid, fn($q) => $q->where('category_id', $catid))
-            ->when($subcat, fn($q) => $q->where('sub_category_id', $subcat))
+            ->when($commission, fn($q) => $q->where('commission_id', $commission->id))
+            ->when($category, fn($q) => $q->where('category_id', $category->id))
+            ->when($subCategory, fn($q) => $q->where('sub_category_id', $subCategory->id))
             ->first();
 
         return view('front.pyq-papers', $data);
     }
 
-    public function testseriesIndex(Request $request)
-    {
+    public function testseriesIndex(
+        Request $request,
+        $examSlug = null,
+        $catSlug = null,
+        $subCatSlug = null
+    ) {
 
-        $exam_id = $request->query('exam_id');
-        $category_id = $request->query('category_id');
-        $sub_category_id = $request->query('sub_category_id');
-        $search = $request->query('search');
-        $sort = $request->query('sort');
+        $search = $request->search;
+        $sort = $request->sort;
 
-        // Limit commission, categories, subcategories
+        // Resolve slugs
+        $commission = null;
+        $category = null;
+        $subCategory = null;
+
+        if ($examSlug) {
+            $commission = ExaminationCommission::where('slug', $examSlug)->first();
+        }
+
+        if ($catSlug) {
+            $category = Category::where('slug', $catSlug)->first();
+        }
+
+        if ($subCatSlug) {
+            $subCategory = SubCategory::where('slug', $subCatSlug)->first();
+        }
+
+        $data['selectedCommission'] = $commission;
+        $data['selectedCategory'] = $category;
+        $data['selectedSubCategory'] = $subCategory;
+
         $data['commissions'] = ExaminationCommission::with(['categories.subCategories'])
             ->get();
 
-        // Load subcategories when category selected
         $data['subcategories'] = collect();
 
-        if ($category_id) {
-            $data['subcategories'] = SubCategory::where('category_id', $category_id)
-                ->get();
+        if ($category) {
+            $data['subcategories'] = SubCategory::where(
+                'category_id',
+                $category->id
+            )->get();
         }
 
-        // Test Series Query
-        $testSeriesQuery = TestSeries::with('testseries', 'commission', 'category', 'subcategory');
+        $testSeriesQuery = TestSeries::with(
+            'testseries',
+            'commission',
+            'category',
+            'subcategory'
+        );
 
-        // Filters
-        if ($exam_id) {
-            $testSeriesQuery->where('exam_com_id', $exam_id);
+        // Filters using IDs resolved from slug
+        if ($commission) {
+            $testSeriesQuery->where('exam_com_id', $commission->id);
         }
 
-        if ($category_id) {
-            $testSeriesQuery->where('category_id', $category_id);
+        if ($category) {
+            $testSeriesQuery->where('category_id', $category->id);
         }
 
-        if ($sub_category_id) {
-            $testSeriesQuery->where('sub_category_id', $sub_category_id);
+        if ($subCategory) {
+            $testSeriesQuery->where('sub_category_id', $subCategory->id);
         }
 
         // Search
         if ($search) {
             $testSeriesQuery->where(function ($q) use ($search) {
-                $q->Where('title', 'like', "%{$search}%")
+                $q->where('title', 'like', "%{$search}%")
                     ->orWhere('short_description', 'like', "%{$search}%");
             });
         }
 
         // Sorting
-        if ($sort) {
-
-            if ($sort == 'newest') {
-                $testSeriesQuery->latest();
-            }
-
-            if ($sort == 'price_low') {
-                $testSeriesQuery->orderBy('price', 'asc');
-            }
-
-            if ($sort == 'price_high') {
-                $testSeriesQuery->orderBy('price', 'desc');
-            }
-
+        if ($sort == 'newest') {
+            $testSeriesQuery->latest();
+        } elseif ($sort == 'price_low') {
+            $testSeriesQuery->orderBy('price', 'asc');
+        } elseif ($sort == 'price_high') {
+            $testSeriesQuery->orderBy('price', 'desc');
         } else {
-            // Default sorting
             $testSeriesQuery->latest();
         }
 
-        // Pagination
-        $data['testPackages'] = $testSeriesQuery->paginate(9)->withQueryString();
+        $data['testPackages'] = $testSeriesQuery
+            ->paginate(9)
+            ->appends($request->query());
 
-        // dd($data['testPackages']->toArray());
         return view('front.user.test-series', $data);
     }
 

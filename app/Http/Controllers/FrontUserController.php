@@ -25,8 +25,9 @@ use App\Models\StudentWalletTransaction;
 use Illuminate\Support\Facades\Validator;
 use App\Models\LogActivity as LogActivityModel;
 use App\Models\StudentHomeworkSubmission;
-use App\Models\ExaminationCommission;
+use App\Models\UserMobiileVerification;
 use App\Models\NoticeBoard;
+use App\Models\DashboardBannerSetting;
 
 class FrontUserController extends Controller
 {
@@ -210,6 +211,8 @@ class FrontUserController extends Controller
             }
         }
 
+        $dashboardBanner = DashboardBannerSetting::first();
+
         return view('front-users.dashboard', compact(
             'courses',
             'notices',
@@ -232,7 +235,8 @@ class FrontUserController extends Controller
             'failed',
             'usageChange',
             'usageData',
-            'monthlyProgress'
+            'monthlyProgress',
+            'dashboardBanner'
         ));
     }
 
@@ -785,6 +789,287 @@ class FrontUserController extends Controller
         $papers = Test::whereIn('id', $paper_ids)->get();
 
         return view('front-users.my-pyq-papers', compact('papers'));
+    }
+
+    // ===============================
+// CHANGE MOBILE NUMBER (Profile - Authenticated user)
+// ===============================
+
+    public function sendOtpChangeMobile(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'mobile_number' => 'required|digits:10',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'code' => 422,
+                'errors' => $validator->errors(),
+            ]);
+        }
+
+        $mobile_number = $request->mobile_number;
+
+        // Same number as current -> block
+        if ($mobile_number == Auth::user()->mobile) {
+            return response()->json([
+                'success' => false,
+                'code' => 422,
+                'message' => 'This is already your registered mobile number',
+            ]);
+        }
+
+        // Number already used by another user -> block
+        $exists = User::where('mobile', $mobile_number)
+            ->where('id', '!=', Auth::id())
+            ->exists();
+
+        if ($exists) {
+            return response()->json([
+                'success' => false,
+                'code' => 422,
+                'message' => 'This mobile number is already registered',
+            ]);
+        }
+
+        $otp = substr(str_shuffle("0123456789"), 0, 4);
+
+        UserMobiileVerification::updateOrInsert(
+            ['mobile_number' => $mobile_number],
+            ['mobile_number' => $mobile_number, 'otp' => $otp, 'verified' => 'no']
+        );
+
+         $message = "$otp is the One Time Password(OTP) to verify your MOB number at Web Mingo, This OTP is Usable only once and is valid for 10 min,PLS DO NOT SHARE THE OTP WITH ANYONE";
+        $dlt_id = '1307161465983326774';
+
+        $request_parameter = [
+            'authkey' => '133780AWLy8zZpC690b124aP1',
+            'mobiles' => $mobile_number,
+            'message' => urlencode($message),
+            'sender' => 'WMINGO',
+            'route' => '4',
+            'country' => '91',
+            'unicode' => '1',
+        ];
+
+        $url = "http://sms.webmingo.in/api/sendhttp.php?";
+        foreach ($request_parameter as $key => $val) {
+            $url .= $key . '=' . $val . '&';
+        }
+        $url = rtrim($url . 'DLT_TE_ID=' . $dlt_id, "&");
+
+        try {
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            curl_exec($ch);
+            curl_close($ch);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'OTP sent successfully on your new mobile number!',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to send OTP. Please try again.',
+            ]);
+        }
+    }
+
+    public function verifyChangeMobile(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'mobile_number' => 'required|digits:10',
+            'otp' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'code' => 422,
+                'errors' => $validator->errors(),
+            ]);
+        }
+
+        $record = UserMobiileVerification::where('mobile_number', $request->mobile_number)
+            ->where('otp', $request->otp)
+            ->first();
+
+        if (!$record) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Incorrect OTP',
+            ]);
+        }
+
+        $record->update(['verified' => 'yes']);
+
+        $user = Auth::user();
+        $user->mobile = $request->mobile_number;
+        $user->save();
+
+        LogActivity::addToLog('Mobile Number Updated', $user);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Mobile number updated successfully',
+        ]);
+    }
+
+
+    // ===============================
+// CHANGE EMAIL (Profile - Authenticated user)
+// ===============================
+
+    public function sendOtpChangeEmail(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'code' => 422,
+                'errors' => $validator->errors(),
+            ]);
+        }
+
+        $email = $request->email;
+
+        if ($email == Auth::user()->email) {
+            return response()->json([
+                'success' => false,
+                'code' => 422,
+                'message' => 'This is already your registered email',
+            ]);
+        }
+
+        $exists = User::where('email', $email)
+            ->where('id', '!=', Auth::id())
+            ->exists();
+
+        if ($exists) {
+            return response()->json([
+                'success' => false,
+                'code' => 422,
+                'message' => 'This email is already registered',
+            ]);
+        }
+
+        $otp = substr(str_shuffle("0123456789"), 0, 4);
+
+        session([
+            'change_email_otp' => $otp,
+            'change_email_target' => $email,
+            'change_email_expires_at' => now()->addMinutes(10),
+        ]);
+
+        try {
+            \Mail::raw("$otp is the OTP to verify your new email address, valid for 10 minutes. Please do not share this OTP with anyone.", function ($msg) use ($email) {
+                $msg->to($email)->subject('Verify your new Email ID');
+            });
+
+            return response()->json([
+                'success' => true,
+                'message' => 'OTP sent successfully on your new email!',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to send OTP. Please try again.',
+            ]);
+        }
+    }
+
+    public function verifyChangeEmail(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email',
+            'otp' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'code' => 422,
+                'errors' => $validator->errors(),
+            ]);
+        }
+
+        if (
+            $request->email !== session('change_email_target') ||
+            $request->otp !== session('change_email_otp') ||
+            now()->greaterThan(session('change_email_expires_at'))
+        ) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Incorrect or expired OTP',
+            ]);
+        }
+
+        $user = Auth::user();
+        $user->email = $request->email;
+        $user->save();
+
+        session()->forget(['change_email_otp', 'change_email_target', 'change_email_expires_at']);
+
+        LogActivity::addToLog('Email Updated', $user);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Email updated successfully',
+        ]);
+    }
+
+
+    public function profile()
+    {
+        return view('front-users.profile');
+    }
+
+    public function updateProfile(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'date_of_birth' => 'nullable|date_format:Y-m-d',
+            'gender' => 'nullable|string|in:Male,Female,Other',
+            'profile_image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'code' => 422,
+                'errors' => $validator->errors(),
+            ]);
+        }
+
+        $user = Auth::user();
+        $user->first_name = $request->first_name;
+        $user->last_name = $request->last_name;
+        $user->name = trim($request->first_name . ' ' . $request->last_name);
+        $user->date_of_birth = $request->date_of_birth;
+        $user->gender = $request->gender;
+
+        if ($request->hasFile('profile_image')) {
+            $path = $request->file('profile_image')->store('profile', 'public');
+            $user->avatar = $path;
+        }
+
+        $user->save();
+
+        LogActivity::addToLog('Profile Updated', $user);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Profile updated successfully',
+            'profile_image_url' => $user->avatar ? asset('storage/' . $user->avatar) : null,
+        ]);
     }
 
 }

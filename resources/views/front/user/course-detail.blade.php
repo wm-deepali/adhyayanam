@@ -785,7 +785,7 @@
                 <span class="arrow">›</span>
 
                 <a href="{{ route('courses', [
-              'exam_id' => $course->examinationCommission->id
+              'examSlug' => $course->examinationCommission->slug
             ]) }}">
                     {{ $course->examinationCommission->name }}
                 </a>
@@ -796,8 +796,8 @@
                 <span class="arrow">›</span>
 
                 <a href="{{ route('courses', [
-              'exam_id' => $course->examinationCommission->id,
-              'category_id' => $course->category->id
+              'examSlug' => $course->examinationCommission->slug,
+              'catSlug' => $course->category->slug
             ]) }}">
                     {{ $course->category->name }}
                 </a>
@@ -808,9 +808,9 @@
                 <span class="arrow">›</span>
 
                 <a href="{{ route('courses', [
-              'exam_id' => $course->examinationCommission->id,
-              'category_id' => $course->category->id,
-              'sub_category_id' => $course->subCategory->id
+              'examSlug' => $course->examinationCommission->slug,
+              'catSlug' => $course->category->slug,
+              'subCatSlug' => $course->subCategory->slug
             ]) }}">
                     {{ $course->subCategory->name }}
                 </a>

@@ -36,6 +36,7 @@ use App\Http\Controllers\PaperController;
 use App\Http\Controllers\OfficeAddressController;
 use App\Http\Controllers\Admin\AboutPageController;
 use App\Http\Controllers\BatchMarqueeController;
+use App\Http\Controllers\DashboardBannerSettingController;
 
 /*
 |--------------------------------------------------------------------------
@@ -66,8 +67,8 @@ Route::get('/about', function () {
     return view('about');
 });
 
-Route::get('pyq-papers/{examid?}/{catid?}/{subcat?}', [FrontController::class, 'pyqPapers'])->name('pyq-papers');
-Route::get('test-series-list/{examid?}/{catid?}/{subcat?}', [FrontController::class, 'testseriesIndex'])->name('test-series-list');
+Route::get('pyq-papers/{examSlug?}/{catSlug?}/{subCatSlug?}', [FrontController::class, 'pyqPapers'])->name('pyq-papers');
+Route::get('test-series-list/{examSlug?}/{catSlug?}/{subCatSlug?}', [FrontController::class, 'testseriesIndex'])->name('test-series-list');
 Route::get('test-series/details/{slug}/{id}', [FrontController::class, 'testseriesDetail'])->name('test-series-detail');
 
 Route::get('/test/download/{id}', [FrontController::class, 'testDownload'])->name('test.download');
@@ -95,7 +96,7 @@ Route::get('blog-articles', [FrontController::class, 'blogIndex'])->name('blog.a
 Route::get('blog-details/{id}', [FrontController::class, 'blogDetailsIndex'])->name('blog.details');
 Route::get('career', [FrontController::class, 'careerIndex'])->name('career');
 Route::post('career/store', [FrontController::class, 'careerStore'])->name('career.store');
-Route::get('courses', [FrontController::class, 'courseIndex'])->name('courses');
+Route::get('courses/{examSlug?}/{catSlug?}/{subCatSlug?}', [FrontController::class, 'courseIndex'])->name('courses');
 Route::get('courses/details/{id}', [FrontController::class, 'courseDetails'])->name('courses.detail');
 Route::get('direct-enquiry', [FrontController::class, 'enquiryIndex'])->name('enquiry.direct');
 Route::post('direct-enquiry/store', [FrontController::class, 'enquiryStore'])->name('enquiry.store');
@@ -115,7 +116,7 @@ Route::get('user/study-material/details/{id}', [FrontController::class, 'studyMa
 
 
 Route::get('study-material/{id}/download', [ContentManagementController::class, 'downloadPdf'])->name('study.material.download');
-Route::get('user/study-material/{examid?}/{catid?}/{subcat?}', [FrontController::class, 'studyMaterialIndex'])->name('study.material.front');
+Route::get('user/study-material/{examSlug?}/{catSlug?}/{subCatSlug?}', [FrontController::class, 'studyMaterialIndex'])->name('study.material.front');
 Route::post('user/study-material/filter', [FrontController::class, 'studyMaterialFilter'])->name('study.material.filter');
 Route::post('user/study-material/search', [FrontController::class, 'studyMaterialSearch'])->name('study.material.search');
 Route::get('user/study-material/all-topics/{id}', [FrontController::class, 'studyMaterialAllTopics'])->name('study.material.topics');
@@ -125,7 +126,7 @@ Route::get('user/feed-back-testimonial', [FrontController::class, 'feedBackIndex
 Route::post('user/feed-back-testimonial/store', [FrontController::class, 'feedBackStore'])->name('feed.back.store');
 Route::get('user/batches-and-programme', [FrontController::class, 'batchesIndex'])->name('batches.index');
 Route::get('user/batches-and-programme/{id}', [FrontController::class, 'batchDetail'])->name('batches.detail');
-Route::get('user/syllabus/{examid?}/{catid?}/{subcat?}', [FrontController::class, 'syllabusIndex'])->name('syllabus.front');
+Route::get('user/syllabus/{examSlug?}/{categorySlug?}/{subCategorySlug?}', [FrontController::class, 'syllabusIndex'])->name('syllabus.front');
 /**
  * Auth Routes
  */
@@ -275,6 +276,13 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
         Route::get('/user/my-pyq-papers', [FrontUserController::class, 'myPyqPapers'])->name('user.my-pyq-papers');
 
         Route::get('/user/setting', [FrontUserController::class, 'setting'])->name('user.setting');
+        Route::get('/user/profile', [FrontUserController::class, 'profile'])->name('user.profile');
+        Route::post('/user/profile/update', [FrontUserController::class, 'updateProfile'])->name('user.profile.update');
+
+        Route::post('/user/send-otp-change-mobile', [FrontUserController::class, 'sendOtpChangeMobile'])->name('send-otp-change-mobile');
+        Route::post('/user/verify-change-mobile', [FrontUserController::class, 'verifyChangeMobile'])->name('verify-change-mobile');
+        Route::post('/user/send-otp-change-email', [FrontUserController::class, 'sendOtpChangeEmail'])->name('send-otp-change-email');
+        Route::post('/user/verify-change-email', [FrontUserController::class, 'verifyChangeEmail'])->name('verify-change-email');
         Route::post('user/register-student', [FrontUserController::class, 'studentRegister'])->name('register-student');
         Route::post('user/change-student-password', [FrontUserController::class, 'studentChangePassword'])->name('change-student-password');
         Route::get('student/wallet', [App\Http\Controllers\StudentWalletController::class, 'index'])->name('student.wallet');
@@ -885,6 +893,9 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
             /* ---------------- SOCIAL MEDIA ---------------- */
             Route::get('/social-media', [ContentManagementController::class, 'socialMediaIndex'])->name('settings.social.index')->middleware('custom.permission:manage_social');
             Route::post('/social-media/store', [ContentManagementController::class, 'socialMediaStore'])->name('settings.social.store')->middleware('custom.permission:manage_social_add');
+
+            Route::get('/dashboard-banner', [DashboardBannerSettingController::class, 'index'])->name('settings.dashboard-banner.index');
+            Route::post('/dashboard-banner', [DashboardBannerSettingController::class, 'update'])->name('settings.dashboard-banner.update');
 
             /* ---------------- BANNER SETTINGS ---------------- */
             Route::get('/banner-settings', [ContentManagementController::class, 'bannerSettingsIndex'])->name('settings.banner.index')->middleware('custom.permission:manage_banner');

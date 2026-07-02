@@ -286,11 +286,11 @@
 				<div class="box bg-success asdsadsa">
 					<div class="box-body d-flex p-0">
 						<div class="flex-grow-1 p-30 flex-grow-1 bg-img bg-none-md"
-							style="background-position: right bottom; background-size: auto 100%; background-image: url(https://edulearn-lms-admin-template.multipurposethemes.com/images/svg-icon/color-svg/custom-30.svg)">
+							style="background-position: right bottom; background-size: auto 100%; background-image: url({{ !empty($dashboardBanner->image) ? asset('storage/' . $dashboardBanner->image) : 'https://edulearn-lms-admin-template.multipurposethemes.com/images/svg-icon/color-svg/custom-30.svg' }})">
 							<div class="row">
 								<div class="col-12 col-xl-7">
-									<h1 class="mb-0 fw-600">Learn With Effectively With Us!</h1>
-									<p class="my-10 fs-16 text-white-70">Get 30% off every course on january.</p>
+									<h1 class="mb-0 fw-600">{{ $dashboardBanner->title ?? 'Learn With Effectively With Us!' }}</h1>
+									<p class="my-10 fs-16 text-white-70">{{ $dashboardBanner->subtitle ?? 'Get 30% off every course on january.' }}</p>
 									<div class="mt-45 d-md-flex align-items-center">
 										<div class="me-30 mb-30 mb-md-0">
 											<div class="d-flex align-items-center">
@@ -814,8 +814,8 @@
 			<!-- Green Banner (from dashboard desktop view) -->
 			<div class="box bg-success rounded-4 mb-4 overflow-hidden shadow-sm border-0">
 				<div class="box-body p-3">
-					<h4 class="fw-bold text-white mb-2 fs-18">Learn Effectively With Us!</h4>
-					<p class="text-white-80 fs-13 mb-3">Get 30% off every course on january.</p>
+					<h4 class="fw-bold text-white mb-2 fs-18">{{ $dashboardBanner->title ?? 'Learn Effectively With Us!' }}</h4>
+					<p class="text-white-80 fs-13 mb-3">{{ $dashboardBanner->subtitle ?? 'Get 30% off every course on january.' }}</p>
 					<div class="d-flex gap-4">
 						<div class="d-flex align-items-center gap-2">
 							<div class="bg-danger rounded-circle d-flex align-items-center justify-content-center border border-white" style="width: 32px; height: 32px;">

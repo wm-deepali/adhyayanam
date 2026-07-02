@@ -22,7 +22,32 @@
                 <h2 class="display-5 fw-bold">Adhyayanam</h2>
                 <ul class="breadcrumb justify-content-center mt-3 mb-0">
                     <li class="breadcrumb-item"><a href="{{ url('/') }}" class="text-dark text-decoration-none">Home</a></li>
-                    <li class="breadcrumb-item active text-dark-50">Syllabus</li>
+
+                    @if(isset($selectedCommission) || isset($selectedCategory) || isset($selectedSubCategory))
+                        <li class="breadcrumb-item"><a href="{{ route('syllabus.front') }}" class="text-dark text-decoration-none">Syllabus</a></li>
+                    @else
+                        <li class="breadcrumb-item active text-dark-50">Syllabus</li>
+                    @endif
+
+                    @if(isset($selectedCommission))
+                        <li class="breadcrumb-item">
+                            <a href="{{ route('syllabus.front',['examSlug' => $selectedCommission->slug]) }}" class="text-dark text-decoration-none">
+                                {{ $selectedCommission->name }}
+                            </a>
+                        </li>
+                    @endif
+
+                    @if(isset($selectedCategory))
+                        <li class="breadcrumb-item">
+                            <a href="{{ route('syllabus.front', ['examSlug' => $selectedCommission->slug, 'catSlug' => $selectedCategory->slug]) }}" class="text-dark text-decoration-none">
+                                {{ $selectedCategory->name }}
+                            </a>
+                        </li>
+                    @endif
+
+                    @if(isset($selectedSubCategory))
+                        <li class="breadcrumb-item active text-dark-50">{{ $selectedSubCategory->name }}</li>
+                    @endif
                 </ul>
             </div>
         </section>
@@ -41,14 +66,14 @@
                             <div class="subjects-scroll" style="max-height: 780px; overflow-y: auto; padding-right: 8px;">
                                 <ul class="subject-list list-unstyled mb-0">
                                     <li>
-                                        <a href="{{ route('syllabus.front', [$commissionId ?? null, $categoryId ?? null, $subCategoryId ?? null]) }}"
+                                        <a href="{{ route('syllabus.front', ['examSlug' => optional($selectedCommission)->slug, 'catSlug' => optional($selectedCategory)->slug, 'subCatSlug' => optional($selectedSubCategory)->slug]) }}"
                                            class="d-block px-3 py-2 rounded mb-1 text-decoration-none small {{ !request('subject') ? 'active' : '' }}">
                                             All Subjects
                                         </a>
                                     </li>
                                     @foreach($subjects as $subject)
                                         <li>
-                                            <a href="{{ route('syllabus.front', [$commissionId ?? null, $categoryId ?? null, $subCategoryId ?? null, 'subject' => $subject->id]) }}"
+                                            <a href="{{ route('syllabus.front', ['examSlug' => optional($selectedCommission)->slug, 'catSlug' => optional($selectedCategory)->slug, 'subCatSlug' => optional($selectedSubCategory)->slug, 'subject' => $subject->id]) }}"
                                                class="d-block px-3 py-2 rounded mb-1 text-decoration-none small {{ request('subject') == $subject->id ? 'active' : '' }}">
                                                 {{ $subject->name }}
                                             </a>

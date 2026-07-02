@@ -107,7 +107,7 @@
         <!-- New Sidebar Header -->
         <div class="sidebar-header d-flex align-items-center justify-content-between px-4 py-3 border-bottom">
             <!-- Left Side Logo & Brand -->
-            <a href="{{ route('user.dashboard') }}" class="d-flex align-items-center gap-2 text-decoration-none sidebar-logo-wrapper">
+            <a href="{{url('/')}}" class="d-flex align-items-center gap-2 text-decoration-none sidebar-logo-wrapper">
                 <img src="{{ url('images/Neti-logo.png')}}" alt="Adhyayanam Logo" class="sidebar-logo"
                     style="height: 45px;">
             </a>
@@ -132,6 +132,12 @@
                         <a href="{{route('user.dashboard')}}">
                             <i data-feather="home"></i>
                             <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{route('user.profile')}}">
+                            <i data-feather="user"></i>
+                            <span>My Profile</span>
                         </a>
                     </li>
                     <li>

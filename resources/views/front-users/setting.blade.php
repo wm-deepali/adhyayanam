@@ -37,6 +37,7 @@ Test Series
 							</div>
 						</div>
 					</div>
+
 					<div class="box">
 						<div class="box-body">
 							<div class="d-md-flex justify-content-between align-items-center">
@@ -100,7 +101,8 @@ Test Series
 					</div>
 				</div>
 			</div>
-<!-- Modal -->
+
+<!-- Change Password Modal -->
 <div class="modal fade" id="changePassModal" tabindex="-1" aria-labelledby="changePassModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -230,10 +232,5 @@ $('#updatePassword').on("click",function (e) {
                 
                 
     });
-	
-
-
-
-	
     </script>
 @endpush

@@ -47,6 +47,7 @@ class User extends Authenticatable implements HasMedia, MustVerifyEmail
         'role_group_id',
         'date_of_birth',
         'gender',
+        'avatar',
         'username',
         'created_by'
     ];

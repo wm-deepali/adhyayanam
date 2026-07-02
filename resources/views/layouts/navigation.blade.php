@@ -1045,6 +1045,17 @@
                     </li>
                 @endif
 
+                @if(Helper::canAccess('manage_dashboard_banner'))
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{route('settings.dashboard-banner.index')}}" target="_top">
+                            <svg class="nav-icon">
+                                <use xlink:href="{{ asset('icons/coreui.svg#cil-image') }}"></use>
+                            </svg>
+                            Student Dashboard Banner
+                        </a>
+                    </li>
+                @endif
+
                 @if(Helper::canAccess('manage_social'))
                     <li class="nav-item">
                         <a class="nav-link" href="{{route('settings.social.index')}}" target="_top">

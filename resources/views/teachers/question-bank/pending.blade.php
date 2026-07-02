@@ -53,7 +53,7 @@
                                     @endif
                                 </td>
 
-                                <td>{{ $data->addedBy->full_name ?? '-' }}<br>{{ $data->addedBy->email ?? '-' }}</td>
+                                <td>{{ $data->addedBy->full_name ?? '-' }}</td>
                                 <td>
 
                                     <div class="dropdown">

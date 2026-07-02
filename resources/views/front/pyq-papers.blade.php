@@ -139,9 +139,28 @@
             <div class="container text-center">
                 <h2 class="display-5 fw-bold text-center" style="width:70%; margin:auto;">Adhyayanam</h2>
                 <ul class="breadcrumb justify-content-center mt-3 mb-0">
-                    <li class="breadcrumb-item"><a href="/" class="text-dark text-decoration-none">Home</a></li>
-                    <li class="breadcrumb-item"><a href="/" class="text-dark text-decoration-none">PYQ Papers</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url('/') }}" class="text-dark text-decoration-none">Home</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('pyq-papers') }}" class="text-dark text-decoration-none">PYQ Papers</a></li>
 
+                    @if(isset($selectedCommission))
+                        <li class="breadcrumb-item">
+                            <a href="{{ route('pyq-papers', ['examSlug' => $selectedCommission->slug]) }}" class="text-dark text-decoration-none">
+                                {{ $selectedCommission->name }}
+                            </a>
+                        </li>
+                    @endif
+
+                    @if(isset($selectedCategory))
+                        <li class="breadcrumb-item">
+                            <a href="{{ route('pyq-papers', ['examSlug' => $selectedCommission->slug, 'catSlug' => $selectedCategory->slug]) }}" class="text-dark text-decoration-none">
+                                {{ $selectedCategory->name }}
+                            </a>
+                        </li>
+                    @endif
+
+                    @if(isset($selectedSubCategory))
+                        <li class="breadcrumb-item text-dark">{{ $selectedSubCategory->name }}</li>
+                    @endif
                 </ul>
             </div>
         </section>
@@ -162,25 +181,6 @@
                         <h3 class="osd sm">
                             Previous Year Question Papers (PYQ)
                         </h3>
-
-                        <!--<div class="text-justify">-->
-
-                        <!--    <p>-->
-                        <!--        Previous Year Question Papers (PYQ) are one of the most effective resources for exam preparation.-->
-                        <!--        By practicing PYQ papers, students can understand the exam pattern, question types, and difficulty level.-->
-                        <!--    </p>-->
-
-                        <!--    <p>-->
-                        <!--        These papers help candidates analyze important topics that are frequently asked in competitive exams-->
-                        <!--        such as SSC, Railway, Banking, and other government exams.-->
-                        <!--    </p>-->
-
-                        <!--    <p>-->
-                        <!--        Attempt the PYQ tests below to evaluate your preparation, improve your speed and accuracy,-->
-                        <!--        and get familiar with the real exam environment.-->
-                        <!--    </p>-->
-
-                        <!--</div>-->
 
                     </div>
 

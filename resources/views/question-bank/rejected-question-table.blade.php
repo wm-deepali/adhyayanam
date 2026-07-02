@@ -26,7 +26,7 @@
                 <td>{{ $data->subject->name ?? "-" }}</td>
                 <td>{{ $data->instruction }}</td>
                 <td><span class="badge bg-danger">{{ ucfirst($data->status) }}</span></td>
-                <td>{{ $data->addedBy->full_name ?? '-' }}<br>{{ $data->addedBy->email ?? '-' }}</td>
+                <td>{{ $data->addedBy->full_name ?? '-' }}</td>
                 <td>
                     {{ $data->rejectedBy->name ?? '-' }}
                 </td>

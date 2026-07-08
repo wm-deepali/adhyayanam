@@ -11,8 +11,23 @@
       border-color: #fff;
     }
 
-    .btn {
+    /* Only force white text on solid/filled buttons, not outline ones */
+    .btn:not(.btn-outline-dark):not(.btn-outline-secondary):not(.btn-outline-success) {
       color: #fff !important;
+    }
+
+    .students-toolbar {
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .students-toolbar .search-group {
+      max-width: 420px;
+      flex: 1 1 320px;
+    }
+
+    .students-toolbar .actions-group {
+      white-space: nowrap;
     }
   </style>
   <div class="bg-light rounded p-2">
@@ -36,24 +51,36 @@
         </div>
 
         <div class="container">
-          <div class="d-flex justify-content-between align-items-center mb-3">
+          <div class="d-flex justify-content-between align-items-center students-toolbar mb-3">
+
             <!-- Search Box -->
-            <form method="GET" action="{{ route('students.registered-student-list') }}" class="d-flex gap-2 mb-3">
+            <form method="GET" action="{{ route('students.registered-student-list') }}"
+              class="d-flex align-items-center students-toolbar flex-grow-1">
 
-              <input type="text" name="search" class="form-control" placeholder="Search by name, email, mobile"
-                value="{{ request('search') }}">
+              <div class="input-group search-group">
+                <input type="text" name="search" class="form-control"
+                  placeholder="Search by name, email, mobile" value="{{ request('search') }}">
+                <button type="submit" class="btn btn-success">
+                  <i class="fa fa-search"></i> Search
+                </button>
+              </div>
 
-              <button type="submit" class="btn btn-success">
-                Search
-              </button>
-
-              {{-- CLEAR BUTTON --}}
-              @if(request()->filled('search'))
-                <a href="{{ route('students.registered-student-list') }}" class="btn btn-secondary">
-                  Clear
-                </a>
-              @endif
+              <div class="actions-group">
+                @if(request()->filled('search'))
+                  <a href="{{ route('students.registered-student-list') }}" class="btn btn-outline-secondary">
+                    <i class="fa fa-times"></i> Clear
+                  </a>
+                @endif
+              </div>
             </form>
+
+            <!-- Export -->
+            <div class="actions-group">
+              <a href="{{ route('students.export', ['search' => request('search')]) }}"
+                class="btn btn-outline-dark">
+                <i class="fa fa-download"></i> Export CSV
+              </a>
+            </div>
           </div>
 
           <table class="table table-striped table-responsive table-bordered">

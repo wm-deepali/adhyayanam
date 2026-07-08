@@ -729,18 +729,18 @@ class QuestionBankController extends Controller
                                 $has_option_e = true;
                             }
 
-                            // Answer (mandatory) - ROW 6
-                            $tr6 = $tables[$i]->find('tr', 6);
-                            $td6 = $tr6 ? $tr6->find('td', 1) : null;
-                            $p6 = $td6 ? $td6->find('p') : null;
-                            $span = $p6 ? $p6->find('span') : null;
-                            $answer = $span ? trim(strip_tags($span->innerHtml)) : null;
+                           // Answer (mandatory) - ROW 6
+                            $rawAnswer = $this->getCellHtml($tables[$i], 6);
+                            $answer = $this->isEmptyCell($rawAnswer)
+                                ? null
+                                : trim(strip_tags(html_entity_decode($rawAnswer, ENT_QUOTES | ENT_HTML5, 'UTF-8')));
 
                             if ($answer === null || $answer === '' || $answer === '&nbsp;') {
                                 $rejectQuestion = true;
                                 $rejectNote = 'Answer missing or unreadable (Row 6)';
                                 $answer = $answer ?: '';
                             }
+
 
                             // Instruction (optional) - ROW 7
                             $rawInstr = $this->getCellHtml($tables[$i], 7);
@@ -858,10 +858,15 @@ class QuestionBankController extends Controller
                             // Image (optional) - ROW 1
                             $tr1 = $tables[$i]->find('tr', 1);
                             $td1 = $tr1 ? $tr1->find('td', 1) : null;
-                            $p1 = $td1 ? $td1->find('p') : null;
-                            $imageElement = $p1 ? $p1->find('img') : null;
+                            $imageElement = null;
+                            if ($td1) {
+                                $imgs = $td1->find('img');
+                                if ($imgs && count($imgs) > 0) {
+                                    $imageElement = $imgs[0];
+                                }
+                            }
 
-                            if ($imageElement && count($imageElement) > 0) {
+                            if ($imageElement) {
                                 $image_64 = $imageElement->src;
                                 $extension = explode('/', explode(':', substr($image_64, 0, strpos($image_64, ';')))[1])[1];
                                 $image = 'question/' . Str::random(40) . '.' . $extension;
@@ -984,10 +989,15 @@ class QuestionBankController extends Controller
                     // Image (optional) - ROW 1
                     $tr1 = $tables[1]->find('tr', 1);
                     $td1 = $tr1 ? $tr1->find('td', 1) : null;
-                    $p1 = $td1 ? $td1->find('p') : null;
-                    $imageElement = $p1 ? $p1->find('img') : null;
+                    $imageElement = null;
+                    if ($td1) {
+                        $imgs = $td1->find('img');
+                        if ($imgs && count($imgs) > 0) {
+                            $imageElement = $imgs[0];
+                        }
+                    }
 
-                    if ($imageElement && count($imageElement) > 0) {
+                    if ($imageElement) {
                         $image_64 = $imageElement->src;
                         $extension = explode('/', explode(':', substr($image_64, 0, strpos($image_64, ';')))[1])[1];
                         $image = 'question/' . Str::random(40) . '.' . $extension;

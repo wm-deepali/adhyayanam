@@ -8,16 +8,19 @@
     <div class="bg-light rounded">
         <div class="card">
             <div class="card-body">
-                <div class="d-flex">
-                    <div class="col">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
                         <h5 class="card-title">Course</h5>
                         <h6 class="card-subtitle mb-2 text-muted"> Manage Course section here.</h6>
                     </div>
-                    @if(\App\Helpers\Helper::canAccess('manage_courses_add'))
-                        <div class="justify-content-end">
+                    <div class="d-flex gap-2">
+                        <a href="#" id="exportCoursesBtn" class="btn btn-outline-dark">
+                            <i class="fa fa-download"></i> Export CSV
+                        </a>
+                        @if(\App\Helpers\Helper::canAccess('manage_courses_add'))
                             <a href='{{route('courses.course.create')}}' class="btn btn-primary">&#43; Add</a>
-                        </div>
-                    @endif
+                        @endif
+                    </div>
                 </div>
                 <div class="mt-2">
                     @include('layouts.includes.messages')
@@ -74,11 +77,6 @@
                                 }
                             },
                         @endif
-                        { extend: 'copy', className: 'btn bg-teal color-palette btn-flat', footer: true, exportOptions: { columns: [1, 2, 3, 4, 5, 6, 7, 8, 9] } },
-                        { extend: 'excel', className: 'btn bg-teal color-palette btn-flat', footer: true, exportOptions: { columns: [1, 2, 3, 4, 5, 6, 7, 8, 9] } },
-                        { extend: 'pdf', className: 'btn bg-teal color-palette btn-flat', footer: true, exportOptions: { columns: [1, 2, 3, 4, 5, 6, 7, 8, 9] } },
-                        { extend: 'print', className: 'btn bg-teal color-palette btn-flat', footer: true, exportOptions: { columns: [1, 2, 3, 4, 5, 6, 7, 8, 9] } },
-                        { extend: 'csv', className: 'btn bg-teal color-palette btn-flat', footer: true, exportOptions: { columns: [1, 2, 3, 4, 5, 6, 7, 8, 9] } },
                         { extend: 'colvis', className: 'btn bg-teal color-palette btn-flat', footer: true, text: 'Columns' },
 
                     ]
@@ -111,6 +109,22 @@
                     { data: 'action', name: 'action', orderable: false, searchable: false },
                 ],
                 lengthMenu: [10, 50, 100],
+            });
+
+            // Keep the Export button in sync with the DataTable's global search box
+            function updateExportLink() {
+                let searchTerm = gb_DataTable.search();
+                let baseUrl = "{{ route('courses.course.export') }}";
+                $('#exportCoursesBtn').attr(
+                    'href',
+                    searchTerm ? baseUrl + '?search=' + encodeURIComponent(searchTerm) : baseUrl
+                );
+            }
+
+            updateExportLink();
+
+            $('#course').on('search.dt', function () {
+                updateExportLink();
             });
         });
 

@@ -37,6 +37,7 @@ use App\Http\Controllers\OfficeAddressController;
 use App\Http\Controllers\Admin\AboutPageController;
 use App\Http\Controllers\BatchMarqueeController;
 use App\Http\Controllers\DashboardBannerSettingController;
+use App\Http\Controllers\SearchController;
 
 /*
 |--------------------------------------------------------------------------
@@ -58,6 +59,7 @@ Route::get('clear-cache', function () {
 });
 
 Route::get('/', [FrontController::class, 'index']);
+Route::get('/global-search', [SearchController::class, 'globalSearch'])->name('global.search');
 
 Route::get('/notice/{id}', [FrontController::class, 'noticeShow'])->name('notice.show');
 Route::get('/news/{id}', [FrontController::class, 'newsShow'])->name('news.show');
@@ -68,8 +70,8 @@ Route::get('/about', function () {
 });
 
 Route::get('pyq-papers/{examSlug?}/{catSlug?}/{subCatSlug?}', [FrontController::class, 'pyqPapers'])->name('pyq-papers');
-Route::get('test-series-list/{examSlug?}/{catSlug?}/{subCatSlug?}', [FrontController::class, 'testseriesIndex'])->name('test-series-list');
 Route::get('test-series/details/{slug}/{id}', [FrontController::class, 'testseriesDetail'])->name('test-series-detail');
+Route::get('test-series-list/{examSlug?}/{catSlug?}/{subCatSlug?}', [FrontController::class, 'testseriesIndex'])->name('test-series-list');
 
 Route::get('/test/download/{id}', [FrontController::class, 'testDownload'])->name('test.download');
 Route::get('/test-instruction/{id}', [LiveTestController::class, 'testInstruction'])->name('test.instruction');
@@ -96,8 +98,8 @@ Route::get('blog-articles', [FrontController::class, 'blogIndex'])->name('blog.a
 Route::get('blog-details/{id}', [FrontController::class, 'blogDetailsIndex'])->name('blog.details');
 Route::get('career', [FrontController::class, 'careerIndex'])->name('career');
 Route::post('career/store', [FrontController::class, 'careerStore'])->name('career.store');
-Route::get('courses/{examSlug?}/{catSlug?}/{subCatSlug?}', [FrontController::class, 'courseIndex'])->name('courses');
 Route::get('courses/details/{id}', [FrontController::class, 'courseDetails'])->name('courses.detail');
+Route::get('courses/{examSlug?}/{catSlug?}/{subCatSlug?}', [FrontController::class, 'courseIndex'])->name('courses');
 Route::get('direct-enquiry', [FrontController::class, 'enquiryIndex'])->name('enquiry.direct');
 Route::post('direct-enquiry/store', [FrontController::class, 'enquiryStore'])->name('enquiry.store');
 Route::get('contact-us-inquiry', [FrontController::class, 'contactUsIndex'])->name('contact.inquiry');
@@ -490,6 +492,7 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
 
         // ---------------- COURSES ----------------
         Route::prefix('manage-courses/course')->group(function () {
+            Route::get('/export', [ContentManagementController::class, 'exportCourses'])->name('courses.course.export');
             Route::get('/', [ContentManagementController::class, 'courseIndex'])->name('courses.course.index')->middleware('custom.permission:manage_courses');
             Route::get('/create', [ContentManagementController::class, 'courseCreate'])->name('courses.course.create')->middleware('custom.permission:manage_courses_add');
             Route::post('/store', [ContentManagementController::class, 'courseStore'])->name('courses.course.store')->middleware('custom.permission:manage_courses_add');
@@ -529,6 +532,7 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
 
         // ---------------- STUDY MATERIAL ----------------
         Route::prefix('study-material')->group(function () {
+            Route::get('/export', [ContentManagementController::class, 'exportStudyMaterial'])->name('study.material.export');
             Route::get('/', [ContentManagementController::class, 'studyMaterialIndex'])->name('study.material.index')->middleware('custom.permission:manage_study_material');
             Route::get('/create', [ContentManagementController::class, 'studyMaterialCreate'])->name('study.material.create')->middleware('custom.permission:manage_study_material_add');
             Route::post('/store', [ContentManagementController::class, 'studyMaterialStore'])->name('study.material.store')->middleware('custom.permission:manage_study_material_add');
@@ -586,10 +590,12 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
             Route::get('/show/{id}', [ContentManagementController::class, 'currentAffairShow'])->name('show')->middleware('custom.permission:manage_ca');
             Route::delete('/delete/{id}', [ContentManagementController::class, 'currentAffairDelete'])->name('delete')->middleware('custom.permission:manage_ca_delete');
             Route::post('/approve/{id}', [ContentManagementController::class, 'approveCurrentAffair'])->name('approve');
+            Route::get('/export', [ContentManagementController::class, 'exportCurrentAffairs'])->name('export');
         });
 
         // TEST SERIES PACKAGE ROUTES
         Route::prefix('test-series')->group(function () {
+            Route::get('/export', [ContentManagementController::class, 'exportTestSeries'])->name('test.series.export');
             Route::get('/', [ContentManagementController::class, 'testSeriesIndex'])->name('test.series.index')->middleware('custom.permission:manage_test_series_package');
             Route::get('/filter', [ContentManagementController::class, 'testSeriesFilter'])->name('test.series.filter')->middleware('custom.permission:manage_test_series_package');
             Route::get('/create', [ContentManagementController::class, 'testSeriesCreate'])->name('test.series.create')->middleware('custom.permission:manage_test_series_package_add');
@@ -670,6 +676,7 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
             Route::get('/create', [TestController::class, 'testPaperCreate'])->name('test.paper.create')->middleware('custom.permission:manage_test_bank_add');
             Route::post('/store', [TestController::class, 'store'])->name('manage-test')->middleware('custom.permission:manage_test_bank_add');
             Route::get('/view/{id}', [TestController::class, 'view'])->name('test.paper.view')->middleware('custom.permission:manage_test_bank');
+            Route::get('/export', [TestController::class, 'exportTests'])->name('test.paper.export');
             Route::get('/edit/{id}', [TestController::class, 'edit'])->name('test.paper.edit')->middleware('custom.permission:manage_test_bank_edit');
             Route::post('/update/{id}', [TestController::class, 'update'])->name('test.paper.update')->middleware('custom.permission:manage_test_bank_edit');
             Route::delete('/delete/{id}', [TestController::class, 'destroy'])->name('test.paper.delete')->middleware('custom.permission:manage_test_bank_delete');
@@ -694,6 +701,7 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
             Route::get('/', 'SyllabusController@index')->name('index')->middleware('custom.permission:manage_syllabus');
             Route::get('/create', 'SyllabusController@create')->name('create')->middleware('custom.permission:manage_syllabus_add');
             Route::post('/', 'SyllabusController@store')->name('store')->middleware('custom.permission:manage_syllabus_add');
+            Route::get('/export', 'SyllabusController@exportSyllabus')->name('export');
             Route::get('/{syllabus}/edit', 'SyllabusController@edit')->name('edit')->middleware('custom.permission:manage_syllabus_edit');
             Route::put('/{syllabus}', 'SyllabusController@update')->name('update')->middleware('custom.permission:manage_syllabus_edit');
             Route::get('/{syllabus}', 'SyllabusController@show')->name('show')->middleware('custom.permission:manage_syllabus');
@@ -762,6 +770,7 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
         });
 
         // STUDENTS ROUTES
+        Route::get('students/export', [StudentController::class, 'exportStudents'])->name('students.export');
         Route::get('students/registered-student-list', [StudentController::class, 'RegisterStudentList'])->name('students.registered-student-list')->middleware('custom.permission:manage_students');
         Route::get('students/view-all-orders/{id}', [StudentController::class, 'ViewAllOrder'])->name('students.view-all-orders')->middleware('custom.permission:manage_students');
         Route::get('students/student-order-detail/{id}', [OrderController::class, 'studentOrderDetails'])->name('students.student-order-detail')->middleware('custom.permission:manage_students');

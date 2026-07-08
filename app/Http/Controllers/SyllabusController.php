@@ -292,4 +292,98 @@ class SyllabusController extends Controller
         return redirect()->route('syllabus.index')
             ->with('success', 'Syllabus deleted successfully!');
     }
+
+    public function exportSyllabus(Request $request)
+    {
+        $query = Syllabus::with([
+            'commission',
+            'category',
+            'subCategory',
+            'subject',
+            'creator'
+        ]);
+
+        // Search support
+        if ($request->filled('search')) {
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'LIKE', "%{$search}%")
+                    ->orWhere('type', 'LIKE', "%{$search}%")
+                    ->orWhereHas('commission', function ($sub) use ($search) {
+                        $sub->where('name', 'LIKE', "%{$search}%");
+                    })
+                    ->orWhereHas('category', function ($sub) use ($search) {
+                        $sub->where('name', 'LIKE', "%{$search}%");
+                    })
+                    ->orWhereHas('subCategory', function ($sub) use ($search) {
+                        $sub->where('name', 'LIKE', "%{$search}%");
+                    })
+                    ->orWhereHas('subject', function ($sub) use ($search) {
+                        $sub->where('name', 'LIKE', "%{$search}%");
+                    });
+            });
+        }
+
+        $syllabuses = $query
+            ->orderBy('created_at', 'DESC')
+            ->get();
+
+        $fileName = 'syllabus-' . now()->format('Y-m-d-His') . '.csv';
+
+        return response()->streamDownload(function () use ($syllabuses) {
+
+            $handle = fopen('php://output', 'w');
+
+            fputcsv($handle, [
+                'Date & Time',
+                'Title',
+                'Type',
+                'Commission',
+                'Category',
+                'Sub Category',
+                'Subject',
+                'PDF URL',
+                'Status',
+                'Detail Content',
+                'Added By',
+            ]);
+
+            foreach ($syllabuses as $item) {
+
+                fputcsv($handle, [
+
+                    optional($item->created_at)->format('d-m-Y H:i'),
+
+                    $item->title ?? '',
+
+                    $item->type ?? '',
+
+                    $item->commission->name ?? '',
+
+                    $item->category->name ?? '',
+
+                    $item->subCategory->name ?? '',
+
+                    $item->subject->name ?? '',
+
+                    $item->pdf
+                    ? asset('storage/' . $item->pdf)
+                    : '',
+
+                    $item->status ? 'Active' : 'Inactive',
+
+                    strip_tags($item->detail_content ?? ''),
+
+                    $item->creator->name ?? 'Super Admin',
+                ]);
+            }
+
+            fclose($handle);
+
+        }, $fileName, [
+            'Content-Type' => 'text/csv',
+        ]);
+    }
+
 }

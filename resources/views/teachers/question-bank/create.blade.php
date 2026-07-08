@@ -486,8 +486,8 @@
         document.addEventListener('DOMContentLoaded', function () {
 
             /* =========================================================
-               CKEDITOR CORE (SAME AS EDIT PAGE)
-            ========================================================= */
+             CKEDITOR CORE
+          ========================================================= */
 
             function initEditor(el) {
 
@@ -495,8 +495,13 @@
                     el.id = 'ck_' + Math.random().toString(36).substr(2, 9);
                 }
 
+                // FIX: if this textarea already has a live CKEditor instance,
+                // do NOT destroy + recreate it. Re-running toggleSolution /
+                // toggleOptionE / toggleInstruction on the whole form was wiping
+                // out already-filled fields in previous question/sub-question
+                // blocks. Just skip already-initialized editors.
                 if (CKEDITOR.instances[el.id]) {
-                    CKEDITOR.instances[el.id].destroy(true);
+                    return;
                 }
 
                 CKEDITOR.replace(el.id, {
@@ -653,7 +658,7 @@
                 const container = document.getElementById('story-sub-questions');
                 const clone = container.children[0].cloneNode(true);
 
-                // 🔥 Remove any duplicated CKEditor widget markup from the clone
+                // Remove any duplicated CKEditor widget markup from the clone
                 clone.querySelectorAll('.cke').forEach(wrapper => wrapper.remove());
 
                 // Reset values and strip duplicated ids — DO NOT touch CKEDITOR.instances here,
@@ -665,6 +670,12 @@
                 });
 
                 clone.querySelectorAll('select').forEach(el => el.selectedIndex = 0);
+                // FIX: keep the cloned block's MCQ/Reasoning field visibility in sync
+                // with the dropdown we just reset to its first option (MCQ).
+                const mcqFields = clone.querySelector('.mcq-fields');
+                const reasoningFields = clone.querySelector('.reasoning-fields');
+                if (mcqFields) mcqFields.style.display = 'block';
+                if (reasoningFields) reasoningFields.style.display = 'none';
 
                 container.appendChild(clone);
                 setTimeout(() => initEditorsIn(clone), 50);
@@ -705,15 +716,16 @@
                 const clone = source.cloneNode(true);
                 clone.classList.add('question-block');
 
-                /* 🔥 DO NOT DESTROY INSTANCES HERE */
+                /* DO NOT DESTROY INSTANCES HERE */
 
-                // 1️⃣ Remove CKEditor wrapper inside clone only
+                // 1) Remove CKEditor wrapper inside clone only
                 clone.querySelectorAll('.cke').forEach(wrapper => wrapper.remove());
 
-                // 2️⃣ Remove duplicated IDs from clone
+                // 2) Remove duplicated IDs from clone
                 clone.querySelectorAll('textarea').forEach(el => {
                     el.removeAttribute('id');
                     el.value = '';
+                    el.style.display = ''; // FIX: restore visibility hidden by CKEditor on the source block
                 });
 
                 clone.querySelectorAll('input').forEach(el => el.value = '');
@@ -735,7 +747,7 @@
                 clone.appendChild(removeBtn);
                 document.getElementById('question-clone').appendChild(clone);
 
-                // 3️⃣ Initialize fresh editors ONLY for clone
+                // 3) Initialize fresh editors ONLY for clone
                 setTimeout(() => initEditorsIn(clone), 50);
             });
 

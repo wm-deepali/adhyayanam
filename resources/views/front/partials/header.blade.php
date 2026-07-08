@@ -1,4 +1,3 @@
-<meta charset="utf-8">
 @if (trim($__env->yieldContent('header')))
     @yield('header')
 @endif
@@ -19,11 +18,46 @@
         position: static;
     }
 
+    /* ==================== FIX: SIMPLE DROPDOWN (About Us, Student Corner etc.) ==================== */
+    .main-header .main-menu .navigation>li.dropdown>ul {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        min-width: 220px;
+        background: #fff;
+        z-index: 1001;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+        border-top: 2px solid orange;
+        padding: 8px 0;
+        margin: 0;
+        list-style: none;
+    }
+
+    .main-header .main-menu .navigation>li.dropdown>ul>li {
+        display: block;
+        float: none;
+        margin: 0;
+    }
+
+    .main-header .main-menu .navigation>li.dropdown>ul>li>a {
+        display: block;
+        padding: 10px 20px;
+        font-size: 14px;
+        font-weight: 500;
+        color: #333;
+        white-space: nowrap;
+    }
+
+    .main-header .main-menu .navigation>li.dropdown>ul>li>a:hover {
+        background: #fdf3e7;
+        color: orange;
+    }
+
     .mega-menu-container {
         display: none;
         position: fixed;
         left: 0;
-        top: 100px;
+        top: 210px;
         /* fallback 107px */
         width: 100vw;
         background: #fff;
@@ -158,6 +192,241 @@
         -o-transition: all 500ms ease;
         margin-right: 25px;
     }
+
+    /* ==================== NEW: HEADER MIDDLE (Logo + Search + Login) ==================== */
+    .header-middle {
+        padding: 18px 0;
+        border-bottom: 1px solid #eee;
+    }
+
+    .header-middle .inner-container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 25px;
+        flex-wrap: wrap;
+    }
+
+    .header-middle .logo-box .logo img {
+        width: 100px;
+    }
+
+    /* ==================== FIX: MAIN NAVIGATION BAR LOOK ==================== */
+    .header-lower {
+        background: #fff;
+        border-bottom: 1px solid #eee;
+    }
+
+    .main-header .main-menu .navigation {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        margin: 0;
+    }
+
+    .main-header .main-menu .navigation>li {
+        margin-right: 0;
+        display: flex;
+        align-items: center;
+    }
+
+    .main-header .main-menu .navigation>li>a {
+        display: flex;
+        align-items: center;
+        padding: 18px 16px;
+        font-size: 15px;
+        font-weight: 600;
+        color: #222;
+        position: relative;
+        transition: color 0.25s ease;
+    }
+
+    .main-header .main-menu .navigation>li>a::after {
+        content: '';
+        position: absolute;
+        left: 16px;
+        right: 16px;
+        bottom: 12px;
+        height: 2px;
+        background: orange;
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.25s ease;
+    }
+
+    .main-header .main-menu .navigation>li:hover>a,
+    .main-header .main-menu .navigation>li.dropdown.active>a {
+        color: orange;
+    }
+
+    .main-header .main-menu .navigation>li:hover>a::after,
+    .main-header .main-menu .navigation>li.dropdown.active>a::after {
+        transform: scaleX(1);
+    }
+
+    /* Thoda even spacing dropdown caret ke saath */
+    .main-header .main-menu .navigation>li.dropdown>a {
+        padding-right: 22px;
+    }
+
+    /* Search Box */
+    .header-search-box {
+        position: relative;
+        flex: 1 1 420px;
+        max-width: 520px;
+        min-width: 0;
+    }
+
+    .header-search-box .search-form {
+        display: flex;
+        align-items: center;
+        border: 1px solid #e0e0e0;
+        border-radius: 30px;
+        padding: 4px 4px 4px 20px;
+        background: #fff;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .header-search-box input[type="text"] {
+        flex: 1 1 auto;
+        min-width: 0;
+        width: 100%;
+        border: none;
+        outline: none;
+        font-size: 14px;
+        padding: 8px 10px;
+        background: transparent;
+    }
+
+    .header-search-box .search-btn {
+        border: none;
+        background: orange;
+        color: #fff;
+        width: 38px;
+        height: 38px;
+        min-width: 38px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        flex-shrink: 0;
+        padding: 0;
+    }
+
+    .header-search-box .search-btn svg {
+        width: 16px;
+        height: 16px;
+        display: block;
+    }
+
+    /* Suggestions Dropdown */
+    .search-suggestions {
+        display: none;
+        position: absolute;
+        top: calc(100% + 8px);
+        left: 0;
+        right: 0;
+        background: #fff;
+        border: 1px solid #eee;
+        border-radius: 10px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        z-index: 1100;
+        max-height: 320px;
+        overflow-y: auto;
+    }
+
+    .search-suggestions.active {
+        display: block;
+    }
+
+    .search-suggestions .suggestion-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 18px;
+        cursor: pointer;
+        border-bottom: 1px solid #f5f5f5;
+    }
+
+    .search-suggestions .suggestion-item:last-child {
+        border-bottom: none;
+    }
+
+    .search-suggestions .suggestion-item:hover {
+        background: #fdf3e7;
+    }
+
+    .search-suggestions .suggestion-name {
+        font-size: 14px;
+        color: #222;
+        font-weight: 500;
+    }
+
+    .search-suggestions .suggestion-type {
+        font-size: 11px;
+        color: #999;
+        background: #f2f2f2;
+        padding: 2px 8px;
+        border-radius: 10px;
+        white-space: nowrap;
+        margin-left: 10px;
+    }
+
+    .search-suggestions .suggestion-empty {
+        padding: 14px 18px;
+        font-size: 13px;
+        color: #999;
+        text-align: center;
+    }
+
+    /* Login/Signup button in middle section */
+    .header-middle .auth-box .theme-btn {
+        white-space: nowrap;
+    }
+
+
+    .desktop-sticky-menu {
+        display: block
+    }
+
+    @media (max-width: 991px) {
+        .header-middle .inner-container {
+            justify-content: space-between;
+        }
+
+        .header-middle .logo-box {
+            order: 1;
+        }
+
+        .header-middle .auth-box {
+            order: 2;
+        }
+
+        .header-search-box {
+            order: 3;
+            flex: 1 1 100%;
+            max-width: 100%;
+            margin-top: 12px;
+        }
+
+        .desktop-sticky-menu {
+            display: none !important;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .header-middle .auth-box .theme-btn .txt {
+            font-size: 12px;
+        }
+
+        .header-search-box input[type="text"] {
+            font-size: 13px;
+        }
+    }
 </style>
 <link href="{{url('assets/css/bootstrap.css')}}" rel="stylesheet">
 <link href="{{url('assets/css/style.css')}}" rel="stylesheet">
@@ -197,36 +466,100 @@
         overflow: hidden;
     }
 
-    @media (min-width: 767px) {
-        .top-header-login1 {
-            display: none;
-        }
-
-
-    }
-
     @media (max-width: 767px) {
-        .top-header-login {
-            margin-right: 15px;
-        }
-
         .btn-style-one {
             background: #fff !important;
             color: black !important;
             border: 1px solid gray !important;
             border-radius: 4px;
         }
+    }
 
+    @media only screen and (max-width: 767px) {
+        .main-header>div .logo {
+            display: block;
+        }
     }
 </style>
 
 <!-- Main Header -->
-<header class="main-header">
+<header class="main-header dg">
     <div class="page-wrapper">
 
+        <!-- ==================== NEW MOBILE HEADER ==================== -->
+        <div class="mobile-custom-header d-block d-lg-none">
+            <!-- 1. Top bar small color #045279 -->
+            <div style="background-color: #045279; height: 6px; width: 100%;"></div>
 
-        <!-- Header Top -->
-        <div class="header-top">
+            <!-- 2. Logo and Icons in one row -->
+            <div
+                style="display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; background: #fff; border-bottom: 1px solid #e0e0e0;">
+                <!-- Left: Logo -->
+                <div class="mobile-logo">
+                    <a href="{{url('/')}}">
+                        <img src="{{ url('images/Neti-logo.png') }}" style="height: 60px; width: auto;" alt="Logo">
+                    </a>
+                </div>
+
+                <!-- Right side: 3 icons -->
+                <div style="display: flex; align-items: center;">
+                    <!-- Search Icon -->
+                    <a href="javascript:void(0);" id="mobileSearchIconBtn"
+                        style="color: #333; margin-right: 15px; display: flex; align-items: center;">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
+                            style="width: 22px; height: 22px;">
+                            <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2" />
+                            <line x1="21" y1="21" x2="16.65" y2="16.65" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" />
+                        </svg>
+                    </a>
+
+                    <!-- User Icon -->
+                    @if(auth()->user() && auth()->user()->type == 'student')
+                        <a href="{{route('user.dashboard')}}"
+                            style="color: #333; margin-right: 15px; font-size: 22px; line-height: 1; display: flex; align-items: center;">
+                            <i class="flaticon-add-user"></i>
+                        </a>
+                    @else
+                        <a href="{{route('student.login')}}"
+                            style="color: #333; margin-right: 15px; font-size: 22px; line-height: 1; display: flex; align-items: center;">
+                            <i class="flaticon-add-user"></i>
+                        </a>
+                    @endif
+
+                    <!-- Menu Icon -->
+                    <div class="mobile-nav-toggler"
+                        style="color: #333; font-size: 22px; cursor: pointer; line-height: 1; display: flex; align-items: center;">
+                        <span class="icon flaticon-menu"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mobile Search Box (Hidden by default) -->
+            <div id="mobileSearchBox"
+                style="display: none; padding: 10px 20px; background: #f9f9f9; border-bottom: 1px solid #eee;">
+                <!-- Search Box (static for now, suggestions logic ready for dynamic data later) -->
+                <div class="header-search-box" id="mobileHeaderSearchBox"
+                    style="max-width: 100%; margin-top: 0; width: 100%; flex: 1 1 100%;">
+                    <form class="search-form" onsubmit="return false;">
+                        <input type="text" id="mobileGlobalSearchInput"
+                            placeholder="Search courses, test series, packages..." autocomplete="off">
+                        <button type="button" class="search-btn" id="mobileGlobalSearchBtn" aria-label="Search">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2" />
+                                <line x1="21" y1="21" x2="16.65" y2="16.65" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" />
+                            </svg>
+                        </button>
+                    </form>
+                    <div class="search-suggestions" id="mobileSearchSuggestions"></div>
+                </div>
+            </div>
+        </div>
+        <!-- ==================== END NEW MOBILE HEADER ==================== -->
+
+        <!-- ==================== SECTION 1: HEADER TOP ==================== -->
+        <div class="header-top d-none d-lg-block">
             <div class="auto-container d-flex justify-content-between align-items-center flex-wrap">
                 <!-- Left Box -->
                 <div class="left-box d-flex flex-wrap">
@@ -243,7 +576,6 @@
                     </ul>
                 </div>
 
-
                 <!-- Right Box -->
                 <div class="right-box d-flex flex-wrap">
                     <div class="lr-box">
@@ -259,43 +591,65 @@
                             <a href="{{route('contact.inquiry')}}" class="theme-btn btn-style-one"><span
                                     class="txt">Contact Us</span></a>
                         </div>
-                        <div class="top-header-login">
-                            @if(auth()->user() && auth()->user()->type == 'student')
-                                <a href="{{route('user.dashboard')}}" class="theme-btn btn-style-one"><span class="txt"><i
-                                            class="flaticon-add-user"></i> Dashboard</span></a>
-                            @else
-                                <a href="{{route('student.login')}}" class="theme-btn btn-style-one"><span class="txt"><i
-                                            class="flaticon-add-user"></i> LogIn / Sign Up</span></a>
-                            @endif
-                        </div>
                     </div>
                 </div>
             </div>
         </div>
+        <!-- End Header Top -->
 
 
-        <!-- Header Lower -->
-        <div class="header-lower">
+        <!-- ==================== SECTION 2: LOGO + SEARCH + LOGIN/SIGNUP ==================== -->
+        <div class="header-middle d-none d-lg-block">
+            <div class="auto-container container-fluid">
+                <div class="inner-container">
+
+                    <!-- Logo -->
+                    <div class="logo-box">
+                        <div class="logo"><a href="{{url('/')}}"><img src="{{ url('images/Neti-logo.png')}}" alt=""
+                                    title=""></a></div>
+                    </div>
+
+                    <!-- Search Box (static for now, suggestions logic ready for dynamic data later) -->
+                    <div class="header-search-box" id="headerSearchBox">
+                        <form class="search-form" onsubmit="return false;">
+                            <input type="text" id="globalSearchInput"
+                                placeholder="Search courses, test series, packages..." autocomplete="off">
+                            <button type="button" class="search-btn" id="globalSearchBtn" aria-label="Search">
+                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2" />
+                                    <line x1="21" y1="21" x2="16.65" y2="16.65" stroke="currentColor" stroke-width="2"
+                                        stroke-linecap="round" />
+                                </svg>
+                            </button>
+                        </form>
+                        <div class="search-suggestions" id="searchSuggestions"></div>
+                    </div>
+
+                    <!-- Login / Signup -->
+                    <div class="auth-box">
+                        @if(auth()->user() && auth()->user()->type == 'student')
+                            <a href="{{route('user.dashboard')}}" class="theme-btn btn-style-one"><span class="txt"><i
+                                        class="flaticon-add-user"></i> Dashboard</span></a>
+                        @else
+                            <a href="{{route('student.login')}}" class="theme-btn btn-style-one"><span class="txt"><i
+                                        class="flaticon-add-user"></i> LogIn / Sign Up</span></a>
+                        @endif
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <!-- End Header Middle -->
+
+
+        <!-- ==================== SECTION 3: MENU (unchanged mega menu logic) ==================== -->
+        <div class="header-lower d-none d-lg-block">
             <div class="auto-container container-fluid">
                 <div class="inner-container d-flex justify-content-between align-items-center flex-wrap">
-                    <div class="logo-box">
-                        <div class="logo"><a href="{{url('/')}}"><img src="{{ url('images/Neti-logo.png')}}"
-                                    style="width:100px;" alt="" title=""></a></div>
-                    </div>
-                    <div class="nav-outer d-flex align-items-center flex-wrap">
+                    <div class="nav-outer d-flex align-items-center flex-wrap" style="width: 100%;">
 
                         <!-- Mobile Navigation Toggler -->
-                        <div class="top-header-login top-header-login1">
-                            @if(auth()->user() && auth()->user()->type == 'student')
-                                <a href="{{route('user.dashboard')}}" class="theme-btn btn-style-one"><span class="txt"><i
-                                            class="flaticon-add-user"></i> Dashboard</span></a>
-                            @else
-                                <a href="{{route('student.login')}}" class="theme-btn btn-style-one"><span class="txt"><i
-                                            class="flaticon-add-user"></i> LogIn / Sign Up</span></a>
-                            @endif
-                        </div>
                         <div class="mobile-nav-toggler"> <span class="icon flaticon-menu"></span></div>
-
 
                         <!-- Main Menu -->
                         <nav class="main-menu show navbar-expand-md">
@@ -309,30 +663,9 @@
                                 </button>
                             </div>
 
-
                             <div class="navbar-collapse collapse clearfix" id="navbarSupportedContent">
                                 <ul class="navigation clearfix">
                                     <li><a href="{{url('/')}}">Home</a></li>
-                                    <!--<li class="dropdown">-->
-                                    <!--    <a href="#">Our Institute </a>-->
-                                    <!--    <div class="mega-menu-container">-->
-                                    <!--        <div class="mega-menu-left">-->
-                                    <!--            <div class="mega-menu-tab active" data-tab="tab-institute-1">Institute-->
-                                    <!--                Info</div>-->
-                                    <!--        </div>-->
-                                    <!--        <div class="mega-menu-right">-->
-                                    <!--            <div class="mega-menu-panel active" id="tab-institute-1">-->
-                                    <!--                <h5>Institute Details</h5>-->
-                                    <!--                <ul>-->
-                                    <!--                    <li><a href="{{route('about')}}">About Us</a></li>-->
-                                    <!--                    <li><a href="{{route('our.team.index')}}">Our Team</a></li>-->
-                                    <!--                    <li><a href="{{route('vision.mission')}}">Vision & Mission</a>-->
-                                    <!--                    </li>-->
-                                    <!--                </ul>-->
-                                    <!--            </div>-->
-                                    <!--        </div>-->
-                                    <!--    </div>-->
-                                    <!--</li>-->
 
                                     <li class="dropdown">
                                         <a href="#">About Us</a>
@@ -466,26 +799,6 @@
                                         </div>
                                     </li>
 
-                                    <!-- Current Affairs Dropdown -->
-                                    <!--<li class="dropdown">-->
-                                    <!--    <a href="#">Current Affairs</a>-->
-                                    <!--    <div class="mega-menu-container">-->
-                                    <!--        <div class="mega-menu-left">-->
-                                    <!--            <div class="mega-menu-tab active" data-tab="tab-current-affairs">Current-->
-                                    <!--                Affairs</div>-->
-                                    <!--        </div>-->
-                                    <!--        <div class="mega-menu-right">-->
-                                    <!--            <div class="mega-menu-panel active" id="tab-current-affairs">-->
-                                    <!--                <h5>Current Affairs</h5>-->
-                                    <!--                <ul>-->
-                                    <!--                    <li><a href="{{route('current.index')}}">View Current-->
-                                    <!--                            Affairs</a></li>-->
-                                    <!--                </ul>-->
-                                    <!--            </div>-->
-                                    <!--        </div>-->
-                                    <!--    </div>-->
-                                    <!--</li>-->
-
                                     <li><a href="{{route('current.index')}}"> Current Affairs</a></li>
 
                                     <!-- PYQ Dropdown -->
@@ -570,28 +883,6 @@
                                         </div>
                                     </li>
 
-                                    <!-- Student Corner Dropdown -->
-                                    <!--<li class="dropdown">-->
-                                    <!--    <a href="#">Student Corner</a>-->
-                                    <!--    <div class="mega-menu-container">-->
-                                    <!--        <div class="mega-menu-left">-->
-                                    <!--            <div class="mega-menu-tab active" data-tab="tab-student-corner">Student-->
-                                    <!--                Resources</div>-->
-                                    <!--        </div>-->
-                                    <!--        <div class="mega-menu-right">-->
-                                    <!--            <div class="mega-menu-panel active" id="tab-student-corner">-->
-                                    <!--                <h5>Resources</h5>-->
-                                    <!--                <ul>-->
-                                    <!--                    <li><a href="{{route('daily.boost.front')}}">Daily Booster</a>-->
-                                    <!--                    </li>-->
-                                    <!--                    <li><a href="{{route('test.planner.front')}}">Test Planner</a>-->
-                                    <!--                    </li>-->
-                                    <!--                </ul>-->
-                                    <!--            </div>-->
-                                    <!--        </div>-->
-                                    <!--    </div>-->
-                                    <!--</li>-->
-
                                     <li class="dropdown">
                                         <a href="#">Student Corner</a>
                                         <ul>
@@ -608,19 +899,20 @@
                 </div>
             </div>
         </div>
-        <!-- End Header Lower -->
+        <!-- End Header Lower (Menu) -->
 
 
         <!-- Sticky Header -->
         <div class="sticky-header" style="padding:0px 0px;">
-            <div class="container d-flex justify-content-between align-items-center flex-wrap">
+            <!-- Desktop Layout -->
+            <div class="container d-none d-lg-flex justify-content-between align-items-center flex-wrap">
                 <div class="logo">
                     <a href="{{url('/')}}" title=""><img src="{{url('images/Neti-logo.png')}}" style="width:100px;"
                             alt="Adhyayanam Logo" title=""></a>
                 </div>
                 <nav class="main-menu"></nav>
-                <div class="d-flex  align-items-center">
-                    <div class="top-header-login top-header-login1">
+                <div class="d-flex align-items-center" style="padding-right: 15px;">
+                    <div class="top-header-login top-header-login1" style="margin-right: 20px;">
                         @if(auth()->user() && auth()->user()->type == 'student')
                             <a href="{{route('user.dashboard')}}" class="theme-btn btn-style-one"><span class="txt"><i
                                         class="flaticon-add-user"></i> Dashboard</span></a>
@@ -629,17 +921,61 @@
                                         class="flaticon-add-user"></i> LogIn / Sign Up</span></a>
                         @endif
                     </div>
-                    <div class="mobile-nav-toggler"><span class="icon flaticon-menu"></span></div>
+                    <div class="mobile-nav-toggler"
+                        style="color: #333; font-size: 24px; cursor: pointer; line-height: 1; display: flex; align-items: center;">
+                        <span class="icon flaticon-menu"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mobile Layout -->
+            <div class="container d-flex d-lg-none justify-content-between align-items-center"
+                style="padding: 10px 15px; background: #fff;">
+                <!-- Left: Logo -->
+                <div class="logo">
+                    <a href="{{url('/')}}">
+                        <img src="{{ url('images/Neti-logo.png') }}" style="height: 50px; width: auto;" alt="Logo">
+                    </a>
                 </div>
 
+                <!-- Right: 3 Icons -->
+                <div style="display: flex; align-items: center;">
+                    <!-- Search Icon -->
+                    <a href="javascript:void(0);" class="mobileSearchIconBtn"
+                        style="color: #333; margin-right: 15px; display: flex; align-items: center;">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
+                            style="width: 22px; height: 22px;">
+                            <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2" />
+                            <line x1="21" y1="21" x2="16.65" y2="16.65" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" />
+                        </svg>
+                    </a>
+
+                    <!-- User Icon -->
+                    @if(auth()->user() && auth()->user()->type == 'student')
+                        <a href="{{route('user.dashboard')}}"
+                            style="color: #333; margin-right: 15px; font-size: 22px; line-height: 1; display: flex; align-items: center;">
+                            <i class="flaticon-add-user"></i>
+                        </a>
+                    @else
+                        <a href="{{route('student.login')}}"
+                            style="color: #333; margin-right: 15px; font-size: 22px; line-height: 1; display: flex; align-items: center;">
+                            <i class="flaticon-add-user"></i>
+                        </a>
+                    @endif
+
+                    <!-- Menu Icon -->
+                    <div class="mobile-nav-toggler"
+                        style="color: #333; font-size: 22px; cursor: pointer; line-height: 1; display: flex; align-items: center;">
+                        <span class="icon flaticon-menu"></span>
+                    </div>
+                </div>
             </div>
         </div>
         <!-- End Sticky Menu -->
 
 
         <!-- Mobile Menu -->
-        <!-- Mobile Menu -->
-        <!-- ==================== MOBILE MENU ==================== -->
         <div class="mobile-menu">
             <div class="menu-backdrop"></div>
             <div class="close-btn"><span class="icon flaticon-cancel"></span></div>
@@ -672,17 +1008,22 @@
                                         <a href="#">{{$commission->name}}</a>
                                         <ul>
                                             @foreach($commission->categories as $category)
-                                                @foreach($category->subCategories as $subCat)
-                                                                                <li>
-                                                                                    <a href="{{ route('courses', [
-                                                        'examSlug' => $commission->slug,
-                                                        'catSlug' => $category->slug,
-                                                        'subCatSlug' => $subCat->slug
-                                                    ]) }}">
-                                                                                        {{ $subCat->name }}
-                                                                                    </a>
-                                                                                </li>
-                                                @endforeach
+                                                <li class="dropdown">
+                                                    <a href="#">{{$category->name}}</a>
+                                                    <ul>
+                                                        @foreach($category->subCategories as $subCat)
+                                                                                                <li>
+                                                                                                    <a href="{{ route('courses', [
+                                                                'examSlug' => $commission->slug,
+                                                                'catSlug' => $category->slug,
+                                                                'subCatSlug' => $subCat->slug
+                                                            ]) }}">
+                                                                                                        {{ $subCat->name }}
+                                                                                                    </a>
+                                                                                                </li>
+                                                        @endforeach
+                                                    </ul>
+                                                </li>
                                             @endforeach
                                         </ul>
                                     </li>
@@ -694,11 +1035,11 @@
                             <a href="#">Test Series</a>
                             <ul>
                                 @foreach($examinationCommission as $commission)
-                                    <li class="dropdown"> <!-- Yeh inner dropdown hai -->
+                                    <li class="dropdown">
                                         <a href="#">{{$commission->name}}</a>
                                         <ul>
                                             @foreach($commission->categories as $category)
-                                                <li class="dropdown"> <!-- Yeh bhi inner dropdown -->
+                                                <li class="dropdown">
                                                     <a href="#">{{$category->name}}</a>
                                                     <ul>
                                                         @foreach($category->subCategories as $subCat)
@@ -729,17 +1070,22 @@
                                         <a href="#">{{$commission->name}}</a>
                                         <ul>
                                             @foreach($commission->categories as $category)
-                                                @foreach($category->subCategories as $subCat)
-                                                                                <li>
-                                                                                    <a href="{{ route('study.material.front', [
-                                                        'examSlug' => $commission->slug,
-                                                        'catSlug' => $category->slug,
-                                                        'subCatSlug' => $subCat->slug
-                                                    ]) }}">
-                                                                                        {{ $subCat->name }}
-                                                                                    </a>
-                                                                                </li>
-                                                @endforeach
+                                                <li class="dropdown">
+                                                    <a href="#">{{$category->name}}</a>
+                                                    <ul>
+                                                        @foreach($category->subCategories as $subCat)
+                                                                                                <li>
+                                                                                                    <a href="{{ route('study.material.front', [
+                                                                'examSlug' => $commission->slug,
+                                                                'catSlug' => $category->slug,
+                                                                'subCatSlug' => $subCat->slug
+                                                            ]) }}">
+                                                                                                        {{ $subCat->name }}
+                                                                                                    </a>
+                                                                                                </li>
+                                                        @endforeach
+                                                    </ul>
+                                                </li>
                                             @endforeach
                                         </ul>
                                     </li>
@@ -762,18 +1108,22 @@
                                         <a href="#">{{$commission->name}}</a>
                                         <ul>
                                             @foreach($commission->categories as $category)
-                                                @foreach($category->subCategories as $subCat)
-                                                    <li>
-                                                        <a
-                                                            href="{{route('pyq-papers', [
-                                                            'examSlug' => $commission->slug,
-                                                            'catSlug' => $category->slug,
-                                                            'subCatSlug' => $subCat->slug
-                                                        ])}}">
-                                                            {{ $subCat->name }}
-                                                        </a>
-                                                    </li>
-                                                @endforeach
+                                                <li class="dropdown">
+                                                    <a href="#">{{$category->name}}</a>
+                                                    <ul>
+                                                        @foreach($category->subCategories as $subCat)
+                                                                                                <li>
+                                                                                                    <a href="{{route('pyq-papers', [
+                                                                'examSlug' => $commission->slug,
+                                                                'catSlug' => $category->slug,
+                                                                'subCatSlug' => $subCat->slug
+                                                            ])}}">
+                                                                                                        {{ $subCat->name }}
+                                                                                                    </a>
+                                                                                                </li>
+                                                        @endforeach
+                                                    </ul>
+                                                </li>
                                             @endforeach
                                         </ul>
                                     </li>
@@ -789,17 +1139,22 @@
                                         <a href="#">{{$commission->name}}</a>
                                         <ul>
                                             @foreach($commission->categories as $category)
-                                                @foreach($category->subCategories as $subCat)
-                                                                                <li>
-                                                                                    <a href="{{ route('syllabus.front', [
-                                                                        'examSlug' => $commission->slug,
-                                                                        'catSlug' => $category->slug,
-                                                                        'subCatSlug' => $subCat->slug
-                                                    ]) }}">
-                                                                                        {{ $subCat->name }}
-                                                                                    </a>
-                                                                                </li>
-                                                @endforeach
+                                                <li class="dropdown">
+                                                    <a href="#">{{$category->name}}</a>
+                                                    <ul>
+                                                        @foreach($category->subCategories as $subCat)
+                                                                                                <li>
+                                                                                                    <a href="{{ route('syllabus.front', [
+                                                                'examSlug' => $commission->slug,
+                                                                'catSlug' => $category->slug,
+                                                                'subCatSlug' => $subCat->slug
+                                                            ]) }}">
+                                                                                                        {{ $subCat->name }}
+                                                                                                    </a>
+                                                                                                </li>
+                                                        @endforeach
+                                                    </ul>
+                                                </li>
                                             @endforeach
                                         </ul>
                                     </li>
@@ -919,6 +1274,129 @@
                 $('.mobile-menu').removeClass('active');
                 $('body').removeClass('overflow-hidden');
             }
+        });
+
+
+
+    });
+</script>
+
+
+<script>
+    $(function () {
+
+        let searchTimeout;
+
+        function renderResults(results, $box) {
+
+            $box.empty();
+
+            if (!results.length) {
+                $box.html(
+                    '<div class="suggestion-empty">No results found</div>'
+                ).addClass('active');
+                return;
+            }
+
+            results.forEach(function (item) {
+
+                $box.append(`
+                <a href="${item.url}" class="suggestion-item"
+                   style="text-decoration:none;color:inherit;">
+                    <div>
+                        <div class="suggestion-name">
+                            ${item.name}
+                        </div>
+
+                        ${item.breadcrumb
+                        ? `<small style="color:#777">
+                                ${item.breadcrumb}
+                               </small>`
+                        : ''
+                    }
+                    </div>
+
+                    <span class="suggestion-type">
+                        ${item.type}
+                    </span>
+                </a>
+            `);
+            });
+
+            $box.addClass('active');
+        }
+
+        function performSearch(query, $box) {
+
+            if (query.length < 2) {
+                $box.removeClass('active').empty();
+                return;
+            }
+
+            $.ajax({
+                url: "{{ route('global.search') }}",
+                type: "GET",
+                data: {
+                    q: query
+                },
+                success: function (response) {
+
+                    if (response.success) {
+                        renderResults(response.results, $box);
+                    }
+                },
+                error: function () {
+                    $box.html(
+                        '<div class="suggestion-empty">Search failed</div>'
+                    ).addClass('active');
+                }
+            });
+        }
+
+        // Desktop
+
+        $('#globalSearchInput').on('keyup', function () {
+
+            clearTimeout(searchTimeout);
+
+            let query = $(this).val().trim();
+
+            searchTimeout = setTimeout(function () {
+                performSearch(query, $('#searchSuggestions'));
+            }, 300);
+
+        });
+
+        // Mobile
+
+        $('#mobileGlobalSearchInput').on('keyup', function () {
+
+            clearTimeout(searchTimeout);
+
+            let query = $(this).val().trim();
+
+            searchTimeout = setTimeout(function () {
+                performSearch(query, $('#mobileSearchSuggestions'));
+            }, 300);
+
+        });
+
+        // Hide dropdown
+
+        $(document).on('click', function (e) {
+
+            if (!$(e.target).closest('#headerSearchBox').length) {
+                $('#searchSuggestions')
+                    .removeClass('active')
+                    .empty();
+            }
+
+            if (!$(e.target).closest('#mobileSearchBox').length) {
+                $('#mobileSearchSuggestions')
+                    .removeClass('active')
+                    .empty();
+            }
+
         });
 
     });

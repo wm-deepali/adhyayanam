@@ -2096,6 +2096,144 @@ class ContentManagementController extends Controller
         return redirect()->back()->with('success', 'Course deleted successfully!');
     }
 
+    public function exportCourses(Request $request)
+    {
+        $query = Course::with([
+            'examinationCommission',
+            'category',
+            'subCategory',
+            'creator'
+        ]);
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'LIKE', "%{$search}%")
+                    ->orWhere('course_heading', 'LIKE', "%{$search}%")
+                    ->orWhere('short_description', 'LIKE', "%{$search}%")
+                    ->orWhereHas('examinationCommission', function ($sub) use ($search) {
+                        $sub->where('name', 'LIKE', "%{$search}%");
+                    })
+                    ->orWhereHas('category', function ($sub) use ($search) {
+                        $sub->where('name', 'LIKE', "%{$search}%");
+                    })
+                    ->orWhereHas('subCategory', function ($sub) use ($search) {
+                        $sub->where('name', 'LIKE', "%{$search}%");
+                    });
+            });
+        }
+
+        $courses = $query->latest()->get();
+
+        $fileName = 'courses-' . now()->format('Y-m-d-His') . '.csv';
+
+        return response()->streamDownload(function () use ($courses) {
+
+            $handle = fopen('php://output', 'w');
+
+            fputcsv($handle, [
+                'Created At',
+                'Course Name',
+                'Course Heading',
+                'Commission',
+                'Category',
+                'Sub Category',
+                'Subjects',
+                'Chapters',
+                'Topics',
+                'Based On',
+                'Course Mode',
+                'Language',
+                'Duration',
+                'Weekly Study',
+                'No. Of Classes',
+                'No. Of Topics',
+                'Course Fee',
+                'Discount',
+                'Offered Price',
+                'Thumbnail Image',
+                'YouTube URL',
+                'Short Description',
+                'Status',
+                'Added By',
+            ]);
+
+            foreach ($courses as $res) {
+
+                $subjects = $res->subjects()
+                    ->pluck('name')
+                    ->implode(', ');
+
+                $chapters = $res->chapters()
+                    ->pluck('name')
+                    ->implode(', ');
+
+                $topics = $res->topics()
+                    ->pluck('name')
+                    ->implode(', ');
+
+                fputcsv($handle, [
+
+                    optional($res->created_at)->format('d-m-Y H:i'),
+
+                    $res->name,
+
+                    $res->course_heading,
+
+                    $res->examinationCommission->name ?? '',
+
+                    $res->category->name ?? '',
+
+                    $res->subCategory->name ?? '',
+
+                    $subjects,
+
+                    $chapters,
+
+                    $topics,
+
+                    $res->based_on,
+
+                    $res->course_mode,
+
+                    $res->language_of_teaching,
+
+                    $res->duration,
+
+                    $res->weekly_study,
+
+                    $res->num_classes,
+
+                    $res->num_topics,
+
+                    $res->course_fee,
+
+                    $res->discount,
+
+                    $res->offered_price,
+
+                    $res->thumbnail_image
+                    ? asset('storage/' . $res->thumbnail_image)
+                    : '',
+
+                    $res->youtube_url,
+
+                    strip_tags($res->short_description ?? ''),
+
+                    ucfirst($res->status),
+
+                    $res->creator->name ?? 'Super Admin',
+                ]);
+            }
+
+            fclose($handle);
+
+        }, $fileName, [
+            'Content-Type' => 'text/csv',
+        ]);
+    }
+
     public function approveCurrentAffair($id)
     {
         $affair = CurrentAffair::findOrFail($id);
@@ -2103,6 +2241,100 @@ class ContentManagementController extends Controller
         $affair->save();
 
         return response()->json(['status' => true]);
+    }
+
+    public function exportCurrentAffairs(Request $request)
+    {
+        $query = CurrentAffair::with([
+            'topic',
+            'creator'
+        ]);
+
+        // Same search logic as listing page
+        if ($request->filled('search')) {
+            $search = $request->search;
+
+            $query->where('title', 'like', "%{$search}%")
+                ->orWhere('short_description', 'like', "%{$search}%")
+                ->orWhereHas('topic', function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%");
+                });
+        }
+
+        $currentAffairs = $query
+            ->orderBy('publishing_date', 'DESC')
+            ->get();
+
+        $fileName = 'current-affairs-' . now()->format('Y-m-d-His') . '.csv';
+
+        return response()->streamDownload(function () use ($currentAffairs) {
+
+            $handle = fopen('php://output', 'w');
+
+            fputcsv($handle, [
+                'Date & Time',
+                'Category',
+                'Title',
+                'Short Description',
+                'Publishing Date',
+                'Thumbnail URL',
+                'Banner URL',
+                'PDF URL',
+                'Alt Tag',
+                'Meta Title',
+                'Meta Keyword',
+                'Meta Description',
+                'Approval Status',
+                'Added By',
+            ]);
+
+            foreach ($currentAffairs as $item) {
+
+                fputcsv($handle, [
+
+                    optional($item->created_at)->format('d-m-Y H:i'),
+
+                    $item->topic->name ?? '',
+
+                    $item->title ?? '',
+
+                    strip_tags($item->short_description ?? ''),
+
+                    $item->publishing_date
+                    ? \Carbon\Carbon::parse($item->publishing_date)->format('d-m-Y')
+                    : '',
+
+                    $item->thumbnail_image
+                    ? asset('storage/' . $item->thumbnail_image)
+                    : '',
+
+                    $item->banner_image
+                    ? asset('storage/' . $item->banner_image)
+                    : '',
+
+                    $item->pdf_file
+                    ? asset('storage/' . $item->pdf_file)
+                    : '',
+
+                    $item->image_alt_tag ?? '',
+
+                    $item->meta_title ?? '',
+
+                    $item->meta_keyword ?? '',
+
+                    $item->meta_description ?? '',
+
+                    ucfirst($item->approval_status ?? ''),
+
+                    $item->creator->name ?? 'Super Admin',
+                ]);
+            }
+
+            fclose($handle);
+
+        }, $fileName, [
+            'Content-Type' => 'text/csv',
+        ]);
     }
 
     public function currentAffairDelete($id)
@@ -3038,6 +3270,146 @@ class ContentManagementController extends Controller
         return redirect()->back()->with('success', 'Study Material deleted successfully.');
     }
 
+
+    public function exportStudyMaterial(Request $request)
+    {
+        $query = StudyMaterial::with([
+            'creator',
+            'commission',
+            'category',
+            'subcategory'
+        ])->orderByDesc('created_at');
+
+        // Free / Paid Filter
+        if ($request->has('type') && $request->type !== '') {
+            $query->where('IsPaid', (int) $request->type);
+        }
+
+        // Search Filter
+        if ($request->filled('search')) {
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'LIKE', "%{$search}%")
+                    ->orWhere('short_description', 'LIKE', "%{$search}%")
+                    ->orWhereHas('commission', function ($sub) use ($search) {
+                        $sub->where('name', 'LIKE', "%{$search}%");
+                    })
+                    ->orWhereHas('category', function ($sub) use ($search) {
+                        $sub->where('name', 'LIKE', "%{$search}%");
+                    })
+                    ->orWhereHas('subcategory', function ($sub) use ($search) {
+                        $sub->where('name', 'LIKE', "%{$search}%");
+                    });
+            });
+        }
+
+        $materials = $query->get();
+
+        $fileName = 'study-material-' . now()->format('Y-m-d-His') . '.csv';
+
+        return response()->streamDownload(function () use ($materials) {
+
+            $handle = fopen('php://output', 'w');
+
+            fputcsv($handle, [
+                'Date & Time',
+                'Title',
+                'Short Description',
+                'Commission',
+                'Category',
+                'Sub Category',
+                'Subjects',
+                'Chapters',
+                'Topics',
+                'Language',
+                'Based On',
+                'Payment Type',
+                'MRP',
+                'Discount',
+                'Price',
+                'Package Type',
+                'Banner URL',
+                'Status',
+                'Approval Status',
+                'Added By',
+            ]);
+
+            $packageTypeLabels = [
+                'topic_based' => 'Topic Based',
+                'chapter_based' => 'Chapter Based',
+                'subject_based' => 'Subject Based',
+                'general' => 'General',
+            ];
+
+            foreach ($materials as $res) {
+
+                $subjects = $res->subjects
+                    ? $res->subjects->pluck('name')->implode(', ')
+                    : '';
+
+                $chapters = $res->chapters
+                    ? $res->chapters->pluck('name')->implode(', ')
+                    : '';
+
+                $topics = $res->topics
+                    ? $res->topics->pluck('name')->implode(', ')
+                    : '';
+
+                fputcsv($handle, [
+
+                    optional($res->created_at)->format('d-m-Y H:i'),
+
+                    $res->title,
+
+                    strip_tags($res->short_description ?? ''),
+
+                    $res->commission->name ?? '',
+
+                    $res->category->name ?? '',
+
+                    $res->subcategory->name ?? '',
+
+                    $subjects,
+
+                    $chapters,
+
+                    $topics,
+
+                    $res->language ?? '',
+
+                    $res->based_on ?? '',
+
+                    $res->IsPaid ? 'Paid' : 'Free',
+
+                    $res->mrp ?? '',
+
+                    $res->discount ?? '',
+
+                    $res->price ?? '',
+
+                    $packageTypeLabels[$res->material_type]
+                    ?? ucwords(str_replace('_', ' ', $res->material_type)),
+
+                    $res->banner
+                    ? asset('storage/' . $res->banner)
+                    : '',
+
+                    $res->status,
+
+                    ucfirst($res->approval_status ?? ''),
+
+                    $res->creator->name ?? 'Super Admin',
+                ]);
+            }
+
+            fclose($handle);
+
+        }, $fileName, [
+            'Content-Type' => 'text/csv',
+        ]);
+    }
+
     public function dailyBoostIndex(Request $request)
     {
         if ($request->ajax()) {
@@ -3926,6 +4298,135 @@ class ContentManagementController extends Controller
         TestSeriesDetail::where('test_series_id', $id)->delete();
         $test_series->delete();
         return redirect()->back()->with('success', 'Test series deleted successfully!');
+    }
+
+    public function exportTestSeries(Request $request)
+    {
+        $query = TestSeries::with([
+            'category',
+            'subcategory',
+            'commission',
+            'creator',
+            'tests'
+        ])->latest();
+
+        if ($request->filled('commission_id')) {
+            $query->where('exam_com_id', $request->commission_id);
+        }
+
+        if ($request->filled('category_id')) {
+            $query->where('category_id', $request->category_id);
+        }
+
+        if ($request->filled('sub_category_id')) {
+            $query->where('sub_category_id', $request->sub_category_id);
+        }
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'LIKE', "%{$search}%")
+                    ->orWhere('short_description', 'LIKE', "%{$search}%")
+                    ->orWhereHas('commission', function ($sub) use ($search) {
+                        $sub->where('name', 'LIKE', "%{$search}%");
+                    })
+                    ->orWhereHas('category', function ($sub) use ($search) {
+                        $sub->where('name', 'LIKE', "%{$search}%");
+                    })
+                    ->orWhereHas('subcategory', function ($sub) use ($search) {
+                        $sub->where('name', 'LIKE', "%{$search}%");
+                    });
+            });
+        }
+
+        $testSeries = $query->get();
+
+        $fileName = 'test-series-' . now()->format('Y-m-d-His') . '.csv';
+
+        return response()->streamDownload(function () use ($testSeries) {
+
+            $handle = fopen('php://output', 'w');
+
+            fputcsv($handle, [
+                'Created At',
+                'Title',
+                'Language',
+                'Commission',
+                'Category',
+                'Sub Category',
+                'Fee Type',
+                'MRP',
+                'Discount',
+                'Price',
+                'Validity (Days)',
+                'Total Papers',
+                'Generated By',
+                'Logo URL',
+                'Short Description',
+                'Overview',
+                'Key Features',
+                'No. Of Tests',
+                'Added By',
+            ]);
+
+            foreach ($testSeries as $res) {
+
+                $keyFeatures = '';
+
+                if (!empty($res->key_features) && is_array($res->key_features)) {
+                    $keyFeatures = implode(' | ', $res->key_features);
+                }
+
+                fputcsv($handle, [
+
+                    optional($res->created_at)->format('d-m-Y H:i'),
+
+                    $res->title,
+
+                    $res->language == '1' ? 'Hindi' : 'English',
+
+                    $res->commission->name ?? '',
+
+                    $res->category->name ?? '',
+
+                    $res->subcategory->name ?? '',
+
+                    ucfirst($res->fee_type),
+
+                    $res->mrp,
+
+                    $res->discount,
+
+                    $res->price,
+
+                    $res->validity,
+
+                    $res->total_paper,
+
+                    ucfirst($res->test_generated_by ?? ''),
+
+                    $res->logo
+                    ? asset('storage/' . $res->logo)
+                    : '',
+
+                    strip_tags($res->short_description ?? ''),
+
+                    strip_tags($res->overview ?? ''),
+
+                    $keyFeatures,
+
+                    $res->tests->count(),
+
+                    $res->creator->name ?? 'Super Admin',
+                ]);
+            }
+
+            fclose($handle);
+
+        }, $fileName, [
+            'Content-Type' => 'text/csv',
+        ]);
     }
 
     public function testSeriesQuestion()
@@ -4881,17 +5382,17 @@ class ContentManagementController extends Controller
                             }
 
                             // Answer (mandatory) - ROW 6
-                            $tr6 = $tables[$i]->find('tr', 6);
-                            $td6 = $tr6 ? $tr6->find('td', 1) : null;
-                            $p6 = $td6 ? $td6->find('p') : null;
-                            $span = $p6 ? $p6->find('span') : null;
-                            $answer = $span ? trim(strip_tags($span->innerHtml)) : null;
+                            $rawAnswer = $this->getCellHtml($tables[$i], 6);
+                            $answer = $this->isEmptyCell($rawAnswer)
+                                ? null
+                                : trim(strip_tags(html_entity_decode($rawAnswer, ENT_QUOTES | ENT_HTML5, 'UTF-8')));
 
                             if ($answer === null || $answer === '' || $answer === '&nbsp;') {
                                 $rejectQuestion = true;
                                 $rejectNote = 'Answer missing or unreadable (Row 6)';
                                 $answer = $answer ?: '';
                             }
+
 
                             // Instruction (optional) - ROW 7
                             $rawInstr = $this->getCellHtml($tables[$i], 7);
@@ -5010,10 +5511,15 @@ class ContentManagementController extends Controller
                             // Image (optional) - ROW 1
                             $tr1 = $tables[$i]->find('tr', 1);
                             $td1 = $tr1 ? $tr1->find('td', 1) : null;
-                            $p1 = $td1 ? $td1->find('p') : null;
-                            $imageElement = $p1 ? $p1->find('img') : null;
+                            $imageElement = null;
+                            if ($td1) {
+                                $imgs = $td1->find('img');
+                                if ($imgs && count($imgs) > 0) {
+                                    $imageElement = $imgs[0];
+                                }
+                            }
 
-                            if ($imageElement && count($imageElement) > 0) {
+                            if ($imageElement) {
                                 $image_64 = $imageElement->src;
                                 $extension = explode('/', explode(':', substr($image_64, 0, strpos($image_64, ';')))[1])[1];
                                 $image = 'question/' . Str::random(40) . '.' . $extension;
@@ -5135,10 +5641,15 @@ class ContentManagementController extends Controller
                     // Image (optional) - ROW 1
                     $tr1 = $tables[1]->find('tr', 1);
                     $td1 = $tr1 ? $tr1->find('td', 1) : null;
-                    $p1 = $td1 ? $td1->find('p') : null;
-                    $imageElement = $p1 ? $p1->find('img') : null;
+                    $imageElement = null;
+                    if ($td1) {
+                        $imgs = $td1->find('img');
+                        if ($imgs && count($imgs) > 0) {
+                            $imageElement = $imgs[0];
+                        }
+                    }
 
-                    if ($imageElement && count($imageElement) > 0) {
+                    if ($imageElement) {
                         $image_64 = $imageElement->src;
                         $extension = explode('/', explode(':', substr($image_64, 0, strpos($image_64, ';')))[1])[1];
                         $image = 'question/' . Str::random(40) . '.' . $extension;

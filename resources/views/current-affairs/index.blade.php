@@ -18,20 +18,35 @@
                 <div class="container mt-4">
 
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <!-- Search Box -->
-                        <form method="GET" action="{{ route('current.affairs.index') }}" class="d-flex">
-                            <input type="text" name="search" class="form-control me-2" placeholder="Search"
-                                value="{{ request('search') }}">
-                            <button type="submit" class="btn btn-success">Search</button>
-                        </form>
 
-                        @if(\App\Helpers\Helper::canAccess('manage_ca_add'))
-                            <a href="{{ route('current.affairs.create') }}" class="btn btn-primary">
-                                Add New
-                            </a>
-                        @endif
+    <form method="GET" action="{{ route('current.affairs.index') }}" class="d-flex">
+        <input type="text"
+               name="search"
+               class="form-control me-2"
+               placeholder="Search"
+               value="{{ request('search') }}">
+        <button type="submit" class="btn btn-success">
+            Search
+        </button>
+    </form>
 
-                    </div>
+    <div class="d-flex gap-2">
+
+        <a href="{{ route('current.affairs.export', ['search' => request('search')]) }}"
+           class="btn btn-outline-dark">
+            <i class="fa fa-download"></i> Export CSV
+        </a>
+
+        @if(\App\Helpers\Helper::canAccess('manage_ca_add'))
+            <a href="{{ route('current.affairs.create') }}"
+               class="btn btn-primary">
+                Add New
+            </a>
+        @endif
+
+    </div>
+
+</div>
 
                     <table class="table table-striped mt-5">
                         <thead>

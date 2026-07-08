@@ -682,30 +682,35 @@
 
             const clone = last.cloneNode(true);
 
-            // ✅ Clear values
+            // Clear values
             clone.querySelectorAll('textarea').forEach(el => el.value = '');
             clone.querySelectorAll('select').forEach(el => el.selectedIndex = 0);
 
-            // ✅ Reset hidden id
+            // FIX: dropdown ko humne abhi "mcq" (selectedIndex 0) pe reset kiya hai,
+            // isliye mcq-fields/reasoning-fields ki visibility bhi usi ke hisaab se sync karo
+            const mcqFields = clone.querySelector('.mcq-fields');
+            const reasoningFields = clone.querySelector('.reasoning-fields');
+            if (mcqFields) mcqFields.style.display = 'block';
+            if (reasoningFields) reasoningFields.style.display = 'none';
+
+            // Reset hidden id
             const idInput = clone.querySelector('input[name="sub_question_id[]"]');
             if (idInput) idInput.value = '';
 
-            // ✅ IMPORTANT: Remove CKEditor UI wrappers from clone
+            // Remove CKEditor UI wrappers from clone
             clone.querySelectorAll('.cke').forEach(el => el.remove());
 
-            // ✅ Remove old IDs from clone ONLY
+            // Remove old IDs from clone ONLY
             clone.querySelectorAll('textarea.editor').forEach(el => {
                 el.removeAttribute('id');
             });
 
             container.appendChild(clone);
 
-            // ✅ Initialize editor ONLY for clone
             setTimeout(() => {
                 clone.querySelectorAll('textarea.editor').forEach(initEditor);
             }, 50);
         });
-
         /* =====================================================
            REMOVE SUB QUESTION
         ===================================================== */

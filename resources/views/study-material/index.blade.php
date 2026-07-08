@@ -9,21 +9,25 @@
         <div class="card">
             <div class="card-body">
 
-                <div class="d-flex mb-3">
-                    <div class="col">
+                <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
+                    <div>
                         <h5 class="card-title">Study Material</h5>
                         <h6 class="card-subtitle mb-2 text-muted">
                             Manage your Study Material section here.
                         </h6>
                     </div>
 
-                    @if(\App\Helpers\Helper::canAccess('manage_study_material_add'))
-                        <div class="justify-content-end">
+                    <div class="d-flex gap-2">
+                        <a href="#" id="exportCoursesBtn" class="btn btn-outline-dark">
+                            <i class="fa fa-download"></i> Export CSV
+                        </a>
+
+                        @if(\App\Helpers\Helper::canAccess('manage_study_material_add'))
                             <a href="{{ route('study.material.create') }}" class="btn btn-primary">
                                 + Add
                             </a>
-                        </div>
-                    @endif
+                        @endif
+                    </div>
                 </div>
 
                 @include('layouts.includes.messages')

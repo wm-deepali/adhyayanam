@@ -4,7 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <title>{{ ucwords($paper->name ?? '') }}</title>
-
+    <link rel="icon" href="https://www.adhyayanam.co.in/public/images/fav.ico" sizes="any">
+    <link rel="shortcut icon" href="https://www.adhyayanam.co.in/public/images/fav.ico">
     <style>
         body {
             font-family: 'notodevanagari', sans-serif;
@@ -420,18 +421,17 @@
                         'question' => $subQuestion,
                         'marks' => $marks,
                         'index' => $key
-                    ])
-                @elseif(isset($testDetail->question))
-                    @php
-                        $question = $testDetail->question;
-                        $marks = $testDetail->positive_mark ?? $paper->positive_marks_per_question;
-                    @endphp
-                    @include('test-series.questions', [
-                        'question' => $question,
-                        'marks' => $marks,
-                        'index' => $key
-                    ])
-                @endif
+                ])      @elseif(isset($testDetail->question))
+                          @php
+                            $question = $testDetail->question;
+                            $marks = $testDetail->positive_mark ?? $paper->positive_marks_per_question;
+                        @endphp
+                                                    @include('test-series.questions', [
+                                                        'question' => $question,
+                                                        'marks' => $marks,
+                                                        'index' => $key
+                                                    ])
+                    @endif
             @endforeach
         @else
             <p class="text-center">No questions found for this test paper.</p>

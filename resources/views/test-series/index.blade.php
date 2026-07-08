@@ -90,6 +90,9 @@
                             <div class="form-group">
                                 <button type="button" class="btn btn-primary filterbtn">Filter Now</button>
                                 <button type="button" class="btn btn-danger resetbtn">Reset</button>
+                                <a href="{{ route('test.series.export') }}" id="exportBtn" class="btn btn-outline-dark">
+                                    <i class="fa fa-download"></i> Export CSV
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -128,6 +131,24 @@
 
     <script>
         $(document).ready(function () {
+
+            // Keep the Export button's link in sync with whatever filters are currently applied
+            function updateExportLink() {
+                let params = {
+                    commission_id: $('#exam_com_id').val(),
+                    category_id: $('#category_id').val(),
+                    sub_category_id: $('#sub_category_id').val(),
+                    search: $('#search').val(),
+                };
+
+                let baseUrl = "{{ route('test.series.export') }}";
+                let query = $.param(params);
+                $('#exportBtn').attr('href', baseUrl + (query ? '?' + query : ''));
+            }
+
+            $(document).on('change', '#exam_com_id, #category_id, #sub_category_id', updateExportLink);
+            $(document).on('input', '#search', updateExportLink);
+
             $(document).on('change', '#exam_com_id', function (event) {
                 $('#category_id').html("");
                 $('#subject_id').html("");
@@ -240,6 +261,7 @@
                 $('#search').val('');
                 $('.sub-cat').addClass('hidecls');
                 $('.filterbtn').click(); // reload default listing
+                updateExportLink();
             });
 
         });

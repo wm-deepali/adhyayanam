@@ -20,16 +20,24 @@
 
         <div class="card">
             <div class="card-body">
-                <div class="d-flex">
-                    <div class="col">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
                         <h5 class="card-title">Test Paper</h5>
-                        <!--<h6 class="card-subtitle mb-2 text-muted"> Manage your Question Bank section here.</h6>-->
                     </div>
-                    @if(\App\Helpers\Helper::canAccess('manage_test_bank_add'))
-                        <div class="justify-content-end">
-                            <a href='{{route('test.paper.create')}}' class="btn btn-primary">&#43; Create New Paper</a>
-                        </div>
-                    @endif
+
+                    <div class="d-flex gap-2">
+
+                        <a href="#" id="exportTestBtn" class="btn btn-outline-dark">
+                            <i class="fa fa-download"></i> Export CSV
+                        </a>
+
+                        @if(\App\Helpers\Helper::canAccess('manage_test_bank_add'))
+                            <a href="{{ route('test.paper.create') }}" class="btn btn-primary">
+                                &#43; Create New Paper
+                            </a>
+                        @endif
+
+                    </div>
                 </div>
                 <div class="mt-2">
                     @include('layouts.includes.messages')
@@ -264,6 +272,24 @@
                 fetchData($(this).attr('href'));
             });
 
+        });
+
+        $('#exportTestBtn').click(function (e) {
+
+            e.preventDefault();
+
+            let params = $.param({
+                commission_id: $('#exam_com_id').val(),
+                category_id: $('#category_id').val(),
+                sub_category_id: $('#sub_category_id').val(),
+                test_type: $('#test_type').val(),
+                test_type_filter: $('#test_type_filter').val(),
+                paper_category: $('#paper_category').val(),
+                search: $('#search').val()
+            });
+
+            window.location.href =
+                "{{ route('test.paper.export') }}" + '?' + params;
         });
     </script>
 

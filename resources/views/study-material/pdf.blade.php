@@ -1,8 +1,11 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="utf-8">
     <title>Study Material PDF</title>
+    <link rel="shortcut icon" href="https://www.adhyayanam.co.in/public/images/fav.ico" type="image/x-icon">
+    <link rel="icon" href="https://www.adhyayanam.co.in/public/images/fav.ico" type="image/x-icon">
     <style>
         body {
             font-family: 'notodevanagari', sans-serif;
@@ -18,7 +21,12 @@
             border-bottom: 2px solid #1e3a5f;
             margin-bottom: 10px;
         }
-        .brand-header img { height: 55px; margin-bottom: 4px; }
+
+        .brand-header img {
+            height: 55px;
+            margin-bottom: 4px;
+        }
+
         .brand-header .tagline {
             font-size: 11px;
             letter-spacing: 2px;
@@ -32,8 +40,14 @@
             margin-bottom: 12px;
             overflow: hidden;
         }
-        .ref-row .ref { float: left; }
-        .ref-row .date { float: right; }
+
+        .ref-row .ref {
+            float: left;
+        }
+
+        .ref-row .date {
+            float: right;
+        }
 
         .doc-title {
             text-align: center;
@@ -41,6 +55,7 @@
             font-weight: bold;
             margin-bottom: 4px;
         }
+
         .doc-title-rule {
             border-bottom: 1px solid #ccc;
             margin-bottom: 14px;
@@ -52,12 +67,17 @@
             border-collapse: collapse;
             margin-bottom: 20px;
         }
+
         table.details-table td {
             padding: 6px 8px;
             border-bottom: 1px solid #e0e0e0;
             vertical-align: top;
         }
-        table.details-table tr:nth-child(even) { background-color: #f4f7fa; }
+
+        table.details-table tr:nth-child(even) {
+            background-color: #f4f7fa;
+        }
+
         table.details-table td.label {
             font-weight: bold;
             width: 150px;
@@ -91,12 +111,16 @@
             padding: 12px;
             margin-top: 10px;
         }
+
         .section-box h4 {
             margin: 0 0 8px 0;
             font-size: 13px;
             color: #1e3a5f;
         }
-        .section-box img { max-width: 200px; }
+
+        .section-box img {
+            max-width: 200px;
+        }
 
         /* ---- Footer ---- */
         .pdf-footer {
@@ -110,10 +134,17 @@
             padding-top: 4px;
             overflow: hidden;
         }
-        .pdf-footer .left { float: left; }
-        .pdf-footer .right { float: right; }
+
+        .pdf-footer .left {
+            float: left;
+        }
+
+        .pdf-footer .right {
+            float: right;
+        }
     </style>
 </head>
+
 <body>
 
     {{-- BRAND HEADER --}}
@@ -126,7 +157,8 @@
 
     {{-- REF / DATE --}}
     <div class="ref-row">
-        <span class="ref"><strong>Ref:</strong> {{ $material->based_on ?? ucwords(str_replace('_', ' ', $material->material_type)) }}</span>
+        <span class="ref"><strong>Ref:</strong>
+            {{ $material->based_on ?? ucwords(str_replace('_', ' ', $material->material_type)) }}</span>
         <span class="date"><strong>Date:</strong> {{ now()->format('d-M-Y') }}</span>
     </div>
 
@@ -148,22 +180,22 @@
             <td>{{ $material->subcategory->name ?? 'N/A' }}</td>
         </tr>
         @if($material->subjects->count())
-        <tr>
-            <td class="label">Subject:</td>
-            <td>{{ $material->subjects->pluck('name')->implode(', ') }}</td>
-        </tr>
+            <tr>
+                <td class="label">Subject:</td>
+                <td>{{ $material->subjects->pluck('name')->implode(', ') }}</td>
+            </tr>
         @endif
         @if($material->chapters->count())
-        <tr>
-            <td class="label">Chapter:</td>
-            <td>{{ $material->chapters->pluck('name')->implode(', ') }}</td>
-        </tr>
+            <tr>
+                <td class="label">Chapter:</td>
+                <td>{{ $material->chapters->pluck('name')->implode(', ') }}</td>
+            </tr>
         @endif
         @if($material->topics->count())
-        <tr>
-            <td class="label">Topic:</td>
-            <td>{{ $material->topics->pluck('name')->implode(', ') }}</td>
-        </tr>
+            <tr>
+                <td class="label">Topic:</td>
+                <td>{{ $material->topics->pluck('name')->implode(', ') }}</td>
+            </tr>
         @endif
         <tr>
             <td class="label">Material Type:</td>
@@ -186,18 +218,18 @@
             <td>{{ $material->IsPaid ? 'Yes' : 'No' }}</td>
         </tr>
         @if($material->IsPaid)
-        <tr>
-            <td class="label">MRP:</td>
-            <td>₹ {{ $material->mrp }}</td>
-        </tr>
-        <tr>
-            <td class="label">Discount:</td>
-            <td>{{ $material->discount }}%</td>
-        </tr>
-        <tr>
-            <td class="label">Offered Price:</td>
-            <td>₹ {{ $material->price }}</td>
-        </tr>
+            <tr>
+                <td class="label">MRP:</td>
+                <td>₹ {{ $material->mrp }}</td>
+            </tr>
+            <tr>
+                <td class="label">Discount:</td>
+                <td>{{ $material->discount }}%</td>
+            </tr>
+            <tr>
+                <td class="label">Offered Price:</td>
+                <td>₹ {{ $material->price }}</td>
+            </tr>
         @endif
         <tr>
             <td class="label">Status:</td>
@@ -238,4 +270,5 @@
     </div>
 
 </body>
+
 </html>

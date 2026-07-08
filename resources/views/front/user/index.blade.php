@@ -377,19 +377,20 @@
 	}
 
 
-.main-slider-carousel .slide {
-    min-height: 390px;
-    height: 390px;
-    max-height: 390px;
-}
+	.main-slider-carousel .slide {
+		min-height: 390px;
+		height: 390px;
+		max-height: 390px;
+	}
 
-.main-slider-carousel .owl-dots {
-    margin-top: 10px;
-}
+	.main-slider-carousel .owl-dots {
+		margin-top: 10px;
+	}
 
-.main-slider-carousel .owl-nav {
-    display: none;
-}
+	.main-slider-carousel .owl-nav {
+		display: none;
+	}
+
 	.notice-box {
 		border-radius: 10px !important;
 		overflow: hidden;
@@ -515,12 +516,12 @@
 		border-radius: 14px;
 		box-shadow: 0 6px 20px rgba(0, 0, 0, 0.07);
 	}
-	
+
 	.intro-left-card img {
-   width: 100%;
-    height: 100%;
-    object-fit: fill;
-}
+		width: 100%;
+		height: 100%;
+		object-fit: fill;
+	}
 
 	/* RIGHT CARD (COL-8) */
 	.intro-right-card {
@@ -533,7 +534,7 @@
 		justify-content: space-between;
 		gap: 30px;
 	}
-	
+
 
 
 	/* INNER LEFT IN COL-8 */
@@ -1745,7 +1746,7 @@
 		width: 100%;
 		height: 280px !important;
 		border-radius: 8px;
-		    object-fit: fill;
+		object-fit: fill;
 	}
 
 	.faq-section {
@@ -2067,14 +2068,14 @@
 		font-weight: 600;
 		margin-bottom: 18px;
 	}
-	
 
 
 
-	
-/*	.card.notice-box.shadow.rounded-card {*/
-/*    height: 100%;*/
-/*}*/
+
+
+	/*	.card.notice-box.shadow.rounded-card {*/
+	/*    height: 100%;*/
+	/*}*/
 
 	/* Responsive */
 	@media(max-width:768px) {
@@ -2391,7 +2392,7 @@
 									</div>
 									@foreach($courses as $course)
 										<div class="edu-course-card col-xl-4 col-lg-6 col-md-6 col-sm-12"
-											data-commission="{{ strtolower($course->examinationCommission->slug ?? $course->examinationCommission->id) }}"
+											data-commission="{{ $course->examinationCommission->id }}"
 											data-category="{{ $course->category_id ?? 'all' }}"
 											data-category-name="{{ addslashes($course->category->name ?? 'Unknown') }}">
 											<div class="edu-card">
@@ -2553,77 +2554,82 @@
 							<!-- Card List -->
 							<!-- Card List -->
 							<div class="p-3 d-flex flex-column gap-3">
-							@foreach($upcomingExams as $data)
-    <div class="upcoming-card position-relative bg-light-subtle rounded-3 p-3 hover-lift border-start border-4 border-primary">
+								@foreach($upcomingExams as $data)
+										<div
+											class="upcoming-card position-relative bg-light-subtle rounded-3 p-3 hover-lift border-start border-4 border-primary">
 
-        @if(!empty($data->pdf))
-            <a href="{{ asset('storage/' . $data->pdf) }}" target="_blank"
-                class="stretched-link text-decoration-none d-block h-100">
-        @else
-            <div class="d-block h-100">
-        @endif
+											@if(!empty($data->pdf))
+												<a href="{{ asset('storage/' . $data->pdf) }}" target="_blank"
+													class="stretched-link text-decoration-none d-block h-100">
+											@else
+													<div class="d-block h-100">
+												@endif
 
-                <h5 class="fw-bold mb-2 text-dark lh-base"
-                    style="line-height: 1.3; max-height: 3em; overflow: hidden;">
-                    {{ Str::limit($data->examination_name, 60, '...') }}
-                </h5>
+													<h5 class="fw-bold mb-2 text-dark lh-base"
+														style="line-height: 1.3; max-height: 3em; overflow: hidden;">
+														{{ Str::limit($data->examination_name, 60, '...') }}
+													</h5>
 
-                <p class="mb-3 small text-muted lh-sm" style="max-height: 3em; overflow: hidden;">
-                    {{ Str::limit($data->description ?? 'Important government exam notification with complete details.', 100, '...') }}
-                </p>
+													<p class="mb-3 small text-muted lh-sm"
+														style="max-height: 3em; overflow: hidden;">
+														{{ Str::limit($data->description ?? 'Important government exam notification with complete details.', 100, '...') }}
+													</p>
 
-                <div class="upcoming-dates small text-muted mb-3">
-                    <div class="d-flex justify-content-between py-1 border-bottom border-1 border-light">
-                        <span class="fw-medium">Advertisement Date:</span>
-                        <span>{{ $data->advertisement_date ?? 'N/A' }}</span>
-                    </div>
+													<div class="upcoming-dates small text-muted mb-3">
+														<div
+															class="d-flex justify-content-between py-1 border-bottom border-1 border-light">
+															<span class="fw-medium">Advertisement Date:</span>
+															<span>{{ $data->advertisement_date ?? 'N/A' }}</span>
+														</div>
 
-                    <div class="d-flex justify-content-between py-1 border-bottom border-1 border-light">
-                        <span class="fw-medium">Exam Date:</span>
-                        <span>{{ $data->examination_date ?? 'TBA' }}</span>
-                    </div>
+														<div
+															class="d-flex justify-content-between py-1 border-bottom border-1 border-light">
+															<span class="fw-medium">Exam Date:</span>
+															<span>{{ $data->examination_date ?? 'TBA' }}</span>
+														</div>
 
-                    <div class="d-flex justify-content-between py-1 border-bottom border-1 border-light">
-                        <span class="fw-medium">Last Date to Apply:</span>
-                        <span class="text-danger fw-semibold">
-                            {{ $data->submission_last_date ?? 'N/A' }}
-                        </span>
-                    </div>
+														<div
+															class="d-flex justify-content-between py-1 border-bottom border-1 border-light">
+															<span class="fw-medium">Last Date to Apply:</span>
+															<span class="text-danger fw-semibold">
+																{{ $data->submission_last_date ?? 'N/A' }}
+															</span>
+														</div>
 
-                    @if($data->form_distribution_date)
-                        <div class="d-flex justify-content-between py-1">
-                            <span class="fw-medium">Form Available From:</span>
-                            <span>{{ $data->form_distribution_date }}</span>
-                        </div>
-                    @endif
-                </div>
+														@if($data->form_distribution_date)
+															<div class="d-flex justify-content-between py-1">
+																<span class="fw-medium">Form Available From:</span>
+																<span>{{ $data->form_distribution_date }}</span>
+															</div>
+														@endif
+													</div>
 
-        @if(!empty($data->pdf))
-            </a>
-        @else
-            </div>
-        @endif
+													@if(!empty($data->pdf))
+														</a>
+													@else
+												</div>
+											@endif
 
-    </div>
-@endforeach
-							</div>
-
-							<!-- Footer hint (optional) -->
-							<div class="text-center py-3 border-top small text-muted">
-								More upcoming exams & notifications added regularly...
-							</div>
-
-
+									</div>
+								@endforeach
 						</div>
-					</div>
-					<!--</div>-->
-					<div class="col-12">
-						<div class="button-box">
-							<a href="{{route('current.index')}}" class="theme-btn btn-style-three"><span class="txt">View
-									All</span></a>
+
+						<!-- Footer hint (optional) -->
+						<div class="text-center py-3 border-top small text-muted">
+							More upcoming exams & notifications added regularly...
 						</div>
+
+
 					</div>
 				</div>
+				<!--</div>-->
+				<div class="col-12">
+					<div class="button-box">
+						<a href="{{route('current.index')}}" class="theme-btn btn-style-three"><span class="txt">View
+								All</span></a>
+					</div>
+				</div>
+			</div>
 			</div>
 		</section>
 		<!-- End Current Affairs Section  -->
@@ -2714,7 +2720,7 @@
 																class="newtestseries-feature-row d-flex justify-content-between py-2">
 																<span class="newtestseries-label">Subject Test</span>
 																<span class="newtestseries-value fw-medium">
-																	 {{ $data->testseries->where('type_name', 'Subject Wise')->count() }}
+																	{{ $data->testseries->where('type_name', 'Subject Wise')->count() }}
 																</span>
 															</div>
 														</div>
@@ -2774,7 +2780,7 @@
 
 									@foreach($testSeries as $data)
 										<div class="col-xl-4 col-lg-6 col-md-6 col-sm-12 testseries-card"
-											data-commission="{{ strtolower($data->commission->slug ?? $data->commission->id) }}"
+											data-commission="{{  $data->commission->id }}"
 											data-category="{{ $data->category_id ?? 'all' }}">
 											<div class="newtestseries-card rounded-4 shadow-sm h-100 overflow-hidden position-relative"
 												style="background: linear-gradient(135deg, {{ $loop->index % 3 == 0 ? '#e6f0ff' : ($loop->index % 3 == 1 ? '#eaffea' : '#f3e6ff') }}, #ffffff); border: 1px solid #e0e0e0;">
@@ -3010,7 +3016,7 @@
 
 																				<div class="edu-price">
 																					{{ $material->IsPaid ? '₹' . $material->price : 'Free'
-																																																																																																																																				}}
+																																																																																																																																												}}
 																				</div>
 																			</div>
 																			<p class="commission-name">
@@ -3382,7 +3388,7 @@
 													style="background: {{ $bgColors[$index % count($bgColors)] }};">
 
 													<div class="newprog-number-circle {{ $circleColors[$index % count($circleColors)] }} text-white
-																																																																																																																																																																																																											rounded-circle d-flex align-items-center justify-content-center"
+																																																																																																																																																																																																															rounded-circle d-flex align-items-center justify-content-center"
 														style="width:40px;height:40px;font-size:1.2rem;font-weight:bold;">
 														{{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}
 													</div>
@@ -3909,13 +3915,13 @@
 			// Yeh object sab commissions ke categories ka name rakhega
 			window.commissionCategories = {
 				@foreach($commissions as $commission)
-																																																			  "{{ $commission->id }}": {
+																																																				  "{{ $commission->id }}": {
 					@foreach($commission->categories as $cat)
 						  "{{ $cat->id }}": "{{ addslashes($cat->name) }}",
 					@endforeach
-																																																			  },
+																																																				  },
 				@endforeach
-																																															  };
+																																																  };
 
 			// test series script
 			document.addEventListener('DOMContentLoaded', function () {
@@ -3933,10 +3939,10 @@
 						const allTabLi = document.createElement('li');
 						allTabLi.className = 'nav-item';
 						allTabLi.innerHTML = `
-																																																	<button class="btn btn-outline-secondary btn-sm11 active" data-category="all">
-																																																	  All
-																																																	</button>
-																																																  `;
+																																																		<button class="btn btn-outline-secondary btn-sm11 active" data-category="all">
+																																																		  All
+																																																		</button>
+																																																	  `;
 						subCategoryTabsContainer.appendChild(allTabLi);
 
 						// Categories collect karo (unique)
@@ -3956,10 +3962,10 @@
 							const li = document.createElement('li');
 							li.className = 'nav-item';
 							li.innerHTML = `
-																																																<button class="btn btn-outline-secondary btn-sm11" data-category="${catId}">
-																																																  ${categoryName}
-																																																</button>
-																																															  `;
+																																																	<button class="btn btn-outline-secondary btn-sm11" data-category="${catId}">
+																																																	  ${categoryName}
+																																																	</button>
+																																																  `;
 							subCategoryTabsContainer.appendChild(li);
 						});
 
@@ -4100,10 +4106,10 @@
 						const allTabLi = document.createElement('li');
 						allTabLi.className = 'nav-item';
 						allTabLi.innerHTML = `
-																																																	<button class="btn btn-outline-secondary btn-sm11 active" data-category="all">
-																																																	  All Courses
-																																																	</button>
-																																																  `;
+																																																		<button class="btn btn-outline-secondary btn-sm11 active" data-category="all">
+																																																		  All Courses
+																																																		</button>
+																																																	  `;
 						subCategoryTabsContainer.appendChild(allTabLi);
 
 						// Categories collect with names from data-attribute
@@ -4123,10 +4129,10 @@
 							const li = document.createElement('li');
 							li.className = 'nav-item';
 							li.innerHTML = `
-																																																	  <button class="btn btn-outline-secondary btn-sm11" data-category="${catId}">
-																																																		${catName}
-																																																	  </button>
-																																																	`;
+																																																		  <button class="btn btn-outline-secondary btn-sm11" data-category="${catId}">
+																																																			${catName}
+																																																		  </button>
+																																																		`;
 							subCategoryTabsContainer.appendChild(li);
 						});
 
@@ -4264,10 +4270,10 @@
 						const allTabLi = document.createElement('li');
 						allTabLi.className = 'nav-item';
 						allTabLi.innerHTML = `
-																																																	<button class="btn btn-outline-secondary btn-sm11 active" data-category="all">
-																																																	  All Study Material
-																																																	</button>
-																																																  `;
+																																																		<button class="btn btn-outline-secondary btn-sm11 active" data-category="all">
+																																																		  All Study Material
+																																																		</button>
+																																																	  `;
 						subCategoryTabsContainer.appendChild(allTabLi);
 
 						// Categories collect with names from data-attribute
@@ -4287,10 +4293,10 @@
 							const li = document.createElement('li');
 							li.className = 'nav-item';
 							li.innerHTML = `
-																																																	  <button class="btn btn-outline-secondary btn-sm11" data-category="${catId}">
-																																																		${catName}
-																																																	  </button>
-																																																	`;
+																																																		  <button class="btn btn-outline-secondary btn-sm11" data-category="${catId}">
+																																																			${catName}
+																																																		  </button>
+																																																		`;
 							subCategoryTabsContainer.appendChild(li);
 						});
 

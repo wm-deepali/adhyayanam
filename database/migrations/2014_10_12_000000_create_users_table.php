@@ -25,7 +25,7 @@ return new class extends Migration
             $table->date('date_of_birth')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password')->nullable();
-            $table->string('avatar')->nullable()->default('img/default-avatar.jpg');
+            $table->string('avatar')->nullable();
             $table->tinyInteger('status')->default(1)->unsigned();
             $table->rememberToken();
             $table->timestamps();

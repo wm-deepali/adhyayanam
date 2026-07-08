@@ -155,6 +155,117 @@ class StudentController extends Controller
         return view('students.registered-student-list', compact('students'));
     }
 
+    public function exportStudents(Request $request)
+    {
+        $query = User::where('type', 'student')
+            ->with([
+                'roleGroup',
+                'creator'
+            ])
+            ->withSum('transactions', 'paid_amount')
+            ->withCount([
+                'orders',
+                'courseOrder',
+                'testSeriesOrder',
+                'studyMaterialOrder'
+            ]);
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+                $q->where('first_name', 'like', "%{$search}%")
+                    ->orWhere('last_name', 'like', "%{$search}%")
+                    ->orWhere('name', 'like', "%{$search}%")
+                    ->orWhere('username', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('mobile', 'like', "%{$search}%");
+            });
+        }
+
+        $students = $query->orderBy('created_at', 'DESC')->get();
+
+        $fileName = 'students-' . now()->format('Y-m-d-His') . '.csv';
+
+        return response()->streamDownload(function () use ($students) {
+
+            $handle = fopen('php://output', 'w');
+
+            fputcsv($handle, [
+                'Date & Time',
+                'Last Order ID',
+                'First Name',
+                'Last Name',
+                'Full Name',
+                'Username',
+                'Mobile',
+                'Email',
+                'Email Verified',
+                'Gender',
+                'Date Of Birth',
+                'Role Group',
+                'Total Orders',
+                'Course Orders',
+                'Test Series Orders',
+                'Study Material Orders',
+                'Total Paid Amount',
+                'Created By',
+                'Status',
+            ]);
+
+            foreach ($students as $res) {
+
+                fputcsv($handle, [
+
+                    optional($res->created_at)->format('d-m-Y H:i'),
+
+                    Helper::getStudentlastOrderID($res->id),
+
+                    $res->first_name,
+
+                    $res->last_name,
+
+                    $res->full_name,
+
+                    $res->username,
+
+                    $res->mobile,
+
+                    $res->email,
+
+                    $res->email_verified_at ? 'Yes' : 'No',
+
+                    $res->gender,
+
+                    $res->date_of_birth
+                    ? \Carbon\Carbon::parse($res->date_of_birth)->format('d-m-Y')
+                    : '',
+
+                    $res->roleGroup->name ?? '',
+
+                    $res->orders_count,
+
+                    $res->course_order_count,
+
+                    $res->test_series_order_count,
+
+                    $res->study_material_order_count,
+
+                    $res->transactions_sum_paid_amount ?? 0,
+
+                    $res->creator->name ?? 'Super Admin',
+
+                    ucfirst($res->status ?? 'active'),
+                ]);
+            }
+
+            fclose($handle);
+
+        }, $fileName, [
+            'Content-Type' => 'text/csv',
+        ]);
+    }
+
     public function changeStatus(Request $request)
     {
         $user = User::find($request->user_id);

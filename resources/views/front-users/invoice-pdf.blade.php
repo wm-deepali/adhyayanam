@@ -3,8 +3,14 @@
 <title>Order Invoice</title>
 
 <head>
-    <link rel="shortcut icon" href="https://www.adhyayanam.co.in/public/images/fav.ico" type="image/x-icon">
-    <link rel="icon" href="https://www.adhyayanam.co.in/public/images/fav.ico" type="image/x-icon">
+
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url('favicon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url('favicon-16x16.png') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url('apple-touch-icon.png') }}">
+    <link rel="icon" type="image/png" sizes="192x192" href="{{ url('android-chrome-192x192.png') }}">
+    <link rel="icon" type="image/png" sizes="512x512" href="{{ url('android-chrome-512x512.png') }}">
+    <link rel="shortcut icon" href="{{ url('favicon.ico') }}">
+    <link rel="manifest" href="{{ url('site.webmanifest') }}">
 
     <style>
         @page {
@@ -70,6 +76,11 @@
 
         .bg-sky {
             background-color: #E8F3FD;
+        }
+
+        .bg-wallet {
+            background-color: #FFF7ED;
+            color: #9a3412;
         }
 
         #clockwise {
@@ -242,6 +253,11 @@
             </center>
         </caption>
 
+        @php
+            $walletUsed = (float) ($order->wallet_used ?? 0);
+            $gatewayPaid = ($order->total ?? 0) - $walletUsed;
+        @endphp
+
         <table autosize="1" style="overflow: wrap" id='mytable' align="center" width="100%" height='100%'
             cellpadding="0" cellspacing="0">
 
@@ -343,6 +359,14 @@
                                             </tr>
                                             <tr>
                                                 <td colspan="8">
+                                                    Payment Mode :
+                                                    <span style="font-size: 10px;">
+                                                        <b>{{$order->payment_mode ?? '-'}}</b>
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="8">
                                                     Transaction Id :
                                                     <span style="font-size: 10px;">
                                                         <b>{{$order->transaction_id ?? ''}}</b>
@@ -421,7 +445,7 @@
 
                     </td>
                     <td colspan='3' class='text-center'>{{$order->quantity ?? 0}}</td>
-                    <td colspan='3' class='text-center'>&#8377;{{$order->billed_amount ?? 0}}</td>
+                    <td colspan='3' class='text-center'>&#8377;{{ number_format($order->billed_amount ?? 0, 2) }}</td>
                 </tr>
 
                 </td>
@@ -437,19 +461,32 @@
 
                 <tr class="bg-sky">
                     <td colspan="12" class='text-right text-bold'>Sub Total: </td>
-                    <td colspan="4" class='text-right text-bold'>&#8377;{{$order->billed_amount ?? 0}}</td>
+                    <td colspan="4" class='text-right text-bold'>&#8377;{{ number_format($order->billed_amount ?? 0, 2) }}</td>
                 </tr>
                 <tr class="bg-sky">
                     <td colspan="12" class='text-bold text-right'>Discount({{$order->discount ?? 0}}%): </td>
-                    <td colspan="4" class='text-bold text-right'>&#8377;{{$order->discount_amount ?? 0}}</td>
+                    <td colspan="4" class='text-bold text-right'>&#8377;{{ number_format($order->discount_amount ?? 0, 2) }}</td>
                 </tr>
                 <tr class="bg-sky">
                     <td colspan="12" class='text-bold text-right'>Taxes({{$order->tax ?? 0}}%): </td>
-                    <td colspan="4" class='text-bold text-right'>&#8377;{{$order->tax ?? 0}}</td>
+                    <td colspan="4" class='text-bold text-right'>&#8377;{{ number_format($order->tax ?? 0, 2) }}</td>
                 </tr>
+                @if($walletUsed > 0)
+                    <tr class="bg-wallet">
+                        <td colspan="12" class='text-bold text-right'>
+                            Paid via Wallet
+                            @if($order->wallet_refunded ?? false)
+                                (refunded)
+                            @endif
+                            :
+                        </td>
+                        <td colspan="4" class='text-bold text-right'>&#8377;{{ number_format($walletUsed, 2) }}</td>
+                    </tr>
+                @endif
+                
                 <tr class="bg-sky">
                     <td colspan="12" class='text-bold text-right'>Total: </td>
-                    <td colspan="4" class='text-bold text-right'>&#8377;{{$order->total ?? 0}}</td>
+                    <td colspan="4" class='text-bold text-right'>&#8377;{{ number_format($order->total ?? 0, 2) }}</td>
                 </tr>
 
 

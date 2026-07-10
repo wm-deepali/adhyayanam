@@ -250,6 +250,7 @@ class FrontUserController extends Controller
             'date_of_birth' => 'required|date_format:Y-m-d|before:12 years',
             'gender' => 'required|string',
             'password' => 'required|min:6|string',
+            'referral_code' => 'nullable|string|exists:users,referral_code',
         ]);
 
         if ($validator->fails()) {
@@ -271,21 +272,36 @@ class FrontUserController extends Controller
             $user->username = "10000" . $request->id;
             $user->gender = $request->gender;
             $user->password = Hash::make($request->password);
+
+            // ✅ Generate this user's own unique referral code
+            $user->referral_code = User::generateReferralCode();
+
+            // ✅ Link to referrer if a valid code was submitted
+            $referrer = null;
+            if ($request->filled('referral_code')) {
+                $referrer = User::where('referral_code', $request->referral_code)->first();
+                if ($referrer) {
+                    $user->referred_by = $referrer->id;
+                }
+            }
+
             $user->save();
 
-            // ✅ Wallet creation with welcome bonus
+            // ✅ Wallet creation with welcome bonus (+ referee bonus if referred)
             $walletSetting = WalletSetting::first();
             $welcomeBonus = $walletSetting->welcome_bonus ?? 0;
+            $refereeBonus = ($referrer && $walletSetting) ? ($walletSetting->referee_bonus ?? 0) : 0;
+            $totalCredit = $welcomeBonus + $refereeBonus;
 
             $wallet = StudentWallet::create([
                 'student_id' => $user->id,
-                'balance' => $welcomeBonus,
-                'total_credited' => $welcomeBonus,
+                'balance' => $totalCredit,
+                'total_credited' => $totalCredit,
                 'total_debited' => 0,
                 'status' => 'active',
             ]);
 
-            // ✅ Record first transaction
+            // ✅ Record welcome bonus transaction
             if ($welcomeBonus > 0) {
                 StudentWalletTransaction::create([
                     'student_id' => $user->id,
@@ -294,6 +310,40 @@ class FrontUserController extends Controller
                     'source' => 'welcome_bonus',
                     'details' => 'Welcome bonus credited during registration.',
                 ]);
+            }
+
+            // ✅ Record referee bonus transaction
+            if ($refereeBonus > 0) {
+                StudentWalletTransaction::create([
+                    'student_id' => $user->id,
+                    'type' => 'credit',
+                    'amount' => $refereeBonus,
+                    'source' => 'referral_signup_bonus',
+                    'details' => 'Bonus for signing up with referral code from ' . $referrer->name . '.',
+                ]);
+            }
+
+            // ✅ Reward the referrer
+            if ($referrer && $walletSetting) {
+                $referralBonus = $walletSetting->referral_bonus ?? 0;
+
+                if ($referralBonus > 0) {
+                    $referrerWallet = StudentWallet::firstOrCreate(
+                        ['student_id' => $referrer->id],
+                        ['balance' => 0, 'total_credited' => 0, 'total_debited' => 0, 'status' => 'active']
+                    );
+
+                    $referrerWallet->increment('balance', $referralBonus);
+                    $referrerWallet->increment('total_credited', $referralBonus);
+
+                    StudentWalletTransaction::create([
+                        'student_id' => $referrer->id,
+                        'type' => 'credit',
+                        'amount' => $referralBonus,
+                        'source' => 'referral_bonus',
+                        'details' => 'Referral bonus for inviting ' . $user->name . '.',
+                    ]);
+                }
             }
 
             DB::commit();
@@ -840,7 +890,7 @@ class FrontUserController extends Controller
             ['mobile_number' => $mobile_number, 'otp' => $otp, 'verified' => 'no']
         );
 
-         $message = "$otp is the One Time Password(OTP) to verify your MOB number at Web Mingo, This OTP is Usable only once and is valid for 10 min,PLS DO NOT SHARE THE OTP WITH ANYONE";
+        $message = "$otp is the One Time Password(OTP) to verify your MOB number at Web Mingo, This OTP is Usable only once and is valid for 10 min,PLS DO NOT SHARE THE OTP WITH ANYONE";
         $dlt_id = '1307161465983326774';
 
         $request_parameter = [

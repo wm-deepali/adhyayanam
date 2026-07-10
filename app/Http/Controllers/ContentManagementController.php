@@ -6322,6 +6322,8 @@ class ContentManagementController extends Controller
     {
         $request->validate([
             'welcome_bonus' => 'required|numeric|min:0',
+            'referral_bonus' => 'required|numeric|min:0',
+            'referee_bonus' => 'required|numeric|min:0',
             'min_deposit.*' => 'required|numeric|min:0',
             'extra_bonus_value.*' => 'required|numeric|min:0',
             'bonus_type.*' => 'required|in:percentage,fixed',
@@ -6330,7 +6332,12 @@ class ContentManagementController extends Controller
         // Save or update main wallet setting
         $setting = WalletSetting::updateOrCreate(
             ['id' => 1],
-            ['welcome_bonus' => $request->welcome_bonus, 'updated_by' => auth()->id(),]
+            [
+                'welcome_bonus' => $request->welcome_bonus,
+                'referral_bonus' => $request->referral_bonus,
+                'referee_bonus' => $request->referee_bonus,
+                'updated_by' => auth()->id(),
+            ]
         );
 
         $existingIds = $setting->bonusRules()->pluck('id')->toArray();

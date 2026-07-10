@@ -295,6 +295,7 @@
                                             // Replace this with your actual purchase logic
                                             $isPurchased = $isLoggedIn && \App\Models\Order::where('order_type', 'Paper')
                                                 ->where('student_id', $studentId)
+                                                ->where('payment_status', 'PAID')
                                                   ->whereRaw('FIND_IN_SET(?, package_id)', [$paper->id])
                                                 ->exists();
                                         @endphp

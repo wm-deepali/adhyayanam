@@ -33,8 +33,15 @@
     <!-- Style-->
     <link rel="stylesheet" href="{{ asset('src/css/style.css')}}">
     <link rel="stylesheet" href="{{ asset('src/css/skin_color.css')}}">
-    <link rel="shortcut icon" href="{{url('images/fav.ico')}}" type="image/x-icon">
-    <link rel="icon" href="{{url('images/fav.ico')}}" type="image/x-icon">
+
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url('favicon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url('favicon-16x16.png') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url('apple-touch-icon.png') }}">
+    <link rel="icon" type="image/png" sizes="192x192" href="{{ url('android-chrome-192x192.png') }}">
+    <link rel="icon" type="image/png" sizes="512x512" href="{{ url('android-chrome-512x512.png') }}">
+    <link rel="shortcut icon" href="{{ url('favicon.ico') }}">
+    <link rel="manifest" href="{{ url('site.webmanifest') }}">
+
 </head>
 <style>
     .fade:not(.show) {
@@ -120,6 +127,14 @@
                                             <option value="Other">Other</option>
                                         </select>
                                         <span id="gender_msg" style="display:none" class="text-danger"></span>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="referral_code" class="col-sm-2 control-label">Referral Code
+                                            (optional)</label>
+                                        <input type="text" class="form-control" name="referral_code" id="referral_code"
+                                            placeholder="Enter Referral Code (if any)">
+                                        <span id="referral_code_msg" style="display:none" class="text-danger"></span>
                                     </div>
 
                                     <div class="form-group">

@@ -33,6 +33,30 @@
                         </small>
                     </div>
 
+                    {{-- Referral Bonus (given to the referrer) --}}
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Referral Bonus</label>
+                        <input type="number" class="form-control" name="referral_bonus"
+                            placeholder="Enter referral bonus amount"
+                            value="{{ old('referral_bonus', $settings->referral_bonus ?? 0) }}" required>
+                        <small class="text-muted">
+                            This amount will be credited to the referring user's wallet when someone signs up using their
+                            referral code.
+                        </small>
+                    </div>
+
+                    {{-- Referee Bonus (given to the new user who used a code) --}}
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Referee Bonus</label>
+                        <input type="number" class="form-control" name="referee_bonus"
+                            placeholder="Enter referee bonus amount"
+                            value="{{ old('referee_bonus', $settings->referee_bonus ?? 0) }}" required>
+                        <small class="text-muted">
+                            Extra bonus credited to a new user's wallet if they registered using someone's referral code, on
+                            top of the welcome bonus.
+                        </small>
+                    </div>
+
                     {{-- Minimum Deposit Rules --}}
                     <div class="mb-3">
                         <label class="form-label fw-bold">Minimum Deposit & Extra Bonus</label>
@@ -128,23 +152,23 @@
             const newRule = document.createElement('div');
             newRule.classList.add('row', 'g-2', 'bonus-rule', 'mb-2', 'align-items-center');
             newRule.innerHTML = `
-                        <input type="hidden" name="rule_id[]" value="">
-                        <div class="col-md-3">
-                            <input type="number" name="min_deposit[]" class="form-control" placeholder="Minimum Deposit" required>
-                        </div>
-                        <div class="col-md-3">
-                            <input type="number" name="extra_bonus_value[]" class="form-control" placeholder="Bonus Value" required>
-                        </div>
-                        <div class="col-md-3">
-                            <select name="bonus_type[]" class="form-select" required>
-                                <option value="percentage">Percentage (%)</option>
-                                <option value="fixed">Fixed Amount</option>
-                            </select>
-                        </div>
-                        <div class="col-md-3 text-end">
-                            <button type="button" class="btn btn-danger btn-sm removeRule">Remove</button>
-                        </div>
-                    `;
+                            <input type="hidden" name="rule_id[]" value="">
+                            <div class="col-md-3">
+                                <input type="number" name="min_deposit[]" class="form-control" placeholder="Minimum Deposit" required>
+                            </div>
+                            <div class="col-md-3">
+                                <input type="number" name="extra_bonus_value[]" class="form-control" placeholder="Bonus Value" required>
+                            </div>
+                            <div class="col-md-3">
+                                <select name="bonus_type[]" class="form-select" required>
+                                    <option value="percentage">Percentage (%)</option>
+                                    <option value="fixed">Fixed Amount</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3 text-end">
+                                <button type="button" class="btn btn-danger btn-sm removeRule">Remove</button>
+                            </div>
+                        `;
             container.appendChild(newRule);
         });
 

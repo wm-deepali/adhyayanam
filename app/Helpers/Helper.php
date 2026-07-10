@@ -25,13 +25,14 @@ class Helper
     public static function getStudentCourseData($id)
     {
         $course = array();
-        $totalOrder = Order::where('student_id', $id)->where('order_type', 'Course')->count();
+        $totalOrder = Order::where('student_id', $id)->where('order_type', 'Course')->where('payment_status', 'PAID')->count();
         $totalBilledAmount = Order::where('student_id', $id)
             ->where('order_type', 'Course')
+            ->where('payment_status', 'PAID')
             ->SUM('billed_amount');
 
 
-        $lastOrder = Order::where('student_id', $id)->where('order_type', 'Course')->orderBy('id', 'DESC')->first();
+        $lastOrder = Order::where('student_id', $id)->where('order_type', 'Course')->where('payment_status', 'PAID')->orderBy('id', 'DESC')->first();
 
         $course['totalOrder'] = $totalOrder;
         $course['totalBilledAmount'] = $totalBilledAmount;
@@ -47,14 +48,17 @@ class Helper
 
         $totalOrder = Order::where('student_id', $id)
             ->where('order_type', 'Test Series')
+            ->where('payment_status', 'PAID')
             ->count();
 
         $totalBilledAmount = Order::where('student_id', $id)
             ->where('order_type', 'Test Series')
+            ->where('payment_status', 'PAID')
             ->sum('billed_amount');
 
         $lastOrder = Order::where('student_id', $id)
             ->where('order_type', 'Test Series')
+            ->where('payment_status', 'PAID')
             ->orderBy('id', 'DESC')
             ->first();
 
@@ -70,12 +74,13 @@ class Helper
     public static function getStudentStudyMaterialData($id)
     {
         $studyMaterial = array();
-        $totalOrder = Order::where('student_id', $id)->where('order_type', 'Study Material')->count();
+        $totalOrder = Order::where('student_id', $id)->where('order_type', 'Study Material')->where('payment_status', 'PAID')->count();
         $totalBilledAmount = Order::where('student_id', $id)
             ->where('order_type', 'Study Material')
+            ->where('payment_status', 'PAID')
             ->SUM('billed_amount');
 
-        $lastOrder = Order::where('student_id', $id)->where('order_type', 'Study Material')->orderBy('id', 'DESC')->first();
+        $lastOrder = Order::where('student_id', $id)->where('order_type', 'Study Material')->where('payment_status', 'PAID')->orderBy('id', 'DESC')->first();
 
         $studyMaterial['totalOrder'] = $totalOrder;
         $studyMaterial['totalBilledAmount'] = $totalBilledAmount;
@@ -86,13 +91,13 @@ class Helper
 
     public static function getStudentlastOrderID($id)
     {
-        $lastOrder = Order::where('student_id', $id)->orderBy('id', 'DESC')->first();
+        $lastOrder = Order::where('student_id', $id)->where('payment_status', 'PAID')->orderBy('id', 'DESC')->first();
         return $lastOrder->order_code ?? '-';
     }
 
     public static function GetStudentOrder($type, $id, $user_id)
     {
-        $order = Order::where('student_id', $user_id)->where('order_type', $type)->where('package_id', $id)->first();
+        $order = Order::where('student_id', $user_id)->where('payment_status', 'PAID')->where('order_type', $type)->where('package_id', $id)->where('payment_status', 'PAID')->first();
         if (!empty($order)) {
             return true;
         } else {

@@ -13,8 +13,14 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js"
         integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF"
         crossorigin="anonymous"></script>
-    <link rel="shortcut icon" href="{{url('images/fav.ico')}}" type="image/x-icon">
-    <link rel="icon" href="{{url('images/fav.ico')}}" type="image/x-icon">
+
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url('favicon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url('favicon-16x16.png') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url('apple-touch-icon.png') }}">
+    <link rel="icon" type="image/png" sizes="192x192" href="{{ url('android-chrome-192x192.png') }}">
+    <link rel="icon" type="image/png" sizes="512x512" href="{{ url('android-chrome-512x512.png') }}">
+    <link rel="shortcut icon" href="{{ url('favicon.ico') }}">
+    <link rel="manifest" href="{{ url('site.webmanifest') }}">
 
     <style>
         body {
@@ -518,16 +524,16 @@
 
     </div>
 
-   <script>
-window.MathJax = {
-    tex: {
-        inlineMath: [['\\(', '\\)']],
-        displayMath: [['\\[', '\\]']]
-    }
-};
-</script>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)']],
+                displayMath: [['\\[', '\\]']]
+            }
+        };
+    </script>
 
-<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>
 
         let answers = [];
@@ -683,7 +689,7 @@ window.MathJax = {
 
             $("#question-text").html(q.question);
 
-MathJax.typesetPromise();
+            MathJax.typesetPromise();
 
             const form = $("#answer-form");
             form.html("");
@@ -711,8 +717,8 @@ MathJax.typesetPromise();
             updatePanel();
 
             setTimeout(() => {
-    MathJax.typesetPromise();
-}, 100);
+                MathJax.typesetPromise();
+            }, 100);
         }
 
         //===================== UI MCQ Loader =====================

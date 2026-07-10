@@ -36,6 +36,8 @@ class User extends Authenticatable implements HasMedia, MustVerifyEmail
     ];
 
     protected $fillable = [
+        'referral_code',
+        'referred_by',
         'first_name',
         'last_name',
         'name',
@@ -157,6 +159,15 @@ class User extends Authenticatable implements HasMedia, MustVerifyEmail
     public function courseReviews()
     {
         return $this->hasMany(CourseReview::class, 'student_id');
+    }
+
+    public static function generateReferralCode()
+    {
+        do {
+            $code = strtoupper(\Illuminate\Support\Str::random(6));
+        } while (self::where('referral_code', $code)->exists());
+
+        return $code;
     }
 
 }

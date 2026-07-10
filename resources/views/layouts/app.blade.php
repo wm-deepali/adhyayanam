@@ -24,8 +24,15 @@
     <link href="https://cdn.datatables.net/2.0.8/css/dataTables.bootstrap5.min.css" rel="stylesheet">
     <link href="https://cdn.datatables.net/buttons/3.0.2/css/buttons.dataTables.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-    <link rel="shortcut icon" href="{{url('images/fav.ico')}}" type="image/x-icon">
-    <link rel="icon" href="{{url('images/fav.ico')}}" type="image/x-icon">
+
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url('favicon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url('favicon-16x16.png') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url('apple-touch-icon.png') }}">
+    <link rel="icon" type="image/png" sizes="192x192" href="{{ url('android-chrome-192x192.png') }}">
+    <link rel="icon" type="image/png" sizes="512x512" href="{{ url('android-chrome-512x512.png') }}">
+    <link rel="shortcut icon" href="{{ url('favicon.ico') }}">
+    <link rel="manifest" href="{{ url('site.webmanifest') }}">
+
 </head>
 <style>
     .badge-success {

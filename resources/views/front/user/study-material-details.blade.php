@@ -385,6 +385,31 @@
         padding-right: 50px;
       }
     }
+
+    /* ====================== WALLET CHECKOUT MODAL ====================== */
+    #walletCheckoutModal .modal-content {
+      border-radius: 20px;
+      border: none;
+    }
+
+    #walletCheckoutModal .modal-header {
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    #walletCheckoutModal .modal-footer {
+      border-top: 1px solid #f1f5f9;
+    }
+
+    #walletCheckoutModal .form-check-input {
+      width: 3em;
+      height: 1.5em;
+      cursor: pointer;
+    }
+
+    #walletCheckoutModal .form-check-input:checked {
+      background-color: #2563eb;
+      border-color: #2563eb;
+    }
   </style>
 
   <!-- Banner Patti (Simple Info) -->
@@ -545,12 +570,12 @@
             @endif
 
           @else
-          
-          @if($isLoggedIn)
-              <a href="{{ route('user.process-order', ['type' => 'study-material', 'id' => $studyMaterial->id]) }}"
-                class="study-detail-buy-btn">
+
+            @if($isLoggedIn)
+              <button type="button" class="study-detail-buy-btn" id="openEnrollModalBtn" data-type="study-material"
+                data-id="{{ $studyMaterial->id }}" data-name="{{ $studyMaterial->name }}">
                 Buy Now - ₹{{ $studyMaterial->price }}
-              </a>
+              </button>
             @else
               <a class="study-detail-buy-btn" href="{{route('student.login', ['redirect' => url()->full()])}}">
                 Login to Unlock{{ $studyMaterial->IsPaid ? ' - ₹' . $studyMaterial->price : ''}}
@@ -580,11 +605,11 @@
               <div class="unlock-box text-center py-5 mt-5">
                 <h4 class="text-muted mb-4">Full Content is Locked</h4>
                 <p class="text-muted mb-4">Purchase to unlock complete notes</p>
-                 @if($isLoggedIn)
-                  <a href="{{ route('user.process-order', ['type' => 'study-material', 'id' => $studyMaterial->id]) }}"
-                    class="study-detail-buy-btn px-5 py-3">
-                    Unlock Now - ₹{{ $studyMaterial->price }}
-                  </a>
+                @if($isLoggedIn)
+                  <button type="button" class="study-detail-buy-btn px-5 py-3" id="openEnrollModalBtn" data-type="study-material"
+                    data-id="{{ $studyMaterial->id }}" data-name="{{ $studyMaterial->name }}">
+                    Buy Now - ₹{{ $studyMaterial->price }}
+                  </button>
                 @else
                   <a class="study-detail-buy-btn px-5 py-3" href="{{route('student.login', ['redirect' => url()->full()])}}">
                     Login to Unlock{{ $studyMaterial->IsPaid ? ' - ₹' . $studyMaterial->price : ''}}
@@ -662,4 +687,202 @@
       </div>
     </div>
   </section>
+
+
+  
+        <!-- ============ WALLET CHECKOUT MODAL ============ -->
+        <div class="modal fade" id="walletCheckoutModal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                        <h5 class="modal-title fw-bold" id="checkoutModalCourseName">Confirm Enrollment</h5>
+                    </div>
+                    <div class="modal-body" style="padding: 24px;">
+
+                        <div id="walletLoadingState" class="text-center py-4">
+                            <div class="spinner-border text-primary" role="status"></div>
+                            <p class="text-muted mt-2 mb-0">Checking your wallet balance...</p>
+                        </div>
+
+                        <div id="walletCheckoutBody" style="display:none;">
+
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Study Material Fee</span>
+                                <strong id="modal_course_fee">₹0</strong>
+                            </div>
+
+                            <div class="d-flex justify-content-between mb-3" id="walletBalanceRow">
+                                <span class="text-muted">Your Wallet Balance</span>
+                                <strong id="modal_wallet_balance" class="text-success">₹0</strong>
+                            </div>
+
+                            <div id="noBalanceNotice" class="alert alert-light border"
+                                style="display:none; font-size: 14px;">
+                                You don't have any wallet balance yet. You'll pay the full study material fee.
+                            </div>
+
+                            <div id="redeemSection" style="display:none;">
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" id="redeemToggle">
+                                    <label class="form-check-label fw-bold ms-2" for="redeemToggle">
+                                        Redeem wallet points for this order
+                                    </label>
+                                </div>
+
+                                <div id="redeemAmountBox" style="display:none;">
+                                    <label for="redeemAmountInput" class="form-label">
+                                        Amount to redeem (max ₹<span id="max_redeem_display">0</span>)
+                                    </label>
+                                    <input type="number" class="form-control" id="redeemAmountInput" min="0" step="1">
+                                    <span id="redeemAmountError" class="text-danger"
+                                        style="display:none; font-size: 13px;"></span>
+                                </div>
+                            </div>
+
+                            <hr>
+
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="fw-bold" style="font-size: 15px;">Amount Payable Now</span>
+                                <strong id="modal_payable_amount" class="text-primary" style="font-size: 22px;">₹0</strong>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-primary" id="confirmEnrollBtn" style="display:none;">
+                            Proceed to Pay <span id="confirmEnrollAmount"></span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hidden form that actually submits to process-order -->
+        <form id="processOrderForm" method="POST" action="" style="display:none;">
+            @csrf
+            <input type="hidden" name="wallet_redeem_amount" id="form_redeem_amount" value="0">
+        </form>
+
+         <script>
+        let currentPackage = { type: null, id: null };
+        let walletData = { balance: 0, maxRedeemable: 0, fee: 0 };
+
+        function openEnrollModal(btn) {
+            currentPackage = { type: $(btn).data('type'), id: $(btn).data('id') };
+
+            $('#checkoutModalCourseName').text('Confirm Enrollment');
+            $('#walletLoadingState').show();
+            $('#walletCheckoutBody').hide();
+            $('#confirmEnrollBtn').hide();
+            $('#redeemToggle').prop('checked', false);
+            $('#redeemAmountBox').hide();
+            $('#redeemAmountInput').val('');
+            $('#redeemAmountError').hide();
+
+            $('#walletCheckoutModal').modal('show');
+
+            $.ajax({
+                headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                url: "{{ route('user.wallet.check-balance') }}",
+                type: 'POST',
+                data: {
+                    type: currentPackage.type,
+                    id: currentPackage.id,
+                },
+                success: function (res) {
+                    $('#walletLoadingState').hide();
+                    $('#walletCheckoutBody').show();
+                    $('#confirmEnrollBtn').show();
+
+                    if (!res.success) {
+                        $('#walletCheckoutBody').html('<p class="text-danger mb-0">' + res.message + '</p>');
+                        $('#confirmEnrollBtn').hide();
+                        return;
+                    }
+
+                    walletData = {
+                        balance: res.wallet_balance,
+                        maxRedeemable: res.max_redeemable,
+                        fee: res.course_fee
+                    };
+
+                    $('#modal_course_fee').text('₹' + res.course_fee);
+                    $('#modal_wallet_balance').text('₹' + res.wallet_balance);
+
+                    if (res.has_balance) {
+                        $('#walletBalanceRow').show();
+                        $('#noBalanceNotice').hide();
+                        $('#redeemSection').show();
+                        $('#max_redeem_display').text(res.max_redeemable);
+                        $('#redeemAmountInput').attr('max', res.max_redeemable).val('');
+                    } else {
+                        $('#walletBalanceRow').show();
+                        $('#noBalanceNotice').show();
+                        $('#redeemSection').hide();
+                    }
+
+                    updatePayable(0);
+                },
+                error: function () {
+                    $('#walletLoadingState').html('<p class="text-danger mb-0">Something went wrong. Please try again.</p>');
+                }
+            });
+        }
+
+        $(document).on('click', '#openEnrollModalBtn, #openEnrollModalBtnMobile', function () {
+            openEnrollModal(this);
+        });
+
+        $('#redeemToggle').on('change', function () {
+            if ($(this).is(':checked')) {
+                $('#redeemAmountBox').show();
+                $('#redeemAmountInput').val(walletData.maxRedeemable).trigger('input');
+            } else {
+                $('#redeemAmountBox').hide();
+                $('#redeemAmountError').hide();
+                updatePayable(0);
+            }
+        });
+
+        $('#redeemAmountInput').on('input', function () {
+            let val = parseFloat($(this).val()) || 0;
+
+            if (val > walletData.maxRedeemable) {
+                $('#redeemAmountError').show().text('You can redeem up to ₹' + walletData.maxRedeemable + ' only.');
+                val = walletData.maxRedeemable;
+                $(this).val(val);
+            } else if (val < 0) {
+                $('#redeemAmountError').show().text('Amount cannot be negative.');
+                val = 0;
+                $(this).val(val);
+            } else {
+                $('#redeemAmountError').hide();
+            }
+
+            updatePayable(val);
+        });
+
+        function updatePayable(redeemAmount) {
+            let payable = Math.max(walletData.fee - redeemAmount, 0);
+            $('#modal_payable_amount').text('₹' + payable.toFixed(2));
+            $('#confirmEnrollAmount').text(payable > 0 ? '(₹' + payable.toFixed(2) + ')' : '(Free)');
+        }
+
+        $('#confirmEnrollBtn').on('click', function () {
+            let redeemAmount = $('#redeemToggle').is(':checked')
+                ? (parseFloat($('#redeemAmountInput').val()) || 0)
+                : 0;
+
+            $('#form_redeem_amount').val(redeemAmount);
+            $('#processOrderForm').attr(
+                'action',
+                "{{ url('/order/process') }}/" + currentPackage.type + "/" + currentPackage.id
+            );
+            $('#processOrderForm').submit();
+        });
+    </script>
+
 @endsection

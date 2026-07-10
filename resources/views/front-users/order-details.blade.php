@@ -39,6 +39,16 @@
             background: #f8fafc;
         }
 
+        .payment-status-note {
+            background: #fff7ed;
+            border: 1px solid #fed7aa;
+            border-radius: 10px;
+            padding: 14px 18px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #9a3412;
+        }
+
         /* ====================== MOBILE PREMIUM INVOICE ====================== */
         .mobile-invoice {
             background: #fff;
@@ -104,17 +114,37 @@
             padding-top: 12px;
             margin-top: 12px;
         }
-        @media (max-width: 740px) {
-    
-    .content {
-    min-height: 250px;
-    padding: 0 !important;
-    margin-right: auto;
-    margin-left: auto;
-}
 
-}
+        @media (max-width: 740px) {
+
+            .content {
+                min-height: 250px;
+                padding: 0 !important;
+                margin-right: auto;
+                margin-left: auto;
+            }
+
+        }
     </style>
+
+    @php
+        // payment_status stores: Success | Failed | Cancelled | Pending
+        $badgeClass = match ($order->payment_status) {
+            'PAID' => 'bg-success',
+            'CANCELLED' => 'bg-secondary',
+            'PENDING' => 'bg-warning text-dark',
+            default => 'bg-danger', // Failed
+        };
+
+        $isPaid = $order->payment_status == 'PAID';
+
+        $statusNote = match ($order->payment_status) {
+            'CANCELLED' => 'This payment was cancelled before completion. No amount was deducted.',
+            'PENDING' => 'This payment is still being confirmed by the bank. This page will update automatically once confirmed.',
+            'FAILED' => 'This payment could not be completed. If any amount was deducted, it will be refunded automatically within 5-7 business days.',
+            default => null,
+        };
+    @endphp
 
     <section class="content py-3">
         <div class="container p-0">
@@ -122,6 +152,13 @@
             <!-- ==================== DESKTOP VIEW ==================== -->
             <div class="d-none d-lg-block">
                 <div class="invoice-card">
+
+                    @if($statusNote)
+                        <div class="payment-status-note">
+                            <strong>{{ $order->payment_status }}:</strong> {{ $statusNote }}
+                        </div>
+                    @endif
+
                     {{-- HEADER --}}
                     <div class="row invoice-header">
                         <div class="col-md-6">
@@ -142,8 +179,9 @@
                                 Email: {{$order->student->email ?? ''}}<br><br>
                                 <strong>Order ID :</strong> {{$order->order_code}} <br>
                                 <strong>Order Type :</strong> {{$order->order_type}} <br>
-                                <strong>Payment Status :</strong> 
-                                <span class="badge bg-success">{{$order->payment_status}}</span><br>
+                                <strong>Payment Status :</strong>
+                                <span class="badge {{ $badgeClass }}">{{$order->payment_status}}</span><br>
+                                <strong>Payment Mode :</strong> {{$order->payment_mode ?? '-'}} <br>
                                 <strong>Transaction ID :</strong> {{$order->transaction_id ?? ''}} <br>
                                 <strong>Date :</strong> {{date('d M Y, h:i A', strtotime($order->created_at))}}
                             </div>
@@ -189,22 +227,53 @@
                     {{-- TOTAL --}}
                     <div class="total-section">
                         <table class="table table-sm total-table">
-                            <tr><td>Sub Total</td><td class="text-end">₹{{$order->billed_amount ?? 0}}</td></tr>
-                            <tr><td>Discount ({{$order->discount ?? 0}}%)</td><td class="text-end">- ₹{{$order->discount_amount ?? 0}}</td></tr>
-                            <tr><td>Taxes</td><td class="text-end">₹{{$order->tax ?? 0}}</td></tr>
-                            <tr><td><strong>Total</strong></td><td class="text-end"><strong>₹{{$order->total ?? 0}}</strong></td></tr>
+                            <tr>
+                                <td>Sub Total</td>
+                                <td class="text-end">₹{{ number_format($order->billed_amount ?? 0, 2) }}</td>
+                            </tr>
+                            <tr>
+                                <td>Discount ({{$order->discount ?? 0}}%)</td>
+                                <td class="text-end">- ₹{{ number_format($order->discount_amount ?? 0, 2) }}</td>
+                            </tr>
+                            <tr>
+                                <td>Taxes</td>
+                                <td class="text-end">₹{{ number_format($order->tax ?? 0, 2) }}</td>
+                            </tr>
+                            @if(($order->wallet_used ?? 0) > 0)
+                                <tr>
+                                    <td>
+                                        Wallet Amount Used
+                                        @if(!$isPaid && ($order->wallet_refunded ?? false))
+                                            <span class="text-muted small">(refunded)</span>
+                                        @endif
+                                    </td>
+                                    <td class="text-end">- ₹{{ number_format($order->wallet_used, 2) }}</td>
+                                </tr>
+                            @endif
+                            <tr>
+                                <td><strong>{{ $isPaid ? 'Paid via Gateway' : 'Total' }}</strong></td>
+                                <td class="text-end"><strong>₹{{ number_format($order->total - ($order->wallet_used ?? 0), 2) }}</strong></td>
+                            </tr>
                         </table>
                     </div>
 
                     {{-- ACTIONS --}}
-                    <div class="invoice-actions">
-                        <a href="{{route('user.print-invoice', $order->id)}}" class="btn btn-primary me-3" target="_blank">
-                            <i data-feather="printer"></i> Print Invoice
-                        </a>
-                        <a href="{{route('user.generate-pdf', $order->id)}}" class="btn btn-success" target="_blank">
-                            <i data-feather="download"></i> Download PDF
-                        </a>
-                    </div>
+                    @if($isPaid)
+                        <div class="invoice-actions">
+                            <a href="{{route('user.print-invoice', $order->id)}}" class="btn btn-primary me-3" target="_blank">
+                                <i data-feather="printer"></i> Print Invoice
+                            </a>
+                            <a href="{{route('user.generate-pdf', $order->id)}}" class="btn btn-success" target="_blank">
+                                <i data-feather="download"></i> Download PDF
+                            </a>
+                        </div>
+                    @else
+                        <div class="invoice-actions">
+                            <a href="{{ url()->previous() }}" class="btn btn-outline-secondary">
+                                <i data-feather="arrow-left"></i> Back to Orders
+                            </a>
+                        </div>
+                    @endif
                 </div>
             </div>
 
@@ -217,6 +286,13 @@
                 </div>
 
                 <div class="mobile-invoice-body">
+
+                    @if($statusNote)
+                        <div class="payment-status-note">
+                            <strong>{{ $order->payment_status }}:</strong> {{ $statusNote }}
+                        </div>
+                    @endif
+
                     <div class="mobile-order-info">
                         <div class="mobile-detail-row">
                             <span><strong>Order ID</strong></span>
@@ -228,7 +304,11 @@
                         </div>
                         <div class="mobile-detail-row">
                             <span><strong>Payment Status</strong></span>
-                            <span class="badge bg-success">{{$order->payment_status}}</span>
+                            <span class="badge {{ $badgeClass }}">{{$order->payment_status}}</span>
+                        </div>
+                        <div class="mobile-detail-row">
+                            <span><strong>Payment Mode</strong></span>
+                            <span>{{$order->payment_mode ?? '-'}}</span>
                         </div>
                         <div class="mobile-detail-row">
                             <span><strong>Transaction ID</strong></span>
@@ -260,19 +340,30 @@
                     <div class="mobile-total">
                         <div class="mobile-total-row">
                             <span>Sub Total</span>
-                            <span>₹{{$order->billed_amount ?? 0}}</span>
+                            <span>₹{{ number_format($order->billed_amount ?? 0, 2) }}</span>
                         </div>
                         <div class="mobile-total-row">
                             <span>Discount ({{$order->discount ?? 0}}%)</span>
-                            <span>- ₹{{$order->discount_amount ?? 0}}</span>
+                            <span>- ₹{{ number_format($order->discount_amount ?? 0, 2) }}</span>
                         </div>
                         <div class="mobile-total-row">
                             <span>Taxes</span>
-                            <span>₹{{$order->tax ?? 0}}</span>
+                            <span>₹{{ number_format($order->tax ?? 0, 2) }}</span>
                         </div>
+                        @if(($order->wallet_used ?? 0) > 0)
+                            <div class="mobile-total-row">
+                                <span>
+                                    Wallet Amount Used
+                                    @if(!$isPaid && ($order->wallet_refunded ?? false))
+                                        <span class="text-muted small">(refunded)</span>
+                                    @endif
+                                </span>
+                                <span>- ₹{{ number_format($order->wallet_used, 2) }}</span>
+                            </div>
+                        @endif
                         <div class="mobile-total-row final">
-                            <span>Total Amount</span>
-                            <span>₹{{$order->total ?? 0}}</span>
+                            <span>{{ $isPaid ? 'Paid via Gateway' : 'Total Amount' }}</span>
+                            <span>₹{{ number_format($order->total - ($order->wallet_used ?? 0), 2) }}</span>
                         </div>
                     </div>
 
@@ -285,14 +376,23 @@
                     </div>
 
                     <!-- Action Buttons -->
-                    <div class="mt-5 d-grid gap-3">
-                        <a href="{{route('user.print-invoice', $order->id)}}" class="btn btn-primary btn-lg" target="_blank">
-                            <i data-feather="printer"></i> Print Invoice
-                        </a>
-                        <a href="{{route('user.generate-pdf', $order->id)}}" class="btn btn-success btn-lg" target="_blank">
-                            <i data-feather="download"></i> Download PDF
-                        </a>
-                    </div>
+                    @if($isPaid)
+                        <div class="mt-5 d-grid gap-3">
+                            <a href="{{route('user.print-invoice', $order->id)}}" class="btn btn-primary btn-lg"
+                                target="_blank">
+                                <i data-feather="printer"></i> Print Invoice
+                            </a>
+                            <a href="{{route('user.generate-pdf', $order->id)}}" class="btn btn-success btn-lg" target="_blank">
+                                <i data-feather="download"></i> Download PDF
+                            </a>
+                        </div>
+                    @else
+                        <div class="mt-5 d-grid gap-3">
+                            <a href="{{ url()->previous() }}" class="btn btn-outline-secondary btn-lg">
+                                <i data-feather="arrow-left"></i> Back to Orders
+                            </a>
+                        </div>
+                    @endif
                 </div>
             </div>
 

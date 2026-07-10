@@ -4,8 +4,15 @@
 <head>
     <meta charset="utf-8">
     <title>Study Material PDF</title>
-    <link rel="shortcut icon" href="https://www.adhyayanam.co.in/public/images/fav.ico" type="image/x-icon">
-    <link rel="icon" href="https://www.adhyayanam.co.in/public/images/fav.ico" type="image/x-icon">
+
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url('favicon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url('favicon-16x16.png') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url('apple-touch-icon.png') }}">
+    <link rel="icon" type="image/png" sizes="192x192" href="{{ url('android-chrome-192x192.png') }}">
+    <link rel="icon" type="image/png" sizes="512x512" href="{{ url('android-chrome-512x512.png') }}">
+    <link rel="shortcut icon" href="{{ url('favicon.ico') }}">
+    <link rel="manifest" href="{{ url('site.webmanifest') }}">
+
     <style>
         body {
             font-family: 'notodevanagari', sans-serif;

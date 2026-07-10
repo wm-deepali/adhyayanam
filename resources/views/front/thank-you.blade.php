@@ -31,13 +31,10 @@
         font-weight: bold;
     }
 
-    .success-icon {
-        background: #22c55e;
-    }
-
-    .failed-icon {
-        background: #ef4444;
-    }
+    .success-icon { background: #22c55e; }
+    .failed-icon { background: #ef4444; }
+    .cancelled-icon { background: #6b7280; }
+    .pending-icon { background: #f59e0b; }
 
     /* TITLE */
 
@@ -57,14 +54,13 @@
         line-height: 1.6;
     }
 
-
     /* ORDER INFO */
 
     .order-info {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
         gap: 10px;
-        margin-bottom: 25px;
+        margin-bottom: 15px;
     }
 
     .info-box {
@@ -84,6 +80,41 @@
         color: #111;
     }
 
+    /* PAYMENT META (gateway / mode / wallet) */
+
+    .payment-meta {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+        margin-bottom: 15px;
+    }
+
+    .payment-meta .info-box {
+        background: #fafafa;
+        border: 1px dashed #ddd;
+    }
+
+    .wallet-box {
+        background: #fff7ed !important;
+        border: 1px dashed #fdba74 !important;
+        margin-bottom: 25px;
+    }
+
+    /* STATUS BADGE */
+
+    .status-badge {
+        display: inline-block;
+        padding: 3px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.03em;
+    }
+
+    .status-PAID { background: #dcfce7; color: #15803d; }
+    .status-FAILED { background: #fee2e2; color: #b91c1c; }
+    .status-CANCELLED { background: #e5e7eb; color: #374151; }
+    .status-PENDING { background: #fef3c7; color: #92400e; }
 
     /* BUTTONS */
 
@@ -91,6 +122,7 @@
         display: flex;
         gap: 10px;
         justify-content: center;
+        flex-wrap: wrap;
     }
 
     .start-btn {
@@ -102,15 +134,29 @@
         font-weight: 600;
     }
 
-    .start-btn:hover {
-        background: #1e4fd1;
+    .start-btn:hover { background: #1e4fd1; }
+
+    .retry-btn {
+        background: #ef4444;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-weight: 600;
     }
+
+    .retry-btn:hover { background: #d33d3d; }
 
     .dashboard-btn {
         background: #e5e7eb;
         color: #111;
         padding: 10px 20px;
-        border-radius:
+        border-radius: 6px;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .dashboard-btn:hover { background: #d1d5db; }
 </style>
 
 <section class="thankyou-section">
@@ -119,32 +165,46 @@
 
         <div class="thankyou-card">
 
-            <div class="thank-icon {{ $order->payment_status == 'PAID' ? 'success-icon' : 'failed-icon' }}">
-                @if($order->payment_status == 'PAID')
-                    ✔
-                @else
-                    ✖
-                @endif
+            @php
+                // payment_status coming from PaymentController is one of: PAID | FAILED | CANCELLED | PENDING
+                $status = $order->payment_status;
+
+                $iconClass = match($status) {
+                    'PAID' => 'success-icon',
+                    'CANCELLED' => 'cancelled-icon',
+                    'PENDING' => 'pending-icon',
+                    default => 'failed-icon',
+                };
+
+                $iconSymbol = match($status) {
+                    'PAID' => '✔',
+                    'CANCELLED' => '⊘',
+                    'PENDING' => '⏳',
+                    default => '✖',
+                };
+
+                $title = match($status) {
+                    'PAID' => 'Thank You For Your Purchase!',
+                    'CANCELLED' => 'Payment Cancelled',
+                    'PENDING' => 'Payment Pending',
+                    default => 'Payment Failed',
+                };
+
+                $text = match($status) {
+                    'PAID' => 'Your ' . ($order->order_type ?? 'Package') . ' has been activated successfully. You can now access your content anytime from your dashboard.',
+                    'CANCELLED' => 'You cancelled the payment before it was completed. No amount has been deducted. You can retry whenever you\'re ready.',
+                    'PENDING' => 'Your payment is still being confirmed by the bank. We will update your order automatically once confirmed — please avoid retrying immediately.',
+                    default => 'Your payment could not be completed. If any amount was deducted, it will be refunded automatically within 5-7 business days.',
+                };
+            @endphp
+
+            <div class="thank-icon {{ $iconClass }}">
+                {{ $iconSymbol }}
             </div>
 
+            <h2 class="thank-title">{{ $title }}</h2>
 
-            <h2 class="thank-title">
-                @if($order->payment_status == 'PAID')
-                    Thank You For Your Purchase!
-                @else
-                    Payment Failed
-                @endif
-            </h2>
-
-            <p class="thank-text">
-                @if($order->payment_status == 'PAID')
-                    Your {{ $order->order_type ?? 'Package'}} has been activated successfully.
-                    You can now access your content anytime from your dashboard.
-                @else
-                    Unfortunately your payment was not successful.
-                    If the amount was deducted it will be refunded automatically.
-                @endif
-            </p>
+            <p class="thank-text">{{ $text }}</p>
 
             <div class="order-info">
 
@@ -154,7 +214,7 @@
                 </div>
 
                 <div class="info-box">
-                    <span>{{ $order->order_type ?? 'Package'}}</span>
+                    <span>{{ $order->order_type ?? 'Package' }}</span>
                     <strong>
                         @if($order->order_type == 'Course')
                             {{ $course->name }}
@@ -170,64 +230,76 @@
 
                 <div class="info-box">
                     <span>Amount Paid</span>
-                    <strong>₹{{$order->total ?? '499'}}</strong>
+                    <strong>₹{{ number_format($order->total ?? 0, 2) }}</strong>
                 </div>
 
             </div>
 
-            @if(isset($papers) && $papers->count())
+            {{-- Payment Method / Mode -- this is what support needs to resolve queries --}}
+            <div class="payment-meta">
+
+                <div class="info-box">
+                    <span>Payment Method</span>
+                    <strong>{{ $order->payment_gateway ?? 'CashFree' }}</strong>
+                </div>
+
+                <div class="info-box">
+                    <span>Payment Mode</span>
+                    <strong>{{ $order->payment_mode ?? '—' }}</strong>
+                </div>
+
+            </div>
+
+            @if(($order->wallet_used ?? 0) > 0)
+                <div class="info-box wallet-box">
+                    <span>Wallet Amount Used</span>
+                    <strong>
+                        ₹{{ number_format($order->wallet_used, 2) }}
+                        @if($status !== 'PAID' && ($order->wallet_refunded ?? false))
+                            <span style="font-weight:400;color:#9a3412;">(refunded to wallet)</span>
+                        @endif
+                    </strong>
+                </div>
+            @endif
+
+            <div style="margin-bottom: 25px;">
+                <span class="status-badge status-{{ $status }}">{{ strtoupper($status) }}</span>
+            </div>
+
+            @if($status == 'PAID' && isset($papers) && $papers->count())
 
                 <div style="margin-top:20px;text-align:left">
-
                     <h4 style="margin-bottom:10px;">Purchased Papers</h4>
-
                     <ul style="padding-left:18px">
-
                         @foreach($papers as $paper)
-
-                            <li style="margin-bottom:6px">
-                                {{ $paper->name }}
-                            </li>
-
+                            <li style="margin-bottom:6px">{{ $paper->name }}</li>
                         @endforeach
-
                     </ul>
-
                 </div>
 
             @endif
 
             <div class="thank-btns">
 
-                @if($order->order_type == 'Test Series')
+                @if($status == 'PAID')
 
-                    <a href="{{ route('user.test-series-detail', $testSeries->slug) }}" class="start-btn">
-                        Start Your Test
-                    </a>
+                    @if($order->order_type == 'Test Series')
+                        <a href="{{ route('user.test-series-detail', $testSeries->slug) }}" class="start-btn">Start Your Test</a>
+                    @elseif($order->order_type == 'Course')
+                        <a href="{{ route('course.detail', $course->id) }}" class="start-btn">Start Learning</a>
+                    @elseif($order->order_type == 'Study Material')
+                        <a href="{{ route('study.material.details', $studyMaterial->id) }}" class="start-btn">View Study Material</a>
+                    @elseif($order->order_type == 'Paper')
+                        <a href="{{ route('user.test-papers') }}" class="start-btn">View Purchased Papers</a>
+                    @endif
 
-                @elseif($order->order_type == 'Course')
+                @else
 
-                    <a href="{{ route('course.detail', $course->id) }}" class="start-btn">
-                        Start Learning
-                    </a>
-
-                @elseif($order->order_type == 'Study Material')
-
-                    <a href="{{ route('study.material.details', $studyMaterial->id) }}" class="start-btn">
-                        View Study Material
-                    </a>
-
-                @elseif($order->order_type == 'Paper')
-
-                    <a href="{{ route('user.test-papers') }}" class="start-btn">
-                        View Purchased Papers
-                    </a>
+                    <a href="{{ url()->previous() }}" class="retry-btn">Retry Payment</a>
 
                 @endif
 
-                <a href="{{route('user.dashboard')}}" class="dashboard-btn">
-                    Go To Dashboard
-                </a>
+                <a href="{{ route('user.dashboard') }}" class="dashboard-btn">Go To Dashboard</a>
 
             </div>
 

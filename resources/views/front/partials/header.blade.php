@@ -427,7 +427,9 @@
             font-size: 13px;
         }
     }
+    
 </style>
+
 <link href="{{url('assets/css/bootstrap.css')}}" rel="stylesheet">
 <link href="{{url('assets/css/style.css')}}" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
@@ -437,8 +439,14 @@
     rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Titillium+Web:wght@300;400;600;700;900&display=swap"
     rel="stylesheet">
-<link rel="shortcut icon" href="{{url('images/fav.ico')}}" type="image/x-icon">
-<link rel="icon" href="{{url('images/fav.ico')}}" type="image/x-icon">
+
+<link rel="icon" type="image/png" sizes="32x32" href="{{ url('favicon-32x32.png') }}">
+<link rel="icon" type="image/png" sizes="16x16" href="{{ url('favicon-16x16.png') }}">
+<link rel="apple-touch-icon" sizes="180x180" href="{{ url('apple-touch-icon.png') }}">
+<link rel="icon" type="image/png" sizes="192x192" href="{{ url('android-chrome-192x192.png') }}">
+<link rel="icon" type="image/png" sizes="512x512" href="{{ url('android-chrome-512x512.png') }}">
+<link rel="shortcut icon" href="{{ url('favicon.ico') }}">
+<link rel="manifest" href="{{ url('site.webmanifest') }}">
 
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -1283,6 +1291,13 @@
 
 
 <script>
+
+    // Toggle mobile search box
+        $('#mobileSearchIconBtn, .mobileSearchIconBtn').on('click', function () {
+            $('#mobileSearchBox').slideToggle(250);
+            window.scrollTo({ top: 0, behavior: 'smooth' }); // Scroll to top since the search box is at the top of the page
+        });
+        
     $(function () {
 
         let searchTimeout;

@@ -5,113 +5,141 @@
 @endsection
 
 <style>
-.cb-item{
-     align-items:center ;
-}
-     @media (max-width: 740px) {
-.content{
-    padding:0px !important;
-}
-.card-body{
-    padding:10px !important;
-   
-    flex-direction:column !important;
-    gap:10px !important;
-}
-.cb-item{
-     align-items:start !important;
-}
-}
+    .cb-item {
+        align-items: center;
+    }
 
-.filter-bar {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    align-items: end;
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    padding: 16px;
-    border-radius: 14px;
-    margin-bottom: 16px;
-}
+    @media (max-width: 740px) {
+        .content {
+            padding: 0px !important;
+        }
 
-.filter-group {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    min-width: 170px;
-}
+        .card-body {
+            padding: 10px !important;
 
-.filter-group label {
-    font-size: 12.5px;
-    font-weight: 600;
-    color: #64748b;
-}
+            flex-direction: column !important;
+            gap: 10px !important;
+        }
 
-.filter-group select {
-    border: 1px solid #d1d5db;
-    border-radius: 10px;
-    padding: 8px 12px;
-    font-size: 14px;
-    background: #fff;
-    color: #1e2937;
-}
+        .cb-item {
+            align-items: start !important;
+        }
+    }
 
-.filter-reset-btn {
-    border: 1px solid #d1d5db;
-    background: #fff;
-    color: #374151;
-    padding: 8px 16px;
-    border-radius: 10px;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    height: fit-content;
-}
-
-.filter-reset-btn:hover {
-    border-color: #ef4444;
-    color: #ef4444;
-}
-
-.filter-empty-state {
-    display: none;
-}
-
-.paper-status-badge {
-    font-size: 12px;
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-weight: 600;
-    display: inline-block;
-    margin-top: 6px;
-}
-
-.status-completed {
-    background: #dcfce7;
-    color: #15803d;
-}
-
-.status-in-progress {
-    background: #fef3c7;
-    color: #92400e;
-}
-
-.status-not-attempted {
-    background: #f1f5f9;
-    color: #64748b;
-}
-
-@media (max-width: 740px) {
     .filter-bar {
-        flex-direction: column;
-        align-items: stretch;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: end;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        padding: 16px;
+        border-radius: 14px;
+        margin-bottom: 16px;
     }
 
     .filter-group {
-        min-width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        min-width: 170px;
     }
-}
+
+    .filter-group label {
+        font-size: 12.5px;
+        font-weight: 600;
+        color: #64748b;
+    }
+
+    .filter-group select {
+        border: 1px solid #d1d5db;
+        border-radius: 10px;
+        padding: 8px 12px;
+        font-size: 14px;
+        background: #fff;
+        color: #1e2937;
+    }
+
+    .filter-reset-btn {
+        border: 1px solid #d1d5db;
+        background: #fff;
+        color: #374151;
+        padding: 8px 16px;
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        height: fit-content;
+    }
+
+    .filter-reset-btn:hover {
+        border-color: #ef4444;
+        color: #ef4444;
+    }
+
+    .filter-empty-state {
+        display: none;
+    }
+
+    .paper-status-badge {
+        font-size: 12px;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-weight: 600;
+        display: inline-block;
+        margin-top: 6px;
+    }
+
+    .status-completed {
+        background: #dcfce7;
+        color: #15803d;
+    }
+
+    .status-in-progress {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .status-not-attempted {
+        background: #f1f5f9;
+        color: #64748b;
+    }
+
+    @media (max-width: 740px) {
+        .filter-bar {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .filter-group {
+            min-width: 100%;
+        }
+    }
+
+    /* ====================== WALLET CHECKOUT MODAL ====================== */
+    #walletCheckoutModal .modal-content {
+        border-radius: 20px;
+        border: none;
+    }
+
+    #walletCheckoutModal .modal-header {
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    #walletCheckoutModal .modal-footer {
+        border-top: 1px solid #f1f5f9;
+    }
+
+    #walletCheckoutModal .form-check-input {
+        width: 3em;
+        height: 1.5em;
+        cursor: pointer;
+    }
+
+    #walletCheckoutModal .form-check-input:checked {
+        background-color: #2563eb;
+        border-color: #2563eb;
+    }
 </style>
 
 @section('content')
@@ -130,8 +158,10 @@
 
         // Helper to work out Full/Subject/Chapter/Topic wise labelling (same logic used in admin evaluate view)
         $resolvePaperType = function ($testpaper) {
-            if ($testpaper->paper_type == 1) return 'Previous Year';
-            if ($testpaper->paper_type == 2) return 'Current Affair';
+            if ($testpaper->paper_type == 1)
+                return 'Previous Year';
+            if ($testpaper->paper_type == 2)
+                return 'Current Affair';
 
             if (is_null($testpaper->topic_id) && is_null($testpaper->subject_id) && is_null($testpaper->chapter_id)) {
                 return 'Full Test';
@@ -186,8 +216,7 @@
 
                             <div class="text-center mb-3">
                                 <img src="{{ $testseries->logo ? asset('storage/' . $testseries->logo) : asset('images/placeholder-logo.png') }}"
-                                    class="img-fluid rounded"
-                                    style="max-height:150px;max-width:150px;"
+                                    class="img-fluid rounded" style="max-height:150px;max-width:150px;"
                                     alt="{{ $testseries->title }}">
                             </div>
 
@@ -266,10 +295,10 @@
                                 </div>
 
                                 <div class="text-center mb-3">
-                                    <a href="{{ route('user.process-order', ['type' => 'test-series', 'id' => $testseries->id]) }}"
-                                        class="btn btn-primary btn-lg">
-                                        Buy Now
-                                    </a>
+                                    <button type="button" class="btn btn-primary btn-lg" id="openEnrollModalBtn" data-type="test-series"
+                                        data-id="{{ $testseries->id }}" data-name="{{ $testseries->name }}">
+                                        Enroll Now
+                                    </button>
                                 </div>
 
                                 <hr>
@@ -370,10 +399,12 @@
 
                                                         {{-- ✅ TEST SYLLABUS --}}
                                                         <div class="text-muted small mt-1">
-                                                            <span class="badge bg-light text-dark border">{{ $paperTypeLabel }}</span>
+                                                            <span
+                                                                class="badge bg-light text-dark border">{{ $paperTypeLabel }}</span>
 
                                                             @if($testpaper->subject)
-                                                                <span class="ms-2"><strong>Subject:</strong> {{ $testpaper->subject->name }}</span>
+                                                                <span class="ms-2"><strong>Subject:</strong>
+                                                                    {{ $testpaper->subject->name }}</span>
                                                             @endif
 
                                                             @if($testpaper->chapter)
@@ -513,7 +544,8 @@
                                                 </div>
                                             </div>
                                         @empty
-                                            <p class="text-muted text-center py-3">No previous year papers available in this series yet.</p>
+                                            <p class="text-muted text-center py-3">No previous year papers available in this series
+                                                yet.</p>
                                         @endforelse
 
                                         <div class="filter-empty-state text-center py-4 text-muted" data-empty="previous">
@@ -535,6 +567,201 @@
         </div>
     </section>
 
+      <!-- ============ WALLET CHECKOUT MODAL ============ -->
+        <div class="modal fade" id="walletCheckoutModal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                        <h5 class="modal-title fw-bold" id="checkoutModalCourseName">Confirm Enrollment</h5>
+                    </div>
+                    <div class="modal-body" style="padding: 24px;">
+
+                        <div id="walletLoadingState" class="text-center py-4">
+                            <div class="spinner-border text-primary" role="status"></div>
+                            <p class="text-muted mt-2 mb-0">Checking your wallet balance...</p>
+                        </div>
+
+                        <div id="walletCheckoutBody" style="display:none;">
+
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Study Material Fee</span>
+                                <strong id="modal_course_fee">₹0</strong>
+                            </div>
+
+                            <div class="d-flex justify-content-between mb-3" id="walletBalanceRow">
+                                <span class="text-muted">Your Wallet Balance</span>
+                                <strong id="modal_wallet_balance" class="text-success">₹0</strong>
+                            </div>
+
+                            <div id="noBalanceNotice" class="alert alert-light border"
+                                style="display:none; font-size: 14px;">
+                                You don't have any wallet balance yet. You'll pay the full study material fee.
+                            </div>
+
+                            <div id="redeemSection" style="display:none;">
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" id="redeemToggle">
+                                    <label class="form-check-label fw-bold ms-2" for="redeemToggle">
+                                        Redeem wallet points for this order
+                                    </label>
+                                </div>
+
+                                <div id="redeemAmountBox" style="display:none;">
+                                    <label for="redeemAmountInput" class="form-label">
+                                        Amount to redeem (max ₹<span id="max_redeem_display">0</span>)
+                                    </label>
+                                    <input type="number" class="form-control" id="redeemAmountInput" min="0" step="1">
+                                    <span id="redeemAmountError" class="text-danger"
+                                        style="display:none; font-size: 13px;"></span>
+                                </div>
+                            </div>
+
+                            <hr>
+
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="fw-bold" style="font-size: 15px;">Amount Payable Now</span>
+                                <strong id="modal_payable_amount" class="text-primary" style="font-size: 22px;">₹0</strong>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-primary" id="confirmEnrollBtn" style="display:none;">
+                            Proceed to Pay <span id="confirmEnrollAmount"></span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hidden form that actually submits to process-order -->
+        <form id="processOrderForm" method="POST" action="" style="display:none;">
+            @csrf
+            <input type="hidden" name="wallet_redeem_amount" id="form_redeem_amount" value="0">
+        </form>
+
+         <script>
+        let currentPackage = { type: null, id: null };
+        let walletData = { balance: 0, maxRedeemable: 0, fee: 0 };
+
+        function openEnrollModal(btn) {
+            currentPackage = { type: $(btn).data('type'), id: $(btn).data('id') };
+
+            $('#checkoutModalCourseName').text('Confirm Enrollment');
+            $('#walletLoadingState').show();
+            $('#walletCheckoutBody').hide();
+            $('#confirmEnrollBtn').hide();
+            $('#redeemToggle').prop('checked', false);
+            $('#redeemAmountBox').hide();
+            $('#redeemAmountInput').val('');
+            $('#redeemAmountError').hide();
+
+            $('#walletCheckoutModal').modal('show');
+
+            $.ajax({
+                headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                url: "{{ route('user.wallet.check-balance') }}",
+                type: 'POST',
+                data: {
+                    type: currentPackage.type,
+                    id: currentPackage.id,
+                },
+                success: function (res) {
+                    $('#walletLoadingState').hide();
+                    $('#walletCheckoutBody').show();
+                    $('#confirmEnrollBtn').show();
+
+                    if (!res.success) {
+                        $('#walletCheckoutBody').html('<p class="text-danger mb-0">' + res.message + '</p>');
+                        $('#confirmEnrollBtn').hide();
+                        return;
+                    }
+
+                    walletData = {
+                        balance: res.wallet_balance,
+                        maxRedeemable: res.max_redeemable,
+                        fee: res.course_fee
+                    };
+
+                    $('#modal_course_fee').text('₹' + res.course_fee);
+                    $('#modal_wallet_balance').text('₹' + res.wallet_balance);
+
+                    if (res.has_balance) {
+                        $('#walletBalanceRow').show();
+                        $('#noBalanceNotice').hide();
+                        $('#redeemSection').show();
+                        $('#max_redeem_display').text(res.max_redeemable);
+                        $('#redeemAmountInput').attr('max', res.max_redeemable).val('');
+                    } else {
+                        $('#walletBalanceRow').show();
+                        $('#noBalanceNotice').show();
+                        $('#redeemSection').hide();
+                    }
+
+                    updatePayable(0);
+                },
+                error: function () {
+                    $('#walletLoadingState').html('<p class="text-danger mb-0">Something went wrong. Please try again.</p>');
+                }
+            });
+        }
+
+        $(document).on('click', '#openEnrollModalBtn, #openEnrollModalBtnMobile', function () {
+            openEnrollModal(this);
+        });
+
+        $('#redeemToggle').on('change', function () {
+            if ($(this).is(':checked')) {
+                $('#redeemAmountBox').show();
+                $('#redeemAmountInput').val(walletData.maxRedeemable).trigger('input');
+            } else {
+                $('#redeemAmountBox').hide();
+                $('#redeemAmountError').hide();
+                updatePayable(0);
+            }
+        });
+
+        $('#redeemAmountInput').on('input', function () {
+            let val = parseFloat($(this).val()) || 0;
+
+            if (val > walletData.maxRedeemable) {
+                $('#redeemAmountError').show().text('You can redeem up to ₹' + walletData.maxRedeemable + ' only.');
+                val = walletData.maxRedeemable;
+                $(this).val(val);
+            } else if (val < 0) {
+                $('#redeemAmountError').show().text('Amount cannot be negative.');
+                val = 0;
+                $(this).val(val);
+            } else {
+                $('#redeemAmountError').hide();
+            }
+
+            updatePayable(val);
+        });
+
+        function updatePayable(redeemAmount) {
+            let payable = Math.max(walletData.fee - redeemAmount, 0);
+            $('#modal_payable_amount').text('₹' + payable.toFixed(2));
+            $('#confirmEnrollAmount').text(payable > 0 ? '(₹' + payable.toFixed(2) + ')' : '(Free)');
+        }
+
+        $('#confirmEnrollBtn').on('click', function () {
+            let redeemAmount = $('#redeemToggle').is(':checked')
+                ? (parseFloat($('#redeemAmountInput').val()) || 0)
+                : 0;
+
+            $('#form_redeem_amount').val(redeemAmount);
+            $('#processOrderForm').attr(
+                'action',
+                "{{ url('/order/process') }}/" + currentPackage.type + "/" + currentPackage.id
+            );
+            $('#processOrderForm').submit();
+        });
+    </script>
+    
     <script>
         document.addEventListener('DOMContentLoaded', function () {
 

@@ -58,15 +58,28 @@
                                 <th>Order Type</th>
                                 <th>Student Name</th>
                                 <th>Mobile</th>
-                                <th>Paid Amount</th>
+                                <th>Total</th>
                                 <th>Payment Status</th>
+                                <th>Payment Mode</th>
+                                <th>Gateway</th>
                                 <th>Transaction ID</th>
-                                <th>Order Status</th>
                                 <th width="12%">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             @forelse($orders as $res)
+                                @php
+                                    // payment_status stores: PAID | CANCELLED | PENDING | FAILED
+                                    $badgeClass = match ($res->payment_status) {
+                                        'PAID' => 'bg-success',
+                                        'CANCELLED' => 'bg-secondary',
+                                        'PENDING' => 'bg-warning text-dark',
+                                        default => 'bg-danger', // Failed
+                                    };
+
+                                    $walletUsed = (float) ($res->wallet_used ?? 0);
+                                    $gatewayPaid = ($res->total ?? 0) - $walletUsed;
+                                @endphp
                                 <tr>
                                     <td>
                                         {{ ($orders->currentPage() - 1) * $orders->perPage() + $loop->iteration }}
@@ -76,19 +89,42 @@
                                     <td>{{ $res->order_type ?? '-' }}</td>
                                     <td>{{ $res->student->name ?? '-' }}</td>
                                     <td>{{ $res->student->mobile ?? '-' }}</td>
-                                    <td>₹ {{ $res->total ?? '0' }}</td>
+
+                                    {{-- TOTAL — order value, may be split across wallet + gateway --}}
+                                    <td>
+                                        ₹{{ number_format($res->total ?? 0, 2) }}
+                                        @if($walletUsed > 0)
+                                            <br>
+                                            <small class="text-muted" title="₹{{ number_format($walletUsed, 2) }} via Wallet + ₹{{ number_format($gatewayPaid, 2) }} via {{ $res->payment_gateway ?? 'Gateway' }}">
+                                                <i class="fa fa-wallet"></i> ₹{{ number_format($walletUsed, 2) }} wallet
+                                                @if($gatewayPaid > 0)
+                                                    + ₹{{ number_format($gatewayPaid, 2) }} gateway
+                                                @endif
+                                            </small>
+                                        @endif
+                                    </td>
 
                                     {{-- PAYMENT STATUS --}}
                                     <td>
-                                        <span
-                                            class="badge 
-                                                                {{ $res->payment_status == 'PAID' ? 'bg-success' : 'bg-warning' }}">
-                                            {{ ucfirst($res->payment_status) }}
+                                        <span class="badge {{ $badgeClass }}">
+                                            {{ $res->payment_status ?? '-' }}
                                         </span>
+
+                                        @if($res->payment_remark)
+                                            <br>
+                                            <small class="text-muted" title="{{ $res->payment_remark }}">
+                                                {{ Illuminate\Support\Str::limit($res->payment_remark, 28) }}
+                                            </small>
+                                        @endif
                                     </td>
 
+                                    {{-- PAYMENT MODE (UPI / Credit Card / Net Banking etc) --}}
+                                    <td>{{ $res->payment_mode ?? '-' }}</td>
+
+                                    {{-- GATEWAY (CashFree) --}}
+                                    <td>{{ $res->payment_gateway ?? 'CashFree' }}</td>
+
                                     <td>{{ $res->transaction_id ?? '-' }}</td>
-                                    <td>{{ ucfirst($res->order_status) }}</td>
 
                                     {{-- ACTIONS --}}
                                     <td>

@@ -16,6 +16,13 @@ Orders
     transform: translateY(-3px);
 }
 
+.wallet-tag {
+    font-size: 11px;
+    color: #9a3412;
+    display: block;
+    margin-top: 2px;
+}
+
 @media (max-width: 991.98px) {
     .table-responsive {
         overflow-x: auto;
@@ -54,41 +61,54 @@ Orders
                                     <th>Date & Time</th>
                                     <th>Order Id</th>
                                     <th>Order Type</th>
-                                    <th>Paid Amount</th>
+                                    <th>Total</th>
+                                    <th>Payment Mode</th>
                                     <th>Payment Status</th>
                                     <th>Transaction ID</th>
-                                    <th>Order Status</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach($orders as $res)
+                                @forelse($orders as $res)
+                                    @php
+                                        // payment_status stores: PAID | CANCELLED | PENDING | FAILED
+                                        $badgeClass = match ($res->payment_status) {
+                                            'PAID' => 'success',
+                                            'CANCELLED' => 'secondary',
+                                            'PENDING' => 'warning',
+                                            default => 'danger', // FAILED
+                                        };
+                                    @endphp
                                     <tr>
                                         <td>{{ \Carbon\Carbon::parse($res->created_at)->format('d M Y, h:i A') }}</td>
                                         <td><strong>{{ $res->order_code ?? '-' }}</strong></td>
                                         <td>{{ $res->order_type ?? '-' }}</td>
-                                        <td><strong>₹{{ number_format($res->total ?? 0) }}</strong></td>
                                         <td>
-                                            <span class="badge bg-{{ $res->payment_status == 'paid' ? 'success' : 'warning' }}">
-                                                {{ ucfirst($res->payment_status) }}
+                                            <strong>₹{{ number_format($res->total ?? 0) }}</strong>
+                                            @if(($res->wallet_used ?? 0) > 0)
+                                                <span class="wallet-tag">₹{{ number_format($res->wallet_used) }} via Wallet</span>
+                                            @endif
+                                        </td>
+                                        <td>{{ $res->payment_mode ?? '-' }}</td>
+                                        <td>
+                                            <span class="badge bg-{{ $badgeClass }}">
+                                                {{ $res->payment_status ?? '-' }}
                                             </span>
                                         </td>
                                         <td>{{ $res->transaction_id ?? '-' }}</td>
                                         <td>
-                                            <span class="badge bg-{{ $res->order_status == 'completed' ? 'success' : 'info' }}">
-                                                {{ ucfirst($res->order_status) }}
-                                            </span>
-                                        </td>
-                                        <td>
                                             <a href="{{route('user.order-details',$res->id)}}" class="btn btn-sm btn-primary me-1">
                                                 <i data-feather="eye"></i>
                                             </a>
-                                            <a href="#" class="btn btn-sm btn-outline-danger">
-                                                <i data-feather="trash"></i>
-                                            </a>
                                         </td>
                                     </tr>
-                                @endforeach
+                                @empty
+                                    <tr>
+                                        <td colspan="8" class="text-center text-muted py-4">
+                                            No orders found.
+                                        </td>
+                                    </tr>
+                                @endforelse
                             </tbody>
                         </table>
                     </div>
@@ -98,7 +118,15 @@ Orders
 
                 </div>
                 <div class="order-cards d-lg-none">
-                        @foreach($orders as $res)
+                        @forelse($orders as $res)
+                            @php
+                                $badgeClass = match ($res->payment_status) {
+                                    'PAID' => 'success',
+                                    'CANCELLED' => 'secondary',
+                                    'PENDING' => 'warning',
+                                    default => 'danger', // Failed
+                                };
+                            @endphp
                             <div class="order-card mb-3">
                                 <div class="card border-0 shadow-sm">
                                     <div class="card-body p-2">
@@ -109,9 +137,14 @@ Orders
                                                     {{ \Carbon\Carbon::parse($res->created_at)->format('d M Y, h:i A') }}
                                                 </p>
                                             </div>
-                                            <span class="badge bg-{{ $res->payment_status == 'paid' ? 'success' : 'warning' }} fs-6">
-                                                ₹{{ number_format($res->total ?? 0) }}
-                                            </span>
+                                            <div class="text-end">
+                                                <span class="badge bg-{{ $badgeClass }} fs-6">
+                                                    ₹{{ number_format($res->total ?? 0) }}
+                                                </span>
+                                                @if(($res->wallet_used ?? 0) > 0)
+                                                    <span class="wallet-tag">₹{{ number_format($res->wallet_used) }} via Wallet</span>
+                                                @endif
+                                            </div>
                                         </div>
 
                                         <div class="row g-2 text-muted small">
@@ -124,15 +157,13 @@ Orders
                                                 {{ $res->transaction_id ?? '-' }}
                                             </div>
                                             <div class="col-6">
-                                                <strong>Payment:</strong><br>
-                                                <span class="badge bg-{{ $res->payment_status == 'paid' ? 'success' : 'warning' }}">
-                                                    {{ ucfirst($res->payment_status) }}
-                                                </span>
+                                                <strong>Payment Mode:</strong><br>
+                                                {{ $res->payment_mode ?? '-' }}
                                             </div>
                                             <div class="col-6">
                                                 <strong>Status:</strong><br>
-                                                <span class="badge bg-{{ $res->order_status == 'completed' ? 'success' : 'info' }}">
-                                                    {{ ucfirst($res->order_status) }}
+                                                <span class="badge bg-{{ $badgeClass }}">
+                                                    {{ $res->payment_status ?? '-' }}
                                                 </span>
                                             </div>
                                         </div>
@@ -142,14 +173,15 @@ Orders
                                                class="btn btn-primary flex-fill">
                                                 <i data-feather="eye" class="me-2"></i> View Details
                                             </a>
-                                            <a href="#" class="btn btn-outline-danger flex-fill">
-                                                <i data-feather="trash"></i>
-                                            </a>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        @endforeach
+                        @empty
+                            <div class="text-center text-muted py-4">
+                                No orders found.
+                            </div>
+                        @endforelse
                     </div>
             </div>
         </div>

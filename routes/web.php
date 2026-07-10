@@ -38,6 +38,7 @@ use App\Http\Controllers\Admin\AboutPageController;
 use App\Http\Controllers\BatchMarqueeController;
 use App\Http\Controllers\DashboardBannerSettingController;
 use App\Http\Controllers\SearchController;
+use App\Http\Controllers\BackupController;
 
 /*
 |--------------------------------------------------------------------------
@@ -294,15 +295,28 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
         Route::get('/paper/cart', [PaperController::class, 'cart'])->name('paper.cart');
         Route::post('/paper/checkout', [PaperController::class, 'checkout'])->name('paper.checkout');
 
-        Route::get('user/process-order/{type}/{id}', [App\Http\Controllers\PaymentController::class, 'orderProcess'])->name('user.process-order');
+        Route::match(['get', 'post'], '/order/process/{type}/{id}', [App\Http\Controllers\PaymentController::class, 'orderProcess'])
+            ->name('user.process-order');
         Route::any('order/status', [App\Http\Controllers\PaymentController::class, 'orderStatus'])->name('order.status');
         Route::get('/thank-you/{order}', [App\Http\Controllers\PaymentController::class, 'thankYou'])->name('thank.you');
+
+        Route::post('/user/wallet/check-balance', [App\Http\Controllers\StudentWalletController::class, 'checkBalance'])
+            ->name('user.wallet.check-balance');
 
     });
 
     // admin panel routes
     Route::middleware(['auth', 'isAdmin'])->group(function () {
         Route::get('admin-login', [App\Http\Controllers\HomeController::class, 'index'])->name('dashboard');
+
+
+        Route::prefix('backup')->name('backup.')->group(function () {
+            Route::get('/', [BackupController::class, 'index'])->name('index');
+            Route::post('/settings', [BackupController::class, 'updateSettings'])->name('settings.update');
+            Route::post('/run', [BackupController::class, 'backupNow'])->name('run');
+            Route::post('/restore', [BackupController::class, 'restore'])->name('restore');
+            Route::delete('/destroy', [BackupController::class, 'destroy'])->name('destroy');
+        });
 
         Route::prefix('about-page')->group(function () {
 

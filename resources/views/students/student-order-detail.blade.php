@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title')
-Order Detail
+    Order Detail
 @endsection
 @section('content')
     <style>
@@ -50,19 +50,24 @@ Order Detail
         .sub-total ul li {
             padding: 1px 5px;
         }
+
+        .sub-total ul li.wallet-line {
+            color: #9a3412;
+            font-size: 13px;
+        }
     </style>
     <div class="bg-light rounded p-2">
         <div class="card">
             <div class="card-body">
-             <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="d-flex justify-content-between align-items-center mb-3">
 
-    <h5 class="card-title mb-0">Order Detail</h5>
+                    <h5 class="card-title mb-0">Order Detail</h5>
 
-    <a href="{{ url()->previous() }}" class="btn btn-secondary btn-sm">
-        ← Back
-    </a>
+                    <a href="{{ url()->previous() }}" class="btn btn-secondary btn-sm">
+                        ← Back
+                    </a>
 
-</div>
+                </div>
 
                 <div class="mt-2">
                     @include('layouts.includes.messages')
@@ -95,6 +100,8 @@ Order Detail
                                     Order Id: {{$order->order_code}}<br>
                                     Order Type: {{$order->order_type}}<br>
                                     Payment Status: {{$order->payment_status}}<br>
+                                    Payment Mode: {{$order->payment_mode ?? '-'}}<br>
+                                    Gateway: {{$order->payment_gateway ?? 'CashFree'}}<br>
                                     Transaction Id: {{$order->transaction_id ?? ''}}<br>
                                 </div>
                             </div>
@@ -116,44 +123,66 @@ Order Detail
                                 <tr>
                                     <td>1</td>
                                     <td>{{$order->order_type}}</td>
-                                   <td>
+                                    <td>
 
-                                    @if($course)
-                                        {{ $course->name ?? '-' }}
+                                        @if($course)
+                                            {{ $course->name ?? '-' }}
 
-                                    @elseif($studyMaterial)
-                                        {{ $studyMaterial->title ?? '-' }}
+                                        @elseif($studyMaterial)
+                                            {{ $studyMaterial->title ?? '-' }}
 
 
-                                    @elseif($testSeries)
-                                        {{ $testSeries->title ?? '-' }}
+                                        @elseif($testSeries)
+                                            {{ $testSeries->title ?? '-' }}
 
-                                    @elseif(isset($papers) && $papers->count())
-                                        @foreach($papers as $paper)
+                                        @elseif(isset($papers) && $papers->count())
+                                            @foreach($papers as $paper)
 
-                                            <li style="margin:6px">
-                                                {{ $paper->name }}
-                                            </li>
+                                                <li style="margin:6px">
+                                                    {{ $paper->name }}
+                                                </li>
 
-                                        @endforeach
-                                    @else
-                                        {{ $order->package_name ?? '-' }}
-                                    @endif
+                                            @endforeach
+                                        @else
+                                            {{ $order->package_name ?? '-' }}
+                                        @endif
 
-                                </td>
+                                    </td>
                                     <td>{{$order->quantity ?? 0}}</td>
-                                    <td>&#8377;{{$order->billed_amount ?? 0}}</td>
+                                    <td>&#8377;{{ number_format($order->billed_amount ?? 0, 2) }}</td>
                                 </tr>
 
                             </tbody>
                         </table>
+                        @php
+                            $walletUsed = (float) ($order->wallet_used ?? 0);
+                            $gatewayPaid = ($order->total ?? 0) - $walletUsed;
+                        @endphp
                         <div class="sub-total">
                             <ul>
-                                <li> Sub Total:<span class="fr">&#8377;{{$order->billed_amount ?? 0}}</span></li>
+                                <li> Sub Total:<span
+                                        class="fr">&#8377;{{ number_format($order->billed_amount ?? 0, 2) }}</span></li>
                                 <li> Discount({{$order->discount ?? 0}}%): <span
-                                        class="fr">&#8377;{{$order->discount_amount ?? 0}}</span></li>
-                                <li> Taxes({{$order->tax ?? 0}}%): <span class="fr">&#8377;{{$order->tax ?? 0}}</span></li>
-                                <li class="total-c"> Total: <span class="fr">&#8377;{{$order->total ?? 0}}</span></li>
+                                        class="fr">&#8377;{{ number_format($order->discount_amount ?? 0, 2) }}</span></li>
+                                <li> Taxes({{$order->tax ?? 0}}%): <span
+                                        class="fr">&#8377;{{ number_format($order->tax ?? 0, 2) }}</span></li>
+                                @if($walletUsed > 0)
+                                    <li class="wallet-line">
+                                        Paid via Wallet
+                                        @if($order->wallet_refunded ?? false)
+                                            <span style="font-weight:400;">(refunded)</span>
+                                        @endif
+                                        : <span class="fr">&#8377;{{ number_format($walletUsed, 2) }}</span>
+                                    </li>
+                                    @if($gatewayPaid > 0)
+                                        <li class="wallet-line">
+                                            Paid via {{ $order->payment_gateway ?? 'Gateway' }}: <span
+                                                class="fr">&#8377;{{ number_format($gatewayPaid, 2) }}</span>
+                                        </li>
+                                    @endif
+                                @endif
+                                <li class="total-c"> Total: <span
+                                        class="fr">&#8377;{{ number_format($order->total ?? 0, 2) }}</span></li>
                             </ul>
                         </div>
                     </div>

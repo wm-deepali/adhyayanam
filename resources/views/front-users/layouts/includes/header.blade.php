@@ -20,21 +20,15 @@
 	<div class="d-flex align-items-center logo-box justify-content-start">
 		<!-- Logo -->
 		<a href="{{url('/')}}" class="logo">
-			<!-- logo-->
-			<div class="logo-mini w-30">
-				<!-- <span class="light-logo"><img src="https://netiias.com/design/images/Neti-logo.svg" alt="logo"></span>
-			  <span class="dark-logo"><img src="https://netiias.com/design/images/Neti-logo.svg" alt="logo"></span> -->
-			</div>
 			<div class="logo-lg">
 				<span class="light-logo"><img src="{{ url('images/Neti-logo.png')}}" alt="logo"></span>
-				<!-- <span class="dark-logo"><img src="https://netiias.com/design/images/Neti-logo.svg" alt="logo"></span> -->
 			</div>
 		</a>
 	</div>
 	<!-- Header Navbar -->
 	<nav class="navbar navbar-static-top">
 		<!-- Sidebar toggle button-->
-		<div class="app-menu">
+		<!-- <div class="app-menu">
 			<ul class="header-megamenu nav">
 				<li class="">
 					<a href="{{url('/')}}" class="">
@@ -42,22 +36,8 @@
 							style="width:100px; padding-bottom:10px;">
 					</a>
 				</li>
-				<!--<li class="btn-group d-lg-inline-flex d-none">-->
-				<!--	<div class="app-menu">-->
-				<!--		<div class="search-bx mx-5">-->
-				<!--			<form>-->
-				<!--				<div class="input-group">-->
-				<!--				  <input type="search" class="form-control" placeholder="Search">-->
-				<!--				  <div class="input-group-append">-->
-				<!--					<button class="btn" type="submit" id="button-addon3"><i class="icon-Search"><span class="path1"></span><span class="path2"></span></i></button>-->
-				<!--				  </div>-->
-				<!--				</div>-->
-				<!--			</form>-->
-				<!--		</div>-->
-				<!--	</div>-->
-				<!--</li>-->
 			</ul>
-		</div>
+		</div> -->
 
 		<div class="navbar-custom-menu r-side">
 			<ul class="nav navbar-nav">
@@ -70,14 +50,6 @@
 						</label>
 					</a>
 				</li>
-
-				<!--<li class="btn-group nav-item d-xl-inline-flex d-none">-->
-				<!--	<a href="#" class="waves-effect waves-light nav-link btn-primary-light svg-bt-icon" title="" id="live-chat">-->
-				<!--		<i data-feather="message-circle"></i>-->
-				<!--    </a>-->
-				<!--</li>-->
-
-
 
 				<li class="btn-group nav-item d-xl-inline-flex d-none">
 					<a href="#" data-provide="fullscreen"

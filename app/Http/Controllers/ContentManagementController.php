@@ -4009,6 +4009,16 @@ class ContentManagementController extends Controller
                 'total_paper'
             ]);
 
+            $slug = Str::slug($request->slug);
+            $originalSlug = $slug;
+            $count = 1;
+
+            while (TestSeries::where('slug', $slug)->exists()) {
+                $slug = $originalSlug . '-' . $count++;
+            }
+
+            $data['slug'] = $slug;
+
             // ✅ NEW FIELDS
             $data['validity'] = $request->validity;
             $data['overview'] = $request->overview;
@@ -4263,6 +4273,20 @@ class ContentManagementController extends Controller
         TestSeriesDetail::where('test_series_id', $id)
             ->whereNotIn('id', $keptIds)
             ->delete();
+
+        $slug = Str::slug($request->slug);
+        $originalSlug = $slug;
+        $count = 1;
+
+        while (
+            TestSeries::where('slug', $slug)
+                ->where('id', '!=', $id)
+                ->exists()
+        ) {
+            $slug = $originalSlug . '-' . $count++;
+        }
+
+        $data['slug'] = $slug;
 
         /* ================= UPDATE MAIN SERIES ================= */
         $test->update([

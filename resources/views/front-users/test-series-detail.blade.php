@@ -643,6 +643,7 @@
             <input type="hidden" name="wallet_redeem_amount" id="form_redeem_amount" value="0">
         </form>
 
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
          <script>
         let currentPackage = { type: null, id: null };
         let walletData = { balance: 0, maxRedeemable: 0, fee: 0 };

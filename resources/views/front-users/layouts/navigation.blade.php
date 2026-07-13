@@ -112,11 +112,6 @@
                     style="height: 45px;">
             </a>
 
-            <!-- Menu Button to Toggle Sidebar -->
-            <!--<button type="button" class="sidebar-toggle-btn" aria-label="Toggle sidebar">-->
-            <!--    <i data-feather="menu" class="text-dark" style="width: 28px; height: 28px;"></i>-->
-            <!--</button>-->
-
             <!-- Right Side Close Button (Mobile pe dikhega) -->
             <button type="button" class="btn-close sidebar-close-btn d-lg-none" aria-label="Close sidebar">
                 <i data-feather="x" class="text-dark" style="width: 28px; height: 28px;"></i>

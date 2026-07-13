@@ -140,7 +140,7 @@
 
         $statusNote = match ($order->payment_status) {
             'CANCELLED' => 'This payment was cancelled before completion. No amount was deducted.',
-            'PENDING' => 'This payment is still being confirmed by the bank. This page will update automatically once confirmed.',
+            'PENDING' => 'This payment was Pending Try again. If any amount was deducted, it will be refunded automatically within 5-7 business days.',
             'FAILED' => 'This payment could not be completed. If any amount was deducted, it will be refunded automatically within 5-7 business days.',
             default => null,
         };

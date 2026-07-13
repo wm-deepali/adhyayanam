@@ -735,10 +735,18 @@
                     @endphp
 
                     @if(!$checkExist)
+                       @if($testseries->fee_type == 'free')
+       <a type="button" class="buy-btn" href="#test-papers">
+            Start Free
+        </a>
+
+    @else
                            <button type="button" class="buy-btn" id="openEnrollModalBtn" data-type="test-series"
                 data-id="{{ $testseries->id }}" data-name="{{ $testseries->name }}">
                 Enroll Now
               </button>
+
+              @endif
                     @else
 
                         <button class="buy-btn" disabled>Already Enrolled</button>
@@ -783,10 +791,17 @@
             @endphp
 
             @if(!$checkExist)
+               @if($testseries->fee_type == 'free')
+        <a type="button" class="buy-btn" href="#test-papers">
+            Start Free
+        </a>
+    @else
+
                  <button type="button" class="buy-btn" id="openEnrollModalBtn" data-type="test-series"
                 data-id="{{ $testseries->id }}" data-name="{{ $testseries->name }}">
                 Enroll Now
               </button>
+              @endif
             @else
                 <button class="buy-btn" disabled>Enrolled</button>
             @endif
@@ -969,7 +984,7 @@
 
     </section>
 
-    <section class="ts-container">
+   <section class="ts-container" id="test-papers">
         <div class="details-card">
             <h2 style="margin-bottom:10px">Test Papers</h2>
             @php

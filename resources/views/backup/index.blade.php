@@ -76,7 +76,7 @@
         <div class="card-header">Backups on Google Drive</div>
         <div class="card-body">
             @if (count($driveFiles) === 0)
-                <p class="text-muted mb-0">Abhi tak koi backup nahi hai.</p>
+                <p class="text-muted mb-0">No backups yet.</p>
             @else
                 <table class="table table-striped align-middle">
                     <thead>
@@ -127,15 +127,15 @@ function toggleAutoFields() {
 }
 
 function confirmBackup() {
-    return confirm('Backup abhi chalu karna hai? Isme kuch time lag sakta hai.');
+    return confirm('Do you want to run the backup now? This may take a few moments.');
 }
 
 function confirmRestore() {
-    return confirm('⚠️ Warning: Ye current database ko is backup se overwrite kar dega. Continue karna hai?');
+    return confirm('⚠️ Warning: This will overwrite the current database with this backup. Do you want to continue?');
 }
 
 function confirmDelete() {
-    return confirm('Ye backup permanently Google Drive se delete ho jayega. Continue karna hai?');
+    return confirm('This backup will be permanently deleted from Google Drive. Do you want to continue?');
 }
 </script>
 @endsection

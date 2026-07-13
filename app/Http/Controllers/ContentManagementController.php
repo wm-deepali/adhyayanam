@@ -4607,7 +4607,7 @@ class ContentManagementController extends Controller
         $data = $request->all();
 
         if ($request->hasFile('pdf')) {
-            $data['pdf'] = $request->file('pdf')->store('examinations');
+            $data['pdf'] = $request->file('pdf')->store('pdfs', 'public');
         }
 
         $data['created_by'] = auth()->id();
@@ -5350,23 +5350,23 @@ class ContentManagementController extends Controller
                         try {
                             $qTr = $tables[$i]->find('tr', 0);
                             $qTd = $qTr ? $qTr->find('td', 1) : null;
-                            $question = $qTd ? $qTd->innerHtml : null;
+                            $question = $qTd ? $this->normalizeParagraphSpacing($qTd->innerHtml) : null;
 
                             if ($question === null) {
                                 throw new \Exception('Missing question row');
                             }
 
                             $rawA = $this->getCellHtml($tables[$i], 1);
-                            $option_a = $this->isEmptyCell($rawA) ? null : $rawA;
+                            $option_a = $this->isEmptyCell($rawA) ? null : $this->normalizeParagraphSpacing($rawA);
 
                             $rawB = $this->getCellHtml($tables[$i], 2);
-                            $option_b = $this->isEmptyCell($rawB) ? null : $rawB;
+                            $option_b = $this->isEmptyCell($rawB) ? null : $this->normalizeParagraphSpacing($rawB);
 
                             $rawC = $this->getCellHtml($tables[$i], 3);
-                            $option_c = $this->isEmptyCell($rawC) ? null : $rawC;
+                            $option_c = $this->isEmptyCell($rawC) ? null : $this->normalizeParagraphSpacing($rawC);
 
                             $rawD = $this->getCellHtml($tables[$i], 4);
-                            $option_d = $this->isEmptyCell($rawD) ? null : $rawD;
+                            $option_d = $this->isEmptyCell($rawD) ? null : $this->normalizeParagraphSpacing($rawD);
 
                             $rejectQuestion = false;
                             $rejectNote = '';
@@ -5377,7 +5377,7 @@ class ContentManagementController extends Controller
                                 $option_e = null;
                                 $has_option_e = false;
                             } else {
-                                $option_e = $rawE;
+                                $option_e = $this->normalizeParagraphSpacing($rawE);
                                 $has_option_e = true;
                             }
 
@@ -5402,14 +5402,14 @@ class ContentManagementController extends Controller
                             } else {
                                 $tr7 = $tables[$i]->find('tr', 7);
                                 $td7 = $tr7 ? $tr7->find('td', 1) : null;
-                                $instruction = $td7 ? $td7->innerHtml : null;
+                                $instruction = $td7 ? $this->normalizeParagraphSpacing($td7->innerHtml) : null;
                                 $has_instruction = true;
                             }
 
                             // Solution (optional) - ROW 8
                             $rawSol = $this->getCellHtml($tables[$i], 8);
                             if (!$this->isEmptyCell($rawSol)) {
-                                $solution = $rawSol;
+                                $solution = $this->normalizeParagraphSpacing($rawSol);
                                 $has_solution = 'yes';
                             }
 
@@ -5472,7 +5472,7 @@ class ContentManagementController extends Controller
                         } catch (\Exception $ex) {
                             $qTr = $tables[$i]->find('tr', 0);
                             $qTd = $qTr ? $qTr->find('td', 1) : null;
-                            $question = $qTd ? $qTd->innerHtml : null;
+                            $question = $qTd ? $this->normalizeParagraphSpacing($qTd->innerHtml) : null;
 
                             $questionData['status'] = "Rejected";
                             $questionData['question_type'] = $request->question_type;
@@ -5502,7 +5502,7 @@ class ContentManagementController extends Controller
                         try {
                             $qTr = $tables[$i]->find('tr', 0);
                             $qTd = $qTr ? $qTr->find('td', 1) : null;
-                            $question = $qTd ? $qTd->innerHtml : null;
+                            $question = $qTd ? $this->normalizeParagraphSpacing($qTd->innerHtml) : null;
 
                             if ($question === null) {
                                 throw new \Exception('Missing question row');
@@ -5538,7 +5538,7 @@ class ContentManagementController extends Controller
                                 $solution = null;
                                 $has_solution = 'no';
                             } else {
-                                $solution = $rawSol;
+                                $solution = $this->normalizeParagraphSpacing($rawSol);
                                 $has_solution = 'yes';
                             }
 
@@ -5550,7 +5550,7 @@ class ContentManagementController extends Controller
                             } else {
                                 $tr4 = $tables[$i]->find('tr', 4);
                                 $td4 = $tr4 ? $tr4->find('td', 1) : null;
-                                $instruction = $td4 ? $td4->innerHtml : null;
+                                $instruction = $td4 ? $this->normalizeParagraphSpacing($td4->innerHtml) : null;
                                 $has_instruction = true;
                             }
 
@@ -5605,7 +5605,7 @@ class ContentManagementController extends Controller
                         } catch (\Exception $ex) {
                             $qTr = $tables[$i]->find('tr', 0);
                             $qTd = $qTr ? $qTr->find('td', 1) : null;
-                            $question = $qTd ? $qTd->innerHtml : null;
+                            $question = $qTd ? $this->normalizeParagraphSpacing($qTd->innerHtml) : null;
 
                             $questionData['question_type'] = $request->question_type;
                             $questionData['question'] = $question;
@@ -5636,7 +5636,7 @@ class ContentManagementController extends Controller
 
                     $qTr = $tables[1]->find('tr', 0);
                     $qTd = $qTr ? $qTr->find('td', 1) : null;
-                    $question = $qTd ? $qTd->innerHtml : null;
+                    $question = $qTd ? $this->normalizeParagraphSpacing($qTd->innerHtml) : null;
 
                     // Image (optional) - ROW 1
                     $tr1 = $tables[1]->find('tr', 1);
@@ -5666,7 +5666,7 @@ class ContentManagementController extends Controller
                     } else {
                         $tr2 = $tables[1]->find('tr', 2);
                         $td2 = $tr2 ? $tr2->find('td', 1) : null;
-                        $instruction = $td2 ? $td2->innerHtml : null;
+                        $instruction = $td2 ? $this->normalizeParagraphSpacing($td2->innerHtml) : null;
                         $has_instruction = true;
                     }
 
@@ -5723,7 +5723,7 @@ class ContentManagementController extends Controller
                                     // Subjective sub-question
                                     $pqTr = $tables[$i]->find('tr', 0);
                                     $pqTd = $pqTr ? $pqTr->find('td', 1) : null;
-                                    $passage_question = $pqTd ? $pqTd->innerHtml : null;
+                                    $passage_question = $pqTd ? $this->normalizeParagraphSpacing($pqTd->innerHtml) : null;
 
                                     // Answer format - ROW 1
                                     $rawAf = $this->getCellHtml($tables[$i], 1);
@@ -5733,7 +5733,7 @@ class ContentManagementController extends Controller
 
                                     // Solution - ROW 2
                                     $rawSol = $this->getCellHtml($tables[$i], 2);
-                                    $detail_solution = $this->isEmptyCell($rawSol) ? null : $rawSol;
+                                    $detail_solution = $this->isEmptyCell($rawSol) ? null : $this->normalizeParagraphSpacing($rawSol);
 
                                     $question_detail = [
                                         'question_id' => $ques->id,
@@ -5751,26 +5751,26 @@ class ContentManagementController extends Controller
                                     // MCQ sub-question
                                     $pqTr = $tables[$i]->find('tr', 0);
                                     $pqTd = $pqTr ? $pqTr->find('td', 1) : null;
-                                    $passage_question = $pqTd ? $pqTd->innerHtml : null;
+                                    $passage_question = $pqTd ? $this->normalizeParagraphSpacing($pqTd->innerHtml) : null;
 
                                     $rawA = $this->getCellHtml($tables[$i], 1);
-                                    $option_a = $this->isEmptyCell($rawA) ? null : $rawA;
+                                    $option_a = $this->isEmptyCell($rawA) ? null : $this->normalizeParagraphSpacing($rawA);
 
                                     $rawB = $this->getCellHtml($tables[$i], 2);
-                                    $option_b = $this->isEmptyCell($rawB) ? null : $rawB;
+                                    $option_b = $this->isEmptyCell($rawB) ? null : $this->normalizeParagraphSpacing($rawB);
 
                                     $rawC = $this->getCellHtml($tables[$i], 3);
-                                    $option_c = $this->isEmptyCell($rawC) ? null : $rawC;
+                                    $option_c = $this->isEmptyCell($rawC) ? null : $this->normalizeParagraphSpacing($rawC);
 
                                     $rawD = $this->getCellHtml($tables[$i], 4);
-                                    $option_d = $this->isEmptyCell($rawD) ? null : $rawD;
+                                    $option_d = $this->isEmptyCell($rawD) ? null : $this->normalizeParagraphSpacing($rawD);
 
                                     $rawE = $this->getCellHtml($tables[$i], 5);
                                     if ($this->isEmptyCell($rawE)) {
                                         $option_e = null;
                                         $has_option_e = false;
                                     } else {
-                                        $option_e = $rawE;
+                                        $option_e = $this->normalizeParagraphSpacing($rawE);
                                         $has_option_e = true;
                                     }
 
@@ -5781,11 +5781,11 @@ class ContentManagementController extends Controller
                                     $detail_solution = null;
                                     $rawSol7 = $this->getCellHtml($tables[$i], 7);
                                     if (!$this->isEmptyCell($rawSol7)) {
-                                        $detail_solution = $rawSol7;
+                                        $detail_solution = $this->normalizeParagraphSpacing($rawSol7);
                                     } else {
                                         $rawSol8 = $this->getCellHtml($tables[$i], 8);
                                         if (!$this->isEmptyCell($rawSol8)) {
-                                            $detail_solution = $rawSol8;
+                                            $detail_solution = $this->normalizeParagraphSpacing($rawSol8);
                                         }
                                     }
 
@@ -5826,6 +5826,24 @@ class ContentManagementController extends Controller
             DB::rollback();
             return redirect()->route('question.bank.bulk-upload')->with('error', 'Something went wrong: ' . $ex->getMessage());
         }
+    }
+
+
+    private function normalizeParagraphSpacing($html)
+    {
+        if (!$html) {
+            return $html;
+        }
+
+        // Strip Word's injected margin/spacing styles on <p> tags so
+        // consecutive paragraphs (e.g. "Conclusions:" then "1. ...")
+        // don't render with large gaps that make the content look empty.
+        $html = preg_replace('/<p([^>]*)style="[^"]*"([^>]*)>/i', '<p$1$2>', $html);
+
+        // Collapse consecutive empty paragraphs (e.g. <p>&nbsp;</p>)
+        $html = preg_replace('/(<p[^>]*>(\s|&nbsp;)*<\/p>)+/i', '', $html);
+
+        return $html;
     }
 
     public function questionBankDelete(Request $request, $id)

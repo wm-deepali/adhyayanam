@@ -147,6 +147,17 @@
 
     .retry-btn:hover { background: #d33d3d; }
 
+    .refresh-btn {
+        background: #f59e0b;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .refresh-btn:hover { background: #d98608; }
+
     .dashboard-btn {
         background: #e5e7eb;
         color: #111;
@@ -193,7 +204,7 @@
                 $text = match($status) {
                     'PAID' => 'Your ' . ($order->order_type ?? 'Package') . ' has been activated successfully. You can now access your content anytime from your dashboard.',
                     'CANCELLED' => 'You cancelled the payment before it was completed. No amount has been deducted. You can retry whenever you\'re ready.',
-                    'PENDING' => 'Your payment is still being confirmed by the bank. We will update your order automatically once confirmed — please avoid retrying immediately.',
+                    'PENDING' => 'Your payment is still being confirmed by the bank. This can take a few minutes. Please do not retry or make a second payment — we will update your order automatically as soon as it is confirmed.',
                     default => 'Your payment could not be completed. If any amount was deducted, it will be refunded automatically within 5-7 business days.',
                 };
             @endphp
@@ -255,7 +266,7 @@
                     <span>Wallet Amount Used</span>
                     <strong>
                         ₹{{ number_format($order->wallet_used, 2) }}
-                        @if($status !== 'PAID' && ($order->wallet_refunded ?? false))
+                        @if($status !== 'PAID' && $status !== 'PENDING' && ($order->wallet_refunded ?? false))
                             <span style="font-weight:400;color:#9a3412;">(refunded to wallet)</span>
                         @endif
                     </strong>
@@ -286,12 +297,22 @@
                     @if($order->order_type == 'Test Series')
                         <a href="{{ route('user.test-series-detail', $testSeries->slug) }}" class="start-btn">Start Your Test</a>
                     @elseif($order->order_type == 'Course')
-                        <a href="{{ route('course.detail', $course->id) }}" class="start-btn">Start Learning</a>
+                        <a href="{{ route('courses.detail', [$course->slug, $course->id]) }}" class="start-btn">Start Learning</a>
                     @elseif($order->order_type == 'Study Material')
-                        <a href="{{ route('study.material.details', $studyMaterial->id) }}" class="start-btn">View Study Material</a>
+                        <a href="{{route('study.material.details', [$studyMaterial->slug, $studyMaterial->id])
+ }}" class="start-btn">View Study Material</a>
                     @elseif($order->order_type == 'Paper')
                         <a href="{{ route('user.test-papers') }}" class="start-btn">View Purchased Papers</a>
                     @endif
+
+                @elseif($status == 'PENDING')
+
+                    {{-- ✅ FIX: no "Retry Payment" here — retrying while the bank
+                    confirmation is still in flight risks a duplicate/second
+                    payment for the same order. Instead let them refresh this
+                    page to re-check status, or just wait for the webhook to
+                    update automatically. --}}
+                    <a href="{{ url()->current() }}" class="refresh-btn">Check Status Again</a>
 
                 @else
 

@@ -116,7 +116,7 @@
                                             </span>
                                         </td>
                                         <td>
-                                            <a href="{{ route('study.material.details', $m->id) }}" 
+                                            <a href="{{ route('study.material.details', [$m->slug, $m->id]) }}" 
                                                class="btn btn-sm btn-primary">
                                                 <i data-feather="eye"></i> View
                                             </a>
@@ -178,7 +178,7 @@
                                         {{ ucfirst($m->status) }}
                                     </span>
                                 </div>
-                                <a href="{{ route('study.material.details', $m->id) }}" 
+                                <a href="{{ route('study.material.details', [$m->slug, $m->id]) }}" 
                                    class="btn btn-primary px-4">
                                     <i data-feather="eye" class="me-2"></i> View Details
                                 </a>

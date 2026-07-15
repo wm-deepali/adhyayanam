@@ -295,8 +295,9 @@
                                 </div>
 
                                 <div class="text-center mb-3">
-                                    <button type="button" class="btn btn-primary btn-lg" id="openEnrollModalBtn" data-type="test-series"
-                                        data-id="{{ $testseries->id }}" data-name="{{ $testseries->name }}">
+                                    <button type="button" class="btn btn-primary btn-lg" id="openEnrollModalBtn"
+                                        data-type="test-series" data-id="{{ $testseries->id }}"
+                                        data-name="{{ $testseries->name }}">
                                         Enroll Now
                                     </button>
                                 </div>
@@ -567,84 +568,82 @@
         </div>
     </section>
 
-      <!-- ============ WALLET CHECKOUT MODAL ============ -->
-        <div class="modal fade" id="walletCheckoutModal" tabindex="-1" role="dialog" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
-                                aria-hidden="true">&times;</span></button>
-                        <h5 class="modal-title fw-bold" id="checkoutModalCourseName">Confirm Enrollment</h5>
-                    </div>
-                    <div class="modal-body" style="padding: 24px;">
+    <!-- ============ WALLET CHECKOUT MODAL ============ -->
+    <div class="modal fade" id="walletCheckoutModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold" id="checkoutModalCourseName">Confirm Enrollment</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" style="padding: 24px;">
 
-                        <div id="walletLoadingState" class="text-center py-4">
-                            <div class="spinner-border text-primary" role="status"></div>
-                            <p class="text-muted mt-2 mb-0">Checking your wallet balance...</p>
+                    <div id="walletLoadingState" class="text-center py-4">
+                        <div class="spinner-border text-primary" role="status"></div>
+                        <p class="text-muted mt-2 mb-0">Checking your wallet balance...</p>
+                    </div>
+
+                    <div id="walletCheckoutBody" style="display:none;">
+
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Study Material Fee</span>
+                            <strong id="modal_course_fee">₹0</strong>
                         </div>
 
-                        <div id="walletCheckoutBody" style="display:none;">
-
-                            <div class="d-flex justify-content-between mb-2">
-                                <span class="text-muted">Study Material Fee</span>
-                                <strong id="modal_course_fee">₹0</strong>
-                            </div>
-
-                            <div class="d-flex justify-content-between mb-3" id="walletBalanceRow">
-                                <span class="text-muted">Your Wallet Balance</span>
-                                <strong id="modal_wallet_balance" class="text-success">₹0</strong>
-                            </div>
-
-                            <div id="noBalanceNotice" class="alert alert-light border"
-                                style="display:none; font-size: 14px;">
-                                You don't have any wallet balance yet. You'll pay the full study material fee.
-                            </div>
-
-                            <div id="redeemSection" style="display:none;">
-                                <div class="form-check form-switch mb-3">
-                                    <input class="form-check-input" type="checkbox" id="redeemToggle">
-                                    <label class="form-check-label fw-bold ms-2" for="redeemToggle">
-                                        Redeem wallet points for this order
-                                    </label>
-                                </div>
-
-                                <div id="redeemAmountBox" style="display:none;">
-                                    <label for="redeemAmountInput" class="form-label">
-                                        Amount to redeem (max ₹<span id="max_redeem_display">0</span>)
-                                    </label>
-                                    <input type="number" class="form-control" id="redeemAmountInput" min="0" step="1">
-                                    <span id="redeemAmountError" class="text-danger"
-                                        style="display:none; font-size: 13px;"></span>
-                                </div>
-                            </div>
-
-                            <hr>
-
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="fw-bold" style="font-size: 15px;">Amount Payable Now</span>
-                                <strong id="modal_payable_amount" class="text-primary" style="font-size: 22px;">₹0</strong>
-                            </div>
-
+                        <div class="d-flex justify-content-between mb-3" id="walletBalanceRow">
+                            <span class="text-muted">Your Wallet Balance</span>
+                            <strong id="modal_wallet_balance" class="text-success">₹0</strong>
                         </div>
+
+                        <div id="noBalanceNotice" class="alert alert-light border" style="display:none; font-size: 14px;">
+                            You don't have any wallet balance yet. You'll pay the full study material fee.
+                        </div>
+
+                        <div id="redeemSection" style="display:none;">
+                            <div class="form-check form-switch mb-3">
+                                <input class="form-check-input" type="checkbox" id="redeemToggle">
+                                <label class="form-check-label fw-bold ms-2" for="redeemToggle">
+                                    Redeem wallet points for this order
+                                </label>
+                            </div>
+
+                            <div id="redeemAmountBox" style="display:none;">
+                                <label for="redeemAmountInput" class="form-label">
+                                    Amount to redeem (max ₹<span id="max_redeem_display">0</span>)
+                                </label>
+                                <input type="number" class="form-control" id="redeemAmountInput" min="0" step="1">
+                                <span id="redeemAmountError" class="text-danger"
+                                    style="display:none; font-size: 13px;"></span>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="fw-bold" style="font-size: 15px;">Amount Payable Now</span>
+                            <strong id="modal_payable_amount" class="text-primary" style="font-size: 22px;">₹0</strong>
+                        </div>
+
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-primary" id="confirmEnrollBtn" style="display:none;">
-                            Proceed to Pay <span id="confirmEnrollAmount"></span>
-                        </button>
-                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="confirmEnrollBtn" style="display:none;">
+                        Proceed to Pay <span id="confirmEnrollAmount"></span>
+                    </button>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Hidden form that actually submits to process-order -->
-        <form id="processOrderForm" method="POST" action="" style="display:none;">
-            @csrf
-            <input type="hidden" name="wallet_redeem_amount" id="form_redeem_amount" value="0">
-        </form>
+    <!-- Hidden form that actually submits to process-order -->
+    <form id="processOrderForm" method="POST" action="" style="display:none;">
+        @csrf
+        <input type="hidden" name="wallet_redeem_amount" id="form_redeem_amount" value="0">
+    </form>
 
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-         <script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
         let currentPackage = { type: null, id: null };
         let walletData = { balance: 0, maxRedeemable: 0, fee: 0 };
 
@@ -762,10 +761,100 @@
             $('#processOrderForm').submit();
         });
     </script>
-    
+
     <script>
         document.addEventListener('DOMContentLoaded', function () {
 
+            // ---------- Build subject -> chapter -> topic hierarchy from rows ----------
+            function buildHierarchy(rowClass) {
+                const rows = document.querySelectorAll(rowClass);
+                const hierarchy = {
+                    chapterSubject: {},   // chapterId -> Set(subjectIds)
+                    topicChapter: {},     // topicId -> chapterId
+                    topicSubject: {}      // topicId -> Set(subjectIds)
+                };
+
+                rows.forEach(row => {
+                    const subject = row.dataset.subject;
+                    const chapter = row.dataset.chapter;
+                    const topic = row.dataset.topic;
+
+                    if (chapter && chapter !== 'none') {
+                        if (!hierarchy.chapterSubject[chapter]) {
+                            hierarchy.chapterSubject[chapter] = new Set();
+                        }
+                        hierarchy.chapterSubject[chapter].add(subject);
+                    }
+
+                    if (topic && topic !== 'none') {
+                        hierarchy.topicChapter[topic] = chapter;
+                        if (!hierarchy.topicSubject[topic]) {
+                            hierarchy.topicSubject[topic] = new Set();
+                        }
+                        hierarchy.topicSubject[topic].add(subject);
+                    }
+                });
+
+                return hierarchy;
+            }
+
+            // ---------- Update chapter & topic dropdown OPTIONS based on parent selection ----------
+            function updateDropdownOptions(section, hierarchy) {
+                const bar = document.querySelector(`.filter-bar[data-section="${section}"]`);
+                if (!bar) return;
+
+                const subjectSelect = bar.querySelector('.filter-select[data-type="subject"]');
+                const chapterSelect = bar.querySelector('.filter-select[data-type="chapter"]');
+                const topicSelect = bar.querySelector('.filter-select[data-type="topic"]');
+
+                const selectedSubject = subjectSelect ? subjectSelect.value : 'all';
+                let selectedChapter = chapterSelect ? chapterSelect.value : 'all';
+
+                // ---- Filter CHAPTER options based on selected subject ----
+                if (chapterSelect) {
+                    chapterSelect.querySelectorAll('option').forEach(opt => {
+                        if (opt.value === 'all') return; // always keep "All Chapters"
+
+                        const belongsToSubjects = hierarchy.chapterSubject[opt.value];
+                        const visible = selectedSubject === 'all' ||
+                            (belongsToSubjects && belongsToSubjects.has(selectedSubject));
+
+                        opt.hidden = !visible;
+
+                        // reset chapter if no longer valid
+                        if (!visible && opt.value === selectedChapter) {
+                            chapterSelect.value = 'all';
+                            selectedChapter = 'all';
+                        }
+                    });
+                }
+
+                // ---- Filter TOPIC options based on selected subject + chapter ----
+                if (topicSelect) {
+                    const selectedTopic = topicSelect.value;
+
+                    topicSelect.querySelectorAll('option').forEach(opt => {
+                        if (opt.value === 'all') return; // always keep "All Topics"
+
+                        const parentChapter = hierarchy.topicChapter[opt.value];
+                        const belongsToSubjects = hierarchy.topicSubject[opt.value];
+
+                        const matchesChapter = selectedChapter === 'all' || parentChapter === selectedChapter;
+                        const matchesSubject = selectedSubject === 'all' ||
+                            (belongsToSubjects && belongsToSubjects.has(selectedSubject));
+
+                        const visible = matchesChapter && matchesSubject;
+                        opt.hidden = !visible;
+
+                        // reset topic if no longer valid
+                        if (!visible && opt.value === selectedTopic) {
+                            topicSelect.value = 'all';
+                        }
+                    });
+                }
+            }
+
+            // ---------- Apply row filtering (unchanged logic, runs after dropdown update) ----------
             function applyFilters(section) {
                 const bar = document.querySelector(`.filter-bar[data-section="${section}"]`);
                 if (!bar) return;
@@ -801,22 +890,34 @@
                 }
             }
 
+            // ---------- Wire everything up per section ----------
             document.querySelectorAll('.filter-bar').forEach(bar => {
                 const section = bar.dataset.section;
+                const rowClass = section === 'mock' ? '.mock-test-row' : '.previous-test-row';
+                const hierarchy = buildHierarchy(rowClass);
+
+                // initial pass in case something is pre-selected
+                updateDropdownOptions(section, hierarchy);
 
                 bar.querySelectorAll('.filter-select').forEach(sel => {
-                    sel.addEventListener('change', () => applyFilters(section));
+                    sel.addEventListener('change', (e) => {
+                        // cascade child dropdowns when subject or chapter changes
+                        if (e.target.dataset.type === 'subject' || e.target.dataset.type === 'chapter') {
+                            updateDropdownOptions(section, hierarchy);
+                        }
+                        applyFilters(section);
+                    });
                 });
 
                 const resetBtn = bar.querySelector('[data-reset]');
                 if (resetBtn) {
                     resetBtn.addEventListener('click', () => {
                         bar.querySelectorAll('.filter-select').forEach(sel => sel.value = 'all');
+                        updateDropdownOptions(section, hierarchy);
                         applyFilters(section);
                     });
                 }
             });
         });
     </script>
-
 @endsection

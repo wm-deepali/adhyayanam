@@ -1257,6 +1257,24 @@ function loadSubjects(row) {
             }, 50);
         });
 
+$(document).on('click', '.remove-row', function () {
+    const totalRows = $('.question-row').length;
+
+    if (totalRows <= 1) {
+        alert('At least one test type row is required.');
+        return;
+    }
+
+    // destroy select2 before removing DOM, warna orphan select2 dropdowns reh jaate hain
+    const $row = $(this).closest('.question-row');
+    $row.find('.subject_ids, .chapter_ids, .topic_ids').each(function () {
+        if ($(this).hasClass('select2-hidden-accessible')) {
+            $(this).select2('destroy');
+        }
+    });
+
+    $row.remove();
+});
 
     </script>
 @endsection

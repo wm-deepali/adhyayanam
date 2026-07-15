@@ -178,10 +178,10 @@
     <div class="modal fade" id="walletCheckoutModal" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
-                            aria-hidden="true">&times;</span></button>
-                    <h5 class="modal-title fw-bold">Confirm Purchase</h5>
+                <div class="modal-content">
+                   <div class="modal-header">
+                    <h5 class="modal-title fw-bold" id="checkoutModalCourseName">Confirm Enrollment</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body" style="padding: 24px;">
 
@@ -234,8 +234,8 @@
 
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+               <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="button" class="btn btn-primary" id="confirmEnrollBtn" style="display:none;">
                         Proceed to Pay <span id="confirmEnrollAmount"></span>
                     </button>

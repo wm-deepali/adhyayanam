@@ -71,7 +71,7 @@ Route::get('/about', function () {
 });
 
 Route::get('pyq-papers/{examSlug?}/{catSlug?}/{subCatSlug?}', [FrontController::class, 'pyqPapers'])->name('pyq-papers');
-Route::get('test-series/details/{slug}/{id}', [FrontController::class, 'testseriesDetail'])->name('test-series-detail');
+Route::get('test-series/{slug}/{id}', [FrontController::class, 'testseriesDetail'])->name('test-series-detail');
 Route::get('test-series-list/{examSlug?}/{catSlug?}/{subCatSlug?}', [FrontController::class, 'testseriesIndex'])->name('test-series-list');
 
 Route::get('/test/download/{id}', [FrontController::class, 'testDownload'])->name('test.download');
@@ -99,7 +99,9 @@ Route::get('blog-articles', [FrontController::class, 'blogIndex'])->name('blog.a
 Route::get('blog-details/{id}', [FrontController::class, 'blogDetailsIndex'])->name('blog.details');
 Route::get('career', [FrontController::class, 'careerIndex'])->name('career');
 Route::post('career/store', [FrontController::class, 'careerStore'])->name('career.store');
-Route::get('courses/details/{id}', [FrontController::class, 'courseDetails'])->name('courses.detail');
+Route::get('course/{slug}/{id}', [FrontController::class, 'courseDetails'])
+    ->where('id', '[0-9]+')
+    ->name('courses.detail');
 Route::get('courses/{examSlug?}/{catSlug?}/{subCatSlug?}', [FrontController::class, 'courseIndex'])->name('courses');
 Route::get('direct-enquiry', [FrontController::class, 'enquiryIndex'])->name('enquiry.direct');
 Route::post('direct-enquiry/store', [FrontController::class, 'enquiryStore'])->name('enquiry.store');
@@ -115,8 +117,9 @@ Route::get('/daily-booster/detail/{id}', [FrontController::class, 'dailyBoostDet
 
 Route::get('user/test-planner', [FrontController::class, 'testPlannerIndex'])->name('test.planner.front');
 Route::get('user/test-planner/details/{id}', [FrontController::class, 'testPlannerDetails'])->name('test.planner.details');
-Route::get('user/study-material/details/{id}', [FrontController::class, 'studyMaterialDetails'])->name('study.material.details');
-
+Route::get('materials/{slug}/{id}', [FrontController::class, 'studyMaterialDetails'])
+    ->where('id', '[0-9]+')
+    ->name('study.material.details');
 
 Route::get('study-material/{id}/download', [ContentManagementController::class, 'downloadPdf'])->name('study.material.download');
 Route::get('user/study-material/{examSlug?}/{catSlug?}/{subCatSlug?}', [FrontController::class, 'studyMaterialIndex'])->name('study.material.front');
@@ -247,6 +250,10 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
 
     })->name('student.login');
 
+
+// routes/web.php ya api.php
+Route::post('/payment/webhook/cashfree', [App\Http\Controllers\PaymentController::class, 'cashfreeWebhook'])->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
+    
     // student panel routes
     Route::middleware(['auth', 'isStudent'])->group(function () {
 

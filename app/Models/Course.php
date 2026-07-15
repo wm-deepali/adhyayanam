@@ -2,12 +2,15 @@
 
 namespace App\Models;
 
+use App\Traits\HasSlug;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Course extends Model
 {
-    use HasFactory;
+     use HasFactory, HasSlug;
+
+    protected $slugSource = 'name'; // course ka slug 'name' field se banega
 
     protected $table = 'course';
 
@@ -16,6 +19,7 @@ class Course extends Model
         'category_id',
         'sub_category_id',
         'name',
+        'slug',
         'duration',
         'weekly_study',
         'course_fee',

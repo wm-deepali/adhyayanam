@@ -572,7 +572,7 @@
 
                     <div class="edu-card">
                       <div class="edu-card-image">
-                        <a href="{{ route('study.material.details', $material->id) }}" class="block">
+                        <a href="{{ route('study.material.details', [$material->slug, $material->id])) }}" class="block">
                           <img src="{{ url('storage/' . $material->banner) }}" alt="{{ $material->title }}"
                             class="edu-thumbnail">
                         </a>
@@ -593,7 +593,7 @@
                         </p>
 
                         <h3 class="edu-title">
-                          <a href="{{ route('study.material.details', $material->id) }}">{{ $material->title }}</a>
+                          <a href="{{ route('study.material.details', [$material->slug, $material->id]) }}">{{ $material->title }}</a>
                         </h3>
 
                         <p class="edu-description">{{ $material->short_description }}
@@ -601,7 +601,7 @@
 
                         <div class="edu-actions">
 
-                          <a href="{{ route('study.material.details', $material->id) }}" class="edu-btn edu-btn-outline"
+                          <a href="{{ route('study.material.details', [$material->slug, $material->id]) }}" class="edu-btn edu-btn-outline"
                             style="width: 100%;display: flex;justify-content: center; text-align: center;">
                             View Details
                             <span class="arrow-icon flaticon-arrow-pointing-to-right"></span>

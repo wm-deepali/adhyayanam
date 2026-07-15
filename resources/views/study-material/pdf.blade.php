@@ -129,38 +129,43 @@
             max-width: 200px;
         }
 
-        /* ---- Footer ---- */
-        .pdf-footer {
+         .watermark {
             position: fixed;
-            bottom: -20px;
+            top: 35%;
             left: 0;
             right: 0;
-            font-size: 9px;
-            color: #777;
-            border-top: 1px solid #ccc;
-            padding-top: 4px;
-            overflow: hidden;
+            text-align: center;
+            z-index: -1;
         }
 
-        .pdf-footer .left {
-            float: left;
+        .watermark img {
+            width: 300px;
+            opacity: 0.08;
+            transform: rotate(-30deg);
         }
 
-        .pdf-footer .right {
-            float: right;
+        .watermark-text {
+            font-size: 60px;
+            color: rgba(0, 0, 0, 0.08);
+            transform: rotate(-30deg);
+            font-weight: bold;
         }
+
     </style>
 </head>
 
 <body>
 
-    {{-- BRAND HEADER --}}
-    <div class="brand-header">
-        @if($logoBase64)
-            <img src="{{ $logoBase64 }}" alt="Logo"><br>
-        @endif
-        <div class="tagline">{{ strtoupper(config('app.name')) }} &bull; STUDY MATERIAL</div>
+     @if($logoBase64)
+    <div class="watermark">
+        <img src="{{ $logoBase64 }}" alt="Watermark Logo">
     </div>
+@else
+    <div class="watermark watermark-text">
+        {{ config('app.name') }}
+    </div>
+@endif
+
 
     {{-- REF / DATE --}}
     <div class="ref-row">
@@ -270,12 +275,7 @@
         @endforeach
     @endif
 
-    {{-- FOOTER --}}
-    <div class="pdf-footer">
-        <span class="left">© {{ date('Y') }} {{ config('app.name') }}. All Rights Reserved.</span>
-        <span class="right">Confidential Study Document</span>
-    </div>
-
+   
 </body>
 
 </html>

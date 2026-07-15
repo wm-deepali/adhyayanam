@@ -45,8 +45,7 @@ use PHPHtmlParser\Dom;
 use Illuminate\Support\Arr;
 use Maatwebsite\Excel\Concerns\Importable;
 use Maatwebsite\Excel\HeadingRowImport;
-use Barryvdh\DomPDF\Facade\Pdf;
-use Mpdf\Mpdf;
+use Spatie\Browsershot\Browsershot;
 
 class TestController extends Controller
 {
@@ -862,6 +861,8 @@ class TestController extends Controller
 
 
 
+
+
     public function download($id)
     {
         set_time_limit(120);
@@ -879,54 +880,33 @@ class TestController extends Controller
 
         $logoPath = public_path('images/Neti-logo.png');
         $logoBase64 = null;
-
         if (file_exists($logoPath)) {
             $type = pathinfo($logoPath, PATHINFO_EXTENSION);
-            $data = file_get_contents($logoPath);
-            $logoBase64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+            $logoBase64 = 'data:image/' . $type . ';base64,' . base64_encode(file_get_contents($logoPath));
         }
 
         $html = view('test-paper.pdf-view', compact('paper', 'logoBase64'))->render();
 
-        $mpdf = new Mpdf([
-            'mode' => 'utf-8',
-            'format' => 'A4',
-            'margin_top' => 10,
-            'margin_bottom' => 20,   // leaves room for the fixed footer
-            'margin_left' => 12,
-            'margin_right' => 12,
-            'fontDir' => array_merge(
-                (new \Mpdf\Config\ConfigVariables())->getDefaults()['fontDir'],
-                [storage_path('fonts')]
-            ),
-            'fontdata' => array_merge(
-                (new \Mpdf\Config\FontVariables())->getDefaults()['fontdata'],
-                [
-                    'notodevanagari' => [
-                        'R' => 'NotoSansDevanagari-Regular.ttf',
-                    ],
-                ]
-            ),
-            'default_font' => 'notodevanagari',
-        ]);
+        $footerHtml = '
+    <div style="width:100%; font-family: \'notodevanagari\', sans-serif; font-size:8px; color:#718096;
+                padding:4px 30px 0 30px; border-top:1px solid #e2e8f0; display:flex; justify-content:space-between;">
+        <span>© ' . date('Y') . ' ' . config('app.name') . '. All Rights Reserved.</span>
+        <span>Confidential Assessment Document</span>
+    </div>';
 
-        // ---- WATERMARK ----
-        if ($logoPath && file_exists($logoPath)) {
-            // SetWatermarkImage($src, $alpha, $size, $pos)
-            $mpdf->SetWatermarkImage($logoPath, 0.06, [140, 140], 'P'); // 'P' = centered per page
-            $mpdf->showWatermarkImage = true;
-        } else {
-            $mpdf->SetWatermarkText(config('app.name'), 0.06);
-            $mpdf->showWatermarkText = true;
-        }
+        $pdf = Browsershot::html($html)
+            ->format('A4')
+            ->margins(10, 12, 22, 12)
+            ->showBackground()
+            ->showBrowserHeaderAndFooter()
+            ->hideHeader()
+            ->footerHtml($footerHtml)
+            ->pdf();
 
-        $mpdf->WriteHTML($html);
-
-        return response($mpdf->Output($paper->name . '.pdf', 'S'), 200)
+        return response($pdf, 200)
             ->header('Content-Type', 'application/pdf')
             ->header('Content-Disposition', 'inline; filename="' . $paper->name . '.pdf"');
     }
-
 
     public function edit($id)
     {

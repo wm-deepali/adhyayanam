@@ -53,7 +53,8 @@ use App\Models\AboutPageSection;
 use App\Models\AboutPageCounter;
 use App\Models\AboutPageHighlight;
 use App\Models\AboutPageStrength;
-use Mpdf\Mpdf;
+use Spatie\Browsershot\Browsershot;
+
 
 class FrontController extends Controller
 {
@@ -413,13 +414,15 @@ class FrontController extends Controller
         return view('front.user.courses', $data);
     }
 
-    public function courseDetails($id)
+    public function courseDetails($slug, $id)
     {
-        $course = Course::withCount([
-            'orders as orders_count' => function ($q) {
-                $q->where('order_status', 'PAID');
-            }
-        ])->findOrFail($id);
+        $course = Course::where('id', $id)
+            ->where('slug', $slug)
+            ->withCount([
+                'orders as orders_count' => function ($q) {
+                    $q->where('order_status', 'PAID');
+                }
+            ])->firstOrFail();
 
         $avgRating = round($course->reviews->avg('rating'), 1);
         $totalReviews = $course->reviews->count();
@@ -763,10 +766,13 @@ class FrontController extends Controller
         return view('front.user.study-material-all-list', $data);
 
     }
-    public function studyMaterialDetails($id)
+    public function studyMaterialDetails($slug, $id)
     {
         // Get the main study material
-        $studyMaterial = StudyMaterial::with('sections')->findOrFail($id);
+        $studyMaterial = StudyMaterial::with('sections')
+            ->where('id', $id)
+            ->where('slug', $slug)
+            ->firstOrFail();
 
         // Directly use arrays (since they're stored as arrays, not JSON)
         $topicIds = $studyMaterial->topic_id ?? [];
@@ -776,7 +782,6 @@ class FrontController extends Controller
         $related = StudyMaterial::where('id', '!=', $studyMaterial->id)
             ->where(function ($query) use ($studyMaterial, $topicIds, $chapterIds, $subjectIds) {
 
-                // Match by topics
                 if (!empty($topicIds)) {
                     $query->where(function ($q) use ($topicIds) {
                         foreach ($topicIds as $topicId) {
@@ -785,7 +790,6 @@ class FrontController extends Controller
                     });
                 }
 
-                // Match by chapters
                 if (!empty($chapterIds)) {
                     $query->orWhere(function ($q) use ($chapterIds) {
                         foreach ($chapterIds as $chapterId) {
@@ -794,7 +798,6 @@ class FrontController extends Controller
                     });
                 }
 
-                // Match by subjects
                 if (!empty($subjectIds)) {
                     $query->orWhere(function ($q) use ($subjectIds) {
                         foreach ($subjectIds as $subjectId) {
@@ -803,9 +806,7 @@ class FrontController extends Controller
                     });
                 }
 
-                // Fallback: Same category
                 $query->orWhere('category_id', $studyMaterial->category_id);
-
             })
             ->take(5)
             ->get();
@@ -815,7 +816,6 @@ class FrontController extends Controller
             'relatedMaterials' => $related,
         ]);
     }
-
 
     public function studyMaterialFilter(Request $request)
     {
@@ -1367,52 +1367,33 @@ class FrontController extends Controller
 
         $logoPath = public_path('images/Neti-logo.png');
         $logoBase64 = null;
-
         if (file_exists($logoPath)) {
             $type = pathinfo($logoPath, PATHINFO_EXTENSION);
-            $data = file_get_contents($logoPath);
-            $logoBase64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+            $logoBase64 = 'data:image/' . $type . ';base64,' . base64_encode(file_get_contents($logoPath));
         }
 
         $html = view('test-paper.pdf-view', compact('paper', 'logoBase64'))->render();
 
-        $mpdf = new Mpdf([
-            'mode' => 'utf-8',
-            'format' => 'A4',
-            'margin_top' => 10,
-            'margin_bottom' => 20,   // leaves room for the fixed footer
-            'margin_left' => 12,
-            'margin_right' => 12,
-            'fontDir' => array_merge(
-                (new \Mpdf\Config\ConfigVariables())->getDefaults()['fontDir'],
-                [storage_path('fonts')]
-            ),
-            'fontdata' => array_merge(
-                (new \Mpdf\Config\FontVariables())->getDefaults()['fontdata'],
-                [
-                    'notodevanagari' => [
-                        'R' => 'NotoSansDevanagari-Regular.ttf',
-                    ],
-                ]
-            ),
-            'default_font' => 'notodevanagari',
-        ]);
+        $footerHtml = '
+    <div style="width:100%; font-family: \'notodevanagari\', sans-serif; font-size:8px; color:#718096;
+                padding:4px 30px 0 30px; border-top:1px solid #e2e8f0; display:flex; justify-content:space-between;">
+        <span>© ' . date('Y') . ' ' . config('app.name') . '. All Rights Reserved.</span>
+        <span>Confidential Assessment Document</span>
+    </div>';
 
-        // ---- WATERMARK ----
-        if ($logoPath && file_exists($logoPath)) {
-            // SetWatermarkImage($src, $alpha, $size, $pos)
-            $mpdf->SetWatermarkImage($logoPath, 0.06, [140, 140], 'P'); // 'P' = centered per page
-            $mpdf->showWatermarkImage = true;
-        } else {
-            $mpdf->SetWatermarkText(config('app.name'), 0.06);
-            $mpdf->showWatermarkText = true;
-        }
+        $pdf = Browsershot::html($html)
+            ->format('A4')
+            ->margins(10, 12, 22, 12)
+            ->showBackground()
+            ->showBrowserHeaderAndFooter()
+            ->hideHeader()
+            ->footerHtml($footerHtml)
+            ->pdf();
 
-        $mpdf->WriteHTML($html);
-
-        return response($mpdf->Output($paper->name . '.pdf', 'S'), 200)
+        return response($pdf, 200)
             ->header('Content-Type', 'application/pdf')
             ->header('Content-Disposition', 'inline; filename="' . $paper->name . '.pdf"');
+
     }
 
     public function logout()

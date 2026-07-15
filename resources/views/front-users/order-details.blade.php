@@ -128,7 +128,7 @@
     </style>
 
     @php
-        // payment_status stores: Success | Failed | Cancelled | Pending
+        // payment_status stores: PAID | FAILED | CANCELLED | PENDING
         $badgeClass = match ($order->payment_status) {
             'PAID' => 'bg-success',
             'CANCELLED' => 'bg-secondary',
@@ -137,10 +137,15 @@
         };
 
         $isPaid = $order->payment_status == 'PAID';
+        $isPending = $order->payment_status == 'PENDING';
 
+        // ✅ FIX: PENDING no longer talks about "refund" — nothing has failed yet,
+        // the payment is still awaiting bank confirmation. Refund language is
+        // reserved for FAILED / CANCELLED where money may actually have moved
+        // and come back.
         $statusNote = match ($order->payment_status) {
             'CANCELLED' => 'This payment was cancelled before completion. No amount was deducted.',
-            'PENDING' => 'This payment was Pending Try again. If any amount was deducted, it will be refunded automatically within 5-7 business days.',
+            'PENDING' => 'This payment is still awaiting confirmation from your bank. This can take a few minutes — please do not make a second payment for this order. This page will reflect the final status automatically once confirmed.',
             'FAILED' => 'This payment could not be completed. If any amount was deducted, it will be refunded automatically within 5-7 business days.',
             default => null,
         };
@@ -243,7 +248,7 @@
                                 <tr>
                                     <td>
                                         Wallet Amount Used
-                                        @if(!$isPaid && ($order->wallet_refunded ?? false))
+                                        @if(!$isPaid && !$isPending && ($order->wallet_refunded ?? false))
                                             <span class="text-muted small">(refunded)</span>
                                         @endif
                                     </td>
@@ -265,6 +270,15 @@
                             </a>
                             <a href="{{route('user.generate-pdf', $order->id)}}" class="btn btn-success" target="_blank">
                                 <i data-feather="download"></i> Download PDF
+                            </a>
+                        </div>
+                    @elseif($isPending)
+                        {{-- ✅ FIX: no "Back to Orders" implying it's over — just let
+                        them refresh, since resolveAndSaveOrder() will update this
+                        order automatically once the webhook/return_url fires. --}}
+                        <div class="invoice-actions">
+                            <a href="{{ url()->current() }}" class="btn btn-outline-warning">
+                                <i data-feather="refresh-cw"></i> Refresh Status
                             </a>
                         </div>
                     @else
@@ -354,7 +368,7 @@
                             <div class="mobile-total-row">
                                 <span>
                                     Wallet Amount Used
-                                    @if(!$isPaid && ($order->wallet_refunded ?? false))
+                                    @if(!$isPaid && !$isPending && ($order->wallet_refunded ?? false))
                                         <span class="text-muted small">(refunded)</span>
                                     @endif
                                 </span>
@@ -384,6 +398,12 @@
                             </a>
                             <a href="{{route('user.generate-pdf', $order->id)}}" class="btn btn-success btn-lg" target="_blank">
                                 <i data-feather="download"></i> Download PDF
+                            </a>
+                        </div>
+                    @elseif($isPending)
+                        <div class="mt-5 d-grid gap-3">
+                            <a href="{{ url()->current() }}" class="btn btn-outline-warning btn-lg">
+                                <i data-feather="refresh-cw"></i> Refresh Status
                             </a>
                         </div>
                     @else

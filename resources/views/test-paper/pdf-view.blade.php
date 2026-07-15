@@ -21,28 +21,9 @@
             padding: 0;
         }
 
-        /* Force Devanagari font everywhere, even over inline styles from rich text editor */
-        body,
-        table,
-        td,
-        th,
-        p,
-        span,
-        div,
-        strong,
-        li,
-        h1,
-        h2,
-        h3,
-        h4,
-        .question,
-        .instructions,
-        .paper-summary {
-            font-family: 'notodevanagari', sans-serif !important;
-        }
 
         .pdf-content {
-            padding: 20px 30px 60px 30px;
+            padding: 20px 30px 20px 30px;
         }
 
         h2,
@@ -121,6 +102,7 @@
             border-top: 3px solid #1a365d;
             padding: 10px 12px;
             background-color: #ebf4ff;
+            page-break-inside: avoid;
         }
 
         .question strong {
@@ -208,38 +190,47 @@
             color: #4a5568;
         }
 
+      
         /* ========================= */
-        /* 🔹 Elegant Footer Styles */
+        /* 🔹 ADDED (Watermark) */
         /* ========================= */
-        .pdf-footer {
-            position: fixed;
-            bottom: 15px;
-            left: 30px;
-            right: 30px;
-            text-align: center;
-            font-size: 9px;
-            color: #718096;
-            border-top: 1px solid #e2e8f0;
-            padding-top: 8px;
-        }
 
-        .pdf-footer table.footer-table {
-            width: 100%;
-            border-collapse: collapse;
-            border: none;
-            margin-bottom: 0;
-        }
+   .watermark {
+    position: fixed;
+    top: 35%;
+    left: 0;
+    right: 0;
+    text-align: center;
+    z-index: -1;
+}
 
-        .pdf-footer table.footer-table td {
-            border: none;
-            padding: 0;
-            font-size: 9px;
-            color: #718096;
-        }
+.watermark img {
+    width: 300px;
+    opacity: 0.08;
+    transform: rotate(-30deg);
+}
+
+.watermark-text {
+    font-size: 60px;
+    color: rgba(0, 0, 0, 0.08);
+    transform: rotate(-30deg);
+    font-weight: bold;
+}
+
     </style>
 </head>
 
 <body>
+
+       @if($logoBase64)
+    <div class="watermark">
+        <img src="{{ $logoBase64 }}" alt="Watermark Logo">
+    </div>
+@else
+    <div class="watermark watermark-text">
+        {{ config('app.name') }}
+    </div>
+@endif
 
     <!-- ======================================= -->
     <!-- 🔹 LETTERHEAD TYPE HEADER (CENTERED LOGO) -->
@@ -442,22 +433,6 @@
             <p class="text-center">No questions found for this test paper.</p>
         @endif
 
-    </div>
-
-    <!-- ========================= -->
-    <!-- 🔹 ELEGANT FOOTER DESIGN -->
-    <!-- ========================= -->
-    <div class="pdf-footer">
-        <table class="footer-table">
-            <tr>
-                <td style="text-align: left;">
-                    © {{ date('Y') }} {{ config('app.name') }}. All Rights Reserved.
-                </td>
-                <td style="text-align: right;">
-                    Confidential Assessment Document
-                </td>
-            </tr>
-        </table>
     </div>
 
 </body>

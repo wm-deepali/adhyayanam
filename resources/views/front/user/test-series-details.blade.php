@@ -741,7 +741,7 @@
         </a>
 
     @else
-                           <button type="button" class="buy-btn" id="openEnrollModalBtn" data-type="test-series"
+    <button type="button" class="buy-btn" id="openEnrollModalBtn" data-type="test-series"
                 data-id="{{ $testseries->id }}" data-name="{{ $testseries->name }}">
                 Enroll Now
               </button>
@@ -860,10 +860,8 @@
                             } else {
                                 $name = 'General';
                             }
-                        @endphp 
-                    <button class="topic-btn">
-
-                        <div class="topic-icon">📘</div>
+                        @endphp
+                        <button class="topic-btn"><div class="topic-icon">📘</div>
 
                         <div class="topic-content">
 
@@ -1051,19 +1049,19 @@
 
                         </div>
 
-                        @php
-$student = auth()->user();
+@php
+    $student = auth()->user();
 @endphp
 
-@if($test->test_type == 'free')
+@if($student && $student->type == 'student')
 
-  <a href="{{ route('test.instruction', base64_encode($test->id)) }}" class="unlock-btn">
-                Attempt Test
-            </a>
+    @if($test->test_type == 'free')
 
-@else
+        <a href="{{ route('test.instruction', base64_encode($test->id)) }}" class="unlock-btn">
+            Attempt Test
+        </a>
 
-    @if($student && $student->type == 'student')
+    @else
 
         @php
             $checkExist = Helper::GetStudentOrder('Test Series', $testseries->id, $student->id);
@@ -1082,16 +1080,17 @@ $student = auth()->user();
                 <i class="fa fa-lock"></i>
                 Unlock
             </a>
+
         @endif
 
-    @else
-
-        <a href="{{ route('student.login', ['redirect' => url()->full()]) }}" class="unlock-btn">
-            <i class="fa fa-lock"></i>
-            Unlock
-        </a>
-
     @endif
+
+@else
+
+    <a href="{{ route('student.login', ['redirect' => url()->full()]) }}" class="unlock-btn">
+        <i class="fa fa-lock"></i>
+        Unlock
+    </a>
 
 @endif
 
@@ -1164,10 +1163,9 @@ $student = auth()->user();
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
-                                aria-hidden="true">&times;</span></button>
-                        <h5 class="modal-title fw-bold" id="checkoutModalCourseName">Confirm Enrollment</h5>
-                    </div>
+    <h5 class="modal-title fw-bold" id="checkoutModalCourseName">Confirm Enrollment</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
                     <div class="modal-body" style="padding: 24px;">
 
                         <div id="walletLoadingState" class="text-center py-4">
@@ -1220,11 +1218,11 @@ $student = auth()->user();
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-primary" id="confirmEnrollBtn" style="display:none;">
-                            Proceed to Pay <span id="confirmEnrollAmount"></span>
-                        </button>
-                    </div>
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+    <button type="button" class="btn btn-primary" id="confirmEnrollBtn" style="display:none;">
+        Proceed to Pay <span id="confirmEnrollAmount"></span>
+    </button>
+</div>
                 </div>
             </div>
         </div>

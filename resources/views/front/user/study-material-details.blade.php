@@ -662,7 +662,7 @@
             <h4 class="mb-4 fw-bold">Related Study Materials</h4>
             @forelse($relatedMaterials as $material)
               <div class="related-item">
-                <a href="{{ route('study.material.details', $material->id) }}" class="d-block mb-2">
+                <a href="{{ route('study.material.details', [$material->slug, $material->id]) }}" class="d-block mb-2">
                   <strong>{{ Str::limit($material->title, 45) }}</strong>
                 </a>
                 <p class="small text-muted mb-2">
@@ -695,10 +695,9 @@
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
-                                aria-hidden="true">&times;</span></button>
-                        <h5 class="modal-title fw-bold" id="checkoutModalCourseName">Confirm Enrollment</h5>
-                    </div>
+                    <h5 class="modal-title fw-bold" id="checkoutModalCourseName">Confirm Enrollment</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
                     <div class="modal-body" style="padding: 24px;">
 
                         <div id="walletLoadingState" class="text-center py-4">
@@ -750,12 +749,12 @@
 
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-primary" id="confirmEnrollBtn" style="display:none;">
-                            Proceed to Pay <span id="confirmEnrollAmount"></span>
-                        </button>
-                    </div>
+                   <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="confirmEnrollBtn" style="display:none;">
+                        Proceed to Pay <span id="confirmEnrollAmount"></span>
+                    </button>
+                </div>
                 </div>
             </div>
         </div>

@@ -2,13 +2,17 @@
 
 namespace App\Models;
 
+use App\Traits\HasSlug;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Collection;
 
 class StudyMaterial extends Model
 {
-    use HasFactory;
+   use HasFactory, HasSlug;
+
+    protected $slugSource = 'title'; // study material ka slug 'title' field se banega
+
     protected $table = 'study_material';
 
     protected $fillable = [
@@ -22,6 +26,7 @@ class StudyMaterial extends Model
         'is_pdf_downloadable',
 
         'title',
+        'slug',
         'short_description',
         'detail_content',
         'status',

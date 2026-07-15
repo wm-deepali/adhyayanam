@@ -384,7 +384,8 @@
                 </div>
 
                 <div class="d-flex flex-column fw-500">
-                    <a href="{{ route('courses.detail', $course->id) }}" class="text-dark mb-1 fs-16">
+                    <a href="{{ route('courses.detail', [$course->slug, $course->id])
+ }}" class="text-dark mb-1 fs-16">
                         {{ $course->title ?? $course->name }}
                     </a>
 
@@ -395,7 +396,8 @@
             </div>
 
             <div>
-                <a href="{{ route('courses.detail', $course->id) }}"
+                <a href="{{ route('courses.detail', [$course->slug, $course->id])
+ }}"
                    class="btn btn-sm btn-warning-light">
                     View
                 </a>
@@ -1074,13 +1076,15 @@
 									{{ strtoupper(substr($course->title ?? $course->name, 0, 1)) }}
 								</div>
 								<div class="course-details">
-									<a href="{{ route('courses.detail', $course->id) }}" class="course-title text-decoration-none">
+									<a href="{{ route('courses.detail', [$course->slug, $course->id])
+ }}" class="course-title text-decoration-none">
 										{{ $course->title ?? $course->name }}
 									</a>
 									<span class="course-price">₹{{ $course->offered_price ?? 0 }}</span>
 								</div>
 							</div>
-							<a href="{{ route('courses.detail', $course->id) }}" class="premium-view-btn">
+							<a href="{{ route('courses.detail', [$course->slug, $course->id])
+ }}" class="premium-view-btn">
 								View
 							</a>
 						</div>

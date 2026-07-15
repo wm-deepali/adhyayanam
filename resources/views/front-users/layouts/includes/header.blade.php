@@ -28,16 +28,16 @@
 	<!-- Header Navbar -->
 	<nav class="navbar navbar-static-top">
 		<!-- Sidebar toggle button-->
-		<!-- <div class="app-menu">
+		<div class="app-menu">
 			<ul class="header-megamenu nav">
 				<li class="">
-					<a href="{{url('/')}}" class="">
+					<!-- <a href="{{url('/')}}" class="">
 						<img src="{{ url('images/Neti-logo.png')}}" alt="logo"
 							style="width:100px; padding-bottom:10px;">
-					</a>
+					</a> -->
 				</li>
 			</ul>
-		</div> -->
+		</div>
 
 		<div class="navbar-custom-menu r-side">
 			<ul class="nav navbar-nav">

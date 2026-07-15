@@ -32,7 +32,7 @@
           <div class="row">
             @foreach($topic->studyMaterials as $data)
             <div class="col-sm-12 col-md-4">
-              <div class="cm-all"><a href="{{route('study.material.details',$data->id)}}">{{$data->title}}</a></div>
+              <div class="cm-all"><a href="{{route('study.material.details', [$data->slug, $data->id])}}">{{$data->title}}</a></div>
             </div>
             @endforeach
           </div>

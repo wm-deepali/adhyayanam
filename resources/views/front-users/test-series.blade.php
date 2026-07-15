@@ -552,57 +552,161 @@
         </div>
     </section>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
+   <script>
+    document.addEventListener('DOMContentLoaded', function () {
 
-            function applyFilters(section) {
-                const bar = document.querySelector(`.filter-bar[data-section="${section}"]`);
-                if (!bar) return;
+        // ---------- Build commission -> category -> subcategory hierarchy from rows ----------
+        function buildHierarchy(rowClass) {
+            const rows = document.querySelectorAll(rowClass);
+            const hierarchy = {
+                categoryCommission: {},     // categoryId -> Set(commissionIds)
+                subCategoryCategory: {},    // subcategoryId -> categoryId
+                subCategoryCommission: {}   // subcategoryId -> Set(commissionIds)
+            };
 
-                const selects = bar.querySelectorAll('.filter-select');
-                const filters = {};
+            rows.forEach(row => {
+                const commission = row.dataset.commission;
+                const category = row.dataset.category;
+                const subcategory = row.dataset.subcategory;
 
-                selects.forEach(sel => {
-                    filters[sel.dataset.type] = sel.value;
-                });
+                if (category && category !== 'none') {
+                    if (!hierarchy.categoryCommission[category]) {
+                        hierarchy.categoryCommission[category] = new Set();
+                    }
+                    hierarchy.categoryCommission[category].add(commission);
+                }
 
-                const rowClass = section === 'purchased' ? '.purchased-series-row' : '.free-series-row';
-                const rows = document.querySelectorAll(rowClass);
-                let visibleCount = 0;
-
-                rows.forEach(row => {
-                    const matches =
-                        (filters.commission === 'all' || row.dataset.commission === filters.commission) &&
-                        (filters.category === 'all' || row.dataset.category === filters.category) &&
-                        (filters.subcategory === 'all' || row.dataset.subcategory === filters.subcategory);
-
-                    row.style.display = matches ? '' : 'none';
-                    if (matches) visibleCount++;
-                });
-
-                const emptyDesktop = document.querySelector(`[data-empty="${section}-desktop"]`);
-                const emptyMobile = document.querySelector(`[data-empty="${section}-mobile"]`);
-
-                if (emptyDesktop) emptyDesktop.style.display = (visibleCount === 0 && rows.length > 0) ? 'block' : 'none';
-                if (emptyMobile) emptyMobile.style.display = (visibleCount === 0 && rows.length > 0) ? 'block' : 'none';
-            }
-
-            document.querySelectorAll('.filter-bar').forEach(bar => {
-                const section = bar.dataset.section;
-
-                bar.querySelectorAll('.filter-select').forEach(sel => {
-                    sel.addEventListener('change', () => applyFilters(section));
-                });
-
-                const resetBtn = bar.querySelector('[data-reset]');
-                if (resetBtn) {
-                    resetBtn.addEventListener('click', () => {
-                        bar.querySelectorAll('.filter-select').forEach(sel => sel.value = 'all');
-                        applyFilters(section);
-                    });
+                if (subcategory && subcategory !== 'none') {
+                    hierarchy.subCategoryCategory[subcategory] = category;
+                    if (!hierarchy.subCategoryCommission[subcategory]) {
+                        hierarchy.subCategoryCommission[subcategory] = new Set();
+                    }
+                    hierarchy.subCategoryCommission[subcategory].add(commission);
                 }
             });
-        });
-    </script>
 
+            return hierarchy;
+        }
+
+        // ---------- Update category & subcategory dropdown OPTIONS based on parent selection ----------
+        function updateDropdownOptions(section, hierarchy) {
+            const bar = document.querySelector(`.filter-bar[data-section="${section}"]`);
+            if (!bar) return;
+
+            const commissionSelect = bar.querySelector('.filter-select[data-type="commission"]');
+            const categorySelect = bar.querySelector('.filter-select[data-type="category"]');
+            const subcategorySelect = bar.querySelector('.filter-select[data-type="subcategory"]');
+
+            const selectedCommission = commissionSelect ? commissionSelect.value : 'all';
+            let selectedCategory = categorySelect ? categorySelect.value : 'all';
+
+            // ---- Filter CATEGORY options based on selected commission ----
+            if (categorySelect) {
+                let categoryChanged = false;
+                categorySelect.querySelectorAll('option').forEach(opt => {
+                    if (opt.value === 'all') return; // always keep "All Categories"
+
+                    const belongsToCommissions = hierarchy.categoryCommission[opt.value];
+                    const visible = selectedCommission === 'all' ||
+                        (belongsToCommissions && belongsToCommissions.has(selectedCommission));
+
+                    opt.hidden = !visible;
+
+                    // if currently selected category is no longer valid, reset it
+                    if (!visible && opt.value === selectedCategory) {
+                        categorySelect.value = 'all';
+                        selectedCategory = 'all';
+                        categoryChanged = true;
+                    }
+                });
+            }
+
+            // ---- Filter SUBCATEGORY options based on selected commission + category ----
+            if (subcategorySelect) {
+                const selectedSubcategory = subcategorySelect.value;
+
+                subcategorySelect.querySelectorAll('option').forEach(opt => {
+                    if (opt.value === 'all') return; // always keep "All Sub Categories"
+
+                    const parentCategory = hierarchy.subCategoryCategory[opt.value];
+                    const belongsToCommissions = hierarchy.subCategoryCommission[opt.value];
+
+                    const matchesCategory = selectedCategory === 'all' || parentCategory === selectedCategory;
+                    const matchesCommission = selectedCommission === 'all' ||
+                        (belongsToCommissions && belongsToCommissions.has(selectedCommission));
+
+                    const visible = matchesCategory && matchesCommission;
+                    opt.hidden = !visible;
+
+                    // if currently selected subcategory is no longer valid, reset it
+                    if (!visible && opt.value === selectedSubcategory) {
+                        subcategorySelect.value = 'all';
+                    }
+                });
+            }
+        }
+
+        // ---------- Apply row filtering (unchanged logic, just runs after dropdown update) ----------
+        function applyFilters(section) {
+            const bar = document.querySelector(`.filter-bar[data-section="${section}"]`);
+            if (!bar) return;
+
+            const selects = bar.querySelectorAll('.filter-select');
+            const filters = {};
+
+            selects.forEach(sel => {
+                filters[sel.dataset.type] = sel.value;
+            });
+
+            const rowClass = section === 'purchased' ? '.purchased-series-row' : '.free-series-row';
+            const rows = document.querySelectorAll(rowClass);
+            let visibleCount = 0;
+
+            rows.forEach(row => {
+                const matches =
+                    (filters.commission === 'all' || row.dataset.commission === filters.commission) &&
+                    (filters.category === 'all' || row.dataset.category === filters.category) &&
+                    (filters.subcategory === 'all' || row.dataset.subcategory === filters.subcategory);
+
+                row.style.display = matches ? '' : 'none';
+                if (matches) visibleCount++;
+            });
+
+            const emptyDesktop = document.querySelector(`[data-empty="${section}-desktop"]`);
+            const emptyMobile = document.querySelector(`[data-empty="${section}-mobile"]`);
+
+            if (emptyDesktop) emptyDesktop.style.display = (visibleCount === 0 && rows.length > 0) ? 'block' : 'none';
+            if (emptyMobile) emptyMobile.style.display = (visibleCount === 0 && rows.length > 0) ? 'block' : 'none';
+        }
+
+        // ---------- Wire everything up per section ----------
+        document.querySelectorAll('.filter-bar').forEach(bar => {
+            const section = bar.dataset.section;
+            const rowClass = section === 'purchased' ? '.purchased-series-row' : '.free-series-row';
+            const hierarchy = buildHierarchy(rowClass);
+
+            // initial pass in case something is pre-selected
+            updateDropdownOptions(section, hierarchy);
+
+            bar.querySelectorAll('.filter-select').forEach(sel => {
+                sel.addEventListener('change', (e) => {
+                    // when commission or category changes, cascade child dropdowns first
+                    if (e.target.dataset.type === 'commission' || e.target.dataset.type === 'category') {
+                        updateDropdownOptions(section, hierarchy);
+                    }
+                    applyFilters(section);
+                });
+            });
+
+            const resetBtn = bar.querySelector('[data-reset]');
+            if (resetBtn) {
+                resetBtn.addEventListener('click', () => {
+                    bar.querySelectorAll('.filter-select').forEach(sel => sel.value = 'all');
+                    updateDropdownOptions(section, hierarchy);
+                    applyFilters(section);
+                });
+            }
+        });
+    });
+</script>
 @endsection

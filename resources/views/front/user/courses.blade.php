@@ -367,7 +367,6 @@
     background: #e2e8f0;
     color: #94a3b8;
   }
-
 </style>
 @section('content')
 
@@ -396,7 +395,8 @@
 
             @if(isset($selectedCategory))
               <li>
-                <a href="{{ route('courses', ['examSlug' => $selectedCommission->slug, 'catSlug' => $selectedCategory->slug]) }}">
+                <a
+                  href="{{ route('courses', ['examSlug' => $selectedCommission->slug, 'catSlug' => $selectedCategory->slug]) }}">
                   {{ $selectedCategory->name }}
                 </a>
               </li>
@@ -438,17 +438,17 @@
                   id="sub-commission-{{ $commission->slug }}">
 
                   @foreach($commission->categories as $category)
-                    <li class="mb-2">
-                      <a href="{{ route('courses', [
-                            'examSlug' => $commission->slug,
-                            'catSlug' => $category->slug
-                          ]) }}"
-                        class="sub-btn d-block py-2 px-3 rounded-3 text-decoration-none
-                              {{ isset($selectedCategory) && $selectedCategory->id == $category->id ? 'active' : '' }}">
-                        {{ $category->name }}
-                      </a>
-                    </li>
-                    <hr class="sub-divider">
+                              <li class="mb-2">
+                                <a href="{{ route('courses', [
+                      'examSlug' => $commission->slug,
+                      'catSlug' => $category->slug
+                    ]) }}"
+                                  class="sub-btn d-block py-2 px-3 rounded-3 text-decoration-none
+                                                              {{ isset($selectedCategory) && $selectedCategory->id == $category->id ? 'active' : '' }}">
+                                  {{ $category->name }}
+                                </a>
+                              </li>
+                              <hr class="sub-divider">
                   @endforeach
 
                 </ul>
@@ -485,17 +485,17 @@
               <ul class="sub-list list-unstyled ms-3 collapse {{ $isCommissionActiveMobile ? 'show' : '' }}"
                 id="sub-commission-mobile-{{ $commission->slug }}">
                 @foreach($commission->categories as $category)
-                  <li class="mb-2">
-                    <a href="{{ route('courses', [
-                          'examSlug' => $commission->slug,
-                          'catSlug' => $category->slug
-                        ]) }}"
-                      class="sub-btn d-block py-2 px-3 rounded-3 text-decoration-none
-                            {{ isset($selectedCategory) && $selectedCategory->id == $category->id ? 'active' : '' }}">
-                      {{ $category->name }}
-                    </a>
-                  </li>
-                  <hr class="sub-divider">
+                          <li class="mb-2">
+                            <a href="{{ route('courses', [
+                    'examSlug' => $commission->slug,
+                    'catSlug' => $category->slug
+                  ]) }}"
+                              class="sub-btn d-block py-2 px-3 rounded-3 text-decoration-none
+                                                        {{ isset($selectedCategory) && $selectedCategory->id == $category->id ? 'active' : '' }}">
+                              {{ $category->name }}
+                            </a>
+                          </li>
+                          <hr class="sub-divider">
                 @endforeach
               </ul>
             @endforeach
@@ -511,12 +511,11 @@
 
             <!-- Toolbar -->
             <div class="toolbar card border-0 shadow-sm rounded-4 mb-4 overflow-hidden" style="background: #f7f7f7">
-              <form method="GET"
-                action="{{ route('courses', array_filter([
-                      'examSlug' => optional($selectedCommission)->slug,
-                      'catSlug' => optional($selectedCategory)->slug,
-                      'subCatSlug' => optional($selectedSubCategory)->slug,
-                    ])) }}">
+              <form method="GET" action="{{ route('courses', array_filter([
+    'examSlug' => optional($selectedCommission)->slug,
+    'catSlug' => optional($selectedCategory)->slug,
+    'subCatSlug' => optional($selectedSubCategory)->slug,
+  ])) }}">
 
                 <div class="card-body d-flex align-items-center justify-content-between flex-wrap gap-3 p-3 px-4">
 
@@ -562,24 +561,24 @@
 
               @if($subcategories->isNotEmpty())
 
-                <a href="{{ route('courses', [
-                      'examSlug' => $selectedCommission->slug,
-                      'catSlug' => $selectedCategory->slug,
-                    ]) }}"
-                  class="btn {{ !isset($selectedSubCategory) ? 'btn-primary' : 'btn-outline-secondary' }} px-4 py-2">
-                  All
-                </a>
+                          <a href="{{ route('courses', [
+                  'examSlug' => $selectedCommission->slug,
+                  'catSlug' => $selectedCategory->slug,
+                ]) }}"
+                            class="btn {{ !isset($selectedSubCategory) ? 'btn-primary' : 'btn-outline-secondary' }} px-4 py-2">
+                            All
+                          </a>
 
-                @foreach($subcategories as $sub)
-                  <a href="{{ route('courses', [
-                        'examSlug' => $selectedCommission->slug,
-                        'catSlug' => $selectedCategory->slug,
-                        'subCatSlug' => $sub->slug
-                      ]) }}"
-                    class="btn {{ isset($selectedSubCategory) && $selectedSubCategory->id == $sub->id ? 'btn-primary' : 'btn-outline-secondary' }} px-4 py-2">
-                    {{ $sub->name }}
-                  </a>
-                @endforeach
+                          @foreach($subcategories as $sub)
+                                    <a href="{{ route('courses', [
+                              'examSlug' => $selectedCommission->slug,
+                              'catSlug' => $selectedCategory->slug,
+                              'subCatSlug' => $sub->slug
+                            ]) }}"
+                                      class="btn {{ isset($selectedSubCategory) && $selectedSubCategory->id == $sub->id ? 'btn-primary' : 'btn-outline-secondary' }} px-4 py-2">
+                                      {{ $sub->name }}
+                                    </a>
+                          @endforeach
 
               @else
 
@@ -595,46 +594,49 @@
               @if($courses->count())
 
                 @foreach($courses as $course)
-                  <div class="edu-course-card col-12 col-md-6 col-xl-4">
-                    <div class="edu-card">
-                      <div class="edu-card-image">
-                        <a href="{{ route('courses.detail', $course->id) }}" class="block">
-                          <img src="{{ url('storage/' . $course->thumbnail_image) }}" alt="{{ $course->image_alt_tag }}"
-                            class="edu-thumbnail">
-                        </a>
-                      </div>
+                              <div class="edu-course-card col-12 col-md-6 col-xl-4">
+                                <div class="edu-card">
+                                  <div class="edu-card-image">
+                                    <a href="{{ route('courses.detail', [$course->slug, $course->id])
+                                     }}" class="block">
+                                      <img src="{{ url('storage/' . $course->thumbnail_image) }}" alt="{{ $course->image_alt_tag }}"
+                                        class="edu-thumbnail">
+                                    </a>
+                                  </div>
 
-                      <div class="edu-card-body">
-                        <div class="edu-meta">
-                          <div class="edu-duration">
-                            <span class="icon flaticon-hourglass"></span>
-                            {{ $course->duration }} Week
-                          </div>
+                                  <div class="edu-card-body">
+                                    <div class="edu-meta">
+                                      <div class="edu-duration">
+                                        <span class="icon flaticon-hourglass"></span>
+                                        {{ $course->duration }} Week
+                                      </div>
 
-                          <div class="edu-price">₹{{ $course->offered_price }}</div>
-                        </div>
-                        <p class="commission-name">{{$course->examinationCommission->name}}</p>
+                                      <div class="edu-price">₹{{ $course->offered_price }}</div>
+                                    </div>
+                                    <p class="commission-name">{{$course->examinationCommission->name}}</p>
 
-                        <h3 class="edu-title">
-                          <a href="{{ route('courses.detail', $course->id) }}">{{ $course->name }}</a>
-                        </h3>
+                                    <h3 class="edu-title">
+                                      <a href="{{ route('courses.detail', [$course->slug, $course->id])
+                   }}">{{ $course->name }}</a>
+                                    </h3>
 
-                        <p class="edu-description">{{ $course->course_heading }}</p>
+                                    <p class="edu-description">{{ $course->course_heading }}</p>
 
-                        <div class="edu-actions">
+                                    <div class="edu-actions">
 
-                          <a href="{{ route('courses.detail', $course->id) }}" class="edu-btn edu-btn-outline" style="width: 100%;
-                                                                              display: flex;
-                                                                              justify-content: center;
-                                                                              text-align: center;
-                                                                          ">
-                            View Details
-                            <span class="arrow-icon flaticon-arrow-pointing-to-right"></span>
-                          </a>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                                      <a href="{{ route('courses.detail', [$course->slug, $course->id])
+                  }}" class="edu-btn edu-btn-outline" style="width: 100%;
+                                                                                                                  display: flex;
+                                                                                                                  justify-content: center;
+                                                                                                                  text-align: center;
+                                                                                                              ">
+                                        View Details
+                                        <span class="arrow-icon flaticon-arrow-pointing-to-right"></span>
+                                      </a>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
                 @endforeach
               @else
 

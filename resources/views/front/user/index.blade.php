@@ -2306,7 +2306,8 @@
 												<div class="edu-card">
 
 													<div class="edu-card-image">
-														<a href="{{ route('courses.detail', $course->id) }}">
+														<a href="{{route('courses.detail', [$course->slug, $course->id])
+ }}">
 															<img src="{{ url('storage/' . $course->thumbnail_image) }}"
 																class="edu-thumbnail">
 														</a>
@@ -2323,7 +2324,8 @@
 														</p>
 
 														<h3 class="edu-title">
-															<a href="{{ route('courses.detail', $course->id) }}">
+															<a href="{{ route('courses.detail', [$course->slug, $course->id])
+ }}">
 																{{ $course->name }}
 															</a>
 														</h3>
@@ -2332,7 +2334,8 @@
 															{{ $course->course_heading }}
 														</p>
 
-														<a href="{{ route('courses.detail', $course->id) }}"
+														<a href="{{ route('courses.detail', [$course->slug, $course->id])
+ }}"
 															class="edu-btn edu-btn-outline w-100 text-center">
 															View Details
 														</a>
@@ -2397,7 +2400,8 @@
 											data-category-name="{{ addslashes($course->category->name ?? 'Unknown') }}">
 											<div class="edu-card">
 												<div class="edu-card-image">
-													<a href="{{ route('courses.detail', $course->id) }}" class="block">
+													<a href="{{ route('courses.detail', [$course->slug, $course->id])
+ }}" class="block">
 														<img src="{{ url('storage/' . $course->thumbnail_image) }}"
 															alt="{{ $course->image_alt_tag }}" class="edu-thumbnail">
 													</a>
@@ -2413,11 +2417,13 @@
 													<p class="commission-name">{{ $course->examinationCommission->name }}</p>
 													<h3 class="edu-title">
 														<a
-															href="{{ route('courses.detail', $course->id) }}">{{ $course->name }}</a>
+															href="{{ route('courses.detail', [$course->slug, $course->id])
+ }}">{{ $course->name }}</a>
 													</h3>
 													<p class="edu-description">{{ $course->course_heading }}</p>
 													<div class="edu-actions">
-														<a href="{{ route('courses.detail', $course->id) }}"
+														<a href="{{ route('courses.detail', [$course->slug, $course->id])
+ }}"
 															class="edu-btn edu-btn-outline"
 															style="width: 100%; display: flex; justify-content: center; text-align: center;">
 															View Details
@@ -2905,7 +2911,7 @@
 											<div class="study-card-mobile col-12 mt-3">
 												<div class="edu-card">
 													<div class="edu-card-image">
-														<a href="{{ route('study.material.details', $material->id) }}"
+														<a href="{{ route('study.material.details', [$material->slug, $material->id]) }}"
 															class="block">
 															<img src="{{ url('storage/' . $material->banner) }}"
 																alt="{{ $material->title }}" class="edu-thumbnail">
@@ -2924,14 +2930,14 @@
 															{{ $material->subcategory->name ?? '' }}
 														</p>
 														<h3 class="edu-title">
-															<a href="{{ route('study.material.details', $material->id) }}">
+															<a href="{{ route('study.material.details', [$material->slug, $material->id]) }}">
 																{{ $material->title }}
 															</a>
 														</h3>
 														<p class="edu-description">{{ $material->short_description }}
 														</p>
 														<div class="edu-actions">
-															<a href="{{ route('study.material.details', $material->id) }}"
+															<a href="{{ route('study.material.details', [$material->slug, $material->id]) }}"
 																class="edu-btn edu-btn-outline"
 																style="width: 100%; display: flex; justify-content: center; text-align: center;">
 																View Details
@@ -3000,7 +3006,7 @@
 
 																	<div class="edu-card">
 																		<div class="edu-card-image">
-																			<a href="{{ route('study.material.details', $material->id) }}"
+																			<a href="{{ route('study.material.details', [$material->slug, $material->id]) }}"
 																				class="block">
 																				<img src="{{ url('storage/' . $material->banner) }}"
 																					alt="{{ $material->title }}" class="edu-thumbnail">
@@ -3024,7 +3030,7 @@
 																			</p>
 
 																			<h3 class="edu-title">
-																				<a href="{{ route('study.material.details', $material->id) }}">{{
+																				<a href="{{ route('study.material.details', [$material->slug, $material->id]) }}">{{
 										$material->title }}</a>
 																			</h3>
 
@@ -3033,7 +3039,7 @@
 
 																			<div class="edu-actions">
 
-																				<a href="{{ route('study.material.details', $material->id) }}"
+																				<a href="{{ route('study.material.details', [$material->slug, $material->id]) }}"
 																					class="edu-btn edu-btn-outline"
 																					style="width: 100%;display: flex;justify-content: center; text-align: center;">
 																					View Details

@@ -6,6 +6,20 @@
     <meta name="keywords" content="{{ $course->meta_keyword ?? 'default, keywords' }}">
     <link rel="canonical" href="{{ url()->current() }}">
 
+    {{-- Open Graph tags — inse WhatsApp/Facebook/LinkedIn preview mein sahi title, description, image dikhega --}}
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="{{ $course->meta_title ?? $course->name }}">
+    <meta property="og:description" content="{{ $course->meta_description ?? $course->short_description }}">
+    <meta property="og:image" content="{{ asset('storage/' . $course->banner_image) }}">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:site_name" content="{{ config('app.name') }}">
+
+    {{-- Twitter/X Card tags --}}
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ $course->meta_title ?? $course->name }}">
+    <meta name="twitter:description" content="{{ $course->meta_description ?? $course->short_description }}">
+    <meta name="twitter:image" content="{{ asset('storage/' . $course->banner_image) }}">
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
@@ -333,6 +347,14 @@
 
         .news-detail .post-share-options .social-box li a.fa-pinterest-p:hover {
             background: #bd081c;
+        }
+
+        .news-detail .post-share-options .social-box li a.fa-whatsapp:hover {
+            background: #25d366;
+        }
+
+        .news-detail .post-share-options .social-box li a.fa-instagram:hover {
+            background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
         }
 
         /* ====================== SIDEBAR CTA PRICE CARD ====================== */
@@ -890,9 +912,9 @@
 
                         @endif
 
-                    </div>
+                            </div>
 
-                    <div class=" courses">
+                            <div class=" courses">
                             <strong>{{ number_format($course->orders_count ?? 0) }}</strong> students enrolled
                     </div>
 
@@ -989,23 +1011,29 @@
                                         <div class="tags-box">Share This Course :</div>
                                         <ul class="social-box">
                                             <li>
-                                                <a class="fa fa-facebook" target="_blank"
+                                                <a class="fa fa-facebook" target="_blank" rel="noopener"
                                                     href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(url()->current()) }}">
                                                 </a>
                                             </li>
                                             <li>
-                                                <a class="fa fa-twitter" target="_blank"
+                                                <a class="fa fa-twitter" target="_blank" rel="noopener"
                                                     href="https://twitter.com/intent/tweet?url={{ urlencode(url()->current()) }}&text={{ urlencode($course->course_heading) }}">
                                                 </a>
                                             </li>
                                             <li>
-                                                <a class="fa fa-linkedin" target="_blank"
+                                                <a class="fa fa-linkedin" target="_blank" rel="noopener"
                                                     href="https://www.linkedin.com/sharing/share-offsite/?url={{ urlencode(url()->current()) }}">
                                                 </a>
                                             </li>
                                             <li>
-                                                <a class="fa fa-pinterest-p" target="_blank"
-                                                    href="https://pinterest.com/pin/create/button/?url={{ urlencode(url()->current()) }}&media={{ url('storage/' . $course->banner_image) }}&description={{ urlencode($course->course_heading) }}">
+                                                <a class="fa fa-whatsapp" target="_blank" rel="noopener"
+                                                    href="https://api.whatsapp.com/send?text={{ urlencode($course->course_heading . ' - ' . url()->current()) }}">
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="fa fa-instagram" href="javascript:void(0);"
+                                                    onclick="copyLinkForInstagram()"
+                                                    title="Copy link to share on Instagram">
                                                 </a>
                                             </li>
                                         </ul>
@@ -1202,9 +1230,8 @@
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
-                                aria-hidden="true">&times;</span></button>
                         <h5 class="modal-title fw-bold" id="checkoutModalCourseName">Confirm Enrollment</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body" style="padding: 24px;">
 
@@ -1258,7 +1285,7 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                         <button type="button" class="btn btn-primary" id="confirmEnrollBtn" style="display:none;">
                             Proceed to Pay <span id="confirmEnrollAmount"></span>
                         </button>
@@ -1273,7 +1300,7 @@
             <input type="hidden" name="wallet_redeem_amount" id="form_redeem_amount" value="0">
         </form>
 
-</body>
+    </body>
 
     <script>
         let currentPackage = { type: null, id: null };
@@ -1392,5 +1419,22 @@
             );
             $('#processOrderForm').submit();
         });
+
+        function copyLinkForInstagram() {
+            const url = "{{ url()->current() }}";
+            navigator.clipboard.writeText(url).then(function () {
+                alert('Link copied!');
+            }).catch(function () {
+                // Fallback for older browsers
+                const tempInput = document.createElement('input');
+                tempInput.value = url;
+                document.body.appendChild(tempInput);
+                tempInput.select();
+                document.execCommand('copy');
+                document.body.removeChild(tempInput);
+                alert('Link copied!');
+            });
+        }
+
     </script>
 @endsection

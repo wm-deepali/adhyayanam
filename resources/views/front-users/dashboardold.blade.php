@@ -109,7 +109,8 @@
                 </div>
 
                 <div class="d-flex flex-column fw-500">
-                    <a href="{{ route('courses.detail', $course->id) }}" class="text-dark mb-1 fs-16">
+                    <a href="{{ route('courses.detail', [$course->slug, $course->id])
+ }}" class="text-dark mb-1 fs-16">
                         {{ $course->title ?? $course->name }}
                     </a>
 
@@ -120,7 +121,8 @@
             </div>
 
             <div>
-                <a href="{{ route('courses.detail', $course->id) }}"
+                <a href="{{ route('courses.detail', [$course->slug, $course->id])
+ }}"
                    class="btn btn-sm btn-warning-light">
                     View
                 </a>

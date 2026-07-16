@@ -1,24 +1,81 @@
 @extends('front.partials.app')
 
 @section('header')
-    <title>{{$course->meta_title ?? 'Course Details'}}</title>
-    <meta name="description" content="{{ $course->meta_description ?? 'Default Description' }}">
-    <meta name="keywords" content="{{ $course->meta_keyword ?? 'default, keywords' }}">
-    <link rel="canonical" href="{{ url()->current() }}">
+@php
+    $ogImage = asset('images/default-course.jpg'); // fallback image
 
-    {{-- Open Graph tags — inse WhatsApp/Facebook/LinkedIn preview mein sahi title, description, image dikhega --}}
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="{{ $course->meta_title ?? $course->name }}">
-    <meta property="og:description" content="{{ $course->meta_description ?? $course->short_description }}">
-    <meta property="og:image" content="{{ asset('storage/' . $course->banner_image) }}">
-    <meta property="og:url" content="{{ url()->current() }}">
-    <meta property="og:site_name" content="{{ config('app.name') }}">
+    // First preference: Banner Image
+    if (!empty($course->banner_image)) {
+        $ogImage = asset('storage/' . $course->banner_image);
+    }
 
-    {{-- Twitter/X Card tags --}}
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="{{ $course->meta_title ?? $course->name }}">
-    <meta name="twitter:description" content="{{ $course->meta_description ?? $course->short_description }}">
-    <meta name="twitter:image" content="{{ asset('storage/' . $course->banner_image) }}">
+    // Second preference: YouTube Thumbnail
+    elseif (!empty($course->youtube_url)) {
+
+        preg_match(
+            '/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([A-Za-z0-9_-]+)/',
+            $course->youtube_url,
+            $matches
+        );
+
+      if (!empty($matches[1])) {
+    $videoId = $matches[1];
+    $ogImage = "https://img.youtube.com/vi/{$videoId}/hqdefault.jpg";
+}
+    }
+@endphp
+<title>{{ $course->meta_title ?? $course->name }}</title>
+
+<meta name="description"
+      content="{{ $course->meta_description ?? strip_tags($course->short_description) }}">
+
+<meta name="keywords"
+      content="{{ $course->meta_keyword }}">
+
+<link rel="canonical"
+      href="{{ url()->current() }}">
+
+{{-- Open Graph --}}
+<meta property="og:type" content="website">
+<meta property="og:title"
+      content="{{ $course->meta_title ?? $course->name }}">
+
+<meta property="og:description"
+      content="{{ $course->meta_description ?? strip_tags($course->short_description) }}">
+
+<meta property="og:url"
+      content="{{ url()->current() }}">
+
+<meta property="og:site_name"
+      content="{{ config('app.name') }}">
+
+<meta property="og:image"
+      content="{{ $ogImage }}">
+
+<meta property="og:image:secure_url"
+      content="{{ $ogImage }}">
+
+<meta property="og:image:type"
+      content="image/jpeg">
+
+<meta property="og:image:width"
+      content="1200">
+
+<meta property="og:image:height"
+      content="630">
+
+{{-- Twitter / X --}}
+<meta name="twitter:card"
+      content="summary_large_image">
+
+<meta name="twitter:title"
+      content="{{ $course->meta_title ?? $course->name }}">
+
+<meta name="twitter:description"
+      content="{{ $course->meta_description ?? strip_tags($course->short_description) }}">
+
+<meta name="twitter:image"
+      content="{{ $ogImage }}">
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
@@ -908,7 +965,7 @@
                             <span class="fa fa-star-o"></span>
                             <span class="fa fa-star-o"></span>
                             <span class="fa fa-star-o"></span>
-                            <span class="text-white>No reviews yet</span>
+                           <span class="text-white">No reviews yet</span>
 
                         @endif
 
@@ -1027,7 +1084,7 @@
                                             </li>
                                             <li>
                                                 <a class="fa fa-whatsapp" target="_blank" rel="noopener"
-                                                    href="https://api.whatsapp.com/send?text={{ urlencode($course->course_heading . ' - ' . url()->current()) }}">
+                                                    href="https://wa.me/?text={{ urlencode($course->course_heading . ' - ' . url()->current()) }}">
                                                 </a>
                                             </li>
                                             <li>

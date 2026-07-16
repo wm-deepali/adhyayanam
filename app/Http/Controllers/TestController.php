@@ -45,7 +45,8 @@ use PHPHtmlParser\Dom;
 use Illuminate\Support\Arr;
 use Maatwebsite\Excel\Concerns\Importable;
 use Maatwebsite\Excel\HeadingRowImport;
-use Spatie\Browsershot\Browsershot;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Mpdf\Mpdf;
 
 class TestController extends Controller
 {
@@ -861,8 +862,6 @@ class TestController extends Controller
 
 
 
-
-
     public function download($id)
     {
         set_time_limit(120);
@@ -880,33 +879,56 @@ class TestController extends Controller
 
         $logoPath = public_path('images/Neti-logo.png');
         $logoBase64 = null;
+
         if (file_exists($logoPath)) {
             $type = pathinfo($logoPath, PATHINFO_EXTENSION);
-            $logoBase64 = 'data:image/' . $type . ';base64,' . base64_encode(file_get_contents($logoPath));
+            $data = file_get_contents($logoPath);
+            $logoBase64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
         }
 
         $html = view('test-paper.pdf-view', compact('paper', 'logoBase64'))->render();
 
-        $footerHtml = '
-    <div style="width:100%; font-family: \'notodevanagari\', sans-serif; font-size:8px; color:#718096;
-                padding:4px 30px 0 30px; border-top:1px solid #e2e8f0; display:flex; justify-content:space-between;">
-        <span>© ' . date('Y') . ' ' . config('app.name') . '. All Rights Reserved.</span>
-        <span>Confidential Assessment Document</span>
-    </div>';
 
-        $pdf = Browsershot::html($html)
-            ->format('A4')
-            ->margins(10, 12, 22, 12)
-            ->showBackground()
-            ->showBrowserHeaderAndFooter()
-            ->hideHeader()
-            ->footerHtml($footerHtml)
-            ->pdf();
+        $mpdf = new \Mpdf\Mpdf([
+            'mode' => 'utf-8',
+            'format' => 'A4',
 
-        return response($pdf, 200)
+            'autoScriptToLang' => true,
+            'autoLangToFont' => true,
+
+            'fontDir' => array_merge(
+                (new \Mpdf\Config\ConfigVariables())->getDefaults()['fontDir'],
+                [storage_path('fonts')]
+            ),
+
+            'fontdata' => array_merge(
+                (new \Mpdf\Config\FontVariables())->getDefaults()['fontdata'],
+                [
+                    'aparajita' => [
+                        'R' => 'aparaj.ttf',
+                    ],
+                ]
+            ),
+
+            'default_font' => 'aparajita',
+        ]);
+        // ---- WATERMARK ----
+        if ($logoPath && file_exists($logoPath)) {
+            // SetWatermarkImage($src, $alpha, $size, $pos)
+            $mpdf->SetWatermarkImage($logoPath, 0.06, [140, 140], 'P'); // 'P' = centered per page
+            $mpdf->showWatermarkImage = true;
+        } else {
+            $mpdf->SetWatermarkText(config('app.name'), 0.06);
+            $mpdf->showWatermarkText = true;
+        }
+
+        $mpdf->WriteHTML($html);
+
+        return response($mpdf->Output($paper->name . '.pdf', 'S'), 200)
             ->header('Content-Type', 'application/pdf')
             ->header('Content-Disposition', 'inline; filename="' . $paper->name . '.pdf"');
     }
+
 
     public function edit($id)
     {
@@ -3010,138 +3032,6 @@ class TestController extends Controller
                 'msgText' => $ex->getMessage(),
             ]);
         }
-    }
-
-    public function exportTests(Request $request)
-    {
-        $query = Test::with([
-            'subject',
-            'topic',
-            'chapter',
-            'commission',
-            'category',
-            'subcategory',
-            'creator'
-        ]);
-
-        // Same filters as listing
-        if ($request->filled('commission_id')) {
-            $query->where('competitive_commission_id', $request->commission_id);
-        }
-
-        if ($request->filled('category_id')) {
-            $query->where('exam_category_id', $request->category_id);
-        }
-
-        if ($request->filled('sub_category_id')) {
-            $query->where('exam_subcategory_id', $request->sub_category_id);
-        }
-
-        if ($request->filled('test_type_filter')) {
-            $query->where('test_type', $request->test_type_filter);
-        }
-
-        if ($request->filled('paper_category')) {
-            $query->where('test_paper_type', $request->paper_category);
-        }
-
-        if ($request->filled('search')) {
-            $search = $request->search;
-
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'LIKE', "%{$search}%")
-                    ->orWhere('test_code', 'LIKE', "%{$search}%")
-                    ->orWhereHas('commission', fn($sub) => $sub->where('name', 'LIKE', "%{$search}%"))
-                    ->orWhereHas('category', fn($sub) => $sub->where('name', 'LIKE', "%{$search}%"))
-                    ->orWhereHas('subcategory', fn($sub) => $sub->where('name', 'LIKE', "%{$search}%"))
-                    ->orWhereHas('subject', fn($sub) => $sub->where('name', 'LIKE', "%{$search}%"))
-                    ->orWhereHas('chapter', fn($sub) => $sub->where('name', 'LIKE', "%{$search}%"))
-                    ->orWhereHas('topic', fn($sub) => $sub->where('name', 'LIKE', "%{$search}%"));
-            });
-        }
-
-        $tests = $query->latest()->get();
-
-        $fileName = 'test-papers-' . now()->format('Y-m-d-His') . '.csv';
-
-        return response()->streamDownload(function () use ($tests) {
-
-            $handle = fopen('php://output', 'w');
-
-            fputcsv($handle, [
-                'Test Code',
-                'Name',
-                'Language',
-                'Test Type',
-                'Paper Type',
-                'Commission',
-                'Category',
-                'Sub Category',
-                'Subject',
-                'Chapter',
-                'Topic',
-                'Duration (Min)',
-                'Total Questions',
-                'Total Marks',
-                'Question Type',
-                'MRP',
-                'Discount',
-                'Offer Price',
-                'Created By',
-                'Created At',
-            ]);
-
-            foreach ($tests as $test) {
-
-                fputcsv($handle, [
-
-                    $test->test_code,
-
-                    $test->name,
-
-                    $test->language,
-
-                    $test->test_type,
-
-                    $test->paper_type == 1 ? 'Previous Year' : 'Regular',
-
-                    $test->commission->name ?? '',
-
-                    $test->category->name ?? '',
-
-                    $test->subcategory->name ?? '',
-
-                    $test->subject->name ?? '',
-
-                    $test->chapter->name ?? '',
-
-                    $test->topic->name ?? '',
-
-                    $test->duration,
-
-                    $test->total_questions,
-
-                    $test->total_marks,
-
-                    $test->test_paper_type,
-
-                    $test->mrp,
-
-                    $test->discount,
-
-                    $test->offer_price,
-
-                    $test->creator->name ?? 'Super Admin',
-
-                    optional($test->created_at)->format('d-m-Y H:i'),
-                ]);
-            }
-
-            fclose($handle);
-
-        }, $fileName, [
-            'Content-Type' => 'text/csv',
-        ]);
     }
 
 }

@@ -63,7 +63,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\WalletTransaction;
 use App\Models\WalletSetting;
 use App\Helpers\Helper;
-use Spatie\Browsershot\Browsershot;
+use Mpdf\Mpdf;
 
 
 class ContentManagementController extends Controller
@@ -3001,8 +3001,8 @@ class ContentManagementController extends Controller
 
     public function downloadPdf($id)
     {
-        set_time_limit(300);
         ini_set('memory_limit', '2048M');
+        set_time_limit(300);
 
         $material = StudyMaterial::with([
             'commission',
@@ -3015,28 +3015,50 @@ class ContentManagementController extends Controller
 
         if (file_exists($logoPath)) {
             $type = pathinfo($logoPath, PATHINFO_EXTENSION);
-            $logoBase64 = 'data:image/' . $type . ';base64,' . base64_encode(file_get_contents($logoPath));
+            $data = file_get_contents($logoPath);
+            $logoBase64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
         }
 
+        // Render blade to HTML string
         $html = view('study-material.pdf', compact('material', 'logoBase64'))->render();
 
-        $footerHtml = '
-    <div style="width:100%; font-family: \'notodevanagari\', sans-serif; font-size:8px; color:#718096;
-                padding:4px 30px 0 30px; border-top:1px solid #e2e8f0; display:flex; justify-content:space-between;">
-        <span>© ' . date('Y') . ' ' . config('app.name') . '. All Rights Reserved.</span>
-        <span>Confidential Document</span>
-    </div>';
+        $mpdf = new \Mpdf\Mpdf([
+            'mode' => 'utf-8',
+            'format' => 'A4',
 
-        $pdf = Browsershot::html($html)
-            ->format('A4')
-            ->margins(10, 12, 22, 12)
-            ->showBackground()
-            ->showBrowserHeaderAndFooter()
-            ->hideHeader()
-            ->footerHtml($footerHtml)
-            ->pdf();
+            'autoScriptToLang' => true,
+            'autoLangToFont' => true,
 
-        return response($pdf, 200)
+            'fontDir' => array_merge(
+                (new \Mpdf\Config\ConfigVariables())->getDefaults()['fontDir'],
+                [storage_path('fonts')]
+            ),
+
+            'fontdata' => array_merge(
+                (new \Mpdf\Config\FontVariables())->getDefaults()['fontdata'],
+                [
+                    'aparajita' => [
+                        'R' => 'aparaj.ttf',
+                    ],
+                ]
+            ),
+
+            'default_font' => 'aparajita',
+        ]);
+
+        // ---- WATERMARK ----
+        if ($logoPath && file_exists($logoPath)) {
+            // SetWatermarkImage($src, $alpha, $size, $pos)
+            $mpdf->SetWatermarkImage($logoPath, 0.07, [140, 140], 'P'); // size in mm, 'P' = centered on page
+            $mpdf->showWatermarkImage = true;
+        } else {
+            $mpdf->SetWatermarkText(config('app.name'), 0.07);
+            $mpdf->showWatermarkText = true;
+        }
+
+        $mpdf->WriteHTML($html);
+
+        return response($mpdf->Output('study_material_' . $material->id . '.pdf', 'S'), 200)
             ->header('Content-Type', 'application/pdf')
             ->header('Content-Disposition', 'attachment; filename="study_material_' . $material->id . '.pdf"');
     }
@@ -5401,7 +5423,6 @@ class ContentManagementController extends Controller
                                 $answer = $answer ?: '';
                             }
 
-
                             // Instruction (optional) - ROW 7
                             $rawInstr = $this->getCellHtml($tables[$i], 7);
                             if ($this->isEmptyCell($rawInstr)) {
@@ -5482,10 +5503,34 @@ class ContentManagementController extends Controller
                             $qTd = $qTr ? $qTr->find('td', 1) : null;
                             $question = $qTd ? $this->normalizeParagraphSpacing($qTd->innerHtml) : null;
 
-                            $questionData['status'] = "Rejected";
+                            $questionData = [];
+                            $questionData['language'] = $request->language;
+                            $questionData['question_category'] = $request->question_category;
                             $questionData['question_type'] = $request->question_type;
+                            $questionData['fee_type'] = $request->fee_type;
+                            $questionData['commission_id'] = $request->commission_id;
+                            $questionData['previous_year'] = $request->previous_year;
+                            $questionData['category_id'] = $request->category_id;
+                            $questionData['sub_category_id'] = $request->sub_category_id;
+                            $questionData['chapter_id'] = $request->chapter_id;
+                            $questionData['subject_id'] = $request->subject_id;
+                            $questionData['topic'] = $request->topic;
                             $questionData['question'] = $question;
+                            $questionData['option_a'] = $option_a;
+                            $questionData['option_b'] = $option_b;
+                            $questionData['option_c'] = $option_c;
+                            $questionData['option_d'] = $option_d;
+                            $questionData['option_e'] = $option_e;
+                            $questionData['image'] = $image;
+                            $questionData['answer'] = $answer ? strtoupper(Str::of($answer)->trim()) : null;
+                            $questionData['has_solution'] = $has_solution;
+                            $questionData['solution'] = $solution;
+                            $questionData['show_on_pyq'] = $show_on_pyq;
+                            $questionData['added_by_id'] = auth()->id();
+                            $questionData['added_by_type'] = 'user';
+                            $questionData['status'] = "Rejected";
                             $questionData['note'] = 'Question Format Issue: ' . $ex->getMessage();
+
                             Question::create($questionData);
                         }
                     }
@@ -5615,10 +5660,32 @@ class ContentManagementController extends Controller
                             $qTd = $qTr ? $qTr->find('td', 1) : null;
                             $question = $qTd ? $this->normalizeParagraphSpacing($qTd->innerHtml) : null;
 
+                            $questionData = [];
+                            $questionData['language'] = $request->language;
+                            $questionData['question_category'] = $request->question_category;
                             $questionData['question_type'] = $request->question_type;
+                            $questionData['fee_type'] = $request->fee_type;
+                            $questionData['commission_id'] = $request->commission_id;
+                            $questionData['previous_year'] = $request->previous_year;
+                            $questionData['category_id'] = $request->category_id;
+                            $questionData['sub_category_id'] = $request->sub_category_id;
+                            $questionData['chapter_id'] = $request->chapter_id;
+                            $questionData['subject_id'] = $request->subject_id;
+                            $questionData['topic'] = $request->topic;
                             $questionData['question'] = $question;
-                            $questionData['note'] = 'Question Format Issue: ' . $ex->getMessage();
+                            $questionData['solution'] = $solution;
+                            $questionData['image'] = $image;
+                            $questionData['answer_format'] = isset($answer_format) ? strip_tags($answer_format) : null;
+                            $questionData['has_solution'] = $has_solution;
+                            $questionData['instruction'] = $instruction;
+                            $questionData['has_instruction'] = $has_instruction;
+                            $questionData['show_on_pyq'] = $show_on_pyq;
+                            $questionData['added_by_id'] = auth()->id();
+                            $questionData['added_by_type'] = 'user';
+                            $questionData['question_type'] = $request->question_type;
                             $questionData['status'] = "Rejected";
+                            $questionData['note'] = 'Question Format Issue: ' . $ex->getMessage();
+
                             Question::create($questionData);
                         }
                     }
@@ -5637,91 +5704,125 @@ class ContentManagementController extends Controller
                     $has_solution = "no";
                     $has_instruction = false;
                     $show_on_pyq = 'no';
+                    $question = null;
+                    $ques = null;
 
-                    if (!isset($tables[1])) {
-                        throw new \Exception('Invalid Story Based document format');
-                    }
-
-                    $qTr = $tables[1]->find('tr', 0);
-                    $qTd = $qTr ? $qTr->find('td', 1) : null;
-                    $question = $qTd ? $this->normalizeParagraphSpacing($qTd->innerHtml) : null;
-
-                    // Image (optional) - ROW 1
-                    $tr1 = $tables[1]->find('tr', 1);
-                    $td1 = $tr1 ? $tr1->find('td', 1) : null;
-                    $imageElement = null;
-                    if ($td1) {
-                        $imgs = $td1->find('img');
-                        if ($imgs && count($imgs) > 0) {
-                            $imageElement = $imgs[0];
+                    try {
+                        if (!isset($tables[1])) {
+                            throw new \Exception('Invalid Story Based document format');
                         }
-                    }
 
-                    if ($imageElement) {
-                        $image_64 = $imageElement->src;
-                        $extension = explode('/', explode(':', substr($image_64, 0, strpos($image_64, ';')))[1])[1];
-                        $image = 'question/' . Str::random(40) . '.' . $extension;
-                        Storage::put($image, file_get_contents($image_64));
-                    } else {
-                        $image = NULL;
-                    }
+                        $qTr = $tables[1]->find('tr', 0);
+                        $qTd = $qTr ? $qTr->find('td', 1) : null;
+                        $question = $qTd ? $this->normalizeParagraphSpacing($qTd->innerHtml) : null;
 
-                    // Instruction (optional) - ROW 2
-                    $rawInstr = $this->getCellHtml($tables[1], 2);
-                    if ($this->isEmptyCell($rawInstr)) {
-                        $instruction = NULL;
-                        $has_instruction = false;
-                    } else {
-                        $tr2 = $tables[1]->find('tr', 2);
-                        $td2 = $tr2 ? $tr2->find('td', 1) : null;
-                        $instruction = $td2 ? $this->normalizeParagraphSpacing($td2->innerHtml) : null;
-                        $has_instruction = true;
-                    }
+                        if ($question === null) {
+                            throw new \Exception('Missing passage/question row');
+                        }
 
-                    // PYQ (Story Based - Passage level) - ROW 3
-                    $rawPyq = $this->getCellHtml($tables[1], 3);
-                    $textPyq = strtolower(trim(strip_tags(html_entity_decode($rawPyq ?? '', ENT_QUOTES | ENT_HTML5, 'UTF-8'))));
-                    $show_on_pyq = ($textPyq === 'yes') ? 'yes' : 'no';
+                        // Image (optional) - ROW 1
+                        $tr1 = $tables[1]->find('tr', 1);
+                        $td1 = $tr1 ? $tr1->find('td', 1) : null;
+                        $imageElement = null;
+                        if ($td1) {
+                            $imgs = $td1->find('img');
+                            if ($imgs && count($imgs) > 0) {
+                                $imageElement = $imgs[0];
+                            }
+                        }
 
-                    $questionData['language'] = $request->language;
-                    $questionData['question_category'] = $request->question_category;
-                    $questionData['question_type'] = $request->question_type;
-                    $questionData['fee_type'] = $request->fee_type;
-                    $questionData['commission_id'] = $request->commission_id;
-                    $questionData['previous_year'] = $request->previous_year;
-                    $questionData['category_id'] = $request->category_id;
-                    $questionData['sub_category_id'] = $request->sub_category_id;
-                    $questionData['chapter_id'] = $request->chapter_id;
-                    $questionData['subject_id'] = $request->subject_id;
-                    $questionData['topic'] = $request->topic;
-                    $questionData['question'] = $question;
-                    $questionData['solution'] = $solution;
-                    $questionData['answer_format'] = null;
-                    $questionData['has_solution'] = $has_solution;
-                    $questionData['instruction'] = $instruction;
-                    $questionData['has_instruction'] = $has_instruction;
-                    $questionData['show_on_pyq'] = $show_on_pyq;
-                    $questionData['added_by_id'] = auth()->id();
-                    $questionData['added_by_type'] = 'user';
+                        if ($imageElement) {
+                            $image_64 = $imageElement->src;
+                            $extension = explode('/', explode(':', substr($image_64, 0, strpos($image_64, ';')))[1])[1];
+                            $image = 'question/' . Str::random(40) . '.' . $extension;
+                            Storage::put($image, file_get_contents($image_64));
+                        } else {
+                            $image = NULL;
+                        }
 
-                    $que = Question::where('question', $question)
-                        ->where('commission_id', $request->commission_id)
-                        ->where('category_id', $request->category_id)
-                        ->where('sub_category_id', $request->sub_category_id)
-                        ->where('subject_id', $request->subject_id);
-                    if ($request->previous_year) {
-                        $que = $que->where('previous_year', $request->previous_year);
-                    }
-                    $que = $que->first();
+                        // Instruction (optional) - ROW 2
+                        $rawInstr = $this->getCellHtml($tables[1], 2);
+                        if ($this->isEmptyCell($rawInstr)) {
+                            $instruction = NULL;
+                            $has_instruction = false;
+                        } else {
+                            $tr2 = $tables[1]->find('tr', 2);
+                            $td2 = $tr2 ? $tr2->find('td', 1) : null;
+                            $instruction = $td2 ? $this->normalizeParagraphSpacing($td2->innerHtml) : null;
+                            $has_instruction = true;
+                        }
 
-                    if ($que) {
+                        // PYQ (Story Based - Passage level) - ROW 3
+                        $rawPyq = $this->getCellHtml($tables[1], 3);
+                        $textPyq = strtolower(trim(strip_tags(html_entity_decode($rawPyq ?? '', ENT_QUOTES | ENT_HTML5, 'UTF-8'))));
+                        $show_on_pyq = ($textPyq === 'yes') ? 'yes' : 'no';
+
+                        $questionData['language'] = $request->language;
+                        $questionData['question_category'] = $request->question_category;
+                        $questionData['question_type'] = $request->question_type;
+                        $questionData['fee_type'] = $request->fee_type;
+                        $questionData['commission_id'] = $request->commission_id;
+                        $questionData['previous_year'] = $request->previous_year;
+                        $questionData['category_id'] = $request->category_id;
+                        $questionData['sub_category_id'] = $request->sub_category_id;
+                        $questionData['chapter_id'] = $request->chapter_id;
+                        $questionData['subject_id'] = $request->subject_id;
+                        $questionData['topic'] = $request->topic;
+                        $questionData['question'] = $question;
+                        $questionData['solution'] = $solution;
+                        $questionData['image'] = $image;
+                        $questionData['answer_format'] = null;
+                        $questionData['has_solution'] = $has_solution;
+                        $questionData['instruction'] = $instruction;
+                        $questionData['has_instruction'] = $has_instruction;
+                        $questionData['show_on_pyq'] = $show_on_pyq;
+                        $questionData['added_by_id'] = auth()->id();
+                        $questionData['added_by_type'] = 'user';
+
+                        $que = Question::where('question', $question)
+                            ->where('commission_id', $request->commission_id)
+                            ->where('category_id', $request->category_id)
+                            ->where('sub_category_id', $request->sub_category_id)
+                            ->where('subject_id', $request->subject_id);
+                        if ($request->previous_year) {
+                            $que = $que->where('previous_year', $request->previous_year);
+                        }
+                        $que = $que->first();
+
+                        if ($que) {
+                            $questionData['status'] = "Rejected";
+                            $questionData['note'] = "Already Exists Question.";
+                        } else {
+                            $questionData['status'] = 'Done';
+                        }
+
+                        $ques = Question::create($questionData);
+                    } catch (\Exception $ex) {
+                        $questionData = [];
+                        $questionData['language'] = $request->language;
+                        $questionData['question_category'] = $request->question_category;
+                        $questionData['question_type'] = $request->question_type;
+                        $questionData['fee_type'] = $request->fee_type;
+                        $questionData['commission_id'] = $request->commission_id;
+                        $questionData['previous_year'] = $request->previous_year;
+                        $questionData['category_id'] = $request->category_id;
+                        $questionData['sub_category_id'] = $request->sub_category_id;
+                        $questionData['chapter_id'] = $request->chapter_id;
+                        $questionData['subject_id'] = $request->subject_id;
+                        $questionData['topic'] = $request->topic;
+                        $questionData['question'] = $question;
+                        $questionData['image'] = $image;
+                        $questionData['instruction'] = $instruction;
+                        $questionData['has_instruction'] = $has_instruction;
+                        $questionData['show_on_pyq'] = $show_on_pyq;
+                        $questionData['added_by_id'] = auth()->id();
+                        $questionData['added_by_type'] = 'user';
                         $questionData['status'] = "Rejected";
-                        $questionData['note'] = "Already Exists Question.";
-                    } else {
-                        $questionData['status'] = 'Done';
-                    }
+                        $questionData['note'] = 'Question Format Issue: ' . $ex->getMessage();
 
-                    $ques = Question::create($questionData);
+                        Question::create($questionData);
+                        $ques = null;
+                    }
 
                     if ($ques) {
                         for ($i = 2; $i < count($tables); $i++) {

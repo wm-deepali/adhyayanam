@@ -14,8 +14,17 @@
     <link rel="manifest" href="{{ url('site.webmanifest') }}">
 
     <style>
+        body,
+        table,
+        td,
+        th,
+        p,
+        span,
+        div {
+            font-family: aparajita !important;
+        }
+
         body {
-            font-family: 'notodevanagari', sans-serif;
             font-size: 11px;
             line-height: 1.6;
             color: #222;
@@ -129,7 +138,7 @@
             max-width: 200px;
         }
 
-         .watermark {
+        .watermark {
             position: fixed;
             top: 35%;
             left: 0;
@@ -151,21 +160,39 @@
             font-weight: bold;
         }
 
+
+        /* ---- Footer ---- */
+        .pdf-footer {
+            position: fixed;
+            bottom: -20px;
+            left: 0;
+            right: 0;
+            font-size: 9px;
+            color: #777;
+            border-top: 1px solid #ccc;
+            padding-top: 4px;
+            overflow: hidden;
+        }
+
+        .pdf-footer .left {
+            float: left;
+        }
+
+        .pdf-footer .right {
+            float: right;
+        }
     </style>
 </head>
 
 <body>
 
-     @if($logoBase64)
-    <div class="watermark">
-        <img src="{{ $logoBase64 }}" alt="Watermark Logo">
+    {{-- BRAND HEADER --}}
+    <div class="brand-header">
+        @if($logoBase64)
+            <img src="{{ $logoBase64 }}" alt="Logo"><br>
+        @endif
+        <div class="tagline">{{ strtoupper(config('app.name')) }} &bull; STUDY MATERIAL</div>
     </div>
-@else
-    <div class="watermark watermark-text">
-        {{ config('app.name') }}
-    </div>
-@endif
-
 
     {{-- REF / DATE --}}
     <div class="ref-row">
@@ -275,7 +302,12 @@
         @endforeach
     @endif
 
-   
+    {{-- FOOTER --}}
+    <div class="pdf-footer">
+        <span class="left">© {{ date('Y') }} {{ config('app.name') }}. All Rights Reserved.</span>
+        <span class="right">Confidential Study Document</span>
+    </div>
+
 </body>
 
 </html>

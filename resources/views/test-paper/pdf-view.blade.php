@@ -12,8 +12,17 @@
     <link rel="shortcut icon" href="{{ url('favicon.ico') }}">
     <link rel="manifest" href="{{ url('site.webmanifest') }}">
     <style>
+        body,
+        table,
+        td,
+        th,
+        p,
+        span,
+        div {
+            font-family: aparajita !important;
+        }
+
         body {
-            font-family: 'notodevanagari', sans-serif;
             font-size: 12px;
             line-height: 1.5;
             color: #2d3748;
@@ -21,9 +30,8 @@
             padding: 0;
         }
 
-
         .pdf-content {
-            padding: 20px 30px 20px 30px;
+            padding: 20px 30px 60px 30px;
         }
 
         h2,
@@ -102,7 +110,6 @@
             border-top: 3px solid #1a365d;
             padding: 10px 12px;
             background-color: #ebf4ff;
-            page-break-inside: avoid;
         }
 
         .question strong {
@@ -148,7 +155,7 @@
         }
 
         .site-name {
-            font-family: 'notodevanagari', sans-serif;
+            font-family: 'notodevanagari', 'dejavusanscondensed', sans-serif;
             font-size: 24px;
             font-weight: bold;
             color: #1a365d;
@@ -156,7 +163,7 @@
         }
 
         .header-tagline {
-            font-family: 'notodevanagari', sans-serif;
+            font-family: 'notodevanagari', 'dejavusanscondensed', sans-serif;
             font-size: 10px;
             letter-spacing: 3px;
             text-transform: uppercase;
@@ -166,7 +173,7 @@
         }
 
         .header-contact-info {
-            font-family: 'notodevanagari', sans-serif;
+            font-family: 'notodevanagari', 'dejavusanscondensed', sans-serif;
             font-size: 9px;
             color: #718096;
             margin-top: 6px;
@@ -190,47 +197,38 @@
             color: #4a5568;
         }
 
-      
         /* ========================= */
-        /* 🔹 ADDED (Watermark) */
+        /* 🔹 Elegant Footer Styles */
         /* ========================= */
+        .pdf-footer {
+            position: fixed;
+            bottom: 15px;
+            left: 30px;
+            right: 30px;
+            text-align: center;
+            font-size: 9px;
+            color: #718096;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 8px;
+        }
 
-   .watermark {
-    position: fixed;
-    top: 35%;
-    left: 0;
-    right: 0;
-    text-align: center;
-    z-index: -1;
-}
+        .pdf-footer table.footer-table {
+            width: 100%;
+            border-collapse: collapse;
+            border: none;
+            margin-bottom: 0;
+        }
 
-.watermark img {
-    width: 300px;
-    opacity: 0.08;
-    transform: rotate(-30deg);
-}
-
-.watermark-text {
-    font-size: 60px;
-    color: rgba(0, 0, 0, 0.08);
-    transform: rotate(-30deg);
-    font-weight: bold;
-}
-
+        .pdf-footer table.footer-table td {
+            border: none;
+            padding: 0;
+            font-size: 9px;
+            color: #718096;
+        }
     </style>
 </head>
 
 <body>
-
-       @if($logoBase64)
-    <div class="watermark">
-        <img src="{{ $logoBase64 }}" alt="Watermark Logo">
-    </div>
-@else
-    <div class="watermark watermark-text">
-        {{ config('app.name') }}
-    </div>
-@endif
 
     <!-- ======================================= -->
     <!-- 🔹 LETTERHEAD TYPE HEADER (CENTERED LOGO) -->
@@ -417,22 +415,38 @@
                         'question' => $subQuestion,
                         'marks' => $marks,
                         'index' => $key
-                ])      @elseif(isset($testDetail->question))
+                ])     @elseif(isset($testDetail->question))
                          @php
                             $question = $testDetail->question;
                             $marks = $testDetail->positive_mark ?? $paper->positive_marks_per_question;
                         @endphp
-                                                            @include('test-series.questions', [
-                                                                'question' => $question,
-                                                                'marks' => $marks,
-                                                                'index' => $key
-                                                            ])
+                                                        @include('test-series.questions', [
+                                                            'question' => $question,
+                                                            'marks' => $marks,
+                                                            'index' => $key
+                                                        ])
                     @endif
             @endforeach
         @else
             <p class="text-center">No questions found for this test paper.</p>
         @endif
 
+    </div>
+
+    <!-- ========================= -->
+    <!-- 🔹 ELEGANT FOOTER DESIGN -->
+    <!-- ========================= -->
+    <div class="pdf-footer">
+        <table class="footer-table">
+            <tr>
+                <td style="text-align: left;">
+                    © {{ date('Y') }} {{ config('app.name') }}. All Rights Reserved.
+                </td>
+                <td style="text-align: right;">
+                    Confidential Assessment Document
+                </td>
+            </tr>
+        </table>
     </div>
 
 </body>

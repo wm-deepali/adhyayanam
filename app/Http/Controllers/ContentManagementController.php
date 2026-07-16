@@ -63,7 +63,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\WalletTransaction;
 use App\Models\WalletSetting;
 use App\Helpers\Helper;
-use Spatie\Browsershot\Browsershot;
+use Mpdf\Mpdf;
 
 
 class ContentManagementController extends Controller
@@ -3001,8 +3001,8 @@ class ContentManagementController extends Controller
 
     public function downloadPdf($id)
     {
-        set_time_limit(300);
         ini_set('memory_limit', '2048M');
+        set_time_limit(300);
 
         $material = StudyMaterial::with([
             'commission',
@@ -3015,28 +3015,50 @@ class ContentManagementController extends Controller
 
         if (file_exists($logoPath)) {
             $type = pathinfo($logoPath, PATHINFO_EXTENSION);
-            $logoBase64 = 'data:image/' . $type . ';base64,' . base64_encode(file_get_contents($logoPath));
+            $data = file_get_contents($logoPath);
+            $logoBase64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
         }
 
+        // Render blade to HTML string
         $html = view('study-material.pdf', compact('material', 'logoBase64'))->render();
 
-        $footerHtml = '
-    <div style="width:100%; font-family: \'notodevanagari\', sans-serif; font-size:8px; color:#718096;
-                padding:4px 30px 0 30px; border-top:1px solid #e2e8f0; display:flex; justify-content:space-between;">
-        <span>© ' . date('Y') . ' ' . config('app.name') . '. All Rights Reserved.</span>
-        <span>Confidential Document</span>
-    </div>';
+        $mpdf = new \Mpdf\Mpdf([
+            'mode' => 'utf-8',
+            'format' => 'A4',
 
-        $pdf = Browsershot::html($html)
-            ->format('A4')
-            ->margins(10, 12, 22, 12)
-            ->showBackground()
-            ->showBrowserHeaderAndFooter()
-            ->hideHeader()
-            ->footerHtml($footerHtml)
-            ->pdf();
+            'autoScriptToLang' => true,
+            'autoLangToFont' => true,
 
-        return response($pdf, 200)
+            'fontDir' => array_merge(
+                (new \Mpdf\Config\ConfigVariables())->getDefaults()['fontDir'],
+                [storage_path('fonts')]
+            ),
+
+            'fontdata' => array_merge(
+                (new \Mpdf\Config\FontVariables())->getDefaults()['fontdata'],
+                [
+                    'aparajita' => [
+                        'R' => 'aparaj.ttf',
+                    ],
+                ]
+            ),
+
+            'default_font' => 'aparajita',
+        ]);
+
+        // ---- WATERMARK ----
+        if ($logoPath && file_exists($logoPath)) {
+            // SetWatermarkImage($src, $alpha, $size, $pos)
+            $mpdf->SetWatermarkImage($logoPath, 0.07, [140, 140], 'P'); // size in mm, 'P' = centered on page
+            $mpdf->showWatermarkImage = true;
+        } else {
+            $mpdf->SetWatermarkText(config('app.name'), 0.07);
+            $mpdf->showWatermarkText = true;
+        }
+
+        $mpdf->WriteHTML($html);
+
+        return response($mpdf->Output('study_material_' . $material->id . '.pdf', 'S'), 200)
             ->header('Content-Type', 'application/pdf')
             ->header('Content-Disposition', 'attachment; filename="study_material_' . $material->id . '.pdf"');
     }
